@@ -518,15 +518,6 @@ function calculateGameDimensions() {
   console.log(`Game area: ${actualWidth}x${actualHeight}, Grid: ${gridWidth}x${gridHeight}, Segment: ${segmentSize}`);
 }
 
-// Call this on load and resize
-window.onload = function() {
-  calculateGameDimensions();
-  checkPlayerName();
-};
-
-window.addEventListener('resize', function() {
-  calculateGameDimensions();
-});
   
   // Extended word list with 30 words
   const words = [
@@ -564,7 +555,7 @@ window.addEventListener('resize', function() {
   
   let currentWord = null;
   let currentIndex = 0;
-  let snake = [{ x: Math.floor(gridWidth/2), y: Math.floor(gridHeight/2) }];
+  let snake = []; // Initialize empty, will be set in resetGame
   let direction = { x: 1, y: 0 }; // Start moving right
   let score = 0;
   let gameInterval = null;
@@ -683,8 +674,14 @@ function generateLetterPosition() {
   let x, y;
   let attempts = 0;
   const letterSize = 32;
-  const maxX = gridWidth * segmentSize - letterSize;
-  const maxY = gridHeight * segmentSize - letterSize;
+  
+  // Make sure we have valid grid dimensions
+  if (!gridWidth || !gridHeight || !segmentSize) {
+    calculateGameDimensions();
+  }
+  
+  const maxX = Math.max(0, (gridWidth * segmentSize) - letterSize);
+  const maxY = Math.max(0, (gridHeight * segmentSize) - letterSize);
   
   do {
     x = Math.floor(Math.random() * maxX);
@@ -695,7 +692,7 @@ function generateLetterPosition() {
 }
   
   function isNearSnake(x, y) {
-    const safeDistance = 60;
+    const safeDistance = 90;
     return snake.some(segment => {
       const segX = segment.x * segmentSize;
       const segY = segment.y * segmentSize;
