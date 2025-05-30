@@ -500,9 +500,33 @@
   const turnLeftBtn = document.getElementById('turnLeft');
   const turnRightBtn = document.getElementById('turnRight');
   
-  const segmentSize = 20;
-  const gridWidth = Math.floor(350 / segmentSize);
-  const gridHeight = Math.floor(350 / segmentSize);
+// Replace the existing segmentSize and grid calculations with this:
+let segmentSize, gridWidth, gridHeight;
+
+function calculateGameDimensions() {
+  const gameAreaElement = document.getElementById('gameArea');
+  const actualWidth = gameAreaElement.offsetWidth;
+  const actualHeight = gameAreaElement.offsetHeight;
+  
+  // Use the smaller dimension to ensure it fits both width and height
+  const gameSize = Math.min(actualWidth, actualHeight);
+  
+  segmentSize = Math.floor(gameSize / 17); // 17x17 grid for clean division
+  gridWidth = Math.floor(gameSize / segmentSize);
+  gridHeight = Math.floor(gameSize / segmentSize);
+  
+  console.log(`Game area: ${actualWidth}x${actualHeight}, Grid: ${gridWidth}x${gridHeight}, Segment: ${segmentSize}`);
+}
+
+// Call this on load and resize
+window.onload = function() {
+  calculateGameDimensions();
+  checkPlayerName();
+};
+
+window.addEventListener('resize', function() {
+  calculateGameDimensions();
+});
   
   // Extended word list with 30 words
   const words = [
