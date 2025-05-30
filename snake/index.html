@@ -682,29 +682,35 @@
     const distractionLetter = document.getElementById('distractionLetter');
     
     if (correctLetter && isCollision(head, correctLetter)) {
-      currentIndex++;
-      score += 1;
-      currentScore.textContent = score;
-      updateProgress();
-      snake.push({ ...snake[snake.length - 1] });
-      
-      if (currentIndex >= currentWord.eng.length) {
-        // Word completed, get new word
-        currentIndex = 0;
-        currentWord = words[Math.floor(Math.random() * words.length)];
-        englishWord.textContent = currentWord.eng;
-        japaneseWord.textContent = currentWord.jap;
-        updateProgress();
-        score += 5; // Bonus for completing word
-        currentScore.textContent = score;
-      }
-      
-      onCorrectLetterEaten();
-    } else if (distractionLetter && isCollision(head, distractionLetter)) {
-      endGame();
-    } else if (isSelfCollision(head)) {
-      endGame();
-    }
+  currentIndex++;
+  score += 1;
+  currentScore.textContent = score;
+  updateProgress();
+  snake.push({ ...snake[snake.length - 1] });
+  
+  // Speed up at 20 points
+  if (score === 20) {
+    clearInterval(gameInterval);
+    gameInterval = setInterval(moveSnake, 160); // 20% faster
+  }
+  
+  if (currentIndex >= currentWord.eng.length) {
+    // Word completed, get new word
+    currentIndex = 0;
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    englishWord.textContent = currentWord.eng;
+    japaneseWord.textContent = currentWord.jap;
+    updateProgress();
+    score += 5; // Bonus for completing word
+    currentScore.textContent = score;
+  }
+  
+  onCorrectLetterEaten();
+} else if (distractionLetter && isCollision(head, distractionLetter)) {
+  endGame();
+} else if (isSelfCollision(head)) {
+  endGame();
+}
   }
   
   function isCollision(snakePart, letter) {
@@ -821,8 +827,9 @@
   }
   
   function resumeGame() {
-    gameInterval = setInterval(moveSnake, 280);
-  }
+  const speed = score >= 20 ? 160 : 200;
+  gameInterval = setInterval(moveSnake, speed);
+}
   
   // Touch controls
   touchpad.addEventListener('touchstart', handleTouch);
