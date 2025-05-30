@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle</title>
+  <style>
+    body {
+      background-color: #264f75;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .game-container {
+      max-width: 450px;
+      margin: 0 auto;
+    }
+    .best-score {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 0.9rem;
+      color: #fff;
+      background-color: rgba(0,0,0,0.3);
+      padding: 5px 8px;
+      border-radius: 5px;
+    }
+    .grid {
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .row {
+      display: block;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: visible;
+    }
+    .row:last-child {
+      margin-bottom: 0;
+    }
+    .cell {
+      width: 36px;
+      height: 36px;
+      display: inline-block;
+      text-align: center;
+      line-height: 36px;
+      border: 2px solid #ccc;
+      background-color: white;
+      font-size: 1.6rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-right: 4px;
+      vertical-align: top;
+    }
+    .cell:last-child {
+      margin-right: 0;
+    }
+    .cell.correct {
+      background-color: #6aaa64;
+      border-color: #6aaa64;
+    }
+    .cell.present {
+      background-color: #c9b458;
+      border-color: #c9b458;
+    }
+    .cell.absent {
+      background-color: #787c7e;
+      border-color: #787c7e;
+    }
+    .keyboard {
+      display: inline-block;
+      margin-top: 5px;
+      max-width: 400px;
+    }
+    .key {
+      width: 45px;
+      height: 45px;
+      margin: 2px;
+      display: inline-block;
+      text-align: center;
+      line-height: 36px;
+      background-color: #d3d6da;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      vertical-align: top;
+    }
+    .key.correct {
+      background-color: #6aaa64;
+    }
+    .key.present {
+      background-color: #c9b458;
+    }
+    .key.absent {
+      background-color: #787c7e;
+    }
+    .button-container {
+      margin-top: 20px;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #6aaa64;
+      color: white;
+      display: none;
+      margin: 5px;
+    }
+    .score {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 1.2rem;
+      color: white;
+    }
+    .game-over-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 300px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .modal-content p {
+      color: #666;
+      margin: 10px 0;
+    }
+    .modal-button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #6aaa64;
+      color: white;
+    }
+    @media (max-width: 400px) {
+      .game-container {
+        max-width: 100%;
+        padding: 0 5px;
+      }
+      .cell {
+        width: 28px;
+        height: 28px;
+        font-size: 1.2rem;
+        line-height: 28px;
+        margin-right: 3px;
+      }
+      .key {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+        line-height: 28px;
+        margin: 1px;
+      }
+    }
+
+.key.enter {
+  background-color: #6aaa64; /* Green */
+  width: 72px; /* Double width (36px * 2) */
+}
+.key.backspace {
+  background-color: #d32f2f; /* Red */
+}
+.key {
+  color: #000000 !important; /* Force black text */
+  /* your other existing styles */
+}
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="best-score" id="bestScore">Best: 0</div>
+    <div class="grid" id="grid"></div>
+    <div class="keyboard" id="keyboard"></div>
+    <div class="button-container">
+      <button class="button" id="newGameButton">New Game</button>
+      <button class="button" id="retryButton">Retry</button>
+    </div>
+    <div class="score" id="score">Score: 0</div>
+  </div>
+  
+  <div class="game-over-modal" id="gameOverModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Game Over!</h2>
+      <p id="modalMessage"></p>
+      <p id="modalScore"></p>
+      <button class="modal-button" id="modalNewGame">New Game</button>
+      <button class="modal-button" id="modalRetry">Retry</button>
+    </div>
+  </div>
+
+  <script>
+    const words5 = ["fruit", "where", "young", "queen", "rival", "smile", "dance", "fight", "sleep", "bring", "swing", "dream", "prove", "stack", "brave", "solid", "crazy", "scary", "round", "white", "black", "brown", "green", "power", "water", "sound", "house", "horse", "roses", "mouth", "share", "ghost", "luigi", "kitty", "books", "heads", "shape", "robot", "clock", "floor", "music", "party", "happy", "angry", "tired", "chair", "table", "phone", "shoes"];
+    const words6 = ["flower", "dancer", "living", "purple", "doctor", "yakiko", "zebras", "boxing", "winner", "satoko", "debido", "scared", "humble", "cheese", "helper", "waiter", "owners", "chairs","shower", "street", "wanted", "lovers", "monkey", "banana", "builds", "option", "bright", "wooden", "potato", "friend", "family", "castle", "simple", "people", "butter", "coffee", "orange", "cookie"];
+    const allWords = [...words5, ...words6];
+    const customWords = new Set(["yakiko", "satoko", "luigi", "debido", "kitty"]); // Add your custom words here
+    let currentWord;
+    let currentGuess = "";
+    let currentRow = 0;
+    let isGameOver = false;
+    let score = 0;
+    let bestScore = parseInt(localStorage.getItem('wordleBestScore') || '0');
+
+    const grid = document.getElementById("grid");
+    const keyboard = document.getElementById("keyboard");
+    const newGameButton = document.getElementById("newGameButton");
+    const retryButton = document.getElementById("retryButton");
+    const scoreDisplay = document.getElementById("score");
+    const bestScoreDisplay = document.getElementById("bestScore");
+    const gameOverModal = document.getElementById("gameOverModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalMessage = document.getElementById("modalMessage");
+    const modalScore = document.getElementById("modalScore");
+    const modalNewGame = document.getElementById("modalNewGame");
+    const modalRetry = document.getElementById("modalRetry");
+
+    newGameButton.addEventListener("click", newGame);
+    retryButton.addEventListener("click", retryGame);
+    modalNewGame.addEventListener("click", () => {
+      hideModal();
+      newGame();
+    });
+    modalRetry.addEventListener("click", () => {
+      hideModal();
+      retryGame();
+    });
+
+    function updateBestScore() {
+      bestScoreDisplay.textContent = `Best: ${bestScore}`;
+    }
+
+    function showModal(title, message, currentScore) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      modalScore.textContent = `Your Score: ${currentScore}`;
+      gameOverModal.style.display = "flex";
+    }
+
+    function hideModal() {
+      gameOverModal.style.display = "none";
+    }
+
+    function newGame() {
+      resetGame();
+      currentWord = allWords[Math.floor(Math.random() * allWords.length)].toUpperCase();
+      createGrid();
+      createKeyboard();
+    }
+
+    function retryGame() {
+      score = 0;
+      updateScore();
+      resetGame();
+      createGrid();
+      createKeyboard();
+    }
+
+    function resetGame() {
+      currentGuess = "";
+      currentRow = 0;
+      isGameOver = false;
+      grid.innerHTML = "";
+      keyboard.innerHTML = "";
+      newGameButton.style.display = "none";
+      retryButton.style.display = "none";
+    }
+
+    function createGrid() {
+      const rows = currentWord.length === 5 ? 6 : 7;
+      for (let i = 0; i < rows; i++) {
+        const row = document.createElement("div");
+        row.classList.add("row");
+        for (let j = 0; j < currentWord.length; j++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          row.appendChild(cell);
+        }
+        grid.appendChild(row);
+      }
+    }
+
+    function createKeyboard() {
+      const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      keys.forEach(key => {
+        const keyButton = document.createElement("button");
+        keyButton.textContent = key;
+        keyButton.classList.add("key");
+        keyButton.addEventListener("click", () => handleKey(key));
+        keyboard.appendChild(keyButton);
+      });
+
+const enterButton = document.createElement("button");
+enterButton.textContent = "Ent";
+enterButton.classList.add("key", "enter"); // Add both classes
+enterButton.addEventListener("click", handleEnter); // This line was missing!
+keyboard.appendChild(enterButton);
+
+const backspaceButton = document.createElement("button");
+backspaceButton.textContent = "←";
+backspaceButton.classList.add("key", "backspace"); // Add both classes
+      backspaceButton.addEventListener("click", handleBackspace);
+      keyboard.appendChild(backspaceButton);
+    }
+
+    function handleKey(key) {
+      if (currentGuess.length < currentWord.length && currentRow < grid.children.length && !isGameOver) {
+        currentGuess += key;
+        updateGrid();
+      }
+    }
+
+    async function handleEnter() {
+      if (currentGuess.length === currentWord.length && !isGameOver && currentRow < grid.children.length) {
+        const isFinalGuess = currentRow === grid.children.length - 1;
+        const isValid = isFinalGuess || await isValidWord(currentGuess);
+        
+        if (isValid) {
+          checkGuess();
+          currentGuess = "";
+          currentRow++;
+        } else {
+          alert("Invalid word. Try again.");
+        }
+      }
+    }
+
+    function handleBackspace() {
+      if (!isGameOver) {
+        currentGuess = currentGuess.slice(0, -1);
+        updateGrid();
+      }
+    }
+
+    function updateGrid() {
+      const rows = grid.querySelectorAll(".row");
+      if (currentRow < rows.length) {
+        const cells = rows[currentRow].querySelectorAll(".cell");
+        cells.forEach((cell, index) => {
+          cell.textContent = currentGuess[index] || "";
+        });
+      }
+    }
+
+    function checkGuess() {
+      const rows = grid.querySelectorAll(".row");
+      const cells = rows[currentRow].querySelectorAll(".cell");
+      let guessArr = currentGuess.split("");
+      let wordArr = currentWord.split("");
+      let correctCount = 0;
+
+      guessArr.forEach((letter, index) => {
+        if (letter === currentWord[index]) {
+          cells[index].classList.add("correct");
+          updateKeyColor(letter, "correct");
+          wordArr[index] = null;
+          correctCount++;
+        }
+      });
+
+      guessArr.forEach((letter, index) => {
+        if (wordArr.includes(letter) && !cells[index].classList.contains("correct")) {
+          cells[index].classList.add("present");
+          updateKeyColor(letter, "present");
+          wordArr[wordArr.indexOf(letter)] = null;
+        } else if (!cells[index].classList.contains("correct")) {
+          cells[index].classList.add("absent");
+          updateKeyColor(letter, "absent");
+        }
+      });
+
+      if (correctCount === currentWord.length) {
+        isGameOver = true;
+        score++;
+        updateScore();
+        
+        if (score > bestScore) {
+          bestScore = score;
+          localStorage.setItem('wordleBestScore', bestScore.toString());
+          updateBestScore();
+          showModal("Congratulations! 🎉", `You guessed the word! New best score!`, score);
+        } else {
+          showModal("Well Done! 😊", `You guessed the word correctly!`, score);
+        }
+      } else if (currentRow === grid.children.length - 1) {
+        isGameOver = true;
+        showModal("Game Over", `The word was: ${currentWord}`, score);
+        score = 0;
+        updateScore();
+      }
+    }
+
+    function updateKeyColor(letter, color) {
+      const keys = keyboard.querySelectorAll(".key");      
+      keys.forEach(key => {
+        if (key.textContent === letter) {
+          if (!key.classList.contains("correct")) {
+            key.classList.remove("present", "absent");
+            key.classList.add(color);
+          }
+        }
+      });
+    }
+
+    function updateScore() {
+      scoreDisplay.textContent = `Score: ${score}`;
+    }
+
+    async function isValidWord(word) {
+      if (customWords.has(word.toLowerCase())) {
+        return true;
+      }
+
+      const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+      
+      try {
+        const response = await fetch(apiUrl);
+        if (response.ok) {
+          const data = await response.json();
+          return data && data.length > 0;
+        } else {
+          return false;
+        }
+      } catch (error) {
+        console.error('Error fetching word validation:', error);
+        return false;
+      }
+    }
+
+    // Initialize best score display
+    updateBestScore();
+    newGame();
+  </script>
+</body>
+</html>
