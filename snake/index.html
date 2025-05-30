@@ -683,7 +683,7 @@
     
     if (correctLetter && isCollision(head, correctLetter)) {
       currentIndex++;
-      score += 10;
+      score += 1;
       currentScore.textContent = score;
       updateProgress();
       snake.push({ ...snake[snake.length - 1] });
@@ -695,7 +695,7 @@
         englishWord.textContent = currentWord.eng;
         japaneseWord.textContent = currentWord.jap;
         updateProgress();
-        score += 50; // Bonus for completing word
+        score += 5; // Bonus for completing word
         currentScore.textContent = score;
       }
       
