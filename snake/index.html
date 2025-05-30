@@ -11,16 +11,17 @@
     box-sizing: border-box;
   }
   
-  body {
+ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 95vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   padding: 5px;
   box-sizing: border-box;
+  overflow: hidden;
 }
   
   #gameContainer {
@@ -32,7 +33,9 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   width: 100%;
   max-width: 600px;
-}
+  max-height: 95vh;
+  transform-origin: center;
+  transform: scale(var(--scale-factor, 1));
   
   #header {
     display: grid;
@@ -468,6 +471,24 @@
 </div>
 
 <script>
+ // Auto-scale game to fit screen
+function scaleGameToFit() {
+  const container = document.getElementById('gameContainer');
+  const windowHeight = window.innerHeight;
+  const windowWidth = window.innerWidth;
+  
+  // Calculate scale to fit height with some padding
+  const scaleByHeight = (windowHeight * 0.95) / 700; // 700 is approximate container height
+  const scaleByWidth = (windowWidth * 0.95) / 600;   // 600 is max container width
+  
+  const scale = Math.min(scaleByHeight, scaleByWidth, 1); // Don't scale up, only down
+  
+  container.style.setProperty('--scale-factor', scale);
+}
+
+// Scale on load and resize
+window.addEventListener('load', scaleGameToFit);
+window.addEventListener('resize', scaleGameToFit);
   const gameArea = document.getElementById('gameArea');
   const englishWord = document.getElementById('englishWord');
   const japaneseWord = document.getElementById('japaneseWord');
