@@ -776,19 +776,21 @@
 }
   }
   
-  function isCollision(snakePart, letter) {
-    const letterRect = letter.getBoundingClientRect();
-    const gameAreaRect = gameArea.getBoundingClientRect();
-    const letterX = letterRect.left - gameAreaRect.left;
-    const letterY = letterRect.top - gameAreaRect.top;
-    const snakeX = snakePart.x * segmentSize;
-    const snakeY = snakePart.y * segmentSize;
-    
-    return (
-      Math.abs(snakeX - letterX) < segmentSize &&
-      Math.abs(snakeY - letterY) < segmentSize
-    );
-  }
+function isCollision(snakePart, letter) {
+  const letterRect = letter.getBoundingClientRect();
+  const gameAreaRect = gameArea.getBoundingClientRect();
+  const letterX = letterRect.left - gameAreaRect.left;
+  const letterY = letterRect.top - gameAreaRect.top;
+  const snakeX = snakePart.x * segmentSize;
+  const snakeY = snakePart.y * segmentSize;
+  
+  return (
+    snakeX < letterX + 32 &&           // Right edge
+    snakeX + segmentSize > letterX &&  // Left edge
+    snakeY < letterY + 32 &&           // Bottom edge
+    snakeY + segmentSize > letterY     // Top edge
+  );
+}
   
   function isSelfCollision(head) {
     return snake.some((segment, index) => 
