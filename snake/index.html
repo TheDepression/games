@@ -574,7 +574,7 @@
     japaneseWord.textContent = currentWord.jap;
     updateProgress();
     placeLetters();
-    gameInterval = setInterval(moveSnake, 280);
+    gameInterval = setInterval(moveSnake, 200);
     audio.src = 'https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a';
     audio.loop = true;
     audio.play().catch(e => console.log('Audio play failed:', e));
