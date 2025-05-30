@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Snake Letter Quest</title>
 <style>
   * {
@@ -17,135 +17,116 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     color: white;
     padding: 5px;
-    overflow-x: hidden;
+    box-sizing: border-box;
   }
   
   #gameContainer {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 8px;
+    border-radius: 20px;
+    padding: 10px;
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
     border: 1px solid rgba(255, 255, 255, 0.18);
     width: 100%;
-    max-width: 350px;
-    position: relative;
+    max-width: 600px;
   }
   
   #header {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    margin-bottom: 2px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 6px;
     align-items: center;
   }
   
   #playerInfo {
     background: rgba(255, 255, 255, 0.15);
-    padding: 6px;
-    border-radius: 8px;
+    padding: 8px;
+    border-radius: 12px;
     text-align: center;
   }
   
   #playerName {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
     color: #ffd700;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
   }
   
   #highScore {
-    font-size: 8px;
+    font-size: 10px;
     opacity: 0.9;
-  }
-  
-  #scoreInfo {
-    background: rgba(255, 255, 255, 0.15);
-    padding: 6px;
-    border-radius: 8px;
-    text-align: center;
-    position: relative;
-  }
-  
-  #currentScore {
-    font-size: 14px;
-    font-weight: bold;
-    color: #4ecdc4;
-    margin-bottom: 1px;
-  }
-  
-  #progressText {
-    font-size: 8px;
-    opacity: 0.8;
-  }
-  
-  #stopButton {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: linear-gradient(45deg, #e74c3c, #c0392b);
-    border: none;
-    color: white;
-    padding: 3px 6px;
-    border-radius: 8px;
-    font-size: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    z-index: 20;
-  }
-  
-  #gameArea {
-    width: 100%;
-    aspect-ratio: 1;
-    background: linear-gradient(135deg, #74b9ff, #0984e3);
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: inset 0 4px 15px rgba(0,0,0,0.1);
-    margin-bottom: 2px;
   }
   
   #wordDisplay {
     background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-    padding: 6px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 12px;
     text-align: center;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-    margin-bottom: 6px;
+  }
+  
+  #englishWord {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
   }
   
   #japaneseWord {
     font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 2px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-  }
-  
-  #englishWord {
-    font-size: 12px;
     opacity: 0.9;
     font-weight: 300;
+  }
+  
+  #scoreInfo {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  
+  #currentScore {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4ecdc4;
+    margin-bottom: 2px;
+  }
+  
+  #progressText {
+    font-size: 10px;
+    opacity: 0.8;
+  }
+  
+  #gameArea {
+    width: 100%;
+    height: 350px;
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
   }
   
   .letter {
     position: absolute;
     color: white;
-    font-size: 12px;
+    font-size: 20px;
     font-weight: bold;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    width: 20px;
-    height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: transform 0.2s ease;
   }
   
@@ -163,8 +144,8 @@
   }
   
   @keyframes glow {
-    from { box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    to { box-shadow: 0 2px 10px rgba(0, 184, 148, 0.6); }
+    from { box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    to { box-shadow: 0 4px 20px rgba(0, 184, 148, 0.6); }
   }
   
   .snake-segment {
@@ -172,131 +153,85 @@
     background: linear-gradient(45deg, #2ecc71, #27ae60);
     border-radius: 50%;
     transition: all 0.1s ease;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   
   .snake-head {
     background: linear-gradient(45deg, #229954, #1e8449) !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.3);
     z-index: 10;
   }
   
   .snake-head::after {
     content: '👁️';
     position: absolute;
-    font-size: 6px;
+    font-size: 10px;
     transform: translate(-50%, -50%);
     left: 50%;
     top: 50%;
   }
   
-  #touchpad {
-    width: 100px;
-    height: 100px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    margin: 0 auto 8px auto;
+  #turnControls {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    touch-action: none;
-    position: relative;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
-    backdrop-filter: blur(5px);
+    height: 80px;
+    margin-bottom: 8px;
+    padding: 0 20px;
   }
   
-  #touchpad::before, #touchpad::after {
-    content: '';
-    position: absolute;
-    width: 1px;
-    height: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 1px;
-  }
-  
-  #touchpad::before {
-    transform: rotate(45deg);
-  }
-  
-  #touchpad::after {
-    transform: rotate(-45deg);
-  }
-  
-  #touchpad .arrow {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background: rgba(255, 255, 255, 0.2);
+  .turn-button {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 10px;
-    transition: all 0.2s ease;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
     user-select: none;
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    pointer-events: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
   
-  #touchpad .up {
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
+  .turn-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
   }
   
-  #touchpad .down {
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
+  .turn-button:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.35);
   }
   
-  #touchpad .left {
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  #touchpad .right {
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  #gameOverlayButtons {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  #controls {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-    z-index: 15;
-  }
-  
-  #gameOverlayButtons.hidden {
-    display: none;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 8px;
   }
   
   button {
     background: linear-gradient(45deg, #6c5ce7, #a29bfe);
     border: none;
     color: white;
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 10px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
-    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
   }
   
   button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 12px rgba(108, 92, 231, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
   }
   
   button:active {
@@ -308,10 +243,10 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 36px;
+    font-size: 60px;
     font-weight: bold;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
     display: none;
     z-index: 100;
     animation: pulse 0.5s ease-in-out;
@@ -338,31 +273,19 @@
   
   #nameForm {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
-    border-radius: 15px;
+    padding: 25px;
+    border-radius: 20px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    max-width: 280px;
-    margin: 0 10px;
-  }
-  
-  #nameForm h2 {
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-  
-  #nameForm p {
-    font-size: 10px;
-    margin-bottom: 8px;
   }
   
   #nameInput {
-    padding: 6px 12px;
+    padding: 10px 18px;
     border: none;
-    border-radius: 15px;
-    font-size: 12px;
-    margin: 8px 0;
-    width: 160px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin: 12px 0;
+    width: 180px;
     text-align: center;
     background: rgba(255, 255, 255, 0.9);
   }
@@ -382,34 +305,27 @@
   
   #leaderboardContent {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 15px;
-    border-radius: 15px;
-    max-width: 300px;
+    padding: 25px;
+    border-radius: 20px;
+    max-width: 450px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   }
   
-  #leaderboardContent h2 {
-    font-size: 14px;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  
   #leaderboardList {
-    margin: 10px 0;
+    margin: 15px 0;
   }
   
   .leaderboard-entry {
     display: flex;
     justify-content: space-between;
-    padding: 4px 8px;
-    margin: 2px 0;
+    padding: 8px 12px;
+    margin: 4px 0;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
+    border-radius: 8px;
     backdrop-filter: blur(5px);
-    font-size: 10px;
   }
   
   .leaderboard-entry.current-player {
@@ -424,54 +340,68 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: linear-gradient(45deg, #e74c3c, #c0392b);
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 25px;
+    border-radius: 20px;
+    font-size: 20px;
     font-weight: bold;
     color: white;
     text-align: center;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     z-index: 50;
-    max-width: 200px;
   }
   
-  /* Very small screen optimizations */
-  @media (max-width: 320px) {
+  /* Mobile optimizations */
+  @media (max-width: 480px) {
     #gameContainer {
-      padding: 6px;
-      max-width: 310px;
+      padding: 8px;
+      max-width: 95vw;
     }
     
     #header {
-      font-size: 9px;
+      gap: 4px;
+      margin-bottom: 4px;
     }
     
-    #currentScore {
-      font-size: 12px;
+    #playerInfo, #scoreInfo {
+      padding: 6px;
     }
     
-    #touchpad {
-      width: 80px;
-      height: 80px;
-    }
-    
-    .letter {
-      width: 16px;
-      height: 16px;
+    #playerName {
       font-size: 10px;
     }
     
-    button {
-      font-size: 9px;
-      padding: 4px 8px;
+    #currentScore {
+      font-size: 16px;
+    }
+    
+    #englishWord {
+      font-size: 18px;
     }
     
     #japaneseWord {
       font-size: 12px;
     }
     
-    #englishWord {
-      font-size: 10px;
+    .turn-button {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+    }
+    
+    #turnControls {
+      height: 60px;
+      padding: 0 15px;
+    }
+    
+    .letter {
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+    }
+    
+    button {
+      padding: 6px 12px;
+      font-size: 11px;
     }
   }
 </style>
@@ -484,30 +414,28 @@
       <div id="highScore">Best: 0</div>
     </div>
     
+    <div id="wordDisplay">
+      <div id="englishWord">cat</div>
+      <div id="japaneseWord">ねこ🐈</div>
+    </div>
+    
     <div id="scoreInfo">
       <div id="currentScore">0</div>
       <div id="progressText">Letters: 0/3</div>
-      <button id="stopButton" onclick="resetGame()">🛑 Stop</button>
     </div>
   </div>
   
-  <div id="gameArea">
-    <div id="gameOverlayButtons">
-      <button onclick="startGame()">🎮 Start Game</button>
-      <button onclick="showLeaderboard()">🏆 Leaderboard</button>
-    </div>
+  <div id="gameArea"></div>
+  
+  <div id="turnControls">
+    <div class="turn-button" id="turnLeft">↺</div>
+    <div class="turn-button" id="turnRight">↻</div>
   </div>
   
-  <div id="wordDisplay">
-    <div id="japaneseWord">ねこ🐈</div>
-    <div id="englishWord">cat</div>
-  </div>
-  
-  <div id="touchpad">
-    <div class="arrow up">⬆️</div>
-    <div class="arrow down">⬇️</div>
-    <div class="arrow left">⬅️</div>
-    <div class="arrow right">➡️</div>
+  <div id="controls">
+    <button onclick="startGame()">🎮 Start Game</button>
+    <button onclick="resetGame()">🛑 Stop</button>
+    <button onclick="showLeaderboard()">🏆 Leaderboard</button>
   </div>
   
   <div id="countdown">3</div>
@@ -516,18 +444,18 @@
 <!-- Name Input Modal -->
 <div id="nameModal">
   <div id="nameForm">
-    <h2>🐍 Welcome to Snake Letter Quest!</h2>
+    <h2 style="margin-bottom: 20px;">🐍 Welcome to Snake Letter Quest!</h2>
     <p>Enter your name to track your high scores:</p>
     <input type="text" id="nameInput" placeholder="Your name" maxlength="20">
     <br>
-    <button onclick="saveName()" style="margin-top: 10px;">Start Playing! 🚀</button>
+    <button onclick="saveName()" style="margin-top: 15px;">Start Playing! 🚀</button>
   </div>
 </div>
 
 <!-- Leaderboard Modal -->
 <div id="leaderboard">
   <div id="leaderboardContent">
-    <h2>🏆 Top 25 Players</h2>
+    <h2 style="text-align: center; margin-bottom: 20px;">🏆 Top 25 Players</h2>
     <div id="leaderboardList">
       <!-- Placeholder leaderboard data -->
       <div class="leaderboard-entry">
@@ -565,26 +493,16 @@
   const progressText = document.getElementById('progressText');
   const playerName = document.getElementById('playerName');
   const highScore = document.getElementById('highScore');
-  const touchpad = document.getElementById('touchpad');
   const countdownElement = document.getElementById('countdown');
   const nameModal = document.getElementById('nameModal');
   const nameInput = document.getElementById('nameInput');
   const leaderboard = document.getElementById('leaderboard');
-  const gameOverlayButtons = document.getElementById('gameOverlayButtons');
-  const stopButton = document.getElementById('stopButton');
+  const turnLeftBtn = document.getElementById('turnLeft');
+  const turnRightBtn = document.getElementById('turnRight');
   
-  // Calculate game area size dynamically based on screen width
-  let gameAreaSize, segmentSize, gridWidth, gridHeight;
-  
-  function calculateGameDimensions() {
-    const containerWidth = document.getElementById('gameContainer').clientWidth - 16; // padding
-    gameAreaSize = containerWidth;
-    segmentSize = Math.floor(gameAreaSize / 18); // 18x18 grid for better mobile performance
-    gridWidth = Math.floor(gameAreaSize / segmentSize);
-    gridHeight = Math.floor(gameAreaSize / segmentSize);
-    gameArea.style.width = gameAreaSize + 'px';
-    gameArea.style.height = gameAreaSize + 'px';
-  }
+  const segmentSize = 20;
+  const gridWidth = Math.floor(350 / segmentSize);
+  const gridHeight = Math.floor(350 / segmentSize);
   
   // Extended word list with 30 words
   const words = [
@@ -622,12 +540,11 @@
   
   let currentWord = null;
   let currentIndex = 0;
-  let snake = [];
-  let direction = { x: 0, y: 0 };
+  let snake = [{ x: Math.floor(gridWidth/2), y: Math.floor(gridHeight/2) }];
+  let direction = { x: 1, y: 0 }; // Start moving right
   let score = 0;
   let gameInterval = null;
   let gameOver = false;
-  let gameInProgress = false;
   let audio = new Audio();
   let countdownInterval;
   let playerData = {
@@ -637,13 +554,8 @@
   
   // Initialize game
   window.onload = function() {
-    calculateGameDimensions();
     checkPlayerName();
   };
-  
-  window.addEventListener('resize', function() {
-    calculateGameDimensions();
-  });
   
   function checkPlayerName() {
     const savedData = localStorage.getItem('snakeGamePlayer');
@@ -671,73 +583,33 @@
   }
   
   function startGame() {
-  if (!playerData.name) {
-    nameModal.style.display = 'flex';
-    return;
+    if (!playerData.name) {
+      nameModal.style.display = 'flex';
+      return;
+    }
+    
+    resetGame();
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    englishWord.textContent = currentWord.eng;
+    japaneseWord.textContent = currentWord.jap;
+    updateProgress();
+    placeLetters();
+    gameInterval = setInterval(moveSnake, 200);
+    audio.src = 'https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a';
+    audio.loop = true;
+    audio.play().catch(e => console.log('Audio play failed:', e));
   }
-  
-  // Clear any existing game state first
-  if (gameInterval) clearInterval(gameInterval);
-  if (audio) audio.pause();
-  
-  // Set up for new game
-  gameInProgress = true;
-  gameOverlayButtons.classList.add('hidden');
-  stopButton.style.display = 'block';
-  
-  // Initialize game state
-  snake = [{ x: Math.floor(gridWidth/2), y: Math.floor(gridHeight/2) }];
-  direction = { x: 0, y: 0 };
-  currentIndex = 0;
-  score = 0;
-  gameOver = false;
-  currentScore.textContent = score;
-  gameArea.innerHTML = '';
-  
-  // Restore overlay buttons to DOM but keep them hidden
-  const overlayButtons = document.getElementById('gameOverlayButtons');
-  if (!gameArea.contains(overlayButtons)) {
-    gameArea.appendChild(overlayButtons);
-  }
-  
-  // Remove any existing game over message
-  const gameOverMessage = document.getElementById('gameOverMessage');
-  if (gameOverMessage) gameOverMessage.remove();
-  
-  // Start the actual game
-  currentWord = words[Math.floor(Math.random() * words.length)];
-  englishWord.textContent = currentWord.eng;
-  japaneseWord.textContent = currentWord.jap;
-  updateProgress();
-  placeLetters();
-  gameInterval = setInterval(moveSnake, 200);
-  audio.src = 'https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a';
-  audio.loop = true;
-  audio.play().catch(e => console.log('Audio play failed:', e));
-}
   
   function resetGame() {
     if (gameInterval) clearInterval(gameInterval);
     if (audio) audio.pause();
-    
-    gameInProgress = false;
-    gameOverlayButtons.classList.remove('hidden');
-    stopButton.style.display = 'none';
-    
     snake = [{ x: Math.floor(gridWidth/2), y: Math.floor(gridHeight/2) }];
-    direction = { x: 0, y: 0 };
+    direction = { x: 1, y: 0 }; // Start moving right
     currentIndex = 0;
     score = 0;
     gameOver = false;
     currentScore.textContent = score;
     gameArea.innerHTML = '';
-    
-    // Restore overlay buttons
-    const overlayButtons = document.getElementById('gameOverlayButtons');
-    if (!gameArea.contains(overlayButtons)) {
-      gameArea.appendChild(overlayButtons);
-    }
-    
     const gameOverMessage = document.getElementById('gameOverMessage');
     if (gameOverMessage) gameOverMessage.remove();
   }
@@ -770,7 +642,7 @@
       [distractionX, distractionY] = generateLetterPosition();
       distractionLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
     } while (
-      (Math.abs(distractionX - correctX) < 25 && Math.abs(distractionY - correctY) < 25) ||
+      (Math.abs(distractionX - correctX) < 40 && Math.abs(distractionY - correctY) < 40) ||
       distractionLetter === currentWord.eng[currentIndex].toUpperCase()
     );
     
@@ -786,17 +658,16 @@
   function generateLetterPosition() {
     let x, y;
     let attempts = 0;
-    const letterSize = 20;
     do {
-      x = Math.floor(Math.random() * (gameAreaSize - letterSize));
-      y = Math.floor(Math.random() * (gameAreaSize - letterSize));
+      x = Math.floor(Math.random() * (350 - 32));
+      y = Math.floor(Math.random() * (350 - 32));
       attempts++;
     } while (isNearSnake(x, y) && attempts < 50);
     return [x, y];
   }
   
   function isNearSnake(x, y) {
-    const safeDistance = 40;
+    const safeDistance = 60;
     return snake.some(segment => {
       const segX = segment.x * segmentSize;
       const segY = segment.y * segmentSize;
@@ -861,8 +732,7 @@
     }
   }
   
-  function isCollision(snakePart, letter
-                       ) {
+  function isCollision(snakePart, letter) {
     const letterRect = letter.getBoundingClientRect();
     const gameAreaRect = gameArea.getBoundingClientRect();
     const letterX = letterRect.left - gameAreaRect.left;
@@ -871,8 +741,8 @@
     const snakeY = snakePart.y * segmentSize;
     
     return (
-      Math.abs(snakeX - letterX) < 20 &&
-      Math.abs(snakeY - letterY) < 20
+      Math.abs(snakeX - letterX) < 25 &&
+      Math.abs(snakeY - letterY) < 25
     );
   }
   
@@ -900,10 +770,6 @@
     gameOver = true;
     audio.pause();
     
-    gameInProgress = false;
-    gameOverlayButtons.classList.remove('hidden');
-    stopButton.style.display = 'none';
-    
     // Check for new high score
     if (score > playerData.highScore) {
       playerData.highScore = score;
@@ -917,8 +783,8 @@
       gameOverMessage.id = 'gameOverMessage';
       gameOverMessage.innerHTML = `
         <div>🎉 NEW HIGH SCORE! 🎉</div>
-        <div style="font-size: 10px; margin-top: 5px;">Score: ${score}</div>
-        <div style="font-size: 8px; margin-top: 5px;">Checking leaderboard...</div>
+        <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
+        <div style="font-size: 14px; margin-top: 10px;">Checking leaderboard...</div>
       `;
       gameArea.appendChild(gameOverMessage);
       
@@ -931,8 +797,8 @@
       gameOverMessage.id = 'gameOverMessage';
       gameOverMessage.innerHTML = `
         <div>Game Over</div>
-        <div style="font-size: 10px; margin-top: 5px;">Score: ${score}</div>
-        <div style="font-size: 8px; margin-top: 5px;">Best: ${playerData.highScore}</div>
+        <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
+        <div style="font-size: 14px; margin-top: 10px;">Best: ${playerData.highScore}</div>
       `;
       gameArea.appendChild(gameOverMessage);
     }
@@ -984,36 +850,54 @@
     gameInterval = setInterval(moveSnake, speed);
   }
   
-  // Touch controls
-  touchpad.addEventListener('touchstart', handleTouch);
-  touchpad.addEventListener('touchmove', handleTouch);
-  
-  function handleTouch(event) {
-    event.preventDefault();
-    const touch = event.touches[0];
-    const rect = touchpad.getBoundingClientRect();
-    const touchX = touch.clientX - rect.left;
-    const touchY = touch.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    const dx = touchX - centerX;
-    const dy = touchY - centerY;
-    
-    if (Math.abs(dx) > Math.abs(dy)) {
-      if (dx > 0 && direction.x === 0) direction = { x: 1, y: 0 };
-      else if (dx < 0 && direction.x === 0) direction = { x: -1, y: 0 };
-    } else {
-      if (dy > 0 && direction.y === 0) direction = { x: 0, y: 1 };
-      else if (dy < 0 && direction.y === 0) direction = { x: 0, y: -1 };
-    }
+  // Turn controls - the new left/right turn system
+  function turnLeft() {
+    // Rotate direction 90 degrees counterclockwise
+    const newDirection = { x: direction.y, y: -direction.x };
+    direction = newDirection;
   }
   
-  // Keyboard controls
+  function turnRight() {
+    // Rotate direction 90 degrees clockwise
+    const newDirection = { x: -direction.y, y: direction.x };
+    direction = newDirection;
+  }
+  
+  // Touch/click event listeners for turn buttons
+  turnLeftBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    turnLeft();
+  });
+  
+  turnLeftBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    turnLeft();
+  });
+  
+  turnRightBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    turnRight();
+  });
+  
+  turnRightBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    turnRight();
+  });
+  
+  // Keyboard controls (still available for desktop)
   document.addEventListener('keydown', function(event) {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
       event.preventDefault();
     }
+    
+    // Left and Right arrows for turning
+    if (event.key === 'ArrowLeft') {
+      turnLeft();
+    } else if (event.key === 'ArrowRight') {
+      turnRight();
+    }
+    
+    // Original directional controls still work
     if (event.key === 'ArrowUp' && direction.y === 0) {
       direction = { x: 0, y: -1 };
     } else if (event.key === 'ArrowDown' && direction.y === 0) {
