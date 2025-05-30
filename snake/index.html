@@ -679,16 +679,20 @@ window.addEventListener('resize', function() {
     gameArea.appendChild(distractionElement);
   }
   
-  function generateLetterPosition() {
-    let x, y;
-    let attempts = 0;
-    do {
-      x = Math.floor(Math.random() * (350 - 32));
-      y = Math.floor(Math.random() * (350 - 32));
-      attempts++;
-    } while (isNearSnake(x, y) && attempts < 50);
-    return [x, y];
-  }
+function generateLetterPosition() {
+  let x, y;
+  let attempts = 0;
+  const letterSize = 32;
+  const maxX = gridWidth * segmentSize - letterSize;
+  const maxY = gridHeight * segmentSize - letterSize;
+  
+  do {
+    x = Math.floor(Math.random() * maxX);
+    y = Math.floor(Math.random() * maxY);
+    attempts++;
+  } while (isNearSnake(x, y) && attempts < 50);
+  return [x, y];
+}
   
   function isNearSnake(x, y) {
     const safeDistance = 60;
@@ -790,43 +794,79 @@ window.addEventListener('resize', function() {
     });
   }
   
-  function endGame() {
-    gameOver = true;
-    audio.pause();
+function endGame() {
+  gameOver = true;
+  audio.pause();
+  
+  // Check for new high score
+  if (score > playerData.highScore) {
+    playerData.highScore = score;
+    highScore.textContent = `Best: ${score}`;
+    localStorage.setItem('snakeGamePlayer', JSON.stringify(playerData));
     
-    // Check for new high score
-    if (score > playerData.highScore) {
-      playerData.highScore = score;
-      highScore.textContent = `Best: ${score}`;
-      localStorage.setItem('snakeGamePlayer', JSON.stringify(playerData));
-      
-      // TODO: Submit to Supabase leaderboard
-      submitToLeaderboard(playerData.name, score);
-      
-      const gameOverMessage = document.createElement('div');
-      gameOverMessage.id = 'gameOverMessage';
-      gameOverMessage.innerHTML = `
-        <div>🎉 NEW HIGH SCORE! 🎉</div>
-        <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
-        <div style="font-size: 14px; margin-top: 10px;">Checking leaderboard...</div>
-      `;
-      gameArea.appendChild(gameOverMessage);
-      
-      // Show leaderboard after delay
-      setTimeout(() => {
-        showLeaderboard();
-      }, 2000);
-    } else {
-      const gameOverMessage = document.createElement('div');
-      gameOverMessage.id = 'gameOverMessage';
-      gameOverMessage.innerHTML = `
-        <div>Game Over</div>
-        <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
-        <div style="font-size: 14px; margin-top: 10px;">Best: ${playerData.highScore}</div>
-      `;
-      gameArea.appendChild(gameOverMessage);
-    }
+    // Update fake leaderboard
+    updateFakeLeaderboard(playerData.name, score);
+    
+    const gameOverMessage = document.createElement('div');
+    gameOverMessage.id = 'gameOverMessage';
+    gameOverMessage.innerHTML = `
+      <div>🎉 NEW HIGH SCORE! 🎉</div>
+      <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
+      <div style="font-size: 14px; margin-top: 10px;">Checking leaderboard...</div>
+    `;
+    gameArea.appendChild(gameOverMessage);
+    
+    setTimeout(() => {
+      showLeaderboard();
+    }, 2000);
+  } else {
+    const gameOverMessage = document.createElement('div');
+    gameOverMessage.id = 'gameOverMessage';
+    gameOverMessage.innerHTML = `
+      <div>Game Over</div>
+      <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
+      <div style="font-size: 14px; margin-top: 10px;">Best: ${playerData.highScore}</div>
+    `;
+    gameArea.appendChild(gameOverMessage);
   }
+}
+
+function updateFakeLeaderboard(playerName, playerScore) {
+  const leaderboardList = document.getElementById('leaderboardList');
+  
+  // Get existing entries
+  const entries = [
+    { name: '🦍ボス', score: 109 },
+    { name: 'Dr.Bear', score: 62 },
+    { name: 'やきこ', score: 58 },
+    { name: 'バンピー', score: 44 },
+    { name: 'バナナさま', score: 39 }
+  ];
+  
+  // Add player's score
+  entries.push({ name: playerName, score: playerScore });
+  
+  // Sort by score (highest first)
+  entries.sort((a, b) => b.score - a.score);
+  
+  // Keep only top 10
+  entries.splice(10);
+  
+  // Rebuild leaderboard HTML
+  leaderboardList.innerHTML = '';
+  entries.forEach((entry, index) => {
+    const entryDiv = document.createElement('div');
+    entryDiv.className = 'leaderboard-entry';
+    if (entry.name === playerName) {
+      entryDiv.classList.add('current-player');
+    }
+    entryDiv.innerHTML = `
+      <span>${index + 1}. ${entry.name}</span>
+      <span>${entry.score}</span>
+    `;
+    leaderboardList.appendChild(entryDiv);
+  });
+}
   
   function submitToLeaderboard(name, score) {
     // TODO: Implement Supabase integration
