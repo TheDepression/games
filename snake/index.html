@@ -671,26 +671,50 @@
   }
   
   function startGame() {
-    if (!playerData.name) {
-      nameModal.style.display = 'flex';
-      return;
-    }
-    
-    gameInProgress = true;
-    gameOverlayButtons.classList.add('hidden');
-    stopButton.style.display = 'block';
-    
-    resetGame();
-    currentWord = words[Math.floor(Math.random() * words.length)];
-    englishWord.textContent = currentWord.eng;
-    japaneseWord.textContent = currentWord.jap;
-    updateProgress();
-    placeLetters();
-    gameInterval = setInterval(moveSnake, 200);
-    audio.src = 'https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a';
-    audio.loop = true;
-    audio.play().catch(e => console.log('Audio play failed:', e));
+  if (!playerData.name) {
+    nameModal.style.display = 'flex';
+    return;
   }
+  
+  // Clear any existing game state first
+  if (gameInterval) clearInterval(gameInterval);
+  if (audio) audio.pause();
+  
+  // Set up for new game
+  gameInProgress = true;
+  gameOverlayButtons.classList.add('hidden');
+  stopButton.style.display = 'block';
+  
+  // Initialize game state
+  snake = [{ x: Math.floor(gridWidth/2), y: Math.floor(gridHeight/2) }];
+  direction = { x: 0, y: 0 };
+  currentIndex = 0;
+  score = 0;
+  gameOver = false;
+  currentScore.textContent = score;
+  gameArea.innerHTML = '';
+  
+  // Restore overlay buttons to DOM but keep them hidden
+  const overlayButtons = document.getElementById('gameOverlayButtons');
+  if (!gameArea.contains(overlayButtons)) {
+    gameArea.appendChild(overlayButtons);
+  }
+  
+  // Remove any existing game over message
+  const gameOverMessage = document.getElementById('gameOverMessage');
+  if (gameOverMessage) gameOverMessage.remove();
+  
+  // Start the actual game
+  currentWord = words[Math.floor(Math.random() * words.length)];
+  englishWord.textContent = currentWord.eng;
+  japaneseWord.textContent = currentWord.jap;
+  updateProgress();
+  placeLetters();
+  gameInterval = setInterval(moveSnake, 200);
+  audio.src = 'https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a';
+  audio.loop = true;
+  audio.play().catch(e => console.log('Audio play failed:', e));
+}
   
   function resetGame() {
     if (gameInterval) clearInterval(gameInterval);
