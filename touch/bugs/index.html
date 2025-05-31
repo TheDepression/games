@@ -205,6 +205,12 @@
             max-width: 100%;
             box-sizing: border-box;
         }
+        .player-icon img {
+    width: 40px;  /* Adjust to match other icon sizes */
+    height: 40px; /* Adjust to match other icon sizes */
+    border-radius: 50%; /* Makes it circular like typical profile icons */
+    object-fit: cover; /* Ensures the image fills the space properly */
+}
     </style>
 </head>
 <body>
@@ -236,12 +242,13 @@
                 <div class="score">タイム: 75</div>
             </div>
             <div class="profile" id="player-profile">
-                <div class="rank-number" id="player-rank">5</div>
-                <div class="player-icon">YOU</div>
-                <div class="name">You</div>
-                <div class="score" id="player-score">タイム: --</div>
-            </div>
-        </div>
+    <div class="rank-number" id="player-rank">5</div>
+    <div class="player-icon">
+        <img src="https://raw.githubusercontent.com/thedepression/games/main/touch/bugs/thumbnails/IMG_5427.webp" alt="You">
+    </div>
+    <div class="name">You</div>
+    <div class="score" id="player-score">タイム: --</div>
+</div>
         
         <div class="grey-box">
             <div class="title-row">
