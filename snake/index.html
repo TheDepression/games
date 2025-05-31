@@ -377,6 +377,21 @@
     font-weight: bold;
   }
   
+  .loading {
+    text-align: center;
+    opacity: 0.7;
+    font-style: italic;
+  }
+  
+  .error {
+    color: #ff6b6b;
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 10px;
+    margin: 10px 0;
+  }
+  
   #gameOverMessage {
     position: absolute;
     top: 50%;
@@ -489,27 +504,7 @@
   <div id="leaderboardContent">
     <h2 style="text-align: center; margin-bottom: 20px;">🏆 Top 25 Players</h2>
     <div id="leaderboardList">
-      <!-- Placeholder leaderboard data -->
-      <div class="leaderboard-entry">
-        <span>1. 🦍ボス</span>
-        <span>109</span>
-      </div>
-      <div class="leaderboard-entry">
-        <span>2. Dr.Bear</span>
-        <span>62</span>
-      </div>
-      <div class="leaderboard-entry">
-        <span>3. やきこ</span>
-        <span>58</span>
-      </div>
-      <div class="leaderboard-entry">
-        <span>4. バンピー</span>
-        <span>44</span>
-      </div>
-      <div class="leaderboard-entry">
-        <span>5. バナナさま</span>
-        <span>39</span>
-      </div>
+      <div class="loading">Loading leaderboard...</div>
     </div>
     <div style="text-align: center;">
       <button onclick="hideLeaderboard()">Close</button>
@@ -517,7 +512,16 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+  
+  // Supabase configuration
+  const SUPABASE_URL = 'https://uhvaquliroqvjgfanmfi.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s';
+  
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  // Game elements
   const gameArea = document.getElementById('gameArea');
   const englishWord = document.getElementById('englishWord');
   const japaneseWord = document.getElementById('japaneseWord');
@@ -530,6 +534,7 @@
   const nameModal = document.getElementById('nameModal');
   const nameInput = document.getElementById('nameInput');
   const leaderboard = document.getElementById('leaderboard');
+  const leaderboardList = document.getElementById('leaderboardList');
   
   // Dynamic grid size based on game area
   let gameAreaSize, segmentSize, gridWidth, gridHeight;
@@ -600,7 +605,7 @@
   };
   
   function checkPlayerName() {
-    const savedData = localStorage.getItem('snakeGamePlayer');
+    const savedData = localStorage.getItem('snakeLetterQuestPlayer');
     if (savedData) {
       playerData = JSON.parse(savedData);
       playerName.textContent = playerData.name;
@@ -610,21 +615,21 @@
     }
   }
   
-  function saveName() {
+  window.saveName = function() {
     const name = nameInput.value.trim();
     if (name) {
       playerData.name = name;
       playerData.highScore = 0;
-      localStorage.setItem('snakeGamePlayer', JSON.stringify(playerData));
+      localStorage.setItem('snakeLetterQuestPlayer', JSON.stringify(playerData));
       playerName.textContent = name;
       highScore.textContent = `Best: 0`;
       nameModal.style.display = 'none';
     } else {
       alert('Please enter a valid name!');
     }
-  }
+  };
   
-  function startGame() {
+  window.startGame = function() {
     if (!playerData.name) {
       nameModal.style.display = 'flex';
       return;
@@ -641,9 +646,9 @@
     audio.src = 'https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a';
     audio.loop = true;
     audio.play().catch(e => console.log('Audio play failed:', e));
-  }
+  };
   
-  function resetGame() {
+  window.resetGame = function() {
     if (gameInterval) clearInterval(gameInterval);
     if (audio) audio.pause();
     snake = [{ x: Math.floor(gridWidth/2), y: Math.floor(gridHeight/2) }];
@@ -655,7 +660,7 @@
     gameArea.innerHTML = '';
     const gameOverMessage = document.getElementById('gameOverMessage');
     if (gameOverMessage) gameOverMessage.remove();
-  }
+  };
   
   function updateProgress() {
     progressText.textContent = `Letters: ${currentIndex}/${currentWord.eng.length}`;
@@ -745,58 +750,57 @@
     const distractionLetter = document.getElementById('distractionLetter');
     
     if (correctLetter && isCollision(head, correctLetter)) {
-  currentIndex++;
-  score += 1;
-  currentScore.textContent = score;
-  updateProgress();
-  snake.push({ ...snake[snake.length - 1] });
-  
-  // Speed up at 20 points
-  if (score === 20) {
-    clearInterval(gameInterval);
-    gameInterval = setInterval(moveSnake, 160); // 20% faster
+      currentIndex++;
+      score += 1;
+      currentScore.textContent = score;
+      updateProgress();
+      snake.push({ ...snake[snake.length - 1] });
+      
+      // Speed up at 20 points
+      if (score === 20) {
+        clearInterval(gameInterval);
+        gameInterval = setInterval(moveSnake, 160); // 20% faster
+      }
+      
+      if (currentIndex >= currentWord.eng.length) {
+        // Word completed, get new word
+        currentIndex = 0;
+        currentWord = words[Math.floor(Math.random() * words.length)];
+        englishWord.textContent = currentWord.eng;
+        japaneseWord.textContent = currentWord.jap;
+        updateProgress();
+        score += 5; // Bonus for completing word
+        currentScore.textContent = score;
+      }
+      
+      onCorrectLetterEaten();
+    } else if (distractionLetter && isCollision(head, distractionLetter)) {
+      endGame();
+    } else if (isSelfCollision(head)) {
+      endGame();
+    }
   }
   
-  if (currentIndex >= currentWord.eng.length) {
-    // Word completed, get new word
-    currentIndex = 0;
-    currentWord = words[Math.floor(Math.random() * words.length)];
-    englishWord.textContent = currentWord.eng;
-    japaneseWord.textContent = currentWord.jap;
-    updateProgress();
-    score += 5; // Bonus for completing word
-    currentScore.textContent = score;
+  function isCollision(snakePart, letter) {
+    const letterRect = letter.getBoundingClientRect();
+    const gameAreaRect = gameArea.getBoundingClientRect();
+    const letterX = letterRect.left - gameAreaRect.left;
+    const letterY = letterRect.top - gameAreaRect.top;
+    const snakeX = snakePart.x * segmentSize;
+    const snakeY = snakePart.y * segmentSize;
+    
+    return (
+      snakeX < letterX + 32 &&           // Right edge
+      snakeX + segmentSize > letterX &&  // Left edge
+      snakeY < letterY + 32 &&           // Bottom edge
+      snakeY + segmentSize > letterY     // Top edge
+    );
   }
-  
-  onCorrectLetterEaten();
-} else if (distractionLetter && isCollision(head, distractionLetter)) {
-  endGame();
-} else if (isSelfCollision(head)) {
-  endGame();
-}
-  }
-  
-function isCollision(snakePart, letter) {
-  const letterRect = letter.getBoundingClientRect();
-  const gameAreaRect = gameArea.getBoundingClientRect();
-  const letterX = letterRect.left - gameAreaRect.left;
-  const letterY = letterRect.top - gameAreaRect.top;
-  const snakeX = snakePart.x * segmentSize;
-  const snakeY = snakePart.y * segmentSize;
-  
-  return (
-    snakeX < letterX + 32 &&           // Right edge
-    snakeX + segmentSize > letterX &&  // Left edge
-    snakeY < letterY + 32 &&           // Bottom edge
-    snakeY + segmentSize > letterY     // Top edge
-  );
-}
   
   function isSelfCollision(head) {
     return snake.some((segment, index) => 
       index !== 0 && head.x === segment.x && head.y === segment.y
-    );
-  }
+    );  }
   
   function renderSnake() {
     gameArea.querySelectorAll('.snake-segment').forEach(segment => segment.remove());
@@ -812,6 +816,44 @@ function isCollision(snakePart, letter) {
     });
   }
   
+  // Submit score to Supabase leaderboard
+  async function submitToLeaderboard(name, score) {
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .insert([{ name: name, score: score }]);
+      
+      if (error) {
+        console.error('Error submitting score:', error);
+        return false;
+      }
+      
+      console.log('Score submitted successfully!');
+      return true;
+    } catch (error) {
+      console.error('Network error submitting score:', error);
+      return false;
+    }
+  }
+  
+  // Load leaderboard from Supabase
+  async function loadLeaderboardData() {
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard')
+        .select('name, score, created_at')
+        .order('score', { ascending: false })
+        .limit(25);
+      
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+      return null;
+    }
+  }
+  
   function endGame() {
     gameOver = true;
     audio.pause();
@@ -820,9 +862,9 @@ function isCollision(snakePart, letter) {
     if (score > playerData.highScore) {
       playerData.highScore = score;
       highScore.textContent = `Best: ${score}`;
-      localStorage.setItem('snakeGamePlayer', JSON.stringify(playerData));
+      localStorage.setItem('snakeLetterQuestPlayer', JSON.stringify(playerData));
       
-      // TODO: Submit to Supabase leaderboard
+      // Submit to Supabase leaderboard
       submitToLeaderboard(playerData.name, score);
       
       const gameOverMessage = document.createElement('div');
@@ -830,7 +872,7 @@ function isCollision(snakePart, letter) {
       gameOverMessage.innerHTML = `
         <div>🎉 NEW HIGH SCORE! 🎉</div>
         <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
-        <div style="font-size: 14px; margin-top: 10px;">Checking leaderboard...</div>
+        <div style="font-size: 14px; margin-top: 10px;">Submitting to leaderboard...</div>
       `;
       gameArea.appendChild(gameOverMessage);
       
@@ -850,20 +892,48 @@ function isCollision(snakePart, letter) {
     }
   }
   
-  function submitToLeaderboard(name, score) {
-    // TODO: Implement Supabase integration
-    console.log(`Submitting to leaderboard: ${name} - ${score}`);
-    // This would be your Supabase API call
-  }
-  
-  function showLeaderboard() {
-    // TODO: Fetch real data from Supabase
+  window.showLeaderboard = async function() {
     leaderboard.style.display = 'flex';
-  }
+    leaderboardList.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+    
+    const data = await loadLeaderboardData();
+    
+    if (data === null) {
+      // Error loading from Supabase - show fallback message
+      leaderboardList.innerHTML = `
+        <div class="error">
+          Unable to load online leaderboard.<br>
+          Check your internet connection.
+        </div>
+      `;
+      return;
+    }
+    
+    if (data.length === 0) {
+      leaderboardList.innerHTML = '<div class="leaderboard-entry">No scores yet! Be the first to play.</div>';
+      return;
+    }
+    
+    // Display real leaderboard data
+    let leaderboardHTML = '';
+    data.forEach((entry, index) => {
+      const isCurrentPlayer = entry.name === playerData.name && entry.score === playerData.highScore;
+      const entryClass = isCurrentPlayer ? 'leaderboard-entry current-player' : 'leaderboard-entry';
+      
+      leaderboardHTML += `
+        <div class="${entryClass}">
+          <span>${index + 1}. ${entry.name}</span>
+          <span>${entry.score}</span>
+        </div>
+      `;
+    });
+    
+    leaderboardList.innerHTML = leaderboardHTML;
+  };
   
-  function hideLeaderboard() {
+  window.hideLeaderboard = function() {
     leaderboard.style.display = 'none';
-  }
+  };
   
   function onCorrectLetterEaten() {
     pauseGame();
