@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Matching Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+
+        .grey-box {
+            background-color: #d3d3d3; /* Light grey */
+            padding: 1px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #controls {
+            text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+            padding: 0 5px;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 0 10px;
+        }
+
+        .title-row h1 {
+            font-size: clamp(16px, 4vw, 20px);
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .button-group button {
+            padding: 5px 10px;
+            font-size: clamp(10px, 2.5vw, 14px);
+            cursor: pointer;
+        }
+
+        #controls p {
+            font-size: clamp(12px, 3vw, 16px);
+            margin: 5px 0;
+        }
+
+        #feedback-message {
+            background-color: transparent;
+            padding: 10px;
+            font-size: clamp(14px, 3.5vw, 18px);
+            display: none;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        .completion {
+            color: blue;
+        }
+
+        .thumbnails {
+            display: grid;
+            gap: clamp(1px, 0.5vw, 2px);
+            grid-template-columns: repeat(3, 1fr);
+            justify-items: center;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 2px;
+            box-sizing: border-box;
+        }
+
+        .thumbnail {
+            border: 1px solid #000;
+            padding: 1px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .thumbnail img {
+            max-width: 100%;
+            max-height: clamp(120px, 25vw, 200px);
+            object-fit: contain;
+            width: 100%;
+            height: auto;
+        }
+
+        .incorrect-marker, .correct-marker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .incorrect-marker {
+            background-color: rgba(255, 0, 0, 0.5);
+        }
+
+        .correct-marker {
+            background-color: rgba(0, 128, 0, 0.7);
+        }
+
+        .profile-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0 10px 0;
+            gap: 2px;
+            padding: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .profile {
+            text-align: center;
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            max-width: 20%;
+        }
+
+        .profile img, .profile .player-icon {
+            width: clamp(45px, 12vw, 60px);
+            height: clamp(45px, 12vw, 60px);
+            object-fit: cover;
+        }
+
+        .profile .player-icon {
+            background-color: #FFD700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: clamp(12px, 3vw, 18px);
+            color: #333;
+        }
+
+        .profile .name {
+            font-weight: bold;
+            font-size: clamp(9px, 2.5vw, 11px);
+            margin: 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile .score {
+            color: green;
+            font-size: clamp(8px, 2vw, 10px);
+            white-space: nowrap;
+        }
+
+        .profile .rank-number {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background-color: #FF6B6B;
+            color: white;
+            border-radius: 50%;
+            width: clamp(16px, 4vw, 20px);
+            height: clamp(16px, 4vw, 20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(8px, 2.5vw, 12px);
+            font-weight: bold;
+        }
+
+        #main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 100vw;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div id="main-container">
+    <div id="game-container">
+        <div class="profile-container" id="leaderboard">
+            <div class="profile">
+                <div class="rank-number">1</div>
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/IMG_0242.jpeg" alt="Profile 1">
+                <div class="name">Alex</div>
+                <div class="score">タイム: 25</div>
+            </div>
+            <div class="profile">
+                <div class="rank-number">2</div>
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/IMG_0274.jpeg" alt="Profile 2">
+                <div class="name">Dr. Bear</div>
+                <div class="score">タイム: 29</div>
+            </div>
+            <div class="profile">
+                <div class="rank-number">3</div>
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/IMG_0390.jpeg" alt="Profile 3">
+                <div class="name">Banバナナ</div>
+                <div class="score">タイム: 38</div>
+            </div>
+            <div class="profile">
+                <div class="rank-number">4</div>
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/frog.jpg" alt="Profile 4">
+                <div class="name">M. Frog</div>
+                <div class="score">タイム: 43</div>
+            </div>
+            <div class="profile" id="player-profile">
+                <div class="rank-number" id="player-rank">5</div>
+                <div class="player-icon">YOU</div>
+                <div class="name">You</div>
+                <div class="score" id="player-score">タイム: --</div>
+            </div>
+        </div>
+        
+        <div class="grey-box">
+            <div class="title-row">
+                <div class="button-group">
+                    <button id="stop-btn">Stop</button>
+                </div>
+                <h1>さと丸のFeelings</h1>
+                <div class="button-group">
+                    <button id="start-btn">Start</button>
+                </div>
+            </div>
+            
+            <div id="controls">
+                <p>Timer: <span id="timer">0</span> seconds | Best: <span id="best-time">--</span> seconds</p>
+            </div>
+
+            <div id="thumbnails" class="thumbnails">
+                <!-- Thumbnails -->
+                <div class="thumbnail" data-id="0"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9999.png" alt="Image 1"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="1"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9998.png" alt="Image 2"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="2"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9986.png" alt="Image 3"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="3"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9995.png" alt="Image 4"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="4"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_0002.png" alt="Image 5"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="5"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9987.png" alt="Image 6"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="6"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9989.png" alt="Image 7"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="7"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9997.png" alt="Image 8"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="8"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9996.png" alt="Image 9"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="9"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_0001.png" alt="Image 10"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="10"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9993.png" alt="Image 11"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+                <div class="thumbnail" data-id="11"><img src="https://raw.githubusercontent.com/TheDepression/Photos/main/Satomaru/IMG_9990.png" alt="Image 12"><div class="incorrect-marker"></div><div class="correct-marker"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<audio id="audio-player" src="#"></audio>
+
+<script>
+    let timer = 0;
+    let interval;
+    let audioPlayer = document.getElementById('audio-player');
+    let audioIndex = 0;
+    let incorrectIndexes = [];
+    let matched = [];
+    let interactionLocked = false;
+    const maxAudioClips = 12;
+    const audioURLs = [
+        'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20angry.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20bored.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20cold.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20excited.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20happy.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20hot.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20hungry.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20sad.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20scared%20.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20sick.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20sleepy.mp3', 'https://raw.githubusercontent.com/TheDepression/Sounds/main/Feel%20thirsty.mp3'
+    ];
+    let shuffledOrder = [];
+
+    // Load best time from local storage
+    function loadBestTime() {
+        const saved = localStorage.getItem('satomaru-best-time');
+        return saved ? parseInt(saved) : null;
+    }
+
+    // Save best time to local storage
+    function saveBestTime(time) {
+        localStorage.setItem('satomaru-best-time', time.toString());
+    }
+
+    // Update just the best time display in the timer area
+    function updateBestTimeDisplay() {
+        const bestTime = loadBestTime();
+        const bestTimeElement = document.getElementById('best-time');
+        bestTimeElement.textContent = bestTime ? bestTime : '--';
+    }
+
+    // Update leaderboard position based on current game time
+    function updateLeaderboardPosition(currentTime) {
+        const playerScoreElement = document.getElementById('player-score');
+        
+        // Update player's displayed time to current game time
+        playerScoreElement.textContent = `タイム: ${currentTime}`;
+        
+        // Reorder leaderboard based on current time
+        const leaderboard = document.getElementById('leaderboard');
+        const playerProfile = document.getElementById('player-profile');
+        
+        // Remove player profile temporarily
+        playerProfile.remove();
+        
+        // Get all remaining profiles and sort them with the player
+        const profiles = Array.from(leaderboard.children);
+        const allProfiles = [...profiles];
+        
+        // Create a temporary object for the player to include in sorting
+        const playerData = {
+            element: playerProfile,
+            time: currentTime,
+            isPlayer: true
+        };
+        
+        // Create objects for existing profiles
+        const profileData = profiles.map(profile => ({
+            element: profile,
+            time: parseInt(profile.querySelector('.score').textContent.match(/\d+/)[0]),
+            isPlayer: false
+        }));
+        
+        // Add player to the array and sort by time
+        const allProfileData = [...profileData, playerData].sort((a, b) => {
+            if (a.time === b.time) {
+                // Ties: existing players come first, then new player
+                return a.isPlayer ? 1 : -1;
+            }
+            return a.time - b.time;
+        });
+        
+        // Clear and rebuild leaderboard in correct order
+        leaderboard.innerHTML = '';
+        allProfileData.forEach((profileData, index) => {
+            leaderboard.appendChild(profileData.element);
+            // Update rank number for this position
+            const rankElement = profileData.element.querySelector('.rank-number');
+            rankElement.textContent = index + 1;
+        });
+    }
+
+    // Update leaderboard display (for initialization)
+    function updateLeaderboard() {
+        const bestTime = loadBestTime();
+        const playerScoreElement = document.getElementById('player-score');
+        
+        updateBestTimeDisplay();
+        
+        if (bestTime) {
+            // Initialize with best time on page load
+            updateLeaderboardPosition(bestTime);
+        } else {
+            playerScoreElement.textContent = 'タイム: --';
+        }
+    }
+
+    // Initialize on page load
+    updateLeaderboard();
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function startTimer() {
+        if (interval) {
+            clearInterval(interval); // Clear any existing interval
+        }
+        interval = setInterval(() => {
+            timer++;
+            document.getElementById('timer').innerText = timer;
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(interval);
+        interval = null;
+    }
+
+    function resetGame() {
+        timer = 0;
+        document.getElementById('timer').innerText = timer;
+    }
+
+    function startGame() {
+        resetGame();
+        audioIndex = 0;
+        incorrectIndexes = [];
+        matched = [];
+        interactionLocked = false;
+        shuffledOrder = Array.from({ length: maxAudioClips }, (_, i) => i);
+        shuffleArray(shuffledOrder);
+        document.querySelectorAll('.thumbnail').forEach((thumbnail) => {
+            thumbnail.style.pointerEvents = 'auto';
+            thumbnail.style.backgroundColor = '#f0f0f0';
+            thumbnail.querySelector('.incorrect-marker').style.display = 'none';
+            thumbnail.querySelector('.correct-marker').style.display = 'none';
+        });
+        startTimer();
+        playNextAudio();
+    }
+
+    function showMessage(message, type, duration) {
+        const messageDiv = document.getElementById('feedback-message');
+        messageDiv.innerText = message;
+        messageDiv.className = type;
+        messageDiv.style.display = 'block';
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, duration);
+    }
+
+    function playNextAudio() {
+        if (audioIndex < shuffledOrder.length) {
+            const currentClip = shuffledOrder[audioIndex];
+            audioPlayer.src = audioURLs[currentClip];
+            audioPlayer.play();
+        } else if (incorrectIndexes.length > 0) {
+            shuffledOrder = incorrectIndexes;
+            incorrectIndexes = [];
+            audioIndex = 0;
+            playNextAudio();
+        } else {
+            // Game completed!
+            stopTimer();
+            
+            // Update leaderboard position based on CURRENT game time
+            updateLeaderboardPosition(timer);
+            
+            // Check if this is a new BEST time (faster than previous best)
+            const currentBest = loadBestTime();
+            if (!currentBest || timer < currentBest) {
+                saveBestTime(timer);
+                updateBestTimeDisplay();
+                alert(`New best time: ${timer} seconds!`);
+            } else {
+                alert(`You're finished! Your time: ${timer} seconds.`);
+            }
+            
+            setTimeout(() => {
+                const playAgain = confirm('Do you want to play again?');
+                if (playAgain) {
+                    startGame();
+                }
+            }, 500);
+        }
+    }
+
+    document.getElementById('start-btn').addEventListener('click', () => {
+        startGame();
+    });
+
+    document.getElementById('stop-btn').addEventListener('click', () => {
+        if (interval) {
+            stopTimer();
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            // No message for stop - just stop silently
+        }
+    });
+
+    document.querySelectorAll('.thumbnail').forEach((thumbnail) => {
+        thumbnail.addEventListener('click', (event) => {
+            if (interactionLocked) return;
+            const selectedId = parseInt(thumbnail.dataset.id, 10);
+            if (selectedId === shuffledOrder[audioIndex]) {
+                // Correct answer - show green overlay
+                matched.push(shuffledOrder[audioIndex]);
+                thumbnail.style.pointerEvents = 'none';
+                const correctMarker = thumbnail.querySelector('.correct-marker');
+                correctMarker.style.display = 'flex';
+                audioIndex++;
+                playNextAudio();
+            } else {
+                // Incorrect answer - show red overlay briefly
+                incorrectIndexes.push(shuffledOrder[audioIndex]);
+                const incorrectMarker = thumbnail.querySelector('.incorrect-marker');
+                incorrectMarker.style.display = 'flex';
+                interactionLocked = true;
+                setTimeout(() => {
+                    incorrectMarker.style.display = 'none';
+                    interactionLocked = false;
+                    audioIndex++;
+                    playNextAudio();
+                }, 1000);
+            }
+        });
+    });
+</script>
+</body>
+</html>
