@@ -502,7 +502,7 @@ class MazeGame {
             const mazeData = {
                 walls: [
                     // Outer walls
-                    {x: -1, y: 0, w: 1600, h: 20}, {x: -1, y: -1, w: 20, h: 1000},
+                     {x: 0, y: 0, w: 1600, h: 20}, {x: 0, y: 0, w: 20, h: 1000},
                     {x: 0, y: 980, w: 1600, h: 20}, {x: 1580, y: 0, w: 20, h: 1000},
                     // Inner maze walls (larger, more complex)
                     {x: 100, y: 80, w: 20, h: 200}, {x: 80, y: 260, w: 180, h: 20},
@@ -520,18 +520,9 @@ class MazeGame {
                     {x: 1300, y: 200, w: 20, h: 300}, {x: 1280, y: 520, w: 160, h: 20},
                     {x: 1400, y: 300, w: 20, h: 400}, {x: 1380, y: 800, w: 120, h: 20},
                     {x: 200, y: 800, w: 300, h: 20}, {x: 600, y: 760, w: 200, h: 20},
-                    {x: 900, y: 820, w: 180, h: 20}, {x: 1200, y: 780, w: 200, h: 20},
-                    // New interior walls from edges
-                    {x: 100, y: 20, w: 10, h: 50}, // From top, down
-                    {x: 200, y: 20, w: 10, h: 80}, // From top, down
-                    {x: 50, y: 880, w: 10, h: 100}, // From bottom, up
-                    {x: 300, y: 900, w: 10, h: 80}, // From bottom, up
-                    {x: 500, y: 100, w: 80, h: 10}, // From left, right
-                    {x: 900, y: 300, w: 100, h: 10}, // From left, right
-                    {x: 1500, y: 150, w: 80, h: 10}, // From right, left
-                    {x: 1520, y: 400, w: 60, h: 10}  // From right, left
+                    {x: 900, y: 820, w: 180, h: 20}, {x: 1200, y: 780, w: 200, h: 20}
                 ],
-                playerStart: {x: 20, y: 20},
+                playerStart: {x: 60, y: 60},
                 enemies: [
                     {x: 180, y: 140, moveX: 160, moveY: 140, range: 120, axis: 'x', speed: 0.6},
                     {x: 360, y: 240, moveX: 360, moveY: 200, range: 100, axis: 'y', speed: 0.5},
