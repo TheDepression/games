@@ -85,7 +85,7 @@
         }
         
         #ui {
-    position: absolute;
+    position: fixed;
     top: 10px;
     left: 10px;
     z-index: 200;
@@ -97,7 +97,7 @@
     pointer-events: none;
 }
 #timer {
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
     z-index: 200;
@@ -283,8 +283,7 @@
 </head>
 <body>
     <div id="gameContainer">
-        <div id="gameArea">
-            <div id="ui">
+        <div id="ui">
                 <div>Level: 1</div>
                 <div>❤️ <span id="hearts">3</span></div>
                 <div id="keyStatus">🔑 Need Key</div>
@@ -292,7 +291,7 @@
             </div>
             
             <div id="timer">3:00</div>
-            
+                  <div id="gameArea">  
             <div id="gameWorld">
                 <div id="player">😷</div>
             </div>
@@ -821,37 +820,36 @@ class MazeGame {
         
         // Check friendly NPCs
         const friendlies = this.gameWorld.querySelectorAll('.friendly');
-        friendlies.forEach(friendly => {
-            const friendlyX = parseInt(friendly.style.left);
-            const friendlyY = parseInt(friendly.style.top);
-            const friendlyRect = {
-                left: friendlyX,
-                top: friendlyY,
-                right: friendlyX + 22,
-                bottom: friendlyY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, friendlyRect)) {
-                const now = Date.now();
-                const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                if (now - lastTime > 1800) {
-                    if (friendly.dataset.message === "🔑ほしいなら、500円ちょうだい" && !this.hasKey) {
-                        if (this.money >= 500) {
-                            this.money -= 500;
-                            this.hasKey = true;
-                            this.showMessage('ありがとうございました!');
-                            friendly.dataset.message = 'ありがとうございました!';
-                            this.updateUI();
-                        } else {
-                            this.showMessage('🔑 500¥ needed for the key!');
-                        }
-                    } else {
-                        this.showMessage(friendly.dataset.message);
-                    }
-                    this.lastInteractionTime[friendly.dataset.message] = now;
+friendlies.forEach(friendly => {
+    const friendlyX = parseInt(friendly.style.left) - this.gameArea.scrollLeft;
+    const friendlyY = parseInt(friendly.style.top) - this.gameArea.scrollTop;
+    const friendlyRect = {
+        left: friendlyX,
+        top: friendlyY,
+        right: friendlyX + 22,
+        bottom: friendlyY + 22
+    };
+    if (this.rectsOverlap(playerRect, friendlyRect)) {
+        const now = Date.now();
+        const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
+        if (now - lastTime > 1800) {
+            if (friendly.dataset.message === "🔑ほしいなら、500円ちょうだい" && !this.hasKey) {
+                if (this.money >= 500) {
+                    this.money -= 500;
+                    this.hasKey = true;
+                    this.showMessage('ありがとうございました!');
+                    friendly.dataset.message = 'ありがとうございました!';
+                    this.updateUI();
+                } else {
+                    this.showMessage('🔒 500¥ needed for the key!');
                 }
+            } else {
+                this.showMessage(friendly.dataset.message);
             }
-        });
+            this.lastInteractionTime[friendly.dataset.message] = now;
+        }
+    }
+});
         
         // Check heart pickup
         const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
