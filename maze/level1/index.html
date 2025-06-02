@@ -652,7 +652,7 @@ class MazeGame {
         if (this.gameStarted) {
             this.updatePlayer();
             this.updateMovingEnemies();
-            //this.updateForegroundEnemy();
+            this.updateForegroundEnemy();
             this.checkCollisions();
             this.updateCamera();
         }
@@ -733,14 +733,15 @@ class MazeGame {
     }
     
     updateForegroundEnemy() {
-        if (!this.gameStarted) return;
-        
-        const now = Date.now();
-        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > (Math.random() * 30000 + 20000)) {
+    if (!this.gameStarted) return;
+    
+    const now = Date.now();
+    if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 60000) { // Spawn every 60 seconds
+        try {
             const direction = Math.random() < 0.5 ? -1 : 1;
             const startX = direction > 0 ? -60 : 1600;
-            const y = Math.random() * 940; // Within 1000px height, adjusted for size
-            const speed = (1600 / 3) / 60; // Cross 1600px in 3 seconds, ~60 FPS
+            const y = Math.random() * 940;
+            const speed = (1600 / 3) / 60;
             
             const enemyEl = document.createElement('div');
             enemyEl.className = 'foreground-enemy';
@@ -757,19 +758,22 @@ class MazeGame {
                 direction: direction
             };
             this.lastForegroundSpawn = now;
-        }
-        
-        if (this.foregroundEnemy) {
-            this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
-            this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
-            this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
-            
-            if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1600) {
-                this.foregroundEnemy.element.remove();
-                this.foregroundEnemy = null;
-            }
+        } catch (e) {
+            this.foregroundEnemy = null; // Reset on error
         }
     }
+    
+    if (this.foregroundEnemy) {
+        this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
+        this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+        this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+        
+        if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1600) {
+            this.foregroundEnemy.element.remove();
+            this.foregroundEnemy = null;
+        }
+    }
+}
     
     checkCollisions() {
         if (this.isInvulnerable) return;
