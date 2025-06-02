@@ -502,7 +502,7 @@ class MazeGame {
             const mazeData = {
                 walls: [
                     // Outer walls
-                     {x: 0, y: 0, w: 1600, h: 20}, {x: 0, y: 0, w: 20, h: 1000},
+                    {x: 0, y: 0, w: 1600, h: 20}, {x: 0, y: 0, w: 20, h: 1000},
                     {x: 0, y: 980, w: 1600, h: 20}, {x: 1580, y: 0, w: 20, h: 1000},
                     // Inner maze walls (larger, more complex)
                     {x: 100, y: 80, w: 20, h: 200}, {x: 80, y: 260, w: 180, h: 20},
@@ -520,7 +520,16 @@ class MazeGame {
                     {x: 1300, y: 200, w: 20, h: 300}, {x: 1280, y: 520, w: 160, h: 20},
                     {x: 1400, y: 300, w: 20, h: 400}, {x: 1380, y: 800, w: 120, h: 20},
                     {x: 200, y: 800, w: 300, h: 20}, {x: 600, y: 760, w: 200, h: 20},
-                    {x: 900, y: 820, w: 180, h: 20}, {x: 1200, y: 780, w: 200, h: 20}
+                    {x: 900, y: 820, w: 180, h: 20}, {x: 1200, y: 780, w: 200, h: 20},
+                    // New interior walls from edges
+                    {x: 400, y: 20, w: 20, h: 75}, // From top, down
+                    {x: 750, y: 50, w: 10, h: 80}, // From top, down
+                    {x: 400, y: 880, w: 10, h: 100}, // From bottom, up
+                    {x: 800, y: 900, w: 10, h: 80}, // From bottom, up
+                    {x: 20, y: 100, w: 80, h: 10}, // From left, right
+                    {x: 20, y: 300, w: 100, h: 10}, // From left, right
+                    {x: 1500, y: 150, w: 80, h: 10}, // From right, left
+                    {x: 1520, y: 400, w: 60, h: 10}  // From right, left
                 ],
                 playerStart: {x: 60, y: 60},
                 enemies: [
@@ -639,18 +648,18 @@ class MazeGame {
     }
     
     startGameLoop() {
-    const gameLoop = () => {
-        if (this.gameStarted) {
-            this.updatePlayer();
-            this.updateMovingEnemies();
-            this.updateForegroundEnemy();
-            this.checkCollisions();
-            this.updateCamera();
-        }
-        requestAnimationFrame(gameLoop);
-    };
-    gameLoop();
-}
+        const gameLoop = () => {
+            if (this.gameStarted) {
+                this.updatePlayer();
+                this.updateMovingEnemies();
+                this.updateForegroundEnemy();
+                this.checkCollisions();
+                this.updateCamera();
+            }
+            requestAnimationFrame(gameLoop);
+        };
+        gameLoop();
+    }
     
     updatePlayer() {
         if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
@@ -724,15 +733,14 @@ class MazeGame {
     }
     
     updateForegroundEnemy() {
-    if (!this.gameStarted) return;
-    
-    const now = Date.now();
-    if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 60000) { // Spawn every 60 seconds
-        try {
+        if (!this.gameStarted) return;
+        
+        const now = Date.now();
+        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > (Math.random() * 30000 + 20000)) {
             const direction = Math.random() < 0.5 ? -1 : 1;
             const startX = direction > 0 ? -60 : 1600;
-            const y = Math.random() * 940;
-            const speed = (1600 / 3) / 60;
+            const y = Math.random() * 940; // Within 1000px height, adjusted for size
+            const speed = (1600 / 3) / 60; // Cross 1600px in 3 seconds, ~60 FPS
             
             const enemyEl = document.createElement('div');
             enemyEl.className = 'foreground-enemy';
@@ -749,22 +757,19 @@ class MazeGame {
                 direction: direction
             };
             this.lastForegroundSpawn = now;
-        } catch (e) {
-            this.foregroundEnemy = null; // Reset on error
         }
-    }
-    
-    if (this.foregroundEnemy) {
-        this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
-        this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
-        this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
         
-        if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1600) {
-            this.foregroundEnemy.element.remove();
-            this.foregroundEnemy = null;
+        if (this.foregroundEnemy) {
+            this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
+            this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+            this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+            
+            if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1600) {
+                this.foregroundEnemy.element.remove();
+                this.foregroundEnemy = null;
+            }
         }
     }
-}
     
     checkCollisions() {
         if (this.isInvulnerable) return;
