@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maze Adventure: Hospital Escape</title>
+    <title>Hospital Maze - Level 1</title>
     <style>
         body {
             margin: 0;
@@ -12,949 +12,663 @@
             color: white;
             font-family: Arial, sans-serif;
             overflow: hidden;
-            user-select: none;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
         }
         
         #gameContainer {
-            width: 350px;
-            height: 550px;
-            background: #2a2a2a;
-            border: 3px solid #555;
-            border-radius: 15px;
             position: relative;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         
-        #gameArea {
-            width: 100%;
-            height: 65%;
-            position: relative;
-            overflow: hidden;
-            background: #e8f5e9; /* Hospital background */
-        }
-        
-        #gameWorld {
+        #gameCanvas {
             position: absolute;
-            width: 1600px;
-            height: 1000px;
-            transform-origin: 0 0;
-        }
-        
-        #player {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: none;
-        }
-        
-        .invulnerable {
-            animation: blink 0.2s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
-        }
-        
-        #controlArea {
-            width: 100%;
-            height: 35%;
-            background: #444;
-            position: absolute;
-            bottom: 0;
-            touch-action: none;
-            border-top: 2px solid #666;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            color: #ccc;
+            top: 0;
+            left: 0;
+            background: #e8f4f8;
         }
         
         #ui {
             position: absolute;
             top: 10px;
             left: 10px;
-            z-index: 200;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            border: 1px solid #666;
-        }
-        
-        #timer {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 200;
-            background: rgba(255,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid #666;
-        }
-        
-        .maze-wall {
-            position: absolute;
-            background: #2c3e50; /* Hospital wall color */
-        }
-        
-        .enemy {
-            position: absolute;
-            width: 22px;
-            height: 22px;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
             font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
         }
         
-        .friendly {
+        #controls {
             position: absolute;
-            width: 22px;
-            height: 22px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 40;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
         }
         
-        .key {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: glow 2s infinite;
-            z-index: 60;
-        }
-        
-        .heart-pickup {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: heartbeat 1s infinite;
-            z-index: 60;
-        }
-        
-        .money-pickup {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: glow 2s infinite;
-            z-index: 60;
-        }
-        
-        .exit {
-            position: absolute;
-            width: 30px;
-            height: 30px;
+        .control-btn {
+            background: rgba(255,255,255,0.8);
+            border: 2px solid #333;
+            border-radius: 10px;
             font-size: 24px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,255,0,0.3);
-            border: 2px solid #00ff00;
-            border-radius: 6px;
-            z-index: 70;
+            user-select: none;
         }
         
-        @keyframes glow {
-            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px gold); }
-            50% { filter: brightness(1.5) drop-shadow(0 0 10px gold); }
+        .control-btn:active {
+            background: rgba(255,255,255,0.9);
+            transform: scale(0.95);
         }
         
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        #message {
-            position: absolute;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            z-index: 300;
-            display: none;
-            border: 1px solid #666;
-            max-width: 280px;
-            text-align: center;
-        }
-        
-        #startScreen, #levelComplete {
+        #gameOverScreen, #levelCompleteScreen, #characterSelect {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            flex-direction: column;
+            background: rgba(0,0,0,0.8);
+            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 500;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
+            flex-direction: column;
+            z-index: 200;
         }
         
-        button {
+        .menu-button {
             background: #4CAF50;
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            border-radius: 6px;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 18px;
             cursor: pointer;
-            margin: 8px;
-            transition: background 0.3s;
         }
         
-        button:hover {
+        .menu-button:hover {
             background: #45a049;
         }
         
-        .start-button {
-            background: #ff6b35;
-            font-size: 18px;
-            padding: 15px 30px;
-        }
-        
-        .start-button:hover {
-            background: #ff5722;
-        }
-        
-        h2, h3 {
-            margin: 10px 0;
-        }
-        
-        .control-hint {
-            background: rgba(255,255,255,0.1);
+        .character-option {
+            font-size: 48px;
+            margin: 10px;
+            cursor: pointer;
             padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
+            border: 3px solid transparent;
+            border-radius: 10px;
+        }
+        
+        .character-option:hover, .character-option.selected {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+        
+        #foregroundEnemy {
+            position: absolute;
+            font-size: 72px;
+            z-index: 50;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
-        <div id="gameArea">
-            <div id="ui">
-                <div>Level: 1</div>
-                <div>❤️ <span id="hearts">3</span></div>
-                <div id="keyStatus">🔑 Need Key</div>
-                <div>💰 <span id="money">0</span>¥</div>
-            </div>
-            
-            <div id="timer">3:00</div>
-            
-            <div id="gameWorld">
-                <div id="player">😷</div>
-            </div>
-            
-            <div id="message"></div>
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div>❤️ Hearts: <span id="hearts">3</span></div>
+            <div>💰 Money: <span id="money">0</span>/500</div>
+            <div>🗝️ Keys: <span id="keys">0</span></div>
         </div>
         
-        <div id="controlArea">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">Hospital</div>
-                <div style="font-size: 12px; opacity: 0.8;">Find the key and escape!</div>
-            </div>
-            <div class="control-hint">
-                <div>🎮 Swipe here to move</div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid viruses & collect money!</div>
-            </div>
+        <div id="controls">
+            <div></div>
+            <div class="control-btn" onclick="move('up')">⬆️</div>
+            <div></div>
+            <div class="control-btn" onclick="move('left')">⬅️</div>
+            <div class="control-btn" onclick="move('down')">⬇️</div>
+            <div class="control-btn" onclick="move('right')">➡️</div>
+            <div></div>
+            <div></div>
+            <div class="control-btn" onclick="interact()">💬</div>
         </div>
         
-        <div id="startScreen">
-            <h2>🏥 Hospital Escape</h2>
-            <p style="margin: 20px 0;">Navigate the hospital maze!</p>
-            <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
-            <button class="start-button" onclick="startGame()">START GAME</button>
+        <div id="foregroundEnemy"></div>
+        
+        <div id="characterSelect">
+            <h2>Select Your Character</h2>
+            <div>
+                <div class="character-option selected" onclick="selectCharacter('😎')" data-char="😎">😎</div>
+                <div class="character-option" onclick="selectCharacter('🤢')" data-char="🤢">🤢</div>
+                <div class="character-option" onclick="selectCharacter('😺')" data-char="😺">😺</div>
+                <div class="character-option" onclick="selectCharacter('👩🏻')" data-char="👩🏻">👩🏻</div>
+                <div class="character-option" onclick="selectCharacter('👩🏽‍🦱')" data-char="👩🏽‍🦱">👩🏽‍🦱</div>
+                <div class="character-option" onclick="selectCharacter('🙍🏻‍♂️')" data-char="🙍🏻‍♂️">🙍🏻‍♂️</div>
+            </div>
+            <button class="menu-button" onclick="startGame()">Start Game</button>
         </div>
         
-        <div id="levelComplete" style="display: none;">
-            <h3 id="levelCompleteTitle">Level Complete!</h3>
-            <p id="levelCompleteText">Great job!</p>
-            <div id="timeBonus" style="font-size: 14px; margin: 10px 0;"></div>
-            <button onclick="nextLevel()">Proceed to Level 2</button>
-            <button onclick="restartGame()">Replay Level</button>
+        <div id="gameOverScreen">
+            <h2>Game Over!</h2>
+            <button class="menu-button" onclick="restartGame()">Retry</button>
+            <button class="menu-button" onclick="showCharacterSelect()">Change Character</button>
+        </div>
+        
+        <div id="levelCompleteScreen">
+            <h2>Level Complete!</h2>
+            <button class="menu-button" onclick="nextLevel()">Next Level</button>
+            <button class="menu-button" onclick="showCharacterSelect()">Change Character</button>
         </div>
     </div>
 
-    <audio id="bgMusic" loop>
-        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m1.m4a" type="audio/mp4">
-        Your browser does not support the audio element.
-    </audio>
-
     <script>
-class MazeGame {
-    constructor() {
-        try {
-            this.hearts = 3;
-            this.hasKey = false;
-            this.gameStarted = false;
-            this.timeLeft = 180; // 3 minutes
-            this.timerInterval = null;
-            this.isInvulnerable = false;
-            this.money = parseInt(localStorage.getItem('money')) || 0;
-            
-            // Movement properties
-            this.playerX = 60;
-            this.playerY = 60;
-            this.playerVelocityX = 0;
-            this.playerVelocityY = 0;
-            this.isDragging = false;
-            this.dragStartX = 0;
-            this.dragStartY = 0;
-            this.lastDragX = 0;
-            this.lastDragY = 0;
-            
-            // Camera properties
-            this.cameraX = 0;
-            this.cameraY = 0;
-            
-            this.movingEnemies = [];
-            this.lastInteractionTime = {};
-            
-            this.player = document.getElementById('player');
-            this.gameWorld = document.getElementById('gameWorld');
-            this.gameArea = document.getElementById('gameArea');
-            this.controlArea = document.getElementById('controlArea');
-            this.bgMusic = document.getElementById('bgMusic');
-            
-            if (!this.player || !this.gameWorld || !this.gameArea || !this.controlArea) {
-                throw new Error('One or more critical DOM elements not found!');
+        // Game variables
+        let canvas = document.getElementById('gameCanvas');
+        let ctx = canvas.getContext('2d');
+        let gameState = 'characterSelect';
+        let selectedCharacter = '😎';
+        
+        // Resize canvas to fill screen
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Game state
+        let player = {
+            x: 50,
+            y: 50,
+            size: 32,
+            char: selectedCharacter
+        };
+        
+        let gameStats = {
+            hearts: parseInt(localStorage.getItem('playerHearts')) || 3,
+            money: 0,
+            keys: 0,
+            maxHearts: 3
+        };
+        
+        // Camera
+        let camera = {
+            x: 0,
+            y: 0
+        };
+        
+        // Map dimensions
+        const TILE_SIZE = 40;
+        const MAP_WIDTH = 30;
+        const MAP_HEIGHT = 25;
+        
+        // Generate maze with interior walls
+        let maze = [];
+        
+        function generateMaze() {
+            // Initialize with walls
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                maze[y] = [];
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    maze[y][x] = '🧱';
+                }
             }
             
-            this.bindEvents();
-            this.startGameLoop();
-        } catch (error) {
-            console.error('Error initializing MazeGame:', error);
-        }
-    }
-    
-    bindEvents() {
-        this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
-        this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
-        this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
-        
-        this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
-        this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
-        this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
-        this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
-    }
-    
-    handleStart(e) {
-        if (!this.gameStarted) return;
-        e.preventDefault();
-        
-        this.isDragging = true;
-        const point = e.touches ? e.touches[0] : e;
-        this.dragStartX = point.clientX;
-        this.dragStartY = point.clientY;
-        this.lastDragX = point.clientX;
-        this.lastDragY = point.clientY;
-    }
-    
-    handleMove(e) {
-        if (!this.isDragging || !this.gameStarted) return;
-        e.preventDefault();
-        
-        const point = e.touches ? e.touches[0] : e;
-        const deltaX = point.clientX - this.lastDragX;
-        const deltaY = point.clientY - this.lastDragY;
-        
-        const sensitivity = 0.5;
-        this.playerVelocityX = deltaX * sensitivity;
-        this.playerVelocityY = deltaY * sensitivity;
-        
-        this.lastDragX = point.clientX;
-        this.lastDragY = point.clientY;
-    }
-    
-    handleEnd(e) {
-        this.isDragging = false;
-        this.playerVelocityX = 0;
-        this.playerVelocityY = 0;
-    }
-    
-    startGameTimer() {
-        try {
-            this.gameStarted = true;
-            this.timeLeft = 180;
-            this.updateTimer();
-            this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-            
-            this.timerInterval = setInterval(() => {
-                this.timeLeft--;
-                this.updateTimer();
+            // Create paths
+            function carvePath(x, y) {
+                maze[y][x] = '⬜';
                 
-                if (this.timeLeft <= 0) {
-                    this.timeUp();
+                const directions = [[0, 2], [2, 0], [0, -2], [-2, 0]];
+                directions.sort(() => Math.random() - 0.5);
+                
+                for (let [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    
+                    if (nx > 0 && nx < MAP_WIDTH - 1 && ny > 0 && ny < MAP_HEIGHT - 1 && maze[ny][nx] === '🧱') {
+                        maze[y + dy/2][x + dx/2] = '⬜';
+                        carvePath(nx, ny);
+                    }
                 }
-            }, 1000);
-        } catch (error) {
-            console.error('Error starting game timer:', error);
-        }
-    }
-    
-    updateTimer() {
-        const minutes = Math.floor(this.timeLeft / 60);
-        const seconds = this.timeLeft % 60;
-        const timerEl = document.getElementById('timer');
-        if (!timerEl) throw new Error('Timer element not found!');
-        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (this.timeLeft <= 60) {
-            timerEl.style.background = 'rgba(255,0,0,0.9)';
-        } else if (this.timeLeft <= 180) {
-            timerEl.style.background = 'rgba(255,165,0,0.8)';
-        }
-    }
-    
-    timeUp() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.money = 0;
-        localStorage.setItem('money', this.money);
-        this.showMessage('⏰ Time\'s up!');
-        setTimeout(() => {
-            this.showLevelComplete('⏰ Time Up!', 'Try again!');
-        }, 2000);
-    }
-    
-    initLevel() {
-        try {
-            const elements = this.gameWorld.querySelectorAll('.maze-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit');
-            elements.forEach(el => el.remove());
+            }
             
-            this.movingEnemies = [];
-            this.hasKey = false;
-            this.lastInteractionTime = {};
+            carvePath(1, 1);
             
-            this.player.textContent = '😷';
-            document.getElementById('timer').style.background = 'rgba(255,0,0,0.8)';
-            this.updateUI();
-            this.generateMaze();
-        } catch (error) {
-            console.error('Error initializing level:', error);
-        }
-    }
-    
-    generateMaze() {
-        try {
-            const mazeData = {
-                walls: [
-                    // Outer walls
-                    {x: 0, y: 0, w: 1600, h: 20}, {x: 0, y: 0, w: 20, h: 1000},
-                    {x: 0, y: 980, w: 1600, h: 20}, {x: 1580, y: 0, w: 20, h: 1000},
-                    // Inner maze walls (larger, more complex)
-                    {x: 100, y: 80, w: 20, h: 200}, {x: 80, y: 260, w: 180, h: 20},
-                    {x: 200, y: 100, w: 20, h: 160}, {x: 160, y: 360, w: 140, h: 20},
-                    {x: 300, y: 60, w: 20, h: 220}, {x: 280, y: 440, w: 160, h: 20},
-                    {x: 400, y: 140, w: 20, h: 240}, {x: 380, y: 520, w: 200, h: 20},
-                    {x: 500, y: 200, w: 20, h: 180}, {x: 480, y: 600, w: 160, h: 20},
-                    {x: 600, y: 100, w: 20, h: 280}, {x: 280, y: 680, w: 400, h: 20},
-                    {x: 700, y: 200, w: 20, h: 220}, {x: 680, y: 400, w: 240, h: 20},
-                    {x: 800, y: 280, w: 20, h: 260}, {x: 720, y: 520, w: 180, h: 20},
-                    {x: 900, y: 140, w: 20, h: 300}, {x: 880, y: 420, w: 140, h: 20},
-                    {x: 1000, y: 240, w: 20, h: 280}, {x: 980, y: 600, w: 120, h: 20},
-                    {x: 1100, y: 340, w: 20, h: 260}, {x: 1080, y: 700, w: 200, h: 20},
-                    {x: 1200, y: 100, w: 20, h: 400}, {x: 1180, y: 600, w: 180, h: 20},
-                    {x: 1300, y: 200, w: 20, h: 300}, {x: 1280, y: 520, w: 160, h: 20},
-                    {x: 1400, y: 300, w: 20, h: 400}, {x: 1380, y: 800, w: 120, h: 20},
-                    {x: 200, y: 800, w: 300, h: 20}, {x: 600, y: 760, w: 200, h: 20},
-                    {x: 900, y: 820, w: 180, h: 20}, {x: 1200, y: 780, w: 200, h: 20}
-                ],
-                playerStart: {x: 60, y: 60},
-                enemies: [
-                    {x: 180, y: 140, moveX: 160, moveY: 140, range: 120, axis: 'x', speed: 0.6},
-                    {x: 360, y: 240, moveX: 360, moveY: 200, range: 100, axis: 'y', speed: 0.5},
-                    {x: 540, y: 160, moveX: 520, moveY: 160, range: 140, axis: 'x', speed: 0.7},
-                    {x: 740, y: 340, moveX: 740, moveY: 320, range: 80, axis: 'y', speed: 0.6},
-                    {x: 940, y: 280, moveX: 920, moveY: 280, range: 100, axis: 'x', speed: 0.8},
-                    {x: 640, y: 460, moveX: 640, moveY: 440, range: 120, axis: 'y', speed: 0.5},
-                    {x: 1100, y: 400, moveX: 1080, moveY: 400, range: 100, axis: 'x', speed: 0.7}, // Near key
-                    {x: 1200, y: 640, moveX: 1200, moveY: 620, range: 80, axis: 'y', speed: 0.6}, // Near heart
-                    {x: 800, y: 700, moveX: 780, moveY: 700, range: 120, axis: 'x', speed: 0.8}, // Near money
-                    {x: 1300, y: 300, moveX: 1300, moveY: 280, range: 100, axis: 'y', speed: 0.7} // Near money
-                ],
-                friendlies: [
-                    {x: 500, y: 300, message: "🔑ほしいなら、500円ちょうだい"}, // Doctor
-                    {x: 900, y: 500, message: "この病院...あぶないんですけど"} // Nurse
-                ],
-                hearts: [{x: 1200, y: 640}],
-                money: [
-                    {x: 300, y: 400}, {x: 700, y: 200},
-                    {x: 800, y: 720}, {x: 1300, y: 300},
-                    {x: 1000, y: 800}
-                ],
-                key: {x: 60, y: 900}, // Far from exit
-                exit: {x: 1500, y: 900} // Opposite corner
-            };
-            
-            // Set player position
-            this.playerX = mazeData.playerStart.x;
-            this.playerY = mazeData.playerStart.y;
-            
-            // Create walls
-            mazeData.walls.forEach(wall => {
-                const wallEl = document.createElement('div');
-                wallEl.className = 'maze-wall';
-                wallEl.style.left = wall.x + 'px';
-                wallEl.style.top = wall.y + 'px';
-                wallEl.style.width = wall.w + 'px';
-                wallEl.style.height = wall.h + 'px';
-                this.gameWorld.appendChild(wallEl);
-            });
-            
-            // Create enemies
-            const enemyEmojis = ['🦠', '💉'];
-            mazeData.enemies.forEach((enemy, index) => {
-                const enemyEl = document.createElement('div');
-                enemyEl.className = 'enemy';
-                enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
-                enemyEl.style.left = enemy.x + 'px';
-                enemyEl.style.top = enemy.y + 'px';
-                this.gameWorld.appendChild(enemyEl);
+            // Add interior walls from edges
+            for (let i = 0; i < 8; i++) {
+                // Top wall extensions
+                let x = Math.floor(Math.random() * (MAP_WIDTH - 4)) + 2;
+                let length = Math.floor(Math.random() * 4) + 2;
+                for (let j = 0; j < length && j + 1 < MAP_HEIGHT; j++) {
+                    if (maze[j + 1][x] === '⬜') maze[j + 1][x] = '🧱';
+                }
                 
-                this.movingEnemies.push({
-                    element: enemyEl,
-                    startX: enemy.moveX,
-                    startY: enemy.moveY,
-                    currentX: enemy.x,
-                    currentY: enemy.y,
-                    range: enemy.range,
-                    axis: enemy.axis,
-                    direction: 1,
-                    speed: enemy.speed
+                // Bottom wall extensions
+                x = Math.floor(Math.random() * (MAP_WIDTH - 4)) + 2;
+                length = Math.floor(Math.random() * 4) + 2;
+                for (let j = 0; j < length && MAP_HEIGHT - j - 2 > 0; j++) {
+                    if (maze[MAP_HEIGHT - j - 2][x] === '⬜') maze[MAP_HEIGHT - j - 2][x] = '🧱';
+                }
+                
+                // Left wall extensions
+                let y = Math.floor(Math.random() * (MAP_HEIGHT - 4)) + 2;
+                length = Math.floor(Math.random() * 4) + 2;
+                for (let j = 0; j < length && j + 1 < MAP_WIDTH; j++) {
+                    if (maze[y][j + 1] === '⬜') maze[y][j + 1] = '🧱';
+                }
+                
+                // Right wall extensions
+                y = Math.floor(Math.random() * (MAP_HEIGHT - 4)) + 2;
+                length = Math.floor(Math.random() * 4) + 2;
+                for (let j = 0; j < length && MAP_WIDTH - j - 2 > 0; j++) {
+                    if (maze[y][MAP_WIDTH - j - 2] === '⬜') maze[y][MAP_WIDTH - j - 2] = '🧱';
+                }
+            }
+        }
+        
+        // Game entities
+        let money = [];
+        let enemies = [];
+        let npcs = [];
+        let doors = [];
+        
+        function spawnEntities() {
+            money = [];
+            enemies = [];
+            npcs = [];
+            doors = [];
+            
+            // Spawn money (500 coins)
+            for (let i = 0; i < 500; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * MAP_WIDTH);
+                    y = Math.floor(Math.random() * MAP_HEIGHT);
+                } while (maze[y][x] !== '⬜' || (x < 3 && y < 3));
+                
+                money.push({
+                    x: x * TILE_SIZE + TILE_SIZE/2,
+                    y: y * TILE_SIZE + TILE_SIZE/2,
+                    collected: false
                 });
-            });
-            
-            // Create friendlies
-            const friendlyEmojis = ['👨‍⚕️', '👩‍⚕️'];
-            mazeData.friendlies.forEach((friendly, index) => {
-                const friendlyEl = document.createElement('div');
-                friendlyEl.className = 'friendly';
-                friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
-                friendlyEl.style.left = friendly.x + 'px';
-                friendlyEl.style.top = friendly.y + 'px';
-                friendlyEl.dataset.message = friendly.message;
-                this.gameWorld.appendChild(friendlyEl);
-            });
-            
-            // Create heart
-            mazeData.hearts.forEach(heart => {
-                const heartEl = document.createElement('div');
-                heartEl.className = 'heart-pickup';
-                heartEl.textContent = '❤️';
-                heartEl.style.left = heart.x + 'px';
-                heartEl.style.top = heart.y + 'px';
-                this.gameWorld.appendChild(heartEl);
-            });
-            
-            // Create money
-            mazeData.money.forEach(money => {
-                const moneyEl = document.createElement('div');
-                moneyEl.className = 'money-pickup';
-                moneyEl.textContent = '💰';
-                moneyEl.style.left = money.x + 'px';
-                moneyEl.style.top = money.y + 'px';
-                this.gameWorld.appendChild(moneyEl);
-            });
-            
-            // Create key
-            const keyEl = document.createElement('div');
-            keyEl.className = 'key';
-            keyEl.textContent = '🔑';
-            keyEl.style.left = mazeData.key.x + 'px';
-            keyEl.style.top = mazeData.key.y + 'px';
-            this.gameWorld.appendChild(keyEl);
-            
-            // Create exit
-            const exitEl = document.createElement('div');
-            exitEl.className = 'exit';
-            exitEl.textContent = '🚪';
-            exitEl.style.left = mazeData.exit.x + 'px';
-            exitEl.style.top = mazeData.exit.y + 'px';
-            this.gameWorld.appendChild(exitEl);
-            
-            this.updateCamera();
-        } catch (error) {
-            console.error('Error generating maze:', error);
-        }
-    }
-    
-    startGameLoop() {
-        const gameLoop = () => {
-            if (this.gameStarted) {
-                this.updatePlayer();
-                this.updateMovingEnemies();
-                this.checkCollisions();
-                this.updateCamera();
             }
+            
+            // Spawn key dealer NPC
+            let dealerX, dealerY;
+            do {
+                dealerX = Math.floor(Math.random() * MAP_WIDTH);
+                dealerY = Math.floor(Math.random() * MAP_HEIGHT);
+            } while (maze[dealerY][dealerX] !== '⬜' || (dealerX < 5 && dealerY < 5));
+            
+            npcs.push({
+                x: dealerX * TILE_SIZE + TILE_SIZE/2,
+                y: dealerY * TILE_SIZE + TILE_SIZE/2,
+                char: '🏥',
+                type: 'keyDealer',
+                message: 'I have a key for 500 yen! Collect all the money first.',
+                soldKey: false
+            });
+            
+            // Spawn door
+            doors.push({
+                x: (MAP_WIDTH - 2) * TILE_SIZE + TILE_SIZE/2,
+                y: (MAP_HEIGHT - 2) * TILE_SIZE + TILE_SIZE/2,
+                char: '🚪',
+                locked: true
+            });
+            
+            // Spawn more enemies (viruses and needles)
+            const enemyTypes = ['🦠', '💉', '🩸', '⚗️', '🧪'];
+            for (let i = 0; i < 25; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * MAP_WIDTH);
+                    y = Math.floor(Math.random() * MAP_HEIGHT);
+                } while (maze[y][x] !== '⬜' || (x < 4 && y < 4));
+                
+                enemies.push({
+                    x: x * TILE_SIZE + TILE_SIZE/2,
+                    y: y * TILE_SIZE + TILE_SIZE/2,
+                    char: enemyTypes[Math.floor(Math.random() * enemyTypes.length)],
+                    dx: (Math.random() - 0.5) * 2,
+                    dy: (Math.random() - 0.5) * 2,
+                    speed: 0.5 + Math.random() * 0.5
+                });
+            }
+        }
+        
+        // Foreground enemy
+        let foregroundEnemy = {
+            active: false,
+            x: -100,
+            y: 0,
+            char: '🦠',
+            speed: 3,
+            direction: 1,
+            lastSpawn: 0
+        };
+        
+        function spawnForegroundEnemy() {
+            if (Date.now() - foregroundEnemy.lastSpawn < (20000 + Math.random() * 30000)) return;
+            
+            foregroundEnemy.active = true;
+            foregroundEnemy.direction = Math.random() > 0.5 ? 1 : -1;
+            foregroundEnemy.x = foregroundEnemy.direction === 1 ? -100 : canvas.width + 100;
+            foregroundEnemy.y = canvas.height / 2 - 36;
+            foregroundEnemy.lastSpawn = Date.now();
+            
+            document.getElementById('foregroundEnemy').style.display = 'block';
+            document.getElementById('foregroundEnemy').innerHTML = foregroundEnemy.char;
+        }
+        
+        function updateForegroundEnemy() {
+            if (!foregroundEnemy.active) return;
+            
+            foregroundEnemy.x += foregroundEnemy.speed * foregroundEnemy.direction;
+            
+            document.getElementById('foregroundEnemy').style.left = foregroundEnemy.x + 'px';
+            document.getElementById('foregroundEnemy').style.top = foregroundEnemy.y + 'px';
+            
+            // Check collision with player (screen center)
+            const playerScreenX = canvas.width / 2;
+            const playerScreenY = canvas.height / 2;
+            
+            if (Math.abs(foregroundEnemy.x - playerScreenX) < 50 && 
+                Math.abs(foregroundEnemy.y - playerScreenY) < 50) {
+                takeDamage();
+            }
+            
+            // Remove when off screen
+            if ((foregroundEnemy.direction === 1 && foregroundEnemy.x > canvas.width + 100) ||
+                (foregroundEnemy.direction === -1 && foregroundEnemy.x < -100)) {
+                foregroundEnemy.active = false;
+                document.getElementById('foregroundEnemy').style.display = 'none';
+            }
+        }
+        
+        // Input handling
+        let keys = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        function move(direction) {
+            if (gameState !== 'playing') return;
+            
+            let newX = player.x;
+            let newY = player.y;
+            const moveSpeed = TILE_SIZE;
+            
+            switch(direction) {
+                case 'up': newY -= moveSpeed; break;
+                case 'down': newY += moveSpeed; break;
+                case 'left': newX -= moveSpeed; break;
+                case 'right': newX += moveSpeed; break;
+            }
+            
+            // Check collision with walls
+            const gridX = Math.floor(newX / TILE_SIZE);
+            const gridY = Math.floor(newY / TILE_SIZE);
+            
+            if (gridX >= 0 && gridX < MAP_WIDTH && 
+                gridY >= 0 && gridY < MAP_HEIGHT && 
+                maze[gridY][gridX] === '⬜') {
+                player.x = newX;
+                player.y = newY;
+                
+                // Collect money
+                money.forEach(coin => {
+                    if (!coin.collected && 
+                        Math.abs(player.x - coin.x) < TILE_SIZE/2 && 
+                        Math.abs(player.y - coin.y) < TILE_SIZE/2) {
+                        coin.collected = true;
+                        gameStats.money++;
+                        updateUI();
+                    }
+                });
+                
+                // Check door
+                doors.forEach(door => {
+                    if (Math.abs(player.x - door.x) < TILE_SIZE/2 && 
+                        Math.abs(player.y - door.y) < TILE_SIZE/2) {
+                        if (gameStats.keys > 0) {
+                            completeLevel();
+                        }
+                    }
+                });
+            }
+        }
+        
+        function interact() {
+            npcs.forEach(npc => {
+                if (Math.abs(player.x - npc.x) < TILE_SIZE && 
+                    Math.abs(player.y - npc.y) < TILE_SIZE) {
+                    if (npc.type === 'keyDealer') {
+                        if (!npc.soldKey && gameStats.money >= 500) {
+                            npc.soldKey = true;
+                            npc.message = 'Arigato gozaimashita! 🗝️';
+                            gameStats.keys++;
+                            updateUI();
+                            alert(npc.message);
+                        } else if (!npc.soldKey) {
+                            alert(npc.message);
+                        } else {
+                            alert(npc.message);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Game mechanics
+        function updateEnemies() {
+            enemies.forEach(enemy => {
+                enemy.x += enemy.dx * enemy.speed;
+                enemy.y += enemy.dy * enemy.speed;
+                
+                // Bounce off walls
+                const gridX = Math.floor(enemy.x / TILE_SIZE);
+                const gridY = Math.floor(enemy.y / TILE_SIZE);
+                
+                if (gridX < 0 || gridX >= MAP_WIDTH || gridY < 0 || gridY >= MAP_HEIGHT || 
+                    maze[gridY][gridX] === '🧱') {
+                    enemy.dx *= -1;
+                    enemy.dy *= -1;
+                    enemy.x += enemy.dx * enemy.speed * 2;
+                    enemy.y += enemy.dy * enemy.speed * 2;
+                }
+                
+                // Check collision with player
+                if (Math.abs(player.x - enemy.x) < TILE_SIZE/2 && 
+                    Math.abs(player.y - enemy.y) < TILE_SIZE/2) {
+                    takeDamage();
+                }
+            });
+        }
+        
+        function takeDamage() {
+            gameStats.hearts--;
+            updateUI();
+            
+            if (gameStats.hearts <= 0) {
+                gameOver();
+            }
+        }
+        
+        function updateCamera() {
+            camera.x = player.x - canvas.width / 2;
+            camera.y = player.y - canvas.height / 2;
+        }
+        
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw maze
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    const screenX = x * TILE_SIZE - camera.x;
+                    const screenY = y * TILE_SIZE - camera.y;
+                    
+                    if (screenX > -TILE_SIZE && screenX < canvas.width && 
+                        screenY > -TILE_SIZE && screenY < canvas.height) {
+                        ctx.font = `${TILE_SIZE}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText(maze[y][x], screenX + TILE_SIZE/2, screenY + TILE_SIZE*0.8);
+                    }
+                }
+            }
+            
+            // Draw money
+            ctx.font = '20px Arial';
+            money.forEach(coin => {
+                if (!coin.collected) {
+                    const screenX = coin.x - camera.x;
+                    const screenY = coin.y - camera.y;
+                    if (screenX > -50 && screenX < canvas.width + 50 && 
+                        screenY > -50 && screenY < canvas.height + 50) {
+                        ctx.fillText('💰', screenX, screenY);
+                    }
+                }
+            });
+            
+            // Draw NPCs
+            ctx.font = '32px Arial';
+            npcs.forEach(npc => {
+                const screenX = npc.x - camera.x;
+                const screenY = npc.y - camera.y;
+                ctx.fillText(npc.char, screenX, screenY);
+            });
+            
+            // Draw doors
+            doors.forEach(door => {
+                const screenX = door.x - camera.x;
+                const screenY = door.y - camera.y;
+                ctx.fillText(door.char, screenX, screenY);
+            });
+            
+            // Draw enemies
+            enemies.forEach(enemy => {
+                const screenX = enemy.x - camera.x;
+                const screenY = enemy.y - camera.y;
+                if (screenX > -50 && screenX < canvas.width + 50 && 
+                    screenY > -50 && screenY < canvas.height + 50) {
+                    ctx.fillText(enemy.char, screenX, screenY);
+                }
+            });
+            
+            // Draw player (always at center)
+            ctx.font = '32px Arial';
+            ctx.fillText(player.char, canvas.width / 2, canvas.height / 2);
+        }
+        
+        // Game states
+        function selectCharacter(char) {
+            selectedCharacter = char;
+            player.char = char;
+            
+            document.querySelectorAll('.character-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`[data-char="${char}"]`).classList.add('selected');
+        }
+        
+        function startGame() {
+            gameState = 'playing';
+            document.getElementById('characterSelect').style.display = 'none';
+            
+            // Reset game state
+            gameStats.money = 0;
+            gameStats.keys = 0;
+            
+            player.x = 50;
+            player.y = 50;
+            
+            generateMaze();
+            spawnEntities();
+            updateUI();
+            
+            gameLoop();
+        }
+        
+        function restartGame() {
+            gameStats.hearts = gameStats.maxHearts;
+            gameStats.money = 0;
+            gameStats.keys = 0;
+            localStorage.removeItem('playerHearts'); // Reset hearts on restart
+            
+            startGame();
+            document.getElementById('gameOverScreen').style.display = 'none';
+        }
+        
+        function gameOver() {
+            gameState = 'gameOver';
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        }
+        
+        function completeLevel() {
+            gameState = 'levelComplete';
+            localStorage.setItem('playerHearts', gameStats.hearts.toString());
+            document.getElementById('levelCompleteScreen').style.display = 'flex';
+        }
+        
+        function nextLevel() {
+            // This would link to level 2
+            alert('Level 2 coming soon!');
+            showCharacterSelect();
+        }
+        
+        function showCharacterSelect() {
+            gameState = 'characterSelect';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('levelCompleteScreen').style.display = 'none';
+            document.getElementById('characterSelect').style.display = 'flex';
+        }
+        
+        function updateUI() {
+            document.getElementById('hearts').textContent = gameStats.hearts;
+            document.getElementById('money').textContent = gameStats.money;
+            document.getElementById('keys').textContent = gameStats.keys;
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (gameState === 'playing') {
+                // Handle keyboard input
+                if (keys['ArrowUp'] || keys['w'] || keys['W']) move('up');
+                if (keys['ArrowDown'] || keys['s'] || keys['S']) move('down');
+                if (keys['ArrowLeft'] || keys['a'] || keys['A']) move('left');
+                if (keys['ArrowRight'] || keys['d'] || keys['D']) move('right');
+                if (keys[' '] || keys['Enter']) interact();
+                
+                updateEnemies();
+                updateCamera();
+                spawnForegroundEnemy();
+                updateForegroundEnemy();
+                render();
+            }
+            
             requestAnimationFrame(gameLoop);
-        };
-        gameLoop();
-    }
-    
-    updatePlayer() {
-        if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
-            const newX = this.playerX + this.playerVelocityX;
-            const newY = this.playerY + this.playerVelocityY;
-            
-            if (this.canMoveTo(newX, newY)) {
-                this.playerX = newX;
-                this.playerY = newY;
-                this.player.style.left = this.playerX + 'px';
-                this.player.style.top = this.playerY + 'px';
-            }
-            
-            this.playerVelocityX *= 0.9;
-            this.playerVelocityY *= 0.9;
-        }
-    }
-    
-    canMoveTo(x, y) {
-        const playerSize = 24;
-        const padding = 2;
-        
-        const points = [
-            {x: x + padding, y: y + padding},
-            {x: x + playerSize - padding, y: y + padding},
-            {x: x + padding, y: y + playerSize - padding},
-            {x: x + playerSize - padding, y: y + playerSize - padding},
-            {x: x + playerSize/2, y: y + padding},
-            {x: x + playerSize/2, y: y + playerSize - padding},
-            {x: x + padding, y: y + playerSize/2},
-            {x: x + playerSize - padding, y: y + playerSize/2}
-        ];
-        
-        const walls = this.gameWorld.querySelectorAll('.maze-wall');
-        
-        for (let wall of walls) {
-            const wallRect = {
-                left: parseInt(wall.style.left),
-                top: parseInt(wall.style.top),
-                right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-            };
-            
-            for (let point of points) {
-                if (point.x >= wallRect.left && point.x <= wallRect.right &&
-                    point.y >= wallRect.top && point.y <= wallRect.bottom) {
-                    return false;
-                }
-            }
         }
         
-        return true;
-    }
-    
-    updateMovingEnemies() {
-        this.movingEnemies.forEach(enemy => {
-            if (enemy.axis === 'x') {
-                enemy.currentX += enemy.direction * enemy.speed;
-                if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
-                    enemy.direction *= -1;
-                }
-                enemy.element.style.left = enemy.currentX + 'px';
-            } else {
-                enemy.currentY += enemy.direction * enemy.speed;
-                if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
-                    enemy.direction *= -1;
-                }
-                enemy.element.style.top = enemy.currentY + 'px';
-            }
-        });
-    }
-    
-    updateCamera() {
-        const gameAreaRect = this.gameArea.getBoundingClientRect();
-        const centerX = gameAreaRect.width / 2;
-        const centerY = gameAreaRect.height / 2;
-        
-        this.cameraX = centerX - this.playerX - 12;
-        this.cameraY = centerY - this.playerY - 12;
-        
-        this.gameWorld.style.transform = `translate(${this.cameraX}px, ${this.cameraY}px)`;
-    }
-    
-    checkCollisions() {
-        if (this.isInvulnerable) return;
-        
-        const playerRect = {
-            left: this.playerX,
-            top: this.playerY,
-            right: this.playerX + 24,
-            bottom: this.playerY + 24
-        };
-        
-        // Check enemy collisions
-        this.movingEnemies.forEach(enemy => {
-            const enemyRect = {
-                left: enemy.currentX,
-                top: enemy.currentY,
-                right: enemy.currentX + 22,
-                bottom: enemy.currentY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, enemyRect)) {
-                this.takeDamage();
-            }
-        });
-        
-        // Check friendly NPCs
-        const friendlies = this.gameWorld.querySelectorAll('.friendly');
-        friendlies.forEach(friendly => {
-            const friendlyX = parseInt(friendly.style.left);
-            const friendlyY = parseInt(friendly.style.top);
-            const friendlyRect = {
-                left: friendlyX,
-                top: friendlyY,
-                right: friendlyX + 22,
-                bottom: friendlyY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, friendlyRect)) {
-                const now = Date.now();
-                const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                if (now - lastTime > 1800) {
-                    this.showMessage(friendly.dataset.message);
-                    this.lastInteractionTime[friendly.dataset.message] = now;
-                }
-            }
-        });
-        
-        // Check heart pickup
-        const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
-        hearts.forEach(heart => {
-            const heartX = parseInt(heart.style.left);
-            const heartY = parseInt(heart.style.top);
-            const heartRect = {
-                left: heartX,
-                top: heartY,
-                right: heartX + 22,
-                bottom: heartY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, heartRect)) {
-                if (this.hearts < 3) {
-                    this.hearts++;
-                    this.showMessage('❤️ Health restored!');
-                    this.updateUI();
-                    heart.remove();
-                }
-            }
-        });
-        
-        // Check money pickup
-        const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
-        moneyItems.forEach(money => {
-            const moneyX = parseInt(money.style.left);
-            const moneyY = parseInt(money.style.top);
-            const moneyRect = {
-                left: moneyX,
-                top: moneyY,
-                right: moneyX + 22,
-                bottom: moneyY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, moneyRect)) {
-                this.money += 100;
-                localStorage.setItem('money', this.money);
-                this.showMessage('💰 +100¥ collected!');
-                this.updateUI();
-                money.remove();
-            }
-        });
-        
-        // Check key pickup
-        const key = this.gameWorld.querySelector('.key');
-        if (key && !this.hasKey) {
-            const keyX = parseInt(key.style.left);
-            const keyY = parseInt(key.style.top);
-            const keyRect = {
-                left: keyX,
-                top: keyY,
-                right: keyX + 22,
-                bottom: keyY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, keyRect)) {
-                this.hasKey = true;
-                this.showMessage('🔑 Key collected!');
-                key.remove();
-                this.updateUI();
-            }
-        }
-        
-        // Check exit
-        const exit = this.gameWorld.querySelector('.exit');
-        if (exit) {
-            const exitX = parseInt(exit.style.left);
-            const exitY = parseInt(exit.style.top);
-            const exitRect = {
-                left: exitX,
-                top: exitY,
-                right: exitX + 30,
-                bottom: exitY + 30
-            };
-            
-            if (this.rectsOverlap(playerRect, exitRect)) {
-                if (this.hasKey) {
-                    this.completeLevel();
-                } else {
-                    this.showMessage('🔒 You need the key first!');
-                }
-            }
-        }
-    }
-    
-    rectsOverlap(rect1, rect2) {
-        return rect1.left < rect2.right &&
-               rect1.right > rect2.left &&
-               rect1.top < rect2.bottom &&
-               rect1.bottom > rect2.top;
-    }
-    
-    takeDamage() {
-        if (this.isInvulnerable) return;
-        
-        this.hearts--;
-        this.showMessage('💔 Ouch!');
-        this.updateUI();
-        
-        this.isInvulnerable = true;
-        this.player.classList.add('invulnerable');
-        
-        setTimeout(() => {
-            this.isInvulnerable = false;
-            this.player.classList.remove('invulnerable');
-        }, 1000);
-        
-        if (this.hearts <= 0) {
-            this.gameOver();
-        }
-    }
-    
-    showMessage(text) {
-        const message = document.getElementById('message');
-        message.textContent = text;
-        message.style.display = 'block';
-        
-        clearTimeout(this.messageTimeout);
-        this.messageTimeout = setTimeout(() => {
-            message.style.display = 'none';
-        }, 2000);
-    }
-    
-    updateUI() {
-        document.getElementById('hearts').textContent = this.hearts;
-        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Found!' : '🔑 Need Key';
-        document.getElementById('money').textContent = this.money;
-    }
-    
-    completeLevel() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        
-        localStorage.setItem('key1', 'unlocked');
-        const timeBonus = Math.floor(this.timeLeft / 60) * 100;
-        const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
-        document.getElementById('timeBonus').textContent = bonusText;
-        
-        this.showLevelComplete('✅ Level Complete!', 'You escaped the hospital!');
-    }
-    
-    showLevelComplete(title, text) {
-        document.getElementById('levelCompleteTitle').textContent = title;
-        document.getElementById('levelCompleteText').textContent = text;
-        document.getElementById('levelComplete').style.display = 'flex';
-    }
-    
-    gameOver() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        this.money = 0;
-        localStorage.setItem('money', this.money);
-        this.showMessage('💀 Game Over!');
-        setTimeout(() => {
-            this.showLevelComplete('💀 Game Over', 'Try again!');
-        }, 2000);
-    }
-}
-
-let game;
-
-function startGame() {
-    try {
-        console.log('Start Game button clicked!');
-        const startScreen = document.getElementById('startScreen');
-        if (!startScreen) throw new Error('Start screen element not found!');
-        startScreen.style.display = 'none';
-        game = new MazeGame();
-        game.initLevel();
-        game.startGameTimer();
-    } catch (error) {
-        console.error('Error starting game:', error);
-    }
-}
-
-function nextLevel() {
-    try {
-        // Redirect to actual Level 2 URL
-        window.location.href = 'https://thedepression.github.io/games/maze/level2';
-    } catch (error) {
-        console.error('Error advancing to next level:', error);
-    }
-}
-
-function restartGame() {
-    try {
-        game.hearts = 3;
-        game.money = parseInt(localStorage.getItem('money')) || 0;
-        game.initLevel();
-        game.startGameTimer();
-        document.getElementById('levelComplete').style.display = 'none';
-    } catch (error) {
-        console.error('Error restarting game:', error);
-    }
-}
+        // Initialize
+        updateUI();
+        document.getElementById('characterSelect').style.display = 'flex';
     </script>
 </body>
 </html>
