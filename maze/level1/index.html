@@ -640,11 +640,11 @@ class MazeGame {
             exitEl.style.top = mazeData.exit.y + 'px';
             this.gameWorld.appendChild(exitEl);
             
-            this.updateCamera();
-        } catch (error) {
-            console.error('Error generating maze:', error);
-        }
-    }
+// Removed updateCamera call
+} catch (error) {
+    console.error('Error generating maze:', error);
+}
+}
     
     startGameLoop() {
         const gameLoop = () => {
