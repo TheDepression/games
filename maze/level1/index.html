@@ -743,43 +743,39 @@ class MazeGame {
     }
     
     updateForegroundEnemy() {
-        if (!this.gameStarted) return;
-        
-        const now = Date.now();
-        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > (Math.random() * 30000 + 20000)) {
-            const direction = Math.random() < 0.5 ? -1 : 1;
-            const startX = direction > 0 ? -60 : 1600;
-            const y = Math.random() * 940; // Within 1000px height, adjusted for size
-            const speed = (1600 / 3) / 60; // Cross 1600px in 3 seconds, ~60 FPS
-            
-            const enemyEl = document.createElement('div');
-            enemyEl.className = 'foreground-enemy';
-            enemyEl.textContent = '🦠';
-            enemyEl.style.left = startX + 'px';
-            enemyEl.style.top = y + 'px';
-            this.gameWorld.appendChild(enemyEl);
-            
-            this.foregroundEnemy = {
-                element: enemyEl,
-                x: startX,
-                y: y,
-                speed: speed,
-                direction: direction
-            };
-            this.lastForegroundSpawn = now;
-        }
-        
-        if (this.foregroundEnemy) {
-            this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
-            this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
-            this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
-            
-            if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1600) {
-                this.foregroundEnemy.element.remove();
-                this.foregroundEnemy = null;
-            }
+    if (!this.gameStarted) return;
+    const now = Date.now();
+    if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000) { // Every 20s
+        const playerCenterX = this.playerX + 12; // Player center
+        const direction = playerCenterX < 800 ? 1 : -1; // Right if player on left, left if on right
+        const startX = direction > 0 ? -60 : 1600;
+        const y = Math.random() * 940;
+        const speed = (1600 / 20) / 60; // 1600px in 20s, ~60 FPS
+        const enemyEl = document.createElement('div');
+        enemyEl.className = 'foreground-enemy';
+        enemyEl.textContent = '🦠';
+        enemyEl.style.left = startX + 'px';
+        enemyEl.style.top = y + 'px';
+        this.gameWorld.appendChild(enemyEl);
+        this.foregroundEnemy = {
+            element: enemyEl,
+            x: startX,
+            y: y,
+            speed: speed,
+            direction: direction
+        };
+        this.lastForegroundSpawn = now;
+    }
+    if (this.foregroundEnemy) {
+        this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
+        this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+        this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+        if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1600) {
+            this.foregroundEnemy.element.remove();
+            this.foregroundEnemy = null;
         }
     }
+}
     
     checkCollisions() {
         if (this.isInvulnerable) return;
