@@ -824,11 +824,11 @@ friendlies.forEach(friendly => {
         bottom: friendlyY + 22
     };
     const adjustedPlayerRect = {
-        left: this.playerX - this.gameArea.scrollLeft,
-        top: this.playerY - this.gameArea.scrollTop,
-        right: this.playerX + 24 - this.gameArea.scrollLeft,
-        bottom: this.playerY + 24 - this.gameArea.scrollTop
-    };
+    left: this.playerX,
+    top: this.playerY,
+    right: this.playerX + 24,
+    bottom: this.playerY + 24
+};
     if (this.rectsOverlap(adjustedPlayerRect, friendlyRect)) {
         const now = Date.now();
         const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
