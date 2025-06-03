@@ -287,13 +287,13 @@
     <div id="ui">
         <div>Level: 1</div>
         <div>❤️ <span id="hearts">3</span></div>
-        <div id="keyStatus">🔑 Need Key</div>
+        <div id="keyStatus">🔑 まだまだ</div>
         <div>💰 <span id="money">0</span>¥</div>
     </div>
     <div id="timer">3:00</div>
     <div id="gameArea">
         <div id="gameWorld">
-            <div id="player">😷</div>
+            <div id="player">😐</div>
         </div>
     </div>
     <div id="message"></div>
@@ -303,22 +303,22 @@
             <div style="font-size: 12px; opacity: 0.8;">Find the key and escape!</div>
         </div>
         <div class="control-hint">
-            <div>🎮 Swipe here to move</div>
+            <div>🎮 ここをスワイプして移動 </div>
             <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid viruses & collect money!</div>
         </div>
     </div>
         
         <div id="startScreen">
             <h2>🏥 Hospital Escape</h2>
-            <p style="margin: 20px 0;">Navigate the hospital maze!</p>
+            <p style="margin: 20px 0;">ひどい病院🏥</p>
             <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
-            <p style="font-size: 14px; margin: 10px 0;">Select Character:</p>
+            <p style="font-size: 14px; margin: 10px 0;">好きなエモジにして:</p>
             <div>
-                <button onclick="selectCharacter('😎')">😎</button>
-                <button onclick="selectCharacter('🤢')">🤢</button>
+                <button onclick="selectCharacter('😐')">😐</button>
+                <button onclick="selectCharacter('🥸')">🥸</button>
                 <button onclick="selectCharacter('😺')">😺</button>
                 <button onclick="selectCharacter('👩🏻')">👩🏻</button>
-                <button onclick="selectCharacter('👩🏽‍🦱')">👩🏽‍🦱</button>
+                <button onclick="selectCharacter('😎')">😎</button>
                 <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
             </div>
             <button class="start-button" onclick="startGame()">START GAME</button>
@@ -847,11 +847,11 @@ friendlies.forEach(friendly => {
                 if (this.money >= 500) {
                     this.money -= 500;
                     this.hasKey = true;
-                    this.showMessage('ありがとうございました!');
-                    friendly.dataset.message = 'ありがとうございました!';
+                    this.showMessage('ありがとうございました!🔑をどうぞ');
+                    friendly.dataset.message = 'ありがとうございました!🔑をどうぞ';
                     this.updateUI();
                 } else {
-                    this.showMessage('🔒 500¥ needed for the key!');
+                    this.showMessage('🔑ほしいなら、500円ちょうだい');
                 }
             } else {
                 this.showMessage(friendly.dataset.message);
@@ -919,7 +919,7 @@ friendlies.forEach(friendly => {
                 if (this.hasKey) {
                     this.completeLevel();
                 } else {
-                    this.showMessage('🔒 You need the key first!');
+                    this.showMessage('カギ🔐なしでダメ🙅');
                 }
             }
         }
@@ -965,7 +965,7 @@ friendlies.forEach(friendly => {
     
     updateUI() {
         document.getElementById('hearts').textContent = this.hearts;
-        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Found!' : '🔑 Need Key';
+        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 ある!!!' : '🔑 まだまだ';
         document.getElementById('money').textContent = this.money;
     }
     
@@ -1014,7 +1014,7 @@ showLevelComplete(title, text) {
 }
 }
 let game;
-let selectedCharacter = '😷'; // Default
+let selectedCharacter = '😐'; // Default
 
 function selectCharacter(emoji) {
     selectedCharacter = emoji;
