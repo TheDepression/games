@@ -298,10 +298,10 @@
     <div id="ui">
         <div>Level: 3</div>
         <div>❤️ <span id="hearts">3</span></div>
-        <div id="keyStatus">🔑 Need Key</div>
+        <div id="keyStatus">🔑 まだまだ</div>
         <div>💰 <span id="money">0</span>¥</div>
     </div>
-    <div id="timer">5:00</div>
+    <div id="timer">3:00</div>
     <div id="gameArea">
         <div id="gameWorld">
             <div id="player">😐</div>
@@ -314,22 +314,22 @@
             <div style="font-size: 12px; opacity: 0.8;">Escape the bugs!</div>
         </div>
         <div class="control-hint">
-            <div>🎮 Swipe here to move</div>
+            <div>🎮 ここをスワイプして移動 </div>
             <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid bugs & collect money!</div>
         </div>
     </div>
         
         <div id="startScreen">
             <h2>⛏️ Underground Depths</h2>
-            <p style="margin: 20px 0;">Navigate the dark tunnels!</p>
+            <p style="margin: 20px 0;">虫だらけ</p>
             <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
-            <p style="font-size: 14px; margin: 10px 0;">Select Character:</p>
+            <p style="font-size: 14px; margin: 10px 0;">好きなエモジにして:</p>
             <div>
-                <button onclick="selectCharacter('😎')">😎</button>
-                <button onclick="selectCharacter('🤢')">🤢</button>
+                <button onclick="selectCharacter('😐')">😐</button>
+                <button onclick="selectCharacter('🥸')">🥸</button>
                 <button onclick="selectCharacter('😺')">😺</button>
                 <button onclick="selectCharacter('👩🏻')">👩🏻</button>
-                <button onclick="selectCharacter('👩🏽‍🦱')">👩🏽‍🦱</button>
+                <button onclick="selectCharacter('😎')">😎</button>
                 <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
             </div>
             <button class="start-button" onclick="startGame()">START GAME</button>
@@ -362,7 +362,7 @@ class MazeGame {
             this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
             this.hasKey = false;
             this.gameStarted = false;
-            this.timeLeft = 300; // 5 minutes
+            this.timeLeft = 180; // 3 minutes
             this.timerInterval = null;
             this.isInvulnerable = false;
             this.money = 0;
@@ -448,7 +448,7 @@ class MazeGame {
     startGameTimer() {
         try {
             this.gameStarted = true;
-            this.timeLeft = 300;
+            this.timeLeft = 180;
             this.updateTimer();
             this.bgMusic.play().catch(e => console.log('Music play failed:', e));
             
@@ -531,7 +531,6 @@ class MazeGame {
                     
                     // Enhanced edge protrusions
                     {x: 20, y: 100, w: 180, h: 20}, // From left
-                    {x: 20, y: 300, w: 200, h: 20}, // From left
                     {x: 20, y: 500, w: 150, h: 20}, // From left
                     {x: 20, y: 700, w: 170, h: 20}, // From left
                     {x: 20, y: 900, w: 160, h: 20}, // From left
@@ -638,7 +637,7 @@ class MazeGame {
                 ],
                 hearts: [{x: 1100, y: 500}],
                 money: [
-                    {x: 500, y: 600}, {x: 800, y: 720},
+                    {x: 30, y: 1370}, {x: 800, y: 720},
                     {x: 1200, y: 640}, {x: 1300, y: 300},
                     {x: 1900, y: 900}, {x: 600, y: 400},
                     {x: 1500, y: 800}
@@ -920,14 +919,14 @@ class MazeGame {
                 const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
                 if (now - lastTime > 1800) {
                     if (friendly.dataset.message === "🔑ほしいなら、500円ちょうだい" && !this.hasKey) {
-                        if (this.money >= 500) {
-                            this.money -= 500;
+                        if (this.money >= 700) {
+                            this.money -= 700;
                             this.hasKey = true;
-                            this.showMessage('ありがとうございました!');
-                            friendly.dataset.message = 'ありがとうございました!';
+                            this.showMessage('ありがとうございました!🔑をどうぞ');
+                            friendly.dataset.message = 'ありがとうございました!🔑をどうぞ';
                             this.updateUI();
                         } else {
-                            this.showMessage('🔒 500¥ needed for the key!');
+                            this.showMessage('🔑ほしいなら、500円ちょうだい');
                         }
                     } else {
                         this.showMessage(friendly.dataset.message);
@@ -995,7 +994,7 @@ class MazeGame {
                 if (this.hasKey) {
                     this.completeLevel();
                 } else {
-                    this.showMessage('🔒 You need the key first!');
+                    this.showMessage('カギ🔐なしでダメ🙅');
                 }
             }
         }
@@ -1041,7 +1040,7 @@ class MazeGame {
     
     updateUI() {
         document.getElementById('hearts').textContent = this.hearts;
-        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Found!' : '🔑 Need Key';
+        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 ある!!!' : '🔑 まだまだ';
         document.getElementById('money').textContent = this.money;
     }
     
@@ -1068,7 +1067,7 @@ class MazeGame {
         const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
         document.getElementById('timeBonus').textContent = bonusText;
         
-        this.showLevelComplete('🎉 Game Complete!', 'Congratulations! You beat all levels!');
+        this.showLevelComplete('🎉 Game Complete!', おめでとう🥳');
     }
     
     gameOver() {
@@ -1081,7 +1080,7 @@ class MazeGame {
         document.getElementById('timer').style.display = 'none';
         setTimeout(() => {
             window.location.href = 'https://thedepression.github.io/games/maze/level1';
-        }, 3000);
+        }, 1800);
     }
     
     showLevelComplete(title, text) {
