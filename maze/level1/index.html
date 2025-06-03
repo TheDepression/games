@@ -488,6 +488,16 @@ class MazeGame {
             document.getElementById('timer').style.background = 'rgba(255,0,0,0.8)';
             this.updateUI();
             this.generateMaze();
+// Center camera on player
+const gameAreaWidth = this.gameArea.offsetWidth;
+const gameAreaHeight = this.gameArea.offsetHeight;
+const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+this.gameArea.scrollTo({
+    left: scrollX,
+    top: scrollY,
+    behavior: 'auto'
+});
         } catch (error) {
             console.error('Error initializing level:', error);
         }
