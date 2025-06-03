@@ -35,7 +35,7 @@
             height: 357.5px;
             position: relative;
             overflow: hidden;
-            background: #2c2c44;
+            background: #5f5d80;
             touch-action: none;
         }
         
@@ -288,23 +288,23 @@
     <div id="ui">
         <div>Level: 2</div>
         <div>❤️ <span id="hearts">3</span></div>
-        <div id="keyStatus">🔑 Need Key</div>
+        <div id="keyStatus">🔑 まだまだ</div>
         <div>💰 <span id="money">0</span>¥</div>
     </div>
     <div id="timer">3:00</div>
     <div id="gameArea">
         <div id="gameWorld">
-            <div id="player">😱</div>
+            <div id="player">😐</div>
         </div>
     </div>
     <div id="message"></div>
     <div id="controlArea">
         <div style="text-align: center; margin-bottom: 10px;">
             <div style="font-size: 18px; font-weight: bold;">Haunted House</div>
-            <div style="font-size: 12px; opacity: 0.8;">Escape the ghosts!</div>
+            <div style="font-size: 12px; opacity: 0.8;">おばけやしき</div>
         </div>
         <div class="control-hint">
-            <div>🎮 Swipe here to move</div>
+            <div>🎮 ここをスワイプして移動 </div>
             <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid ghosts & collect money!</div>
         </div>
     </div>
@@ -315,11 +315,11 @@
             <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
             <p style="font-size: 14px; margin: 10px 0;">Select Character:</p>
             <div>
-                <button onclick="selectCharacter('😎')">😎</button>
-                <button onclick="selectCharacter('🤢')">🤢</button>
+                <button onclick="selectCharacter('😐')">😐</button>
+                <button onclick="selectCharacter('🥸')">🥸</button>
                 <button onclick="selectCharacter('😺')">😺</button>
                 <button onclick="selectCharacter('👩🏻')">👩🏻</button>
-                <button onclick="selectCharacter('👩🏽‍🦱')">👩🏽‍🦱</button>
+                <button onclick="selectCharacter('😎')">😎</button>
                 <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
             </div>
             <button class="start-button" onclick="startGame()">START GAME</button>
@@ -595,13 +595,13 @@ class MazeGame {
                 ],
                 friendlies: [
                     {x: 600, y: 300, message: "オバケこわい!!"}, // Wizard
-                    {x: 1100, y: 500, message: "🔑ほしいなら、500円ちょうだい"} // Witch
+                    {x: 1100, y: 500, message: "🔑ほしいなら、600円ちょうだい"} // Witch
                 ],
                 hearts: [{x: 1100, y: 400}],
                 money: [
                     {x: 400, y: 500}, {x: 800, y: 720},
                     {x: 1200, y: 640}, {x: 1300, y: 300},
-                    {x: 1500, y: 900}
+                    {x: 1500, y: 900}, {x: 1920, y: 1170}
                 ],
                 exit: {x: 60, y: 1100} // Opposite corner
             };
@@ -878,15 +878,15 @@ class MazeGame {
                 const now = Date.now();
                 const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
                 if (now - lastTime > 1800) {
-                    if (friendly.dataset.message === "🔑ほしいなら、500円ちょうだい" && !this.hasKey) {
-                        if (this.money >= 500) {
-                            this.money -= 500;
+                    if (friendly.dataset.message === "🔑ほしいなら、600円ちょうだい" && !this.hasKey) {
+                        if (this.money >= 600) {
+                            this.money -= 600;
                             this.hasKey = true;
-                            this.showMessage('ありがとうございました!');
-                            friendly.dataset.message = 'ありがとうございました!';
+                            this.showMessage('ありがとうございました!🔑をどうぞ');
+                            friendly.dataset.message = 'ありがとうございました!🔑をどうぞ';
                             this.updateUI();
                         } else {
-                            this.showMessage('🔒 500¥ needed for the key!');
+                            this.showMessage('🔑ほしいなら、600円ちょうだい');
                         }
                     } else {
                         this.showMessage(friendly.dataset.message);
@@ -954,7 +954,7 @@ class MazeGame {
                 if (this.hasKey) {
                     this.completeLevel();
                 } else {
-                    this.showMessage('🔒 You need the key first!');
+                    this.showMessage('カギ🔐なしでダメ🙅');
                 }
             }
         }
@@ -1000,7 +1000,7 @@ class MazeGame {
     
     updateUI() {
         document.getElementById('hearts').textContent = this.hearts;
-        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Found!' : '🔑 Need Key';
+        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 ある!!!' : '🔑 まだまだ';
         document.getElementById('money').textContent = this.money;
     }
     
@@ -1054,7 +1054,7 @@ class MazeGame {
 }
 
 let game;
-let selectedCharacter = localStorage.getItem('selectedCharacter') || '😱'; // Get from localStorage or default
+let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐'; // Get from localStorage or default
 
 function selectCharacter(emoji) {
     selectedCharacter = emoji;
