@@ -632,7 +632,7 @@ class MazeGame {
                     {x: 2050, y: 350, moveX: 2030, moveY: 350, range: 90, axis: 'x', speed: 2.0}
                 ],
                 friendlies: [
-                    {x: 700, y: 300, message: "🔑ほしいなら、500円ちょうだい"}, // First person
+                    {x: 700, y: 300, message: "🔑ほしいなら、700円ちょうだい"}, // First person
                     {x: 1300, y: 500, message: "虫がきらい。げきおこぷんぷんまる😡"} // Second person
                 ],
                 hearts: [{x: 1100, y: 500}],
@@ -918,7 +918,7 @@ class MazeGame {
                 const now = Date.now();
                 const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
                 if (now - lastTime > 1800) {
-                    if (friendly.dataset.message === "🔑ほしいなら、500円ちょうだい" && !this.hasKey) {
+                    if (friendly.dataset.message === "🔑ほしいなら、700円ちょうだい" && !this.hasKey) {
                         if (this.money >= 700) {
                             this.money -= 700;
                             this.hasKey = true;
@@ -926,7 +926,7 @@ class MazeGame {
                             friendly.dataset.message = 'ありがとうございました!🔑をどうぞ';
                             this.updateUI();
                         } else {
-                            this.showMessage('🔑ほしいなら、500円ちょうだい');
+                            this.showMessage('🔑ほしいなら、700円ちょうだい');
                         }
                     } else {
                         this.showMessage(friendly.dataset.message);
