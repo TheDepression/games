@@ -983,6 +983,7 @@ friendlies.forEach(friendly => {
         
         localStorage.setItem('key1', 'unlocked');
         localStorage.setItem('hearts', this.hearts);
+        localStorage.setItem('selectedCharacter', selectedCharacter);
         const timeBonus = Math.floor(this.timeLeft / 60) * 100;
         const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
         document.getElementById('timeBonus').textContent = bonusText;
