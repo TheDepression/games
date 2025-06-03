@@ -1016,6 +1016,8 @@ function startGame() {
         const startScreen = document.getElementById('startScreen');
         if (!startScreen) throw new Error('Start screen element not found!');
         startScreen.style.display = 'none';
+        document.getElementById('ui').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
         game = new MazeGame();
         game.initLevel();
         game.startGameTimer();
