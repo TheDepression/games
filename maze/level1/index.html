@@ -823,15 +823,21 @@ class MazeGame {
         // Check friendly NPCs
         const friendlies = this.gameWorld.querySelectorAll('.friendly');
 friendlies.forEach(friendly => {
-    const friendlyX = parseInt(friendly.style.left) - this.gameArea.scrollLeft;
-    const friendlyY = parseInt(friendly.style.top) - this.gameArea.scrollTop;
+    const friendlyX = parseInt(friendly.style.left);
+    const friendlyY = parseInt(friendly.style.top);
     const friendlyRect = {
         left: friendlyX,
         top: friendlyY,
         right: friendlyX + 22,
         bottom: friendlyY + 22
     };
-    if (this.rectsOverlap(playerRect, friendlyRect)) {
+    const adjustedPlayerRect = {
+        left: this.playerX - this.gameArea.scrollLeft,
+        top: this.playerY - this.gameArea.scrollTop,
+        right: this.playerX + 24 - this.gameArea.scrollLeft,
+        bottom: this.playerY + 24 - this.gameArea.scrollTop
+    };
+    if (this.rectsOverlap(adjustedPlayerRect, friendlyRect)) {
         const now = Date.now();
         const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
         if (now - lastTime > 1800) {
