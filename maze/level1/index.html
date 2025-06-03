@@ -982,24 +982,26 @@ friendlies.forEach(friendly => {
         this.showLevelComplete('✅ Level Complete!', 'You escaped the hospital!');
     }
     
-    showLevelComplete(title, text) {
-        document.getElementById('levelCompleteTitle').textContent = title;
-        document.getElementById('levelCompleteText').textContent = text;
-        document.getElementById('levelComplete').style.display = 'flex';
-        document.getElementById('nextLevelButton').style.display = title === '✅ Level Complete!' ? 'block' : 'none';
-        document.getElementById('retryButton').style.display = title === '✅ Level Complete!' ? 'none' : 'block';
-    }
-    
     gameOver() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        this.resetStats();
-        this.showMessage('💀 Game Over!');
-        setTimeout(() => {
-            this.showLevelComplete('💀 Game Over', 'Try again!');
-        }, 2000);
-    }
+    clearInterval(this.timerInterval);
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    this.resetStats();
+    this.showMessage('💀 Game Over!');
+    document.getElementById('ui').style.display = 'none';
+    document.getElementById('timer').style.display = 'none';
+    setTimeout(() => {
+        this.showLevelComplete('💀 Game Over', 'Try again!');
+    }, 2000);
+}
+showLevelComplete(title, text) {
+    document.getElementById('levelCompleteTitle').textContent = title;
+    document.getElementById('levelCompleteText').textContent = text;
+    document.getElementById('levelComplete').style.display = 'flex';
+    document.getElementById('nextLevelButton').style.display = title === '✅ Level Complete!' ? 'block' : 'none';
+    document.getElementById('retryButton').style.display = title === '✅ Level Complete!' ? 'none' : 'block';
+    document.getElementById('ui').style.display = 'none';
+    document.getElementById('timer').style.display = 'none';
 }
 
 let game;
