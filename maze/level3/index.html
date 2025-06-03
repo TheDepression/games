@@ -301,7 +301,7 @@
         <div id="keyStatus">🔑 まだまだ</div>
         <div>💰 <span id="money">0</span>¥</div>
     </div>
-    <div id="timer">3:00</div>
+    <div id="timer">5:00</div>
     <div id="gameArea">
         <div id="gameWorld">
             <div id="player">😐</div>
@@ -362,7 +362,7 @@ class MazeGame {
             this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
             this.hasKey = false;
             this.gameStarted = false;
-            this.timeLeft = 180; // 3 minutes
+            this.timeLeft = 300; // 5 minutes
             this.timerInterval = null;
             this.isInvulnerable = false;
             this.money = 0;
@@ -448,7 +448,7 @@ class MazeGame {
     startGameTimer() {
         try {
             this.gameStarted = true;
-            this.timeLeft = 180;
+            this.timeLeft = 300;
             this.updateTimer();
             this.bgMusic.play().catch(e => console.log('Music play failed:', e));
             
@@ -635,9 +635,10 @@ class MazeGame {
                     {x: 700, y: 300, message: "🔑ほしいなら、700円ちょうだい"}, // First person
                     {x: 1300, y: 500, message: "虫がきらい。げきおこぷんぷんまる😡"} // Second person
                 ],
-                hearts: [{x: 1100, y: 500}],
+                hearts: [{x: 450, y: 750}, {x: 2370, y: 30},
+                         {x: 1100, y: 500}],
                 money: [
-                    {x: 30, y: 1370}, {x: 800, y: 720},
+                    {x: 2370, y: 1370}, {x: 800, y: 720},
                     {x: 1200, y: 640}, {x: 1300, y: 300},
                     {x: 1900, y: 900}, {x: 600, y: 400},
                     {x: 1500, y: 800}
