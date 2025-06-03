@@ -1041,6 +1041,8 @@ function restartGame() {
         game.initLevel();
         game.startGameTimer();
         document.getElementById('levelComplete').style.display = 'none';
+        document.getElementById('ui').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
     } catch (error) {
         console.error('Error restarting game:', error);
     }
