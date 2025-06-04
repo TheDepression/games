@@ -734,78 +734,91 @@ this.initRoom();
         }
 
         checkCollisions() {
-            if (this.isInvulnerable) return;
-            
-            const playerRect = {
-                left: this.playerX,
-                top: this.playerY,
-                right: this.playerX + 24,
-                bottom: this.playerY + 24
-            };
-            
-            // Check boss collision (instant death)
-            const bossRect = {
-                left: this.bossX,
-                top: this.bossY,
-                right: this.bossX + 80,
-                bottom: this.bossY + 80
-            };
-            
-            if (this.rectsOverlap(playerRect, bossRect)) {
-                this.hearts = 0;
-                this.takeDamage();
-                return;
-            }
-            
-            // Check projectile collisions
-            this.projectiles.forEach((projectile, index) => {
-                const projRect = {
-                    left: projectile.x,
-                    top: projectile.y,
-                    right: projectile.x + 16,
-                    bottom: projectile.y + 16
-                };
-                
-                if (this.rectsOverlap(playerRect, projRect)) {
-                    this.takeDamage();
-                    projectile.element.remove();
-                    this.projectiles.splice(index, 1);
-                }
-            });
-            
-            // Check wall collisions (electric damage)
-if (!this.bossDefeated) {
-    const walls = this.gameWorld.querySelectorAll('.maze-wall');
-    walls.forEach(wall => {
-        const wallRect = {
-            left: parseInt(wall.style.left),
-            top: parseInt(wall.style.top),
-            right: parseInt(wall.style.left) + parseInt(wall.style.width),
-            bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+    if (this.isInvulnerable) return;
+    
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    // Check boss collision (instant death)
+    if (!this.bossDefeated) {
+        const bossRect = {
+            left: this.bossX,
+            top: this.bossY,
+            right: this.bossX + 80,
+            bottom: this.bossY + 80
         };
-        
-        if (this.rectsOverlap(playerRect, wallRect)) {
+        if (this.rectsOverlap(playerRect, bossRect)) {
+            this.hearts = 0;
             this.takeDamage();
+            return;
+        }
+    }
+    
+    // Check projectile collisions
+    this.projectiles.forEach((projectile, index) => {
+        const projRect = {
+            left: projectile.x,
+            top: projectile.y,
+            right: projectile.x + 16,
+            bottom: projectile.y + 16
+        };
+        if (this.rectsOverlap(playerRect, projRect)) {
+            this.takeDamage();
+            projectile.element.remove();
+            this.projectiles.splice(index, 1);
         }
     });
-}
-            
-            // Check TNT collision
-            if (this.currentTnt) {
-                const tntX = parseInt(this.currentTnt.style.left);
-                const tntY = parseInt(this.currentTnt.style.top);
-                const tntRect = {
-                    left: tntX,
-                    top: tntY,
-                    right: tntX + 30,
-                    bottom: tntY + 30
-                };
-                
-                if (this.rectsOverlap(playerRect, tntRect)) {
-                    this.hitTnt();
-                }
+    
+    // Check wall collisions (electric damage)
+    if (!this.bossDefeated) {
+        const walls = this.gameWorld.querySelectorAll('.maze-wall');
+        walls.forEach(wall => {
+            const wallRect = {
+                left: parseInt(wall.style.left),
+                top: parseInt(wall.style.top),
+                right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+            };
+            if (this.rectsOverlap(playerRect, wallRect)) {
+                this.takeDamage();
             }
+        });
+    }
+    
+    // Check TNT collision
+    if (this.currentTnt) {
+        const tntX = parseInt(this.currentTnt.style.left);
+        const tntY = parseInt(this.currentTnt.style.top);
+        const tntRect = {
+            left: tntX,
+            top: tntY,
+            right: tntX + 30,
+            bottom: tntY + 30
+        };
+        if (this.rectsOverlap(playerRect, tntRect)) {
+            this.hitTnt();
         }
+    }
+    
+    // Check exit collision
+    if (this.exit) {
+        const exitX = parseInt(this.exit.style.left);
+        const exitY = parseInt(this.exit.style.top);
+        const exitRect = {
+            left: exitX,
+            top: exitY,
+            right: exitX + 30,
+            bottom: exitY + 30
+        };
+        if (this.rectsOverlap(playerRect, exitRect)) {
+            this.completeGame();
+        }
+    }
+}
 
         rectsOverlap(rect1, rect2) {
             return rect1.left < rect2.right &&
@@ -852,7 +865,7 @@ if (!this.bossDefeated) {
         }
 
         defeatBoss() {
-    this.bossDefeated = true;  // ← New flag instead of gameStarted = false
+    this.bossDefeated = true;
     this.bgMusic.pause();
     
     // Remove boss and remaining elements
@@ -875,10 +888,9 @@ if (!this.bossDefeated) {
         exitEl.textContent = '🚪';
         exitEl.style.left = '285px';
         exitEl.style.top = '215px';
-        exitEl.onclick = () => this.completeGame();
         this.gameWorld.appendChild(exitEl);
-        
-        this.showMessage('🚪 Exit appeared! Game Complete!');
+        this.exit = exitEl; // Store reference to exit
+        this.showMessage('🚪 Exit appeared! Step on it to complete the game!');
     }, 2000);
 }
 
