@@ -38,8 +38,8 @@
         }
         #gameWorld {
             position: absolute;
-            width: 800px;
-            height: 600px;
+            width: 600px;
+            height: 4500px;
             transform-origin: 0 0;
         }
         #player {
@@ -424,18 +424,18 @@
             // Create dangerous electric walls
             const walls = [
                 // Outer walls only - boss can go through inner walls
-                {x: 0, y: 0, w: 800, h: 20}, // top
-                {x: 0, y: 0, w: 20, h: 600}, // left
-                {x: 0, y: 580, w: 800, h: 20}, // bottom
-                {x: 780, y: 0, w: 20, h: 600}, // right
+                {x: 0, y: 0, w: 600, h: 20}, // top
+                {x: 0, y: 0, w: 20, h: 4500}, // left
+                {x: 0, y: 430, w: 600, h: 20}, // bottom
+                {x: 580, y: 0, w: 20, h: 450}, // right
                 
                 // Some inner obstacles (boss can pass through these)
-                {x: 200, y: 150, w: 20, h: 100},
-                {x: 580, y: 150, w: 20, h: 100},
-                {x: 200, y: 350, w: 20, h: 100},
-                {x: 580, y: 350, w: 20, h: 100},
-                {x: 350, y: 100, w: 100, h: 20},
-                {x: 350, y: 480, w: 100, h: 20}
+                {x: 150, y: 110, w: 20, h: 75},
+                {x: 430, y: 110, w: 20, h: 75},
+                {x: 150, y: 260, w: 20, h: 75},
+                {x: 430, y: 260, w: 20, h: 75},
+                {x: 260, y: 75, w: 80, h: 20},
+                {x: 260, y: 355, w: 80, h: 20}
             ];
             
             walls.forEach(wall => {
@@ -613,11 +613,11 @@
             let newY = this.bossY + this.bossVelocityY;
             
             // Only bounce off outer edge walls (boss can pass through inner walls)
-            if (newX < 30 || newX > 690) {
+            if (newX < 30 || newX > 490) {
                 this.bossVelocityX = -this.bossVelocityX;
                 newX = this.bossX + this.bossVelocityX;
             }
-            if (newY < 30 || newY > 490) {
+            if (newY < 30 || newY > 340) {
                 this.bossVelocityY = -this.bossVelocityY;
                 newY = this.bossY + this.bossVelocityY;
             }
