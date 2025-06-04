@@ -360,8 +360,9 @@
             this.bgMusic = document.getElementById('bgMusic');
             
             this.bossDefeated = false;  // ← Move before bindEvents
-this.bindEvents();
-this.initRoom();
+            this.exit = null;
+            this.bindEvents();
+            this.initRoom();
         }
 
         bindEvents() {
