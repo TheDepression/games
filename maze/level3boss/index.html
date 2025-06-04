@@ -359,10 +359,10 @@
             this.controlArea = document.getElementById('controlArea');
             this.bgMusic = document.getElementById('bgMusic');
             
-            this.bindEvents();
-            this.initRoom();
-            this.bossDefeated = false;  // Add this line
-}
+            this.bossDefeated = false;  // ← Move before bindEvents
+this.bindEvents();
+this.initRoom();
+        }
 
         bindEvents() {
             this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
