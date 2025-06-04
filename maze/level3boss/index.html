@@ -773,19 +773,21 @@
             });
             
             // Check wall collisions (electric damage)
-            const walls = this.gameWorld.querySelectorAll('.maze-wall');
-            walls.forEach(wall => {
-                const wallRect = {
-                    left: parseInt(wall.style.left),
-                    top: parseInt(wall.style.top),
-                    right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                    bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-                };
-                
-                if (this.rectsOverlap(playerRect, wallRect)) {
-                    this.takeDamage();
-                }
-            });
+if (!this.bossDefeated) {
+    const walls = this.gameWorld.querySelectorAll('.maze-wall');
+    walls.forEach(wall => {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + parseInt(wall.style.width),
+            bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+        };
+        
+        if (this.rectsOverlap(playerRect, wallRect)) {
+            this.takeDamage();
+        }
+    });
+}
             
             // Check TNT collision
             if (this.currentTnt) {
