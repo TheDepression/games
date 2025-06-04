@@ -600,7 +600,7 @@
         }
 
         updateBoss() {
-            if (!this.boss || this.isShooting) return;
+            if (!this.boss || this.isShooting || this.bossDefeated) return;
             
             const now = Date.now();
             
