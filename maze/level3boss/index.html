@@ -895,8 +895,11 @@ this.initRoom();
 }
 
         completeGame() {
-            this.showLevelComplete();
-        }
+    // Play victory music
+    const victoryMusic = new Audio('https://example.com/victory.mp3');
+    victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
+    this.showLevelComplete();
+}
 
         gameOver() {
             this.gameStarted = false;
