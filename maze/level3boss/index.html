@@ -691,7 +691,7 @@
                 projectile.element.style.top = projectile.y + 'px';
                 
                 // Remove if out of bounds
-                if (projectile.x < 0 || projectile.x > 800 || projectile.y < 0 || projectile.y > 600) {
+                if (projectile.x < 0 || projectile.x > 600 || projectile.y < 0 || projectile.y > 450) {
                     projectile.element.remove();
                     return false;
                 }
