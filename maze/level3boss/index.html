@@ -851,35 +851,35 @@ if (!this.bossDefeated) {
         }
 
         defeatBoss() {
-            this.gameStarted = false;
-            this.bgMusic.pause();
-            
-            // Remove boss and remaining elements
-            if (this.boss) {
-                this.boss.remove();
-            }
-            if (this.currentTnt) {
-                this.currentTnt.remove();
-            }
-            this.projectiles.forEach(proj => proj.element.remove());
-            this.projectiles = [];
-            
-            // Show explosion effect
-            this.showMessage('💥 BOSS DEFEATED! 💥');
-            
-            // Create exit door
-            setTimeout(() => {
-                const exitEl = document.createElement('div');
-                exitEl.className = 'exit';
-                exitEl.textContent = '🚪';
-                exitEl.style.left = '285px';
-                exitEl.style.top = '215px';
-                exitEl.onclick = () => this.completeGame();
-                this.gameWorld.appendChild(exitEl);
-                
-                this.showMessage('🚪 Exit appeared! Game Complete!');
-            }, 2000);
-        }
+    this.bossDefeated = true;  // ← New flag instead of gameStarted = false
+    this.bgMusic.pause();
+    
+    // Remove boss and remaining elements
+    if (this.boss) {
+        this.boss.remove();
+    }
+    if (this.currentTnt) {
+        this.currentTnt.remove();
+    }
+    this.projectiles.forEach(proj => proj.element.remove());
+    this.projectiles = [];
+    
+    // Show explosion effect
+    this.showMessage('💥 BOSS DEFEATED! 💥');
+    
+    // Create exit door
+    setTimeout(() => {
+        const exitEl = document.createElement('div');
+        exitEl.className = 'exit';
+        exitEl.textContent = '🚪';
+        exitEl.style.left = '285px';
+        exitEl.style.top = '215px';
+        exitEl.onclick = () => this.completeGame();
+        this.gameWorld.appendChild(exitEl);
+        
+        this.showMessage('🚪 Exit appeared! Game Complete!');
+    }, 2000);
+}
 
         completeGame() {
             this.showLevelComplete();
