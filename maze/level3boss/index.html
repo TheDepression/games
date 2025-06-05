@@ -362,9 +362,9 @@
             this.gameArea = document.getElementById('gameArea');
             this.controlArea = document.getElementById('controlArea');
             this.bgMusic = document.getElementById('bgMusic');
-            
-            this.bossDefeated = false;  // ← Move before bindEvents
-            this.exit = null;
+            this.victoryMusic = document.getElementById('victoryMusic');
+            this.bossDefeated = false;
+            this.exit = null
             this.bindEvents();
             this.initRoom();
         }
