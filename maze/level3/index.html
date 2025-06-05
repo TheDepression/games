@@ -309,7 +309,7 @@
             <div id="keyStatus">🔑 まだまだ</div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
-        <_AFTER>5:00</div>
+        <div id="timer">5:00</div>
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player">😐</div>
@@ -392,7 +392,7 @@
                     this.controlArea = document.getElementById('controlArea');
                     this.bgMusic = document.getElementById('bgMusic');
                     
-                    if (!this PLAYER || !this.gameWorld || !this.gameArea || !this.controlArea) {
+                    if (!this.player || !this.gameWorld || !this.gameArea || !this.controlArea) {
                         throw new Error('One or more critical DOM elements not found!');
                     }
                     
@@ -537,32 +537,32 @@
                             {x: 20, y: 500, w: 150, h: 20}, // From left
                             {x: 20, y: 700, w: 170, h: 20}, // From left
                             {x: 20, y: 900, w: 160, h: 20}, // From left
-                            {x: 20, y: 1100, w: 190, h: 20}, // From left (new)
+                            {x: 20, y: 1100, w: 190, h: 20}, // From left
                             
                             {x: 2200, y: 150, w: 180, h: 20}, // From right
                             {x: 2180, y: 350, w: 200, h: 20}, // From right
                             {x: 2220, y: 550, w: 160, h: 20}, // From right
                             {x: 2200, y: 750, w: 180, h: 20}, // From right
                             {x: 2210, y: 950, w: 170, h: 20}, // From right
-                            {x: 2190, y: 1150, w: 190, h: 20}, // From right (new)
+                            {x: 2190, y: 1150, w: 190, h: 20}, // From right
                             
                             {x: 300, y: 20, w: 20, h: 150}, // From top
                             {x: 600, y: 20, w: 20, h: 180}, // From top
                             {x: 900, y: 20, w: 20, h: 160}, // From top
                             {x: 1200, y: 20, w: 20, h: 170}, // From top
                             {x: 1500, y: 20, w: 20, h: 140}, // From top
-                            {x: 1800, y: 20, w: 20, h: 190}, // From top (new)
-                            {x: 2100, y: 20, w: 20, h: 160}, // From top (new)
+                            {x: 1800, y: 20, w: 20, h: 190}, // From top
+                            {x: 2100, y: 20, w: 20, h: 160}, // From top
                             
                             {x: 400, y: 1230, w: 20, h: 150}, // From bottom
                             {x: 700, y: 1200, w: 20, h: 180}, // From bottom
                             {x: 1000, y: 1220, w: 20, h: 160}, // From bottom
                             {x: 1300, y: 1210, w: 20, h: 170}, // From bottom
                             {x: 1600, y: 1240, w: 20, h: 140}, // From bottom
-                            {x: 1900, y: 1190, w: 20, h: 190}, // From bottom (new)
-                            {x: 2200, y: 1220, w: 20, h: 160}, // From bottom (new)
+                            {x: 1900, y: 1190, w: 20, h: 190}, // From bottom
+                            {x: 2200, y: 1220, w: 20, h: 160}, // From bottom
                             
-                            // Inner maze walls (tighter and more complex)
+                            // Inner maze walls
                             {x: 200, y: 100, w: 20, h: 220}, {x: 180, y: 420, w: 180, h: 20},
                             {x: 300, y: 60, w: 20, h: 280}, {x: 280, y: 500, w: 200, h: 20},
                             {x: 400, y: 140, w: 20, h: 300}, {x: 380, y: 580, w: 240, h: 20},
@@ -590,7 +590,6 @@
                         ],
                         playerStart: {x: 60, y: 60},
                         enemies: [
-                            // Level 2 enemies with even higher speeds (level 2 * 1.2)
                             {x: 180, y: 140, moveX: 160, moveY: 140, range: 120, axis: 'x', speed: 1.62},
                             {x: 360, y: 240, moveX: 360, moveY: 200, range: 100, axis: 'y', speed: 1.35},
                             {x: 540, y: 160, moveX: 520, moveY: 160, range: 140, axis: 'x', speed: 1.89},
@@ -619,9 +618,8 @@
                             {x: 1700, y: 400, moveX: 1680, moveY: 400, range: 120, axis: 'x', speed: 2.16},
                             {x: 1900, y: 600, moveX: 1900, moveY: 580, range: 100, axis: 'y', speed: 1.89},
                             {x: 2100, y: 800, moveX: 2080, moveY: 800, range: 140, axis: 'x', speed: 1.62},
-                            {x: 2300, y: 500, moveX: 2300, moveY: 480, range: 80, axis: 'y', speed: 1 stop.35},
+                            {x: 2300, y: 500, moveX: 2300, moveY: 480, range: 80, axis: 'y', speed: 1.35},
                             {x: 1100, y: 1200, moveX: 1080, moveY: 1200, range: 120, axis: 'x', speed: 2.16},
-                            // Additional extra enemies for maximum difficulty
                             {x: 250, y: 450, moveX: 230, moveY: 450, range: 100, axis: 'x', speed: 1.8},
                             {x: 350, y: 350, moveX: 350, moveY: 330, range: 90, axis: 'y', speed: 1.5},
                             {x: 450, y: 750, moveX: 430, moveY: 750, range: 110, axis: 'x', speed: 2.0},
@@ -645,7 +643,7 @@
                             {x: 1900, y: 900}, {x: 600, y: 400},
                             {x: 1500, y: 800}
                         ],
-                        exit: {x: 60, y: 1300} // Opposite corner
+                        exit: {x: 60, y: 1300}
                     };
                     
                     // Set player position
@@ -698,7 +696,7 @@
                         this.gameWorld.appendChild(friendlyEl);
                     });
                     
-                    // Create heart
+                    // Create hearts
                     mazeData.hearts.forEach(heart => {
                         const heartEl = document.createElement('div');
                         heartEl.className = 'heart-pickup';
@@ -1063,17 +1061,16 @@
                 this.gameStarted = false;
                 this.bgMusic.pause();
                 
-                // Store necessary data for boss fight, reset money
+                // Store data for boss fight, reset money
                 localStorage.setItem('key3', 'unlocked');
                 localStorage.setItem('hearts', this.hearts);
                 localStorage.setItem('selectedCharacter', selectedCharacter);
-                localStorage.setItem('money', 0); // Reset money to zero
+                localStorage.setItem('money', 0);
                 
                 const timeBonus = Math.floor(this.timeLeft / 60) * 100;
                 const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
                 document.getElementById('timeBonus').textContent = bonusText;
                 
-                // Show level complete screen with boss fight transition
                 this.showLevelComplete('🎉 Level 3 Complete!', 'Prepare for the Boss Fight! 🦹');
             }
             
@@ -1095,11 +1092,9 @@
                 document.getElementById('levelCompleteText').textContent = text;
                 document.getElementById('levelComplete').style.display = 'flex';
                 
-                // Hide password and retry button
                 document.getElementById('password').style.display = 'none';
                 document.getElementById('retryButton').style.display = 'none';
                 
-                // Update startOverButton to be a Fight Boss button
                 const bossButton = document.getElementById('startOverButton');
                 bossButton.textContent = 'Fight Boss!';
                 bossButton.onclick = goToBossFight;
@@ -1112,7 +1107,6 @@
         let game;
         let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
 
-        // Set the selected character emoji on page load
         document.addEventListener('DOMContentLoaded', () => {
             const emojiSpan = document.getElementById('selectedCharacterEmoji');
             if (emojiSpan) {
@@ -1139,7 +1133,6 @@
 
         function goToBossFight() {
             try {
-                // Redirect to boss fight without clearing key3, hearts, or selectedCharacter
                 window.location.href = 'https://thedepression.github.io/games/maze/level3boss';
             } catch (error) {
                 console.error('Error redirecting to boss fight:', error);
