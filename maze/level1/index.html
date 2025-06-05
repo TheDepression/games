@@ -243,21 +243,28 @@
             box-sizing: border-box;
         }
         
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 8px;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background: #45a049;
-        }
+        /* Add this new class */
+.selected {
+    background: #4fc3f7; /* Light blue highlight */
+}
+
+/* Modify existing button style to remove default green highlight */
+button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 8px;
+    transition: background 0.3s;
+}
+
+/* Update hover to respect selected state */
+button:hover:not(.selected) {
+    background: #45a049;
+}
         
         .start-button {
             background: #ff6b35;
