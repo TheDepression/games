@@ -976,23 +976,18 @@ if (explosionSound) {
         game.startGame();
     }
 
-    function goToEndScreen() {
-        game.victoryMusic.pause();
-        // This would go to your final end screen
-        // For now, just show an alert
-        alert('🎉 Congratulations! You completed all levels and defeated the boss! Game Complete!');
-        
-        // You can redirect to a final end screen page here
-        // window.location.href = 'your-end-screen-url';
-        
-        // Or restart the game
-        localStorage.removeItem('hearts');
-        localStorage.removeItem('selectedCharacter'); 
-        localStorage.removeItem('key1');
-        localStorage.removeItem('key2');
-        localStorage.removeItem('key3');
-        window.location.href = 'https://thedepression.github.io/games/maze/level1';
-    }
+    function goToLevel3() {
+    game.victoryMusic.pause();
+    
+    // Save progress for level 3
+    localStorage.setItem('hearts', '3');
+    localStorage.setItem('money', '0');
+    localStorage.setItem('key2', 'unlocked'); // Unlock level 3
+    // Keep the same selected character
+    
+    // Go to level 3
+    window.location.href = 'https://thedepression.github.io/games/maze/level3';
+}
 
     // Initialize the game when page loads
     window.onload = function() {
