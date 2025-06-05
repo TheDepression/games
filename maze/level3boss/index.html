@@ -310,7 +310,10 @@
     <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/mw.m4a" type="audio/mp4">
     Your browser does not support the audio element.
 </audio>
-
+<audio id="explosionSound" preload="auto">
+    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/boom.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
 <script>
     // Get saved data from localStorage
     let hearts = parseInt(localStorage.getItem('hearts')) || 3;
@@ -873,6 +876,13 @@
         defeatBoss() {
     this.bossDefeated = true;
     this.bgMusic.pause();
+    
+    // Play explosion sound immediately
+    const explosionSound = document.getElementById('explosionSound');
+    if (explosionSound) {
+        explosionSound.currentTime = 0; // Reset to beginning in case it played before
+        explosionSound.play().catch(e => console.log('Explosion sound failed:', e));
+    }
     
     // Remove boss and remaining elements
     if (this.boss) {
