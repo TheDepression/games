@@ -291,6 +291,14 @@
             border-radius: 8px;
             border: 1px solid gold;
         }
+        #selectedCharacterDisplay {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
     </style>
 </head>
 <body>
@@ -320,20 +328,15 @@
     </div>
         
         <div id="startScreen">
-            <h2>⛏️ Underground Depths</h2>
-            <p style="margin: 20px 0;">虫だらけ</p>
-            <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
-            <p style="font-size: 14px; margin: 10px 0;">好きなエモジにして:</p>
-            <div>
-                <button onclick="selectCharacter('😐')">😐</button>
-                <button onclick="selectCharacter('🥸')">🥸</button>
-                <button onclick="selectCharacter('😺')">😺</button>
-                <button onclick="selectCharacter('👩🏻')">👩🏻</button>
-                <button onclick="selectCharacter('😎')">😎</button>
-                <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
-            </div>
-            <button class="start-button" onclick="startGame()">START GAME</button>
-        </div>
+    <h2>⛏️ Underground</h2>
+    <p style="margin: 20px 0;">虫だらけ</p>
+    <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
+    <div id="selectedCharacterDisplay" style="font-size: 48px; margin: 20px 0;">
+        <span id="selectedCharacterEmoji"></span>
+    </div>
+    <p style="font-size: 16px; margin: 10px 0;">Never give up!</p>
+    <button class="start-button" onclick="startGame()">START GAME</button>
+</div>
         
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
@@ -1105,12 +1108,16 @@ class MazeGame {
 }
 
 let game;
-let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
+let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐'; // Get from localStorage or default
 
-function selectCharacter(emoji) {
-    selectedCharacter = emoji;
-    document.getElementById('player').textContent = emoji;
-}
+// Set the selected character emoji on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const emojiSpan = document.getElementById('selectedCharacterEmoji');
+    if (emojiSpan) {
+        emojiSpan.textContent = selectedCharacter;
+    }
+    document.getElementById('player').textContent = selectedCharacter; // Preview in game
+});
 
 function startGame() {
     try {
