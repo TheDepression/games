@@ -740,7 +740,7 @@
         }
 
         checkCollisions() {
-    if (this.isInvulnerable) return;
+    if (this.isInvulnerable || this.gameCompleted) return; // Skip if game is completed
     
     const playerRect = {
         left: this.playerX,
