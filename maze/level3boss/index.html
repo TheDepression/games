@@ -879,10 +879,11 @@
     
     // Play explosion sound immediately
     const explosionSound = document.getElementById('explosionSound');
-    if (explosionSound) {
-        explosionSound.currentTime = 0; // Reset to beginning in case it played before
-        explosionSound.play().catch(e => console.log('Explosion sound failed:', e));
-    }
+if (explosionSound) {
+    explosionSound.load(); // Force load the audio
+    explosionSound.currentTime = 0;
+    explosionSound.play().catch(e => console.log('Explosion sound failed:', e));
+}
     
     // Remove boss and remaining elements
     if (this.boss) {
@@ -912,7 +913,8 @@
 
         completeGame() {
     // Don't set gameCompleted=true immediately
-    
+    const victoryMusic = document.getElementById('victoryMusic');
+victoryMusic.load(); // Force load the audio
     this.victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
     this.showLevelComplete();
     
