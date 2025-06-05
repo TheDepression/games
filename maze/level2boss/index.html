@@ -550,10 +550,10 @@
                 this.boss.classList.remove('damaged');
             }, 500);
             
-            this.showMessage(`💥 TNT Hit! ${this.tntHits}/4`);
+            this.showMessage(`💥 TNT Hit! ${this.tntHits}/3`);
             this.updateUI();
             
-            if (this.tntHits >= 4) {
+            if (this.tntHits >= 3) {
                 this.defeatBoss();
             } else {
                 // Spawn new TNT after 10 seconds
