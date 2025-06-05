@@ -292,58 +292,58 @@
             border: 1px solid gold;
         }
         #selectedCharacterDisplay {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
     </style>
 </head>
 <body>
     <div id="gameContainer">
-        <div id="ui">
-            <div>Level: 3</div>
-            <div>❤️ <span id="hearts">3</span></div>
-            <div id="keyStatus">🔑 まだまだ</div>
-            <div>💰 <span id="money">0</span>¥</div>
+    <div id="ui">
+        <div>Level: 3</div>
+        <div>❤️ <span id="hearts">3</span></div>
+        <div id="keyStatus">🔑 まだまだ</div>
+        <div>💰 <span id="money">0</span>¥</div>
+    </div>
+    <div id="timer">5:00</div>
+    <div id="gameArea">
+        <div id="gameWorld">
+            <div id="player">😐</div>
         </div>
-        <_AFTER>5:00</div>
-        <div id="gameArea">
-            <div id="gameWorld">
-                <div id="player">😐</div>
-            </div>
+    </div>
+    <div id="message"></div>
+    <div id="controlArea">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <div style="font-size: 18px; font-weight: bold;">Underground Depths</div>
+            <div style="font-size: 12px; opacity: 0.8;">Escape the bugs!</div>
         </div>
-        <div id="message"></div>
-        <div id="controlArea">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">Underground Depths</div>
-                <div style="font-size: 12px; opacity: 0.8;">Escape the bugs!</div>
-            </div>
-            <div class="control-hint">
-                <div>🎮 ここをスワイプして移動 </div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid bugs & collect money!</div>
-            </div>
+        <div class="control-hint">
+            <div>🎮 ここをスワイプして移動 </div>
+            <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid bugs & collect money!</div>
         </div>
+    </div>
         
         <div id="startScreen">
-            <h2>⛏️ Underground</h2>
-            <p style="margin: 20px 0;">虫だらけ</p>
-            <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
-            <div id="selectedCharacterDisplay" style="font-size: 48px; margin: 20px 0;">
-                <span id="selectedCharacterEmoji"></span>
-            </div>
-            <p style="font-size: 16px; margin: 10px 0;">Never give up!</p>
-            <button class="start-button" onclick="startGame()">START GAME</button>
-        </div>
+    <h2>⛏️ Underground</h2>
+    <p style="margin: 20px 0;">虫だらけ</p>
+    <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
+    <div id="selectedCharacterDisplay" style="font-size: 48px; margin: 20px 0;">
+        <span id="selectedCharacterEmoji"></span>
+    </div>
+    <p style="font-size: 16px; margin: 10px 0;">Never give up!</p>
+    <button class="start-button" onclick="startGame()">START GAME</button>
+</div>
         
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
             <p id="levelCompleteText">Great job!</p>
             <div id="timeBonus" style="font-size: 14px; margin: 10px 0;"></div>
             <div id="password" class="password-text" style="display: none;"></div>
-            <button id="startOverButton" onclick="goToBossFight()">Fight Boss!</button>
+            <button id="startOverButton" onclick="startOver()">Start Over from Level 1</button>
             <button id="retryButton" style="display: none;" onclick="restartGame()">Replay Level</button>
         </div>
     </div>
@@ -354,809 +354,814 @@
     </audio>
 
     <script>
-        // Check for key2 to prevent cheating
-        if (localStorage.getItem('key2') !== 'unlocked') {
-            window.location.href = 'https://thedepression.github.io/games/maze/level1';
-        }
+// Check for key2 to prevent cheating
+if (localStorage.getItem('key2') !== 'unlocked') {
+    window.location.href = 'https://thedepression.github.io/games/maze/level1';
+}
 
-        class MazeGame {
-            constructor() {
-                try {
-                    this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
-                    this.hasKey = false;
-                    this.gameStarted = false;
-                    this.timeLeft = 300; // 5 minutes
-                    this.timerInterval = null;
-                    this.isInvulnerable = false;
-                    this.money = 0;
-                    
-                    // Movement properties
-                    this.playerX = 60;
-                    this.playerY = 60;
-                    this.playerVelocityX = 0;
-                    this.playerVelocityY = 0;
-                    this.isDragging = false;
-                    this.dragStartX = 0;
-                    this.dragStartY = 0;
-                    this.lastDragX = 0;
-                    this.lastDragY = 0;
-                    
-                    this.movingEnemies = [];
-                    this.foregroundEnemy = null;
-                    this.lastForegroundSpawn = Date.now();
-                    this.lastInteractionTime = {};
-                    
-                    this.player = document.getElementById('player');
-                    this.gameWorld = document.getElementById('gameWorld');
-                    this.gameArea = document.getElementById('gameArea');
-                    this.controlArea = document.getElementById('controlArea');
-                    this.bgMusic = document.getElementById('bgMusic');
-                    
-                    if (!this PLAYER || !this.gameWorld || !this.gameArea || !this.controlArea) {
-                        throw new Error('One or more critical DOM elements not found!');
-                    }
-                    
-                    this.bindEvents();
-                    this.startGameLoop();
-                } catch (error) {
-                    console.error('Error initializing MazeGame:', error);
+class MazeGame {
+    constructor() {
+        try {
+            this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
+            this.hasKey = false;
+            this.gameStarted = false;
+            this.timeLeft = 300; // 5 minutes
+            this.timerInterval = null;
+            this.isInvulnerable = false;
+            this.money = 0;
+            
+            // Movement properties
+            this.playerX = 60;
+            this.playerY = 60;
+            this.playerVelocityX = 0;
+            this.playerVelocityY = 0;
+            this.isDragging = false;
+            this.dragStartX = 0;
+            this.dragStartY = 0;
+            this.lastDragX = 0;
+            this.lastDragY = 0;
+            
+            this.movingEnemies = [];
+            this.foregroundEnemy = null;
+            this.lastForegroundSpawn = Date.now();
+            this.lastInteractionTime = {};
+            
+            this.player = document.getElementById('player');
+            this.gameWorld = document.getElementById('gameWorld');
+            this.gameArea = document.getElementById('gameArea');
+            this.controlArea = document.getElementById('controlArea');
+            this.bgMusic = document.getElementById('bgMusic');
+            
+            if (!this.player || !this.gameWorld || !this.gameArea || !this.controlArea) {
+                throw new Error('One or more critical DOM elements not found!');
+            }
+            
+            this.bindEvents();
+            this.startGameLoop();
+        } catch (error) {
+            console.error('Error initializing MazeGame:', error);
+        }
+    }
+    
+    bindEvents() {
+        this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+        this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+        this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+        
+        this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+        this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+        this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+        this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+    }
+    
+    handleStart(e) {
+        if (!this.gameStarted) return;
+        e.preventDefault();
+        
+        this.isDragging = true;
+        const point = e.touches ? e.touches[0] : e;
+        this.dragStartX = point.clientX;
+        this.dragStartY = point.clientY;
+        this.lastDragX = point.clientX;
+        this.lastDragY = point.clientY;
+    }
+    
+    handleMove(e) {
+        if (!this.isDragging || !this.gameStarted) return;
+        e.preventDefault();
+        
+        const point = e.touches ? e.touches[0] : e;
+        const deltaX = point.clientX - this.lastDragX;
+        const deltaY = point.clientY - this.lastDragY;
+        
+        const sensitivity = 0.5;
+        this.playerVelocityX = deltaX * sensitivity;
+        this.playerVelocityY = deltaY * sensitivity;
+        
+        this.lastDragX = point.clientX;
+        this.lastDragY = point.clientY;
+    }
+    
+    handleEnd(e) {
+        this.isDragging = false;
+        this.playerVelocityX = 0;
+        this.playerVelocityY = 0;
+    }
+    
+    startGameTimer() {
+        try {
+            this.gameStarted = true;
+            this.timeLeft = 300;
+            this.updateTimer();
+            this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+            
+            this.timerInterval = setInterval(() => {
+                this.timeLeft--;
+                this.updateTimer();
+                
+                if (this.timeLeft <= 0) {
+                    this.timeUp();
                 }
-            }
+            }, 1000);
+        } catch (error) {
+            console.error('Error starting game timer:', error);
+        }
+    }
+    
+    updateTimer() {
+        const minutes = Math.floor(this.timeLeft / 60);
+        const seconds = this.timeLeft % 60;
+        const timerEl = document.getElementById('timer');
+        if (!timerEl) throw new Error('Timer element not found!');
+        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (this.timeLeft <= 60) {
+            timerEl.style.background = 'rgba(255,0,0,0.9)';
+        } else if (this.timeLeft <= 180) {
+            timerEl.style.background = 'rgba(255,165,0,0.8)';
+        }
+    }
+    
+    timeUp() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.resetStats();
+        this.showMessage('⏰ Time\'s up!');
+        setTimeout(() => {
+            this.showLevelComplete('⏰ Time Up!', 'Try again!');
+        }, 2000);
+    }
+    
+    initLevel() {
+        try {
+            const elements = this.gameWorld.querySelectorAll('.maze-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy');
+            elements.forEach(el => el.remove());
             
-            bindEvents() {
-                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
-                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
-                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+            this.movingEnemies = [];
+            this.foregroundEnemy = null;
+            this.lastForegroundSpawn = Date.now();
+            this.hasKey = false;
+            this.lastInteractionTime = {};
+            
+            this.player.textContent = selectedCharacter;
+            document.getElementById('timer').style.background = 'rgba(255,0,0,0.8)';
+            this.updateUI();
+            this.generateMaze();
+            
+            // Center camera on player
+            const gameAreaWidth = this.gameArea.offsetWidth;
+            const gameAreaHeight = this.gameArea.offsetHeight;
+            const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+            const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+            this.gameArea.scrollTo({
+                left: scrollX,
+                top: scrollY,
+                behavior: 'auto'
+            });
+        } catch (error) {
+            console.error('Error initializing level:', error);
+        }
+    }
+    
+    generateMaze() {
+        try {
+            const mazeData = {
+                walls: [
+                    // Outer walls
+                    {x: 0, y: 0, w: 2400, h: 20}, {x: 0, y: 0, w: 20, h: 1400},
+                    {x: 0, y: 1380, w: 2400, h: 20}, {x: 2380, y: 0, w: 20, h: 1400},
+                    
+                    // Enhanced edge protrusions
+                    {x: 20, y: 100, w: 180, h: 20}, // From left
+                    {x: 20, y: 500, w: 150, h: 20}, // From left
+                    {x: 20, y: 700, w: 170, h: 20}, // From left
+                    {x: 20, y: 900, w: 160, h: 20}, // From left
+                    {x: 20, y: 1100, w: 190, h: 20}, // From left (new)
+                    
+                    {x: 2200, y: 150, w: 180, h: 20}, // From right
+                    {x: 2180, y: 350, w: 200, h: 20}, // From right
+                    {x: 2220, y: 550, w: 160, h: 20}, // From right
+                    {x: 2200, y: 750, w: 180, h: 20}, // From right
+                    {x: 2210, y: 950, w: 170, h: 20}, // From right
+                    {x: 2190, y: 1150, w: 190, h: 20}, // From right (new)
+                    
+                    {x: 300, y: 20, w: 20, h: 150}, // From top
+                    {x: 600, y: 20, w: 20, h: 180}, // From top
+                    {x: 900, y: 20, w: 20, h: 160}, // From top
+                    {x: 1200, y: 20, w: 20, h: 170}, // From top
+                    {x: 1500, y: 20, w: 20, h: 140}, // From top
+                    {x: 1800, y: 20, w: 20, h: 190}, // From top (new)
+                    {x: 2100, y: 20, w: 20, h: 160}, // From top (new)
+                    
+                    {x: 400, y: 1230, w: 20, h: 150}, // From bottom
+                    {x: 700, y: 1200, w: 20, h: 180}, // From bottom
+                    {x: 1000, y: 1220, w: 20, h: 160}, // From bottom
+                    {x: 1300, y: 1210, w: 20, h: 170}, // From bottom
+                    {x: 1600, y: 1240, w: 20, h: 140}, // From bottom
+                    {x: 1900, y: 1190, w: 20, h: 190}, // From bottom (new)
+                    {x: 2200, y: 1220, w: 20, h: 160}, // From bottom (new)
+                    
+                    // Inner maze walls (tighter and more complex)
+                    {x: 200, y: 100, w: 20, h: 220}, {x: 180, y: 420, w: 180, h: 20},
+                    {x: 300, y: 60, w: 20, h: 280}, {x: 280, y: 500, w: 200, h: 20},
+                    {x: 400, y: 140, w: 20, h: 300}, {x: 380, y: 580, w: 240, h: 20},
+                    {x: 500, y: 200, w: 20, h: 240}, {x: 480, y: 660, w: 200, h: 20},
+                    {x: 600, y: 100, w: 20, h: 340}, {x: 320, y: 740, w: 420, h: 20},
+                    {x: 700, y: 200, w: 20, h: 280}, {x: 680, y: 460, w: 280, h: 20},
+                    {x: 800, y: 280, w: 20, h: 320}, {x: 780, y: 580, w: 220, h: 20},
+                    {x: 900, y: 140, w: 20, h: 360}, {x: 880, y: 480, w: 180, h: 20},
+                    {x: 1000, y: 240, w: 20, h: 340}, {x: 980, y: 660, w: 160, h: 20},
+                    {x: 1100, y: 340, w: 20, h: 300}, {x: 1080, y: 760, w: 240, h: 20},
+                    {x: 1200, y: 100, w: 20, h: 420}, {x: 1180, y: 660, w: 220, h: 20},
+                    {x: 1300, y: 200, w: 20, h: 360}, {x: 1280, y: 580, w: 200, h: 20},
+                    {x: 1400, y: 300, w: 20, h: 380}, {x: 1380, y: 860, w: 180, h: 20},
+                    {x: 1500, y: 140, w: 20, h: 420}, {x: 1480, y: 700, w: 220, h: 20},
+                    {x: 1600, y: 240, w: 20, h: 400}, {x: 1580, y: 780, w: 200, h: 20},
+                    {x: 1700, y: 300, w: 20, h: 420}, {x: 1680, y: 920, w: 180, h: 20},
+                    {x: 1800, y: 200, w: 20, h: 460}, {x: 1780, y: 820, w: 160, h: 20},
+                    {x: 1900, y: 300, w: 20, h: 400}, {x: 1880, y: 900, w: 200, h: 20},
+                    {x: 2000, y: 400, w: 20, h: 380}, {x: 1980, y: 980, w: 180, h: 20},
+                    {x: 2100, y: 200, w: 20, h: 420}, {x: 2080, y: 1100, w: 200, h: 20},
+                    {x: 2200, y: 300, w: 20, h: 400}, {x: 2180, y: 1000, w: 160, h: 20},
+                    {x: 200, y: 920, w: 420, h: 20}, {x: 720, y: 980, w: 300, h: 20},
+                    {x: 1100, y: 940, w: 240, h: 20}, {x: 1400, y: 1020, w: 320, h: 20},
+                    {x: 1800, y: 1100, w: 200, h: 20}, {x: 2100, y: 1200, w: 180, h: 20}
+                ],
+                playerStart: {x: 60, y: 60},
+                enemies: [
+                    // Level 2 enemies with even higher speeds (level 2 * 1.2)
+                    {x: 180, y: 140, moveX: 160, moveY: 140, range: 120, axis: 'x', speed: 1.62}, // 1.35 * 1.2
+                    {x: 360, y: 240, moveX: 360, moveY: 200, range: 100, axis: 'y', speed: 1.35}, // 1.125 * 1.2
+                    {x: 540, y: 160, moveX: 520, moveY: 160, range: 140, axis: 'x', speed: 1.89}, // 1.575 * 1.2
+                    {x: 740, y: 340, moveX: 740, moveY: 320, range: 80, axis: 'y', speed: 1.62}, // 1.35 * 1.2
+                    {x: 940, y: 280, moveX: 920, moveY: 280, range: 100, axis: 'x', speed: 2.16}, // 1.8 * 1.2
+                    {x: 640, y: 460, moveX: 640, moveY: 440, range: 120, axis: 'y', speed: 1.35}, // 1.125 * 1.2
+                    {x: 1100, y: 500, moveX: 1080, moveY: 500, range: 100, axis: 'x', speed: 1.89},
+                    {x: 1200, y: 640, moveX: 1200, moveY: 620, range: 80, axis: 'y', speed: 1.62},
+                    {x: 800, y: 700, moveX: 780, moveY: 700, range: 120, axis: 'x', speed: 2.16},
+                    {x: 1300, y: 300, moveX: 1300, moveY: 280, range: 100, axis: 'y', speed: 1.89},
+                    {x: 1500, y: 500, moveX: 1480, moveY: 500, range: 140, axis: 'x', speed: 1.62},
+                    {x: 1700, y: 600, moveX: 1700, moveY: 580, range: 80, axis: 'y', speed: 1.35},
+                    {x: 2200, y: 900, moveX: 2180, moveY: 900, range: 120, axis: 'x', speed: 2.16},
+                    {x: 2000, y: 800, moveX: 2000, moveY: 780, range: 100, axis: 'y', speed: 1.62},
+                    {x: 900, y: 1000, moveX: 880, moveY: 1000, range: 140, axis: 'x', speed: 1.89},
+                    {x: 400, y: 600, moveX: 380, moveY: 600, range: 100, axis: 'x', speed: 1.62},
+                    {x: 600, y: 800, moveX: 600, moveY: 780, range: 80, axis: 'y', speed: 1.35},
+                    {x: 1400, y: 400, moveX: 1380, moveY: 400, range: 120, axis: 'x', speed: 2.16},
+                    {x: 1600, y: 900, moveX: 1600, moveY: 880, range: 100, axis: 'y', speed: 1.89},
+                    {x: 1800, y: 300, moveX: 1780, moveY: 300, range: 140, axis: 'x', speed: 1.62},
+                    {x: 500, y: 1100, moveX: 500, moveY: 1080, range: 80, axis: 'y', speed: 1.35},
+                    {x: 700, y: 500, moveX: 680, moveY: 500, range: 120, axis: 'x', speed: 2.16},
+                    {x: 1000, y: 700, moveX: 1000, moveY: 680, range: 100, axis: 'y', speed: 1.89},
+                    {x: 1200, y: 900, moveX: 1180, moveY: 900, range: 140, axis: 'x', speed: 1.62},
+                    {x: 1500, y: 1100, moveX: 1500, moveY: 1080, range: 80, axis: 'y', speed: 1.35},
+                    {x: 1700, y: 400, moveX: 1680, moveY: 400, range: 120, axis: 'x', speed: 2.16},
+                    {x: 1900, y: 600, moveX: 1900, moveY: 580, range: 100, axis: 'y', speed: 1.89},
+                    {x: 2100, y: 800, moveX: 2080, moveY: 800, range: 140, axis: 'x', speed: 1.62},
+                    {x: 2300, y: 500, moveX: 2300, moveY: 480, range: 80, axis: 'y', speed: 1.35},
+                    {x: 1100, y: 1200, moveX: 1080, moveY: 1200, range: 120, axis: 'x', speed: 2.16},
+                    // Additional extra enemies for maximum difficulty
+                    {x: 250, y: 450, moveX: 230, moveY: 450, range: 100, axis: 'x', speed: 1.8},
+                    {x: 350, y: 350, moveX: 350, moveY: 330, range: 90, axis: 'y', speed: 1.5},
+                    {x: 450, y: 750, moveX: 430, moveY: 750, range: 110, axis: 'x', speed: 2.0},
+                    {x: 750, y: 350, moveX: 750, moveY: 330, range: 80, axis: 'y', speed: 1.7},
+                    {x: 850, y: 1050, moveX: 830, moveY: 1050, range: 120, axis: 'x', speed: 1.9},
+                    {x: 1050, y: 450, moveX: 1050, moveY: 430, range: 90, axis: 'y', speed: 1.6},
+                    {x: 1250, y: 550, moveX: 1230, moveY: 550, range: 100, axis: 'x', speed: 2.1},
+                    {x: 1450, y: 750, moveX: 1450, moveY: 730, range: 110, axis: 'y', speed: 1.4},
+                    {x: 1650, y: 200, moveX: 1630, moveY: 200, range: 80, axis: 'x', speed: 1.8},
+                    {x: 1850, y: 550, moveX: 1850, moveY: 530, range: 100, axis: 'y', speed: 1.7},
+                    {x: 2050, y: 350, moveX: 2030, moveY: 350, range: 90, axis: 'x', speed: 2.0}
+                ],
+                friendlies: [
+                    {x: 700, y: 300, message: "🔑ほしいなら、700円ちょうだい"}, // First person
+                    {x: 1300, y: 500, message: "虫がきらい。げきおこぷんぷんまる😡"} // Second person
+                ],
+                hearts: [{x: 450, y: 750}, {x: 2370, y: 30},
+                         {x: 1100, y: 500}],
+                money: [
+                    {x: 2370, y: 1370}, {x: 800, y: 720},
+                    {x: 1200, y: 640}, {x: 1300, y: 300},
+                    {x: 1900, y: 900}, {x: 600, y: 400},
+                    {x: 1500, y: 800}
+                ],
+                exit: {x: 60, y: 1300} // Opposite corner
+            };
+            
+            // Set player position
+            this.playerX = mazeData.playerStart.x;
+            this.playerY = mazeData.playerStart.y;
+            
+            // Create walls
+            mazeData.walls.forEach(wall => {
+                const wallEl = document.createElement('div');
+                wallEl.className = 'maze-wall';
+                wallEl.style.left = wall.x + 'px';
+                wallEl.style.top = wall.y + 'px';
+                wallEl.style.width = wall.w + 'px';
+                wallEl.style.height = wall.h + 'px';
+                this.gameWorld.appendChild(wallEl);
+            });
+            
+            // Create enemies
+            const enemyEmojis = ['🦗', '🕷️', '🐛', '🪲'];
+            mazeData.enemies.forEach((enemy, index) => {
+                const enemyEl = document.createElement('div');
+                enemyEl.className = 'enemy';
+                enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
+                enemyEl.style.left = enemy.x + 'px';
+                enemyEl.style.top = enemy.y + 'px';
+                this.gameWorld.appendChild(enemyEl);
                 
-                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
-                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
-                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
-                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
-            }
+                this.movingEnemies.push({
+                    element: enemyEl,
+                    startX: enemy.moveX,
+                    startY: enemy.moveY,
+                    currentX: enemy.x,
+                    currentY: enemy.y,
+                    range: enemy.range,
+                    axis: enemy.axis,
+                    direction: 1,
+                    speed: enemy.speed
+                });
+            });
             
-            handleStart(e) {
-                if (!this.gameStarted) return;
-                e.preventDefault();
+            // Create friendlies
+            const friendlyEmojis = ['🧑', '👩'];
+            mazeData.friendlies.forEach((friendly, index) => {
+                const friendlyEl = document.createElement('div');
+                friendlyEl.className = 'friendly';
+                friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
+                friendlyEl.style.left = friendly.x + 'px';
+                friendlyEl.style.top = friendly.y + 'px';
+                friendlyEl.dataset.message = friendly.message;
+                this.gameWorld.appendChild(friendlyEl);
+            });
+            
+            // Create heart
+            mazeData.hearts.forEach(heart => {
+                const heartEl = document.createElement('div');
+                heartEl.className = 'heart-pickup';
+                heartEl.textContent = '❤️';
+                heartEl.style.left = heart.x + 'px';
+                heartEl.style.top = heart.y + 'px';
+                this.gameWorld.appendChild(heartEl);
+            });
+            
+            // Create money
+            mazeData.money.forEach(money => {
+                const moneyEl = document.createElement('div');
+                moneyEl.className = 'money-pickup';
+                moneyEl.textContent = '💰';
+                moneyEl.style.left = money.x + 'px';
+                moneyEl.style.top = money.y + 'px';
+                this.gameWorld.appendChild(moneyEl);
+            });
+            
+            // Create exit
+            const exitEl = document.createElement('div');
+            exitEl.className = 'exit';
+            exitEl.textContent = '🚪';
+            exitEl.style.left = mazeData.exit.x + 'px';
+            exitEl.style.top = mazeData.exit.y + 'px';
+            this.gameWorld.appendChild(exitEl);
+            
+        } catch (error) {
+            console.error('Error generating maze:', error);
+        }
+    }
+    
+    startGameLoop() {
+        const gameLoop = () => {
+            if (this.gameStarted) {
+                this.updatePlayer();
+                this.updateMovingEnemies();
+                this.updateForegroundEnemy();
+                this.checkCollisions();
+            }
+            requestAnimationFrame(gameLoop);
+        };
+        gameLoop();
+    }
+    
+    updatePlayer() {
+        if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+            const newX = this.playerX + this.playerVelocityX;
+            const newY = this.playerY + this.playerVelocityY;
+            
+            if (this.canMoveTo(newX, newY)) {
+                this.playerX = newX;
+                this.playerY = newY;
+                this.player.style.left = this.playerX + 'px';
+                this.player.style.top = this.playerY + 'px';
                 
-                this.isDragging = true;
-                const point = e.touches ? e.touches[0] : e;
-                this.dragStartX = point.clientX;
-                this.dragStartY = point.clientY;
-                this.lastDragX = point.clientX;
-                this.lastDragY = point.clientY;
-            }
-            
-            handleMove(e) {
-                if (!this.isDragging || !this.gameStarted) return;
-                e.preventDefault();
-                
-                const point = e.touches ? e.touches[0] : e;
-                const deltaX = point.clientX - this.lastDragX;
-                const deltaY = point.clientY - this.lastDragY;
-                
-                const sensitivity = 0.5;
-                this.playerVelocityX = deltaX * sensitivity;
-                this.playerVelocityY = deltaY * sensitivity;
-                
-                this.lastDragX = point.clientX;
-                this.lastDragY = point.clientY;
-            }
-            
-            handleEnd(e) {
-                this.isDragging = false;
-                this.playerVelocityX = 0;
-                this.playerVelocityY = 0;
-            }
-            
-            startGameTimer() {
-                try {
-                    this.gameStarted = true;
-                    this.timeLeft = 300;
-                    this.updateTimer();
-                    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-                    
-                    this.timerInterval = setInterval(() => {
-                        this.timeLeft--;
-                        this.updateTimer();
-                        
-                        if (this.timeLeft <= 0) {
-                            this.timeUp();
-                        }
-                    }, 1000);
-                } catch (error) {
-                    console.error('Error starting game timer:', error);
-                }
-            }
-            
-            updateTimer() {
-                const minutes = Math.floor(this.timeLeft / 60);
-                const seconds = this.timeLeft % 60;
-                const timerEl = document.getElementById('timer');
-                if (!timerEl) throw new Error('Timer element not found!');
-                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (this.timeLeft <= 60) {
-                    timerEl.style.background = 'rgba(255,0,0,0.9)';
-                } else if (this.timeLeft <= 180) {
-                    timerEl.style.background = 'rgba(255,165,0,0.8)';
-                }
-            }
-            
-            timeUp() {
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                this.bgMusic.pause();
-                this.resetStats();
-                this.showMessage('⏰ Time\'s up!');
-                setTimeout(() => {
-                    this.showLevelComplete('⏰ Time Up!', 'Try again!');
-                }, 2000);
-            }
-            
-            initLevel() {
-                try {
-                    const elements = this.gameWorld.querySelectorAll('.maze-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy');
-                    elements.forEach(el => el.remove());
-                    
-                    this.movingEnemies = [];
-                    this.foregroundEnemy = null;
-                    this.lastForegroundSpawn = Date.now();
-                    this.hasKey = false;
-                    this.lastInteractionTime = {};
-                    
-                    this.player.textContent = selectedCharacter;
-                    document.getElementById('timer').style.background = 'rgba(255,0,0,0.8)';
-                    this.updateUI();
-                    this.generateMaze();
-                    
-                    // Center camera on player
-                    const gameAreaWidth = this.gameArea.offsetWidth;
-                    const gameAreaHeight = this.gameArea.offsetHeight;
-                    const scrollX = this.playerX - gameAreaWidth / 2 + 12;
-                    const scrollY = this.playerY - gameAreaHeight / 2 + 12;
-                    this.gameArea.scrollTo({
-                        left: scrollX,
-                        top: scrollY,
-                        behavior: 'auto'
-                    });
-                } catch (error) {
-                    console.error('Error initializing level:', error);
-                }
-            }
-            
-            generateMaze() {
-                try {
-                    const mazeData = {
-                        walls: [
-                            // Outer walls
-                            {x: 0, y: 0, w: 2400, h: 20}, {x: 0, y: 0, w: 20, h: 1400},
-                            {x: 0, y: 1380, w: 2400, h: 20}, {x: 2380, y: 0, w: 20, h: 1400},
-                            
-                            // Enhanced edge protrusions
-                            {x: 20, y: 100, w: 180, h: 20}, // From left
-                            {x: 20, y: 500, w: 150, h: 20}, // From left
-                            {x: 20, y: 700, w: 170, h: 20}, // From left
-                            {x: 20, y: 900, w: 160, h: 20}, // From left
-                            {x: 20, y: 1100, w: 190, h: 20}, // From left (new)
-                            
-                            {x: 2200, y: 150, w: 180, h: 20}, // From right
-                            {x: 2180, y: 350, w: 200, h: 20}, // From right
-                            {x: 2220, y: 550, w: 160, h: 20}, // From right
-                            {x: 2200, y: 750, w: 180, h: 20}, // From right
-                            {x: 2210, y: 950, w: 170, h: 20}, // From right
-                            {x: 2190, y: 1150, w: 190, h: 20}, // From right (new)
-                            
-                            {x: 300, y: 20, w: 20, h: 150}, // From top
-                            {x: 600, y: 20, w: 20, h: 180}, // From top
-                            {x: 900, y: 20, w: 20, h: 160}, // From top
-                            {x: 1200, y: 20, w: 20, h: 170}, // From top
-                            {x: 1500, y: 20, w: 20, h: 140}, // From top
-                            {x: 1800, y: 20, w: 20, h: 190}, // From top (new)
-                            {x: 2100, y: 20, w: 20, h: 160}, // From top (new)
-                            
-                            {x: 400, y: 1230, w: 20, h: 150}, // From bottom
-                            {x: 700, y: 1200, w: 20, h: 180}, // From bottom
-                            {x: 1000, y: 1220, w: 20, h: 160}, // From bottom
-                            {x: 1300, y: 1210, w: 20, h: 170}, // From bottom
-                            {x: 1600, y: 1240, w: 20, h: 140}, // From bottom
-                            {x: 1900, y: 1190, w: 20, h: 190}, // From bottom (new)
-                            {x: 2200, y: 1220, w: 20, h: 160}, // From bottom (new)
-                            
-                            // Inner maze walls (tighter and more complex)
-                            {x: 200, y: 100, w: 20, h: 220}, {x: 180, y: 420, w: 180, h: 20},
-                            {x: 300, y: 60, w: 20, h: 280}, {x: 280, y: 500, w: 200, h: 20},
-                            {x: 400, y: 140, w: 20, h: 300}, {x: 380, y: 580, w: 240, h: 20},
-                            {x: 500, y: 200, w: 20, h: 240}, {x: 480, y: 660, w: 200, h: 20},
-                            {x: 600, y: 100, w: 20, h: 340}, {x: 320, y: 740, w: 420, h: 20},
-                            {x: 700, y: 200, w: 20, h: 280}, {x: 680, y: 460, w: 280, h: 20},
-                            {x: 800, y: 280, w: 20, h: 320}, {x: 780, y: 580, w: 220, h: 20},
-                            {x: 900, y: 140, w: 20, h: 360}, {x: 880, y: 480, w: 180, h: 20},
-                            {x: 1000, y: 240, w: 20, h: 340}, {x: 980, y: 660, w: 160, h: 20},
-                            {x: 1100, y: 340, w: 20, h: 300}, {x: 1080, y: 760, w: 240, h: 20},
-                            {x: 1200, y: 100, w: 20, h: 420}, {x: 1180, y: 660, w: 220, h: 20},
-                            {x: 1300, y: 200, w: 20, h: 360}, {x: 1280, y: 580, w: 200, h: 20},
-                            {x: 1400, y: 300, w: 20, h: 380}, {x: 1380, y: 860, w: 180, h: 20},
-                            {x: 1500, y: 140, w: 20, h: 420}, {x: 1480, y: 700, w: 220, h: 20},
-                            {x: 1600, y: 240, w: 20, h: 400}, {x: 1580, y: 780, w: 200, h: 20},
-                            {x: 1700, y: 300, w: 20, h: 420}, {x: 1680, y: 920, w: 180, h: 20},
-                            {x: 1800, y: 200, w: 20, h: 460}, {x: 1780, y: 820, w: 160, h: 20},
-                            {x: 1900, y: 300, w: 20, h: 400}, {x: 1880, y: 900, w: 200, h: 20},
-                            {x: 2000, y: 400, w: 20, h: 380}, {x: 1980, y: 980, w: 180, h: 20},
-                            {x: 2100, y: 200, w: 20, h: 420}, {x: 2080, y: 1100, w: 200, h: 20},
-                            {x: 2200, y: 300, w: 20, h: 400}, {x: 2180, y: 1000, w: 160, h: 20},
-                            {x: 200, y: 920, w: 420, h: 20}, {x: 720, y: 980, w: 300, h: 20},
-                            {x: 1100, y: 940, w: 240, h: 20}, {x: 1400, y: 1020, w: 320, h: 20},
-                            {x: 1800, y: 1100, w: 200, h: 20}, {x: 2100, y: 1200, w: 180, h: 20}
-                        ],
-                        playerStart: {x: 60, y: 60},
-                        enemies: [
-                            // Level 2 enemies with even higher speeds (level 2 * 1.2)
-                            {x: 180, y: 140, moveX: 160, moveY: 140, range: 120, axis: 'x', speed: 1.62},
-                            {x: 360, y: 240, moveX: 360, moveY: 200, range: 100, axis: 'y', speed: 1.35},
-                            {x: 540, y: 160, moveX: 520, moveY: 160, range: 140, axis: 'x', speed: 1.89},
-                            {x: 740, y: 340, moveX: 740, moveY: 320, range: 80, axis: 'y', speed: 1.62},
-                            {x: 940, y: 280, moveX: 920, moveY: 280, range: 100, axis: 'x', speed: 2.16},
-                            {x: 640, y: 460, moveX: 640, moveY: 440, range: 120, axis: 'y', speed: 1.35},
-                            {x: 1100, y: 500, moveX: 1080, moveY: 500, range: 100, axis: 'x', speed: 1.89},
-                            {x: 1200, y: 640, moveX: 1200, moveY: 620, range: 80, axis: 'y', speed: 1.62},
-                            {x: 800, y: 700, moveX: 780, moveY: 700, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1300, y: 300, moveX: 1300, moveY: 280, range: 100, axis: 'y', speed: 1.89},
-                            {x: 1500, y: 500, moveX: 1480, moveY: 500, range: 140, axis: 'x', speed: 1.62},
-                            {x: 1700, y: 600, moveX: 1700, moveY: 580, range: 80, axis: 'y', speed: 1.35},
-                            {x: 2200, y: 900, moveX: 2180, moveY: 900, range: 120, axis: 'x', speed: 2.16},
-                            {x: 2000, y: 800, moveX: 2000, moveY: 780, range: 100, axis: 'y', speed: 1.62},
-                            {x: 900, y: 1000, moveX: 880, moveY: 1000, range: 140, axis: 'x', speed: 1.89},
-                            {x: 400, y: 600, moveX: 380, moveY: 600, range: 100, axis: 'x', speed: 1.62},
-                            {x: 600, y: 800, moveX: 600, moveY: 780, range: 80, axis: 'y', speed: 1.35},
-                            {x: 1400, y: 400, moveX: 1380, moveY: 400, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1600, y: 900, moveX: 1600, moveY: 880, range: 100, axis: 'y', speed: 1.89},
-                            {x: 1800, y: 300, moveX: 1780, moveY: 300, range: 140, axis: 'x', speed: 1.62},
-                            {x: 500, y: 1100, moveX: 500, moveY: 1080, range: 80, axis: 'y', speed: 1.35},
-                            {x: 700, y: 500, moveX: 680, moveY: 500, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1000, y: 700, moveX: 1000, moveY: 680, range: 100, axis: 'y', speed: 1.89},
-                            {x: 1200, y: 900, moveX: 1180, moveY: 900, range: 140, axis: 'x', speed: 1.62},
-                            {x: 1500, y: 1100, moveX: 1500, moveY: 1080, range: 80, axis: 'y', speed: 1.35},
-                            {x: 1700, y: 400, moveX: 1680, moveY: 400, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1900, y: 600, moveX: 1900, moveY: 580, range: 100, axis: 'y', speed: 1.89},
-                            {x: 2100, y: 800, moveX: 2080, moveY: 800, range: 140, axis: 'x', speed: 1.62},
-                            {x: 2300, y: 500, moveX: 2300, moveY: 480, range: 80, axis: 'y', speed: 1 stop.35},
-                            {x: 1100, y: 1200, moveX: 1080, moveY: 1200, range: 120, axis: 'x', speed: 2.16},
-                            // Additional extra enemies for maximum difficulty
-                            {x: 250, y: 450, moveX: 230, moveY: 450, range: 100, axis: 'x', speed: 1.8},
-                            {x: 350, y: 350, moveX: 350, moveY: 330, range: 90, axis: 'y', speed: 1.5},
-                            {x: 450, y: 750, moveX: 430, moveY: 750, range: 110, axis: 'x', speed: 2.0},
-                            {x: 750, y: 350, moveX: 750, moveY: 330, range: 80, axis: 'y', speed: 1.7},
-                            {x: 850, y: 1050, moveX: 830, moveY: 1050, range: 120, axis: 'x', speed: 1.9},
-                            {x: 1050, y: 450, moveX: 1050, moveY: 430, range: 90, axis: 'y', speed: 1.6},
-                            {x: 1250, y: 550, moveX: 1230, moveY: 550, range: 100, axis: 'x', speed: 2.1},
-                            {x: 1450, y: 750, moveX: 1450, moveY: 730, range: 110, axis: 'y', speed: 1.4},
-                            {x: 1650, y: 200, moveX: 1630, moveY: 200, range: 80, axis: 'x', speed: 1.8},
-                            {x: 1850, y: 550, moveX: 1850, moveY: 530, range: 100, axis: 'y', speed: 1.7},
-                            {x: 2050, y: 350, moveX: 2030, moveY: 350, range: 90, axis: 'x', speed: 2.0}
-                        ],
-                        friendlies: [
-                            {x: 700, y: 300, message: "🔑ほしいなら、700円ちょうだい"},
-                            {x: 1300, y: 500, message: "虫がきらい。げきおこぷんぷんまる😡"}
-                        ],
-                        hearts: [{x: 450, y: 750}, {x: 2370, y: 30}, {x: 1100, y: 500}],
-                        money: [
-                            {x: 2370, y: 1370}, {x: 800, y: 720},
-                            {x: 1200, y: 640}, {x: 1300, y: 300},
-                            {x: 1900, y: 900}, {x: 600, y: 400},
-                            {x: 1500, y: 800}
-                        ],
-                        exit: {x: 60, y: 1300} // Opposite corner
-                    };
-                    
-                    // Set player position
-                    this.playerX = mazeData.playerStart.x;
-                    this.playerY = mazeData.playerStart.y;
-                    
-                    // Create walls
-                    mazeData.walls.forEach(wall => {
-                        const wallEl = document.createElement('div');
-                        wallEl.className = 'maze-wall';
-                        wallEl.style.left = wall.x + 'px';
-                        wallEl.style.top = wall.y + 'px';
-                        wallEl.style.width = wall.w + 'px';
-                        wallEl.style.height = wall.h + 'px';
-                        this.gameWorld.appendChild(wallEl);
-                    });
-                    
-                    // Create enemies
-                    const enemyEmojis = ['🦗', '🕷️', '🐛', '🪲'];
-                    mazeData.enemies.forEach((enemy, index) => {
-                        const enemyEl = document.createElement('div');
-                        enemyEl.className = 'enemy';
-                        enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
-                        enemyEl.style.left = enemy.x + 'px';
-                        enemyEl.style.top = enemy.y + 'px';
-                        this.gameWorld.appendChild(enemyEl);
-                        
-                        this.movingEnemies.push({
-                            element: enemyEl,
-                            startX: enemy.moveX,
-                            startY: enemy.moveY,
-                            currentX: enemy.x,
-                            currentY: enemy.y,
-                            range: enemy.range,
-                            axis: enemy.axis,
-                            direction: 1,
-                            speed: enemy.speed
-                        });
-                    });
-                    
-                    // Create friendlies
-                    const friendlyEmojis = ['🧑', '👩'];
-                    mazeData.friendlies.forEach((friendly, index) => {
-                        const friendlyEl = document.createElement('div');
-                        friendlyEl.className = 'friendly';
-                        friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
-                        friendlyEl.style.left = friendly.x + 'px';
-                        friendlyEl.style.top = friendly.y + 'px';
-                        friendlyEl.dataset.message = friendly.message;
-                        this.gameWorld.appendChild(friendlyEl);
-                    });
-                    
-                    // Create heart
-                    mazeData.hearts.forEach(heart => {
-                        const heartEl = document.createElement('div');
-                        heartEl.className = 'heart-pickup';
-                        heartEl.textContent = '❤️';
-                        heartEl.style.left = heart.x + 'px';
-                        heartEl.style.top = heart.y + 'px';
-                        this.gameWorld.appendChild(heartEl);
-                    });
-                    
-                    // Create money
-                    mazeData.money.forEach(money => {
-                        const moneyEl = document.createElement('div');
-                        moneyEl.className = 'money-pickup';
-                        moneyEl.textContent = '💰';
-                        moneyEl.style.left = money.x + 'px';
-                        moneyEl.style.top = money.y + 'px';
-                        this.gameWorld.appendChild(moneyEl);
-                    });
-                    
-                    // Create exit
-                    const exitEl = document.createElement('div');
-                    exitEl.className = 'exit';
-                    exitEl.textContent = '🚪';
-                    exitEl.style.left = mazeData.exit.x + 'px';
-                    exitEl.style.top = mazeData.exit.y + 'px';
-                    this.gameWorld.appendChild(exitEl);
-                    
-                } catch (error) {
-                    console.error('Error generating maze:', error);
-                }
-            }
-            
-            startGameLoop() {
-                const gameLoop = () => {
-                    if (this.gameStarted) {
-                        this.updatePlayer();
-                        this.updateMovingEnemies();
-                        this.updateForegroundEnemy();
-                        this.checkCollisions();
-                    }
-                    requestAnimationFrame(gameLoop);
-                };
-                gameLoop();
-            }
-            
-            updatePlayer() {
-                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
-                    const newX = this.playerX + this.playerVelocityX;
-                    const newY = this.playerY + this.playerVelocityY;
-                    
-                    if (this.canMoveTo(newX, newY)) {
-                        this.playerX = newX;
-                        this.playerY = newY;
-                        this.player.style.left = this.playerX + 'px';
-                        this.player.style.top = this.playerY + 'px';
-                        
-                        // Center player in gameArea
-                        const gameAreaWidth = this.gameArea.offsetWidth;
-                        const gameAreaHeight = this.gameArea.offsetHeight;
-                        const scrollX = this.playerX - gameAreaWidth / 2 + 12;
-                        const scrollY = this.playerY - gameAreaHeight / 2 + 12;
-                        this.gameArea.scrollTo({
-                            left: scrollX,
-                            top: scrollY,
-                            behavior: 'auto'
-                        });
-                    }
-                    
-                    this.playerVelocityX *= 0.9;
-                    this.playerVelocityY *= 0.9;
-                }
-            }
-            
-            canMoveTo(x, y) {
-                const playerSize = 24;
-                const padding = 2;
-                
-                const points = [
-                    {x: x + padding, y: y + padding},
-                    {x: x + playerSize - padding, y: y + padding},
-                    {x: x + padding, y: y + playerSize - padding},
-                    {x: x + playerSize - padding, y: y + playerSize - padding},
-                    {x: x + playerSize/2, y: y + padding},
-                    {x: x + playerSize/2, y: y + playerSize - padding},
-                    {x: x + padding, y: y + playerSize/2},
-                    {x: x + playerSize - padding, y: y + playerSize/2}
-                ];
-                
-                const walls = this.gameWorld.querySelectorAll('.maze-wall');
-                
-                for (let wall of walls) {
-                    const wallRect = {
-                        left: parseInt(wall.style.left),
-                        top: parseInt(wall.style.top),
-                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-                    };
-                    
-                    for (let point of points) {
-                        if (point.x >= wallRect.left && point.x <= wallRect.right &&
-                            point.y >= wallRect.top && point.y <= wallRect.bottom) {
-                            return false;
-                        }
-                    }
-                }
-                
-                return true;
-            }
-            
-            updateMovingEnemies() {
-                this.movingEnemies.forEach(enemy => {
-                    if (enemy.axis === 'x') {
-                        enemy.currentX += enemy.direction * enemy.speed;
-                        if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
-                            enemy.direction *= -1;
-                        }
-                        enemy.element.style.left = enemy.currentX + 'px';
-                    } else {
-                        enemy.currentY += enemy.direction * enemy.speed;
-                        if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
-                            enemy.direction *= -1;
-                        }
-                        enemy.element.style.top = enemy.currentY + 'px';
-                    }
+                // Center player in gameArea
+                const gameAreaWidth = this.gameArea.offsetWidth;
+                const gameAreaHeight = this.gameArea.offsetHeight;
+                const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+                const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+                this.gameArea.scrollTo({
+                    left: scrollX,
+                    top: scrollY,
+                    behavior: 'auto'
                 });
             }
             
-            updateForegroundEnemy() {
-                if (!this.gameStarted) return;
-                const now = Date.now();
-                if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000) {
-                    const playerCenterX = this.playerX + 12;
-                    const direction = playerCenterX < 1200 ? 1 : -1;
-                    const startX = direction > 0 ? -80 : 2400;
-                    const y = Math.random() * 1320;
-                    const speed = (2400 / 18) / 60;
-                    const enemyEl = document.createElement('div');
-                    enemyEl.className = 'foreground-enemy';
-                    enemyEl.textContent = '🐛';
-                    enemyEl.style.left = startX + 'px';
-                    enemyEl.style.top = y + 'px';
-                    this.gameWorld.appendChild(enemyEl);
-                    this.foregroundEnemy = {
-                        element: enemyEl,
-                        x: startX,
-                        y: y,
-                        speed: speed,
-                        direction: direction
-                    };
-                    this.lastForegroundSpawn = now;
+            this.playerVelocityX *= 0.9;
+            this.playerVelocityY *= 0.9;
+        }
+    }
+    
+    canMoveTo(x, y) {
+        const playerSize = 24;
+        const padding = 2;
+        
+        const points = [
+            {x: x + padding, y: y + padding},
+            {x: x + playerSize - padding, y: y + padding},
+            {x: x + padding, y: y + playerSize - padding},
+            {x: x + playerSize - padding, y: y + playerSize - padding},
+            {x: x + playerSize/2, y: y + padding},
+            {x: x + playerSize/2, y: y + playerSize - padding},
+            {x: x + padding, y: y + playerSize/2},
+            {x: x + playerSize - padding, y: y + playerSize/2}
+        ];
+        
+        const walls = this.gameWorld.querySelectorAll('.maze-wall');
+        
+        for (let wall of walls) {
+            const wallRect = {
+                left: parseInt(wall.style.left),
+                top: parseInt(wall.style.top),
+                right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+            };
+            
+            for (let point of points) {
+                if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                    point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                    return false;
                 }
-                if (this.foregroundEnemy) {
-                    this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
-                    this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
-                    this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
-                    if (this.foregroundEnemy.x < -80 || this.foregroundEnemy.x > 2400) {
-                        this.foregroundEnemy.element.remove();
-                        this.foregroundEnemy = null;
-                    }
-                }
-            }
-            
-            checkCollisions() {
-                if (this.isInvulnerable) return;
-                
-                const playerRect = {
-                    left: this.playerX,
-                    top: this.playerY,
-                    right: this.playerX + 24,
-                    bottom: this.playerY + 24
-                };
-                
-                // Check enemy collisions
-                this.movingEnemies.forEach(enemy => {
-                    const enemyRect = {
-                        left: enemy.currentX,
-                        top: enemy.currentY,
-                        right: enemy.currentX + 22,
-                        bottom: enemy.currentY + 22
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, enemyRect)) {
-                        this.takeDamage();
-                    }
-                });
-                
-                // Check foreground enemy collision
-                if (this.foregroundEnemy) {
-                    const fgEnemyRect = {
-                        left: this.foregroundEnemy.x,
-                        top: this.foregroundEnemy.y,
-                        right: this.foregroundEnemy.x + 80,
-                        bottom: this.foregroundEnemy.y + 80
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, fgEnemyRect)) {
-                        this.hearts = 0;
-                        this.takeDamage();
-                    }
-                }
-                
-                // Check friendly NPCs
-                const friendlies = this.gameWorld.querySelectorAll('.friendly');
-                friendlies.forEach(friendly => {
-                    const friendlyX = parseInt(friendly.style.left);
-                    const friendlyY = parseInt(friendly.style.top);
-                    const friendlyRect = {
-                        left: friendlyX,
-                        top: friendlyY,
-                        right: friendlyX + 22,
-                        bottom: friendlyY + 22
-                    };
-                    const adjustedPlayerRect = {
-                        left: this.playerX,
-                        top: this.playerY,
-                        right: this.playerX + 24,
-                        bottom: this.playerY + 24
-                    };
-                    if (this.rectsOverlap(adjustedPlayerRect, friendlyRect)) {
-                        const now = Date.now();
-                        const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                        if (now - lastTime > 1800) {
-                            if (friendly.dataset.message === "🔑ほしいなら、700円ちょうだい" && !this.hasKey) {
-                                if (this.money >= 700) {
-                                    this.money -= 700;
-                                    this.hasKey = true;
-                                    this.showMessage('ありがとうございました!🔑をどうぞ');
-                                    friendly.dataset.message = 'ありがとうございました!🔑をどうぞ';
-                                    this.updateUI();
-                                } else {
-                                    this.showMessage('🔑ほしいなら、700円ちょうだい');
-                                }
-                            } else {
-                                this.showMessage(friendly.dataset.message);
-                            }
-                            this.lastInteractionTime[friendly.dataset.message] = now;
-                        }
-                    }
-                });
-                
-                // Check heart pickup
-                const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
-                hearts.forEach(heart => {
-                    const heartX = parseInt(heart.style.left);
-                    const heartY = parseInt(heart.style.top);
-                    const heartRect = {
-                        left: heartX,
-                        top: heartY,
-                        right: heartX + 22,
-                        bottom: heartY + 22
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, heartRect)) {
-                        if (this.hearts < 3) {
-                            this.hearts++;
-                            this.showMessage('❤️ Health restored!');
-                            this.updateUI();
-                            heart.remove();
-                        }
-                    }
-                });
-                
-                // Check money pickup
-                const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
-                moneyItems.forEach(money => {
-                    const moneyX = parseInt(money.style.left);
-                    const moneyY = parseInt(money.style.top);
-                    const moneyRect = {
-                        left: moneyX,
-                        top: moneyY,
-                        right: moneyX + 22,
-                        bottom: moneyY + 22
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, moneyRect)) {
-                        this.money += 100;
-                        this.showMessage('💰 +100¥ collected!');
-                        this.updateUI();
-                        money.remove();
-                    }
-                });
-                
-                // Check exit
-                const exit = this.gameWorld.querySelector('.exit');
-                if (exit) {
-                    const exitX = parseInt(exit.style.left);
-                    const exitY = parseInt(exit.style.top);
-                    const exitRect = {
-                        left: exitX,
-                        top: exitY,
-                        right: exitX + 30,
-                        bottom: exitY + 30
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, exitRect)) {
-                        if (this.hasKey) {
-                            this.completeLevel();
-                        } else {
-                            this.showMessage('カギ🔐なしでダメ🙅');
-                        }
-                    }
-                }
-            }
-            
-            rectsOverlap(rect1, rect2) {
-                return rect1.left < rect2.right &&
-                       rect1.right > rect2.left &&
-                       rect1.top < rect2.bottom &&
-                       rect1.bottom > rect2.top;
-            }
-            
-            takeDamage() {
-                if (this.isInvulnerable) return;
-                
-                this.hearts--;
-                this.showMessage('💔 Ouch!');
-                this.updateUI();
-                
-                this.isInvulnerable = true;
-                this.player.classList.add('invulnerable');
-                
-                setTimeout(() => {
-                    this.isInvulnerable = false;
-                    this.player.classList.remove('invulnerable');
-                }, 1000);
-                
-                if (this.hearts <= 0) {
-                    this.gameOver();
-                }
-            }
-            
-            showMessage(text) {
-                const message = document.getElementById('message');
-                message.textContent = text;
-                message.style.display = 'block';
-                
-                clearTimeout(this.messageTimeout);
-                this.messageTimeout = setTimeout(() => {
-                    message.style.display = 'none';
-                }, 2000);
-            }
-            
-            updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 ある!!!' : '🔑 まだまだ';
-                document.getElementById('money').textContent = this.money;
-            }
-            
-            resetStats() {
-                localStorage.removeItem('hearts');
-                localStorage.removeItem('selectedCharacter');
-                localStorage.removeItem('key1');
-                localStorage.removeItem('key2');
-                localStorage.removeItem('key3');
-                this.money = 0;
-                this.hearts = 3;
-                this.updateUI();
-            }
-            
-            completeLevel() {
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                this.bgMusic.pause();
-                
-                // Store necessary data for boss fight, reset money
-                localStorage.setItem('key3', 'unlocked');
-                localStorage.setItem('hearts', this.hearts);
-                localStorage.setItem('selectedCharacter', selectedCharacter);
-                localStorage.setItem('money', 0); // Reset money to zero
-                
-                const timeBonus = Math.floor(this.timeLeft / 60) * 100;
-                const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
-                document.getElementById('timeBonus').textContent = bonusText;
-                
-                // Show level complete screen with boss fight transition
-                this.showLevelComplete('🎉 Level 3 Complete!', 'Prepare for the Boss Fight! 🦹');
-            }
-            
-            gameOver() {
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                this.bgMusic.pause();
-                this.resetStats();
-                this.showMessage('💀 Game Over!');
-                document.getElementById('ui').style.display = 'none';
-                document.getElementById('timer').style.display = 'none';
-                setTimeout(() => {
-                    window.location.href = 'https://thedepression.github.io/games/maze/level1';
-                }, 3000);
-            }
-            
-            showLevelComplete(title, text) {
-                document.getElementById('levelCompleteTitle').textContent = title;
-                document.getElementById('levelCompleteText').textContent = text;
-                document.getElementById('levelComplete').style.display = 'flex';
-                
-                // Hide password and retry button
-                document.getElementById('password').style.display = 'none';
-                document.getElementById('retryButton').style.display = 'none';
-                
-                // Update startOverButton to be a Fight Boss button
-                const bossButton = document.getElementById('startOverButton');
-                bossButton.textContent = 'Fight Boss!';
-                bossButton.onclick = goToBossFight;
-                
-                document.getElementById('ui').style.display = 'none';
-                document.getElementById('timer').style.display = 'none';
             }
         }
-
-        let game;
-        let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
-
-        // Set the selected character emoji on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const emojiSpan = document.getElementById('selectedCharacterEmoji');
-            if (emojiSpan) {
-                emojiSpan.textContent = selectedCharacter;
+        
+        return true;
+    }
+    
+    updateMovingEnemies() {
+        this.movingEnemies.forEach(enemy => {
+            if (enemy.axis === 'x') {
+                enemy.currentX += enemy.direction * enemy.speed;
+                if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.left = enemy.currentX + 'px';
+            } else {
+                enemy.currentY += enemy.direction * enemy.speed;
+                if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.top = enemy.currentY + 'px';
             }
-            document.getElementById('player').textContent = selectedCharacter;
         });
-
-        function startGame() {
-            try {
-                console.log('Start Game button clicked!');
-                const startScreen = document.getElementById('startScreen');
-                if (!startScreen) throw new Error('Start screen element not found!');
-                startScreen.style.display = 'none';
-                document.getElementById('ui').style.display = 'block';
-                document.getElementById('timer').style.display = 'block';
-                game = new MazeGame();
-                game.initLevel();
-                game.startGameTimer();
-            } catch (error) {
-                console.error('Error starting game:', error);
+    }
+    
+    updateForegroundEnemy() {
+        if (!this.gameStarted) return;
+        const now = Date.now();
+        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000) { // Every 20s (same as level 1)
+            const playerCenterX = this.playerX + 12;
+            const direction = playerCenterX < 1200 ? 1 : -1;
+            const startX = direction > 0 ? -80 : 2400;
+            const y = Math.random() * 1320;
+            const speed = (2400 / 18) / 60; // Faster than previous levels
+            const enemyEl = document.createElement('div');
+            enemyEl.className = 'foreground-enemy';
+            enemyEl.textContent = '🐛'; // Large centipede
+            enemyEl.style.left = startX + 'px';
+            enemyEl.style.top = y + 'px';
+            this.gameWorld.appendChild(enemyEl);
+            this.foregroundEnemy = {
+                element: enemyEl,
+                x: startX,
+                y: y,
+                speed: speed,
+                direction: direction
+            };
+            this.lastForegroundSpawn = now;
+        }
+        if (this.foregroundEnemy) {
+            this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
+            this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+            this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+            if (this.foregroundEnemy.x < -80 || this.foregroundEnemy.x > 2400) {
+                this.foregroundEnemy.element.remove();
+                this.foregroundEnemy = null;
             }
         }
-
-        function goToBossFight() {
-            try {
-                // Redirect to boss fight without clearing key3, hearts, or selectedCharacter
-                window.location.href = 'https://thedepression.github.io/games/maze/level3boss';
-            } catch (error) {
-                console.error('Error redirecting to boss fight:', error);
+    }
+    
+    checkCollisions() {
+        if (this.isInvulnerable) return;
+        
+        const playerRect = {
+            left: this.playerX,
+            top: this.playerY,
+            right: this.playerX + 24,
+            bottom: this.playerY + 24
+        };
+        
+        // Check enemy collisions
+        this.movingEnemies.forEach(enemy => {
+            const enemyRect = {
+                left: enemy.currentX,
+                top: enemy.currentY,
+                right: enemy.currentX + 22,
+                bottom: enemy.currentY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, enemyRect)) {
+                this.takeDamage();
+            }
+        });
+        
+        // Check foreground enemy collision
+        if (this.foregroundEnemy) {
+            const fgEnemyRect = {
+                left: this.foregroundEnemy.x,
+                top: this.foregroundEnemy.y,
+                right: this.foregroundEnemy.x + 80,
+                bottom: this.foregroundEnemy.y + 80
+            };
+            
+            if (this.rectsOverlap(playerRect, fgEnemyRect)) {
+                this.hearts = 0;
+                this.takeDamage();
             }
         }
-
-        function restartGame() {
-            try {
-                game.initLevel();
-                game.startGameTimer();
-                document.getElementById('levelComplete').style.display = 'none';
-                document.getElementById('ui').style.display = 'block';
-                document.getElementById('timer').style.display = 'block';
-            } catch (error) {
-                console.error('Error restarting game:', error);
+        
+        // Check friendly NPCs
+        const friendlies = this.gameWorld.querySelectorAll('.friendly');
+        friendlies.forEach(friendly => {
+            const friendlyX = parseInt(friendly.style.left);
+            const friendlyY = parseInt(friendly.style.top);
+            const friendlyRect = {
+                left: friendlyX,
+                top: friendlyY,
+                right: friendlyX + 22,
+                bottom: friendlyY + 22
+            };
+            const adjustedPlayerRect = {
+                left: this.playerX,
+                top: this.playerY,
+                right: this.playerX + 24,
+                bottom: this.playerY + 24
+            };
+            if (this.rectsOverlap(adjustedPlayerRect, friendlyRect)) {
+                const now = Date.now();
+                const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
+                if (now - lastTime > 1800) {
+                    if (friendly.dataset.message === "🔑ほしいなら、700円ちょうだい" && !this.hasKey) {
+                        if (this.money >= 700) {
+                            this.money -= 700;
+                            this.hasKey = true;
+                            this.showMessage('ありがとうございました!🔑をどうぞ');
+                            friendly.dataset.message = 'ありがとうございました!🔑をどうぞ';
+                            this.updateUI();
+                        } else {
+                            this.showMessage('🔑ほしいなら、700円ちょうだい');
+                        }
+                    } else {
+                        this.showMessage(friendly.dataset.message);
+                    }
+                    this.lastInteractionTime[friendly.dataset.message] = now;
+                }
+            }
+        });
+        
+        // Check heart pickup
+        const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
+        hearts.forEach(heart => {
+            const heartX = parseInt(heart.style.left);
+            const heartY = parseInt(heart.style.top);
+            const heartRect = {
+                left: heartX,
+                top: heartY,
+                right: heartX + 22,
+                bottom: heartY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, heartRect)) {
+                if (this.hearts < 3) {
+                    this.hearts++;
+                    this.showMessage('❤️ Health restored!');
+                    this.updateUI();
+                    heart.remove();
+                }
+            }
+        });
+        
+        // Check money pickup
+        const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
+        moneyItems.forEach(money => {
+            const moneyX = parseInt(money.style.left);
+            const moneyY = parseInt(money.style.top);
+            const moneyRect = {
+                left: moneyX,
+                top: moneyY,
+                right: moneyX + 22,
+                bottom: moneyY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, moneyRect)) {
+                this.money += 100;
+                this.showMessage('💰 +100¥ collected!');
+                this.updateUI();
+                money.remove();
+            }
+        });
+        
+        // Check exit
+        const exit = this.gameWorld.querySelector('.exit');
+        if (exit) {
+            const exitX = parseInt(exit.style.left);
+            const exitY = parseInt(exit.style.top);
+            const exitRect = {
+                left: exitX,
+                top: exitY,
+                right: exitX + 30,
+                bottom: exitY + 30
+            };
+            
+            if (this.rectsOverlap(playerRect, exitRect)) {
+                if (this.hasKey) {
+                    this.completeLevel();
+                } else {
+                    this.showMessage('カギ🔐なしでダメ🙅');
+                }
             }
         }
+    }
+    
+    rectsOverlap(rect1, rect2) {
+        return rect1.left < rect2.right &&
+               rect1.right > rect2.left &&
+               rect1.top < rect2.bottom &&
+               rect1.bottom > rect2.top;
+    }
+    
+    takeDamage() {
+        if (this.isInvulnerable) return;
+        
+        this.hearts--;
+        this.showMessage('💔 Ouch!');
+        this.updateUI();
+        
+        this.isInvulnerable = true;
+        this.player.classList.add('invulnerable');
+        
+        setTimeout(() => {
+            this.isInvulnerable = false;
+            this.player.classList.remove('invulnerable');
+        }, 1000);
+        
+        if (this.hearts <= 0) {
+            this.gameOver();
+        }
+    }
+    
+    showMessage(text) {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.style.display = 'block';
+        
+        clearTimeout(this.messageTimeout);
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+    
+    updateUI() {
+        document.getElementById('hearts').textContent = this.hearts;
+        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 ある!!!' : '🔑 まだまだ';
+        document.getElementById('money').textContent = this.money;
+    }
+    
+    resetStats() {
+        localStorage.removeItem('hearts');
+        localStorage.removeItem('selectedCharacter');
+        localStorage.removeItem('key1');
+        localStorage.removeItem('key2');
+        localStorage.removeItem('key3');
+        this.money = 0;
+        this.hearts = 3;
+        this.updateUI();
+    }
+    
+    completeLevel() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        
+        localStorage.setItem('key3', 'unlocked');
+        localStorage.setItem('hearts', this.hearts);
+        localStorage.setItem('selectedCharacter', selectedCharacter);
+        const timeBonus = Math.floor(this.timeLeft / 60) * 100;
+        const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
+        document.getElementById('timeBonus').textContent = bonusText;
+        
+        this.showLevelComplete('🎉 Game Complete!', 'おめでとう🥳', true);
+    }
+    
+    gameOver() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.resetStats();
+        this.showMessage('💀 Game Over!');
+        document.getElementById('ui').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+        setTimeout(() => {
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        }, 3000);
+    }
+    
+    showLevelComplete(title, text, showPassword = false) {
+    document.getElementById('levelCompleteTitle').textContent = title;
+    document.getElementById('levelCompleteText').textContent = text;
+    document.getElementById('levelComplete').style.display = 'flex';
+    
+    // Only show password if player actually won
+    const passwordEl = document.getElementById('password');
+    if (showPassword) {
+        passwordEl.textContent = 'パスワード: 出日土';
+        passwordEl.style.display = 'block';
+    } else {
+        passwordEl.style.display = 'none';
+    }
+    
+    document.getElementById('retryButton').style.display = 'none';
+    document.getElementById('ui').style.display = 'none';
+    document.getElementById('timer').style.display = 'none';
+}
+}
+
+let game;
+let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐'; // Get from localStorage or default
+
+// Set the selected character emoji on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const emojiSpan = document.getElementById('selectedCharacterEmoji');
+    if (emojiSpan) {
+        emojiSpan.textContent = selectedCharacter;
+    }
+    document.getElementById('player').textContent = selectedCharacter; // Preview in game
+});
+
+function startGame() {
+    try {
+        console.log('Start Game button clicked!');
+        const startScreen = document.getElementById('startScreen');
+        if (!startScreen) throw new Error('Start screen element not found!');
+        startScreen.style.display = 'none';
+        document.getElementById('ui').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
+        game = new MazeGame();
+        game.initLevel();
+        game.startGameTimer();
+    } catch (error) {
+        console.error('Error starting game:', error);
+    }
+}
+
+function startOver() {
+    try {
+        // Reset all cached data
+        localStorage.removeItem('key1');
+        localStorage.removeItem('key2');
+        localStorage.removeItem('key3');
+        localStorage.removeItem('hearts');
+        localStorage.removeItem('selectedCharacter');
+        localStorage.setItem('money', 0);
+        // Redirect to Level 1
+        window.location.href = 'https://thedepression.github.io/games/maze/level1';
+    } catch (error) {
+        console.error('Error starting over:', error);
+    }
+}
+
+function restartGame() {
+    try {
+        game.initLevel();
+        game.startGameTimer();
+        document.getElementById('levelComplete').style.display = 'none';
+        document.getElementById('ui').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
+    } catch (error) {
+        console.error('Error restarting game:', error);
+    }
+}
     </script>
 </body>
 </html>
