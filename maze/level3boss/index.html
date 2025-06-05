@@ -562,10 +562,33 @@
         }
 
         startGame() {
-            this.gameStarted = true;
-            this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-            this.startGameLoop();
-        }
+    this.gameStarted = true;
+    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    // ADD THIS PART - Preload audio during user interaction
+    const victoryMusic = document.getElementById('victoryMusic');
+    const explosionSound = document.getElementById('explosionSound');
+    
+    // For victory music:
+    if (victoryMusic) {
+        victoryMusic.load(); // Load the file
+        victoryMusic.play().then(() => {
+            victoryMusic.pause(); // Immediately pause
+            victoryMusic.currentTime = 0; // Reset to beginning
+        }).catch(e => console.log('Victory music preload failed:', e));
+    }
+    
+    // For explosion sound:
+    if (explosionSound) {
+        explosionSound.load(); // Load the file  
+        explosionSound.play().then(() => {
+            explosionSound.pause(); // Immediately pause
+            explosionSound.currentTime = 0; // Reset to beginning
+        }).catch(e => console.log('Explosion sound preload failed:', e));
+    }
+    
+    this.startGameLoop();
+}
 
         startGameLoop() {
             const gameLoop = () => {
