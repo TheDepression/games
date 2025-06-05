@@ -1059,10 +1059,14 @@ class MazeGame {
 let game;
 let selectedCharacter = localStorage.getItem('selectedCharacter') || '😐'; // Get from localStorage or default
 
-function selectCharacter(emoji) {
-    selectedCharacter = emoji;
-    document.getElementById('player').textContent = emoji; // Preview
-}
+// Set the selected character emoji on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const emojiSpan = document.getElementById('selectedCharacterEmoji');
+    if (emojiSpan) {
+        emojiSpan.textContent = selectedCharacter;
+    }
+    document.getElementById('player').textContent = selectedCharacter; // Preview in game
+});
 
 function startGame() {
     try {
