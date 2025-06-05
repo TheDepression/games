@@ -269,14 +269,14 @@
         </div>
     <div id="message"></div>
 <div class="boss-health">
-    <div>🐛 GIANT BUG BOSS</div>
+    <div>👻 GIANT GHOST BOSS</div>
     <div>HP: <span id="bossHp">4</span>/4</div>
 </div>
 
 <div id="controlArea">
     <div style="text-align: center; margin-bottom: 10px;">
         <div style="font-size: 18px; font-weight: bold;">⚔️ BOSS BATTLE</div>
-        <div style="font-size: 12px; opacity: 0.8;">Touch TNT to damage boss!</div>
+        <div style="font-size: 12px; opacity: 0.8;">TNTをさわって ボスにダメージを与える!</div>
     </div>
     <div class="control-hint">
         <div>🎮 ここをスワイプして移動</div>
@@ -286,10 +286,10 @@
 
 <div id="startScreen">
     <h2>⚔️ BOSS BATTLE</h2>
-    <p style="margin: 20px 0;">🐛 GIANT BUG AWAITS</p>
-    <p style="font-size: 12px; opacity: 0.8;">Touch 4 TNT bombs to defeat the boss!</p>
-    <p style="font-size: 11px; opacity: 0.6; margin: 10px 0;">⚠️ Walls are electrified and deal damage!</p>
-    <button class="start-button" onclick="startBoss()">ENTER BOSS ROOM</button>
+    <p style="margin: 20px 0;">👻 GIANT GHOST</p>
+    <p style="font-size: 12px; opacity: 0.8;"> 4個のTNTをさわって ボスをたおす!</p>
+    <p style="font-size: 11px; opacity: 0.6; margin: 10px 0;">⚠️ かべも...あぶないよ!</p>
+    <button class="start-button" onclick="startBoss()">ボスの部屋に入る</button>
 </div>
 
 <div id="levelComplete" style="display: none;">
@@ -462,7 +462,7 @@
         createBoss() {
             const bossEl = document.createElement('div');
             bossEl.className = 'boss';
-            bossEl.textContent = '🐛';
+            bossEl.textContent = '👻';
             bossEl.style.left = this.bossX + 'px';
             bossEl.style.top = this.bossY + 'px';
             this.gameWorld.appendChild(bossEl);
