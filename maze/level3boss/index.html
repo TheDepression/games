@@ -306,6 +306,10 @@
     <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/Mazeboss.m4a" type="audio/mp4">
     Your browser does not support the audio element.
 </audio>
+<audio id="victoryMusic" preload="auto" loop>
+    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/mw.m4a" type="audio/mp4">
+    Your browser does not support the audio element.
+</audio>
 
 <script>
     // Get saved data from localStorage
@@ -935,6 +939,7 @@
     }
 
     function goToEndScreen() {
+        game.victoryMusic.pause();
         // This would go to your final end screen
         // For now, just show an alert
         alert('🎉 Congratulations! You completed all levels and defeated the boss! Game Complete!');
