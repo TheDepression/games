@@ -901,10 +901,13 @@
 }
 
         completeGame() {
-    if (this.gameCompleted) return;
-    this.gameCompleted = true;
+    // Don't set gameCompleted=true immediately
+    
     this.victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
     this.showLevelComplete();
+    
+    // Set it true after everything is done
+    this.gameCompleted = true;
 }
 
         gameOver() {
