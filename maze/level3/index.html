@@ -1060,19 +1060,23 @@ class MazeGame {
     }
     
     completeLevel() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        
-        localStorage.setItem('key3', 'unlocked');
-        localStorage.setItem('hearts', this.hearts);
-        localStorage.setItem('selectedCharacter', selectedCharacter);
-        const timeBonus = Math.floor(this.timeLeft / 60) * 100;
-        const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
-        document.getElementById('timeBonus').textContent = bonusText;
-        
-        this.showLevelComplete('🎉 Game Complete!', 'おめでとう🥳', true);
-    }
+    clearInterval(this.timerInterval);
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    
+    // Store necessary data for boss fight, reset money
+    localStorage.setItem('key3', 'unlocked');
+    localStorage.setItem('hearts', this.hearts);
+    localStorage.setItem('selectedCharacter', selectedCharacter);
+    localStorage.setItem('money', 0); // Reset money to zero
+    
+    const timeBonus = Math.floor(this.timeLeft / 60) * 100;
+    const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
+    document.getElementById('timeBonus').textContent = bonusText;
+    
+    // Show level complete screen with boss fight transition
+    this.showLevelComplete('🎉 Level 3 Complete!', 'Prepare for the Boss Fight! 🦹');
+}
     
     gameOver() {
         clearInterval(this.timerInterval);
