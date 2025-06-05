@@ -310,20 +310,15 @@
     </div>
         
         <div id="startScreen">
-            <h2>👻 Haunted House</h2>
-            <p style="margin: 20px 0;">にげてね</p>
-            <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
-            <p style="font-size: 14px; margin: 10px 0;">好きなエモジにして:</p>
-            <div>
-                <button onclick="selectCharacter('😐')">😐</button>
-                <button onclick="selectCharacter('🥸')">🥸</button>
-                <button onclick="selectCharacter('😺')">😺</button>
-                <button onclick="selectCharacter('👩🏻')">👩🏻</button>
-                <button onclick="selectCharacter('😎')">😎</button>
-                <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
-            </div>
-            <button class="start-button" onclick="startGame()">START GAME</button>
-        </div>
+    <h2>👻 Haunted House</h2>
+    <p style="margin: 20px 0;">にげてね</p>
+    <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
+    <div id="selectedCharacterDisplay" style="font-size: 48px; margin: 20px 0;">
+        <span id="selectedCharacterEmoji"></span>
+    </div>
+    <p style="font-size: 16px; margin: 10px 0;">Let’s do it!</p>
+    <button class="start-button" onclick="startGame()">START GAME</button>
+</div>
         
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
