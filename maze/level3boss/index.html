@@ -913,8 +913,7 @@ if (explosionSound) {
 
         completeGame() {
     // Don't set gameCompleted=true immediately
-    const victoryMusic = document.getElementById('victoryMusic');
-victoryMusic.load(); // Force load the audio
+    
     this.victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
     this.showLevelComplete();
     
