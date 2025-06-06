@@ -321,11 +321,13 @@
 
     class BossBattle {
         constructor() {
-            this.hearts = hearts;
-            this.gameStarted = false;
-            this.isInvulnerable = false;
-            this.tntHits = 0;
-            this.bossHp = 3;
+    this.hearts = hearts;
+    this.gameStarted = false;
+    this.isInvulnerable = false;
+    this.tntHits = 0;
+    this.bossHp = 3;
+    this.elapsedTime = 0; // NEW: Track elapsed time
+    this.elapsedInterval = null; // NEW: Interval for elapsed time
             
             // Player properties
             this.playerX = 100;
@@ -567,7 +569,13 @@
 
         startGame() {
     this.gameStarted = true;
+    this.elapsedTime = 0; // Reset elapsed time
     this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    // Start elapsed time tracker
+    this.elapsedInterval = setInterval(() => {
+        this.elapsedTime++;
+    }, 1000);
     
     // ADD THIS PART - Preload audio during user interaction
     const victoryMusic = document.getElementById('victoryMusic');
@@ -939,30 +947,32 @@ if (explosionSound) {
 }
 
         completeGame() {
-    // Don't set gameCompleted=true immediately
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    
+    // Save elapsed time for boss fight
+    localStorage.setItem('level2BossTime', this.elapsedTime);
+    
+    // Remove key2 and add key2b
+    localStorage.removeItem('key2');
+    localStorage.setItem('key2b', 'unlocked');
     
     this.victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
     this.showLevelComplete();
     
-    // Set it true after everything is done
     this.gameCompleted = true;
 }
 
         gameOver() {
-            this.gameStarted = false;
-            this.bgMusic.pause();
-            this.showMessage('💀 Game Over!');
-            
-            setTimeout(() => {
-                // Reset and go back to level 1
-                localStorage.removeItem('hearts');
-                localStorage.removeItem('selectedCharacter');
-                localStorage.removeItem('key1');
-                localStorage.removeItem('key2');
-                localStorage.removeItem('key3');
-                window.location.href = 'https://thedepression.github.io/games/maze/level1';
-            }, 3000);
-        }
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    this.showMessage('💀 Game Over!');
+    
+    setTimeout(() => {
+        // Go back to Level 2 (not Level 1)
+        window.location.href = 'https://thedepression.github.io/games/maze/level2';
+    }, 3000);
+}
 
         showLevelComplete() {
     document.getElementById('levelCompleteTitle').textContent = 'Giant Ghost Defeated!';
@@ -986,20 +996,21 @@ if (explosionSound) {
     // Save progress for level 3
     localStorage.setItem('hearts', '3');
     localStorage.setItem('money', '0');
-    localStorage.setItem('key2', 'unlocked'); // Unlock level 3
+    // key2b is already set in completeGame()
     // Keep the same selected character
     
-    // Go to level 3
-    window.location.href = 'https://thedepression.github.io/games/maze/level3';
+    // Go to level 2.5 (which will be displayed as level 3)
+    window.location.href = 'https://thedepression.github.io/games/maze/level25';
 }
 
     // Initialize the game when page loads
-    window.onload = function() {
-        // Comment out for testing
-        // if (localStorage.getItem('key2') !== 'unlocked') {
-        //     alert('You must get the level 2 key first!');
-        //     window.location.href = 'https://thedepression.github.io/games/maze/level2';
-        // }
+window.onload = function() {
+    // Check for level 2 key
+    if (localStorage.getItem('key2') !== 'unlocked') {
+        alert('You must complete Level 2 first!');
+        window.location.href = 'https://thedepression.github.io/games/maze/level2';
+        return;
+    }
         
         // Set character from localStorage
         const savedCharacter = localStorage.getItem('selectedCharacter') || '😐';
