@@ -1130,7 +1130,7 @@ showDeathScreen() {
                 
                 document.getElementById('password').style.display = 'none';
                 document.getElementById('retryButton').style.display = 'none';
-                
+                document.getElementById('timeBonus').style.display = 'none'; // Hide time bonus
                 const bossButton = document.getElementById('startOverButton');
                 bossButton.textContent = 'Fight Boss!';
                 bossButton.onclick = goToBossFight;
