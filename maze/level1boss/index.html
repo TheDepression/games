@@ -569,7 +569,13 @@
 
         startGame() {
     this.gameStarted = true;
+    this.elapsedTime = 0; // Reset elapsed time
     this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    // Start elapsed time tracker
+    this.elapsedInterval = setInterval(() => {
+        this.elapsedTime++;
+    }, 1000);
     
     // ADD THIS PART - Preload audio during user interaction
     const victoryMusic = document.getElementById('victoryMusic');
