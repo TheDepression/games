@@ -1022,19 +1022,19 @@ class MazeGame {
     }
     
     completeLevel() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        
-        localStorage.setItem('key2', 'unlocked');
-        localStorage.setItem('hearts', this.hearts);
-        localStorage.setItem('selectedCharacter', selectedCharacter);
-        const timeBonus = Math.floor(this.timeLeft / 60) * 100;
-        const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
-        document.getElementById('timeBonus').textContent = bonusText;
-        
-        this.showLevelComplete('✅ Level Complete!', 'きみはすげっ');
-    }
+    clearInterval(this.timerInterval);
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    
+    // Save final elapsed time for level 2
+    localStorage.setItem('level2Time', this.elapsedTime);
+    localStorage.setItem('key2', 'unlocked');
+    localStorage.setItem('hearts', this.hearts);
+    localStorage.setItem('selectedCharacter', selectedCharacter);
+    
+    this.showLevelComplete('✅ Level Complete!', 'きみはすげっ');
+}
     
     gameOver() {
     clearInterval(this.timerInterval);
