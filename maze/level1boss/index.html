@@ -269,7 +269,7 @@
         </div>
     <div id="message"></div>
 <div class="boss-health">
-    <div>👻 GIANT GHOST BOSS</div>
+    <div>🦠 GIANT GHOST VIRUS</div>
     <div>HP: <span id="bossHp">3</span>/3</div>
 </div>
 
@@ -286,7 +286,7 @@
 
 <div id="startScreen">
     <h2>⚔️ BOSS BATTLE</h2>
-    <p style="margin: 20px 0;">👻 GIANT GHOST</p>
+    <p style="margin: 20px 0;">🦠 GIANT VIRUS</p>
     <p style="font-size: 12px; opacity: 0.8;"> 3個のTNTをさわって ボスをたおす!</p>
     <p style="font-size: 11px; opacity: 0.6; margin: 10px 0;">⚠️ かべも...あぶないよ!</p>
     <button class="start-button" onclick="startBoss()">ボスの部屋に入る</button>
@@ -298,7 +298,7 @@
     <div class="password-text" style="color: gold; font-weight: bold; margin: 15px 0; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border: 1px solid gold;">
         👍君のすごさは高い👍
     </div>
-    <button onclick="goToLevel3()">🚪 Continue to level 3</button>
+    <button onclick="goToLevel2()">🚪 Continue to level 2</button>
 </div>
 </div>
 
@@ -307,7 +307,7 @@
     Your browser does not support the audio element.
 </audio>
 <audio id="victoryMusic">
-    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/vc2.mp3" type="audio/mpeg">
+    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/vc.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
 <audio id="explosionSound">
@@ -466,7 +466,7 @@
         createBoss() {
             const bossEl = document.createElement('div');
             bossEl.className = 'boss';
-            bossEl.textContent = '👻';
+            bossEl.textContent = '🦠';
             bossEl.style.left = this.bossX + 'px';
             bossEl.style.top = this.bossY + 'px';
             this.gameWorld.appendChild(bossEl);
@@ -965,8 +965,8 @@ if (explosionSound) {
         }
 
         showLevelComplete() {
-    document.getElementById('levelCompleteTitle').textContent = 'Giant Ghost Defeated!';
-    document.getElementById('levelCompleteText').textContent = '🎉 You defeated the Giant Ghost!';
+    document.getElementById('levelCompleteTitle').textContent = 'Giant Virus Defeated!';
+    document.getElementById('levelCompleteText').textContent = '🎉 You defeated the Giant Virus!';
     document.getElementById('levelComplete').style.display = 'flex';
 }
     }
@@ -980,24 +980,24 @@ if (explosionSound) {
         game.startGame();
     }
 
-    function goToLevel3() {
+    function goToLevel2() {
     game.victoryMusic.pause();
     
-    // Save progress for level 3
+    // Save progress for level 2
     localStorage.setItem('hearts', '3');
     localStorage.setItem('money', '0');
-    localStorage.setItem('key2', 'unlocked'); // Unlock level 3
+    localStorage.setItem('key1', 'unlocked'); // Unlock level 2
     // Keep the same selected character
     
-    // Go to level 3
-    window.location.href = 'https://thedepression.github.io/games/maze/level3';
+    // Go to level 2
+    window.location.href = 'https://thedepression.github.io/games/maze/level2';
 }
 
     // Initialize the game when page loads
     window.onload = function() {
         // Comment out for testing
-        // if (localStorage.getItem('key2') !== 'unlocked') {
-        //     alert('You must get the level 2 key first!');
+        // if (localStorage.getItem('key1') !== 'unlocked') {
+        //     alert('You must get the level 1 key first!');
         //     window.location.href = 'https://thedepression.github.io/games/maze/level2';
         // }
         
