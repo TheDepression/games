@@ -335,8 +335,8 @@ button:hover:not(.selected) {
             <h3 id="levelCompleteTitle">Level Complete!</h3>
             <p id="levelCompleteText">Great job!</p>
             <div id="timeBonus" style="font-size: 14px; margin: 10px 0;"></div>
-            <button id="nextLevelButton" style="display: none;" onclick="nextLevel()">Proceed to Level 2</button>
-            <button id="retryButton" style="display: none;" onclick="restartGame()">Replay Level</button>
+            <button id="nextLevelButton" style="display: none;" onclick="nextLevel()">ボスに行く</button>
+            <button id="retryButton" style="display: none;" onclick="restartGame()">最初から</button>
         </div>
     </div>
 
@@ -999,7 +999,7 @@ friendlies.forEach(friendly => {
         const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
         document.getElementById('timeBonus').textContent = bonusText;
         
-        this.showLevelComplete('✅ Level Complete!', 'You escaped the hospital!');
+        this.showLevelComplete('✅ Level Complete!', '上手ね');
     }
     
     gameOver() {
