@@ -350,14 +350,16 @@ if (localStorage.getItem('key1b') !== 'unlocked') {
 
 class MazeGame {
     constructor() {
-        try {
-            this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
-            this.hasKey = false;
-            this.gameStarted = false;
-            this.timeLeft = 240; // 4 minutes
-            this.timerInterval = null;
-            this.isInvulnerable = false;
-            this.money = 0;
+    try {
+        this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
+        this.hasKey = false;
+        this.gameStarted = false;
+        this.timeLeft = 240; // 4 minutes
+        this.timerInterval = null;
+        this.elapsedTime = parseInt(localStorage.getItem('level2Time')) || 0; // Load existing time
+        this.elapsedInterval = null; // Interval for elapsed time
+        this.isInvulnerable = false;
+        this.money = 0;
             
             // Movement properties
             this.playerX = 60;
@@ -442,13 +444,19 @@ class MazeGame {
     }
     
     startGameTimer() {
-        try {
-            this.gameStarted = true;
-            this.timeLeft = 240;
-            this.updateTimer();
-            this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-            
-            this.timerInterval = setInterval(() => {
+    try {
+        this.gameStarted = true;
+        this.timeLeft = 240;
+        // Don't reset elapsedTime - keep accumulating
+        this.updateTimer();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        
+        // Start elapsed time tracker
+        this.elapsedInterval = setInterval(() => {
+            this.elapsedTime++;
+        }, 1000);
+        
+        this.timerInterval = setInterval(() => {
                 this.timeLeft--;
                 this.updateTimer();
                 
@@ -476,15 +484,17 @@ class MazeGame {
     }
     
     timeUp() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        this.resetStats();
-        this.showMessage('⏰ Time\'s up!');
-        setTimeout(() => {
-            this.showLevelComplete('⏰ Time Up!', 'Try again!');
-        }, 2000);
-    }
+    clearInterval(this.timerInterval);
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    // Save current elapsed time before showing death screen
+    localStorage.setItem('level2Time', this.elapsedTime);
+    this.showMessage('⏰ Time\'s up!');
+    setTimeout(() => {
+        this.showDeathScreen();
+    }, 2000);
+}
     
     initLevel() {
         try {
@@ -1011,16 +1021,6 @@ class MazeGame {
         document.getElementById('money').textContent = this.money;
     }
     
-    resetStats() {
-        localStorage.removeItem('hearts');
-        localStorage.removeItem('selectedCharacter');
-        localStorage.removeItem('key1');
-        localStorage.removeItem('key2');
-        this.money = 0;
-        this.hearts = 3;
-        this.updateUI();
-    }
-    
     completeLevel() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
@@ -1037,17 +1037,51 @@ class MazeGame {
     }
     
     gameOver() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        this.resetStats();
-        this.showMessage('💀 Game Over!');
-        document.getElementById('ui').style.display = 'none';
-        document.getElementById('timer').style.display = 'none';
-        setTimeout(() => {
-            window.location.href = 'https://thedepression.github.io/games/maze/level1';
-        }, 3000);
+    clearInterval(this.timerInterval);
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    // Save current elapsed time before showing death screen
+    localStorage.setItem('level2Time', this.elapsedTime);
+    this.showMessage('💀 Game Over!');
+    document.getElementById('ui').style.display = 'none';
+    document.getElementById('timer').style.display = 'none';
+    setTimeout(() => {
+        this.showDeathScreen();
+    }, 2000);
+}
+
+    showDeathScreen() {
+    // Create a custom death screen with choices
+    document.getElementById('levelCompleteTitle').textContent = '💀 Game Over';
+    document.getElementById('levelCompleteText').textContent = 'What would you like to do?';
+    document.getElementById('timeBonus').style.display = 'none';
+    document.getElementById('nextLevelButton').style.display = 'none';
+    
+    // Show retry button
+    const retryButton = document.getElementById('retryButton');
+    retryButton.textContent = 'Retry Level 2';
+    retryButton.style.display = 'block';
+    retryButton.onclick = () => {
+        window.location.reload(); // Reload to retry
+    };
+    
+    // Create and add start over button
+    const startOverButton = document.createElement('button');
+    startOverButton.textContent = '最初から (Start Over)';
+    startOverButton.onclick = () => {
+        localStorage.clear(); // Clear everything
+        window.location.href = 'https://thedepression.github.io/games/maze/level1';
+    };
+    
+    // Add start over button if it doesn't exist
+    const levelCompleteDiv = document.getElementById('levelComplete');
+    if (!levelCompleteDiv.querySelector('button:nth-child(5)')) {
+        levelCompleteDiv.appendChild(startOverButton);
     }
+    
+    levelCompleteDiv.style.display = 'flex';
+}
     
     showLevelComplete(title, text) {
         document.getElementById('levelCompleteTitle').textContent = title;
