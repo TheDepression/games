@@ -309,31 +309,31 @@
     <div id="controlArea">
         <div style="text-align: center; margin-bottom: 10px;">
             <div style="font-size: 18px; font-weight: bold;">Haunted House</div>
-            <div style="font-size: 12px; opacity: 0.8;">おばけやしき</div>
+            <div style="font-size: 12px; opacity: 0.8;">🎮 ここをスワイプして移動</div>
         </div>
         <div class="control-hint">
             <div>🎮 ここをスワイプして移動 </div>
-            <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid ghosts & collect money!</div>
+            <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">🎮 ここをスワイプして移動</div>
         </div>
     </div>
         
         <div id="startScreen">
     <h2>👻 Haunted House</h2>
-    <p style="margin: 20px 0;">にげてね</p>
-    <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
+    <p style="margin: 20px 0;">👻は🏠を　のっとった！</p>
+    <p style="font-size: 12px; opacity: 0.8;">👴🏻鍵屋から🔑鍵を買って💰、ボス部屋に入ろう🚪</p>
     <div id="selectedCharacterDisplay" style="font-size: 48px; margin: 20px 0;">
         <span id="selectedCharacterEmoji"></span>
     </div>
     <p style="font-size: 16px; margin: 10px 0;">Let’s do it!</p>
-    <button class="start-button" onclick="startGame()">START GAME</button>
+    <button class="start-button" onclick="startGame()">START</button>
 </div>
         
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
             <p id="levelCompleteText">Great job!</p>
             <div id="timeBonus" style="font-size: 14px; margin: 10px 0;"></div>
-            <button id="nextLevelButton" style="display: none;" onclick="nextLevel()">Proceed to Level 3</button>
-            <button id="retryButton" style="display: none;" onclick="restartGame()">Replay Level</button>
+            <button id="nextLevelButton" style="display: none;" onclick="nextLevel()">ボスに行く</button>
+            <button id="retryButton" style="display: none;" onclick="restartGame()">最初から</button>
         </div>
     </div>
 
@@ -1033,7 +1033,7 @@ class MazeGame {
         const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
         document.getElementById('timeBonus').textContent = bonusText;
         
-        this.showLevelComplete('✅ Level Complete!', 'You escaped the haunted house!');
+        this.showLevelComplete('✅ Level Complete!', 'きみはすげっ');
     }
     
     gameOver() {
