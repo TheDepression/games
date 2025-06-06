@@ -334,7 +334,6 @@ button:hover:not(.selected) {
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
             <p id="levelCompleteText">Great job!</p>
-            <div id="timeBonus" style="font-size: 14px; margin: 10px 0;"></div>
             <button id="nextLevelButton" style="display: none;" onclick="nextLevel()">ボスに行く</button>
             <button id="retryButton" style="display: none;" onclick="restartGame()">最初から</button>
         </div>
@@ -349,11 +348,13 @@ button:hover:not(.selected) {
 class MazeGame {
     constructor() {
         try {
-            this.hearts = parseInt(localStorage.getItem('hearts')) || 3;
+            this.hearts = 3; // Always start fresh for level 1
             this.hasKey = false;
             this.gameStarted = false;
-            this.timeLeft = 180; // 3 minutes
+            this.timeLeft = 180; // 3 minutes countdown
+            this.elapsedTime = 0; // NEW: Track elapsed time
             this.timerInterval = null;
+            this.elapsedInterval = null; // NEW: Interval for elapsed time
             this.isInvulnerable = false;
             this.money = 0;
             
@@ -443,9 +444,11 @@ class MazeGame {
         try {
             this.gameStarted = true;
             this.timeLeft = 180;
+            this.elapsedTime = 0; // Reset elapsed time
             this.updateTimer();
             this.bgMusic.play().catch(e => console.log('Music play failed:', e));
             
+            // Countdown timer
             this.timerInterval = setInterval(() => {
                 this.timeLeft--;
                 this.updateTimer();
@@ -453,6 +456,11 @@ class MazeGame {
                 if (this.timeLeft <= 0) {
                     this.timeUp();
                 }
+            }, 1000);
+            
+            // NEW: Elapsed time tracker
+            this.elapsedInterval = setInterval(() => {
+                this.elapsedTime++;
             }, 1000);
         } catch (error) {
             console.error('Error starting game timer:', error);
@@ -475,9 +483,9 @@ class MazeGame {
     
     timeUp() {
         clearInterval(this.timerInterval);
+        clearInterval(this.elapsedInterval); // Stop elapsed timer
         this.gameStarted = false;
         this.bgMusic.pause();
-        this.resetStats();
         this.showMessage('⏰ Time\'s up!');
         setTimeout(() => {
             this.showLevelComplete('⏰ Time Up!', 'Try again!');
@@ -704,7 +712,6 @@ this.gameArea.scrollTo({
         this.playerVelocityY *= 0.9;
     }
 }
-    
     canMoveTo(x, y) {
         const playerSize = 24;
         const padding = 2;
@@ -980,49 +987,43 @@ friendlies.forEach(friendly => {
         document.getElementById('money').textContent = this.money;
     }
     
-    resetStats() {
-        this.money = 0;
-        this.hearts = 3;
-        localStorage.setItem('hearts', this.hearts);
-        this.updateUI();
-    }
-    
     completeLevel() {
         clearInterval(this.timerInterval);
+        clearInterval(this.elapsedInterval); // Stop elapsed timer
         this.gameStarted = false;
         this.bgMusic.pause();
         
+        // Save progress to localStorage
         localStorage.setItem('key1', 'unlocked');
         localStorage.setItem('hearts', this.hearts);
         localStorage.setItem('selectedCharacter', selectedCharacter);
-        const timeBonus = Math.floor(this.timeLeft / 60) * 100;
-        const bonusText = timeBonus > 0 ? `Time Bonus: +${timeBonus} points!` : '';
-        document.getElementById('timeBonus').textContent = bonusText;
+        localStorage.setItem('level1Time', this.elapsedTime); // Save elapsed time
         
         this.showLevelComplete('✅ Level Complete!', '上手ね');
     }
     
     gameOver() {
-    clearInterval(this.timerInterval);
-    this.gameStarted = false;
-    this.bgMusic.pause();
-    this.resetStats();
-    this.showMessage('💀 Game Over!');
-    document.getElementById('ui').style.display = 'none';
-    document.getElementById('timer').style.display = 'none';
-    setTimeout(() => {
-        this.showLevelComplete('💀 Game Over', 'Try again!');
-    }, 2000);
-}
-showLevelComplete(title, text) {
-    document.getElementById('levelCompleteTitle').textContent = title;
-    document.getElementById('levelCompleteText').textContent = text;
-    document.getElementById('levelComplete').style.display = 'flex';
-    document.getElementById('nextLevelButton').style.display = title === '✅ Level Complete!' ? 'block' : 'none';
-    document.getElementById('retryButton').style.display = title === '✅ Level Complete!' ? 'none' : 'block';
-    document.getElementById('ui').style.display = 'none';
-    document.getElementById('timer').style.display = 'none';
-}
+        clearInterval(this.timerInterval);
+        clearInterval(this.elapsedInterval); // Stop elapsed timer
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.showMessage('💀 Game Over!');
+        document.getElementById('ui').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+        setTimeout(() => {
+            this.showLevelComplete('💀 Game Over', 'Try again!');
+        }, 2000);
+    }
+    
+    showLevelComplete(title, text) {
+        document.getElementById('levelCompleteTitle').textContent = title;
+        document.getElementById('levelCompleteText').textContent = text;
+        document.getElementById('levelComplete').style.display = 'flex';
+        document.getElementById('nextLevelButton').style.display = title === '✅ Level Complete!' ? 'block' : 'none';
+        document.getElementById('retryButton').style.display = title === '✅ Level Complete!' ? 'none' : 'block';
+        document.getElementById('ui').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+    }
 }
 let game;
 let selectedCharacter = '😐'; // Default
@@ -1050,6 +1051,11 @@ document.addEventListener('DOMContentLoaded', () => {
 function startGame() {
     try {
         console.log('Start Game button clicked!');
+        
+        // Clear ALL localStorage when starting Level 1
+        localStorage.clear();
+        console.log('All localStorage cleared for fresh start');
+        
         const startScreen = document.getElementById('startScreen');
         if (!startScreen) throw new Error('Start screen element not found!');
         startScreen.style.display = 'none';
@@ -1074,12 +1080,8 @@ function nextLevel() {
 
 function restartGame() {
     try {
-        game.resetStats();
-        game.initLevel();
-        game.startGameTimer();
-        document.getElementById('levelComplete').style.display = 'none';
-        document.getElementById('ui').style.display = 'block';
-        document.getElementById('timer').style.display = 'block';
+        // For Level 1, restart just goes back to character select
+        window.location.reload();
     } catch (error) {
         console.error('Error restarting game:', error);
     }
