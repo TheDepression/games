@@ -947,12 +947,18 @@ if (explosionSound) {
 }
 
         completeGame() {
-    // Don't set gameCompleted=true immediately
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    
+    // Save elapsed time for boss fight
+    localStorage.setItem('level1BossTime', this.elapsedTime);
+    
+    // Remove key1 and add key1b
+    localStorage.removeItem('key1');
+    localStorage.setItem('key1b', 'unlocked');
     
     this.victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
     this.showLevelComplete();
     
-    // Set it true after everything is done
     this.gameCompleted = true;
 }
 
