@@ -318,24 +318,24 @@
         <div id="message"></div>
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">Underground Depths</div>
-                <div style="font-size: 12px; opacity: 0.8;">Escape the bugs!</div>
+                <div style="font-size: 18px; font-weight: bold;">Underground</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 ここをスワイプして移動</div>
             </div>
             <div class="control-hint">
                 <div>🎮 ここをスワイプして移動 </div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid bugs & collect money!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">🎮 ここをスワイプして移動</div>
             </div>
         </div>
         
         <div id="startScreen">
             <h2>⛏️ Underground</h2>
             <p style="margin: 20px 0;">虫だらけ</p>
-            <p style="font-size: 12px; opacity: 0.8;">Find the key 🔑 to unlock the exit 🚪</p>
+            <p style="font-size: 12px; opacity: 0.8;">👴🏻鍵屋から🔑鍵を買って💰、ボス部屋に入ろう🚪</p>
             <div id="selectedCharacterDisplay" style="font-size: 48px; margin: 20px 0;">
                 <span id="selectedCharacterEmoji"></span>
             </div>
             <p style="font-size: 16px; margin: 10px 0;">Never give up!</p>
-            <button class="start-button" onclick="startGame()">START GAME</button>
+            <button class="start-button" onclick="startGame()">START</button>
         </div>
         
         <div id="levelComplete" style="display: none;">
@@ -343,8 +343,8 @@
             <p id="levelCompleteText">Great job!</p>
             <div id="timeBonus" style="font-size: 14px; margin: 10px 0;"></div>
             <div id="password" class="password-text" style="display: none;"></div>
-            <button id="startOverButton" onclick="goToBossFight()">Fight Boss!</button>
-            <button id="retryButton" style="display: none;" onclick="restartGame()">Replay Level</button>
+            <button id="startOverButton" onclick="goToBossFight()">ボスに行く</button>
+            <button id="retryButton" style="display: none;" onclick="restartGame()">最初から</button>
         </div>
     </div>
 
@@ -689,7 +689,7 @@
                     });
                     
                     // Create friendlies
-                    const friendlyEmojis = ['🧑', '👩'];
+                    const friendlyEmojis = ['👴🏻', '👩'];
                     mazeData.friendlies.forEach((friendly, index) => {
                         const friendlyEl = document.createElement('div');
                         friendlyEl.className = 'friendly';
