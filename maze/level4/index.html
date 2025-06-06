@@ -367,7 +367,7 @@
                     this.gameStarted = false;
                     this.timeLeft = 360; // 6 minutes
                     this.timerInterval = null;
-                    this.elapsedTime = parseInt(localStorage.getItem('level3Time')) || 0; // Load existing time
+                    this.elapsedTime = parseInt(localStorage.getItem('level4Time')) || 0; // Load existing time
                     this.elapsedInterval = null; // Interval for elapsed time
                     this.isInvulnerable = false;
                     this.money = 0;
@@ -1065,9 +1065,9 @@
     this.gameStarted = false;
     this.bgMusic.pause();
     
-    // Save final elapsed time for level 3
-    localStorage.setItem('level3Time', this.elapsedTime);
-    localStorage.setItem('key3', 'unlocked');
+    // Save final elapsed time for level 4
+    localStorage.setItem('level4Time', this.elapsedTime);
+    localStorage.setItem('key4', 'unlocked');
     localStorage.setItem('hearts', this.hearts);
     localStorage.setItem('selectedCharacter', selectedCharacter);
     
