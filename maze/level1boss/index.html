@@ -957,20 +957,17 @@ if (explosionSound) {
 }
 
         gameOver() {
-            this.gameStarted = false;
-            this.bgMusic.pause();
-            this.showMessage('💀 Game Over!');
-            
-            setTimeout(() => {
-                // Reset and go back to level 1
-                localStorage.removeItem('hearts');
-                localStorage.removeItem('selectedCharacter');
-                localStorage.removeItem('key1');
-                localStorage.removeItem('key2');
-                localStorage.removeItem('key3');
-                window.location.href = 'https://thedepression.github.io/games/maze/level1';
-            }, 3000);
-        }
+    clearInterval(this.elapsedInterval); // Stop elapsed timer
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    this.showMessage('💀 Game Over!');
+    
+    setTimeout(() => {
+        // Clear ALL localStorage (same as Level 1)
+        localStorage.clear();
+        window.location.href = 'https://thedepression.github.io/games/maze/level1';
+    }, 3000);
+}
 
         showLevelComplete() {
     document.getElementById('levelCompleteTitle').textContent = 'Giant Virus Defeated!';
