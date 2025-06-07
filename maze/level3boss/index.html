@@ -298,7 +298,7 @@
     <div class="password-text" style="color: gold; font-weight: bold; margin: 15px 0; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border: 1px solid gold;">
         🥷🏻君はニンジャだな〜🥷🏻
     </div>
-    <button onclick="goToEndScreen()">🎉 Complete Game!</button>
+    <button onclick="goToEndScreen()">🚪 Continue to Level 4</button>
 </div>
 </div>
 
@@ -991,12 +991,21 @@ if (explosionSound) {
     }
 
     function goToEndScreen() {
-        game.victoryMusic.pause();
-        alert('🎉 Congratulations! だけど、もう一つのLevelがのこってる🧟‍♂️!');
-        localStorage.setItem('hearts', '3');
+    game.victoryMusic.pause();
+    
+    // Save progress for level 4
+    localStorage.setItem('hearts', '3');
     localStorage.setItem('money', '0');
+    // key3b is already set in completeGame()
+    // Keep the same selected character
+    
+    // Show message then redirect
+    game.showMessage('🎉 Congratulations! だけど、もう一つのLevelがのこってる🧟‍♂️!');
+    
+    setTimeout(() => {
         window.location.href = 'https://thedepression.github.io/games/maze/level4';
-    }
+    }, 3000);
+}
 
     // Initialize the game when page loads
 window.onload = function() {
