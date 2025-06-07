@@ -1094,7 +1094,7 @@ showDeathScreen() {
     document.getElementById('levelCompleteTitle').textContent = '💀 Game Over';
     document.getElementById('levelCompleteText').textContent = 'What would you like to do?';
     document.getElementById('timeBonus').style.display = 'none';
-    document.getElementById('nextLevelButton').style.display = 'none';
+    document.getElementById('startOverButton').style.display = 'none'; // Hide the boss button
     
     // Show retry button
     const retryButton = document.getElementById('retryButton');
@@ -1104,18 +1104,21 @@ showDeathScreen() {
         window.location.reload(); // Reload to retry
     };
     
-    // Create and add start over button
-    const startOverButton = document.createElement('button');
-    startOverButton.textContent = '最初から (Start Over)';
-    startOverButton.onclick = () => {
-        localStorage.clear(); // Clear everything
-        window.location.href = 'https://thedepression.github.io/games/maze/level1';
-    };
-    
-    // Add start over button if it doesn't exist
+    // Create start over button if it doesn't exist
     const levelCompleteDiv = document.getElementById('levelComplete');
-    if (!levelCompleteDiv.querySelector('button:nth-child(5)')) {
-        levelCompleteDiv.appendChild(startOverButton);
+    let startOverBtn = document.getElementById('startOverFromBeginning');
+    
+    if (!startOverBtn) {
+        startOverBtn = document.createElement('button');
+        startOverBtn.id = 'startOverFromBeginning';
+        startOverBtn.textContent = '最初から (Start Over)';
+        startOverBtn.onclick = () => {
+            localStorage.clear(); // Clear everything
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        };
+        levelCompleteDiv.appendChild(startOverBtn);
+    } else {
+        startOverBtn.style.display = 'block';
     }
     
     levelCompleteDiv.style.display = 'flex';
@@ -1132,7 +1135,7 @@ showDeathScreen() {
                 document.getElementById('retryButton').style.display = 'none';
                 document.getElementById('timeBonus').style.display = 'none'; // Hide time bonus
                 const bossButton = document.getElementById('startOverButton');
-                bossButton.textContent = 'Fight Boss!';
+                bossButton.textContent = 'ボスに行く';
                 bossButton.onclick = goToBossFight;
                 
                 document.getElementById('ui').style.display = 'none';
