@@ -994,7 +994,7 @@
        document.getElementById('levelComplete').style.display = 'none';
        document.getElementById('cutsceneScreen').style.display = 'flex';
        
-       // Calculate total time for leaderboard later
+       // Calculate total time for leaderboard later but might need to change later
        const totalTime = calculateTotalTime();
        localStorage.setItem('totalGameTime', totalTime);
        
@@ -1009,13 +1009,13 @@
    }
 
    function endCutscene() {
-       // Save progress for true final boss
+       // Save progress for true final boss but now redirecting to separate cutscene
        localStorage.setItem('hearts', '3');
        localStorage.setItem('money', '0');
        // key4b is already set
        
        // Redirect to true final boss
-       window.location.href = 'https://thedepression.github.io/games/maze/truefinalboss';
+       window.location.href = 'https://thedepression.github.io/games/maze/cutscene';
    }
 
    function calculateTotalTime() {
