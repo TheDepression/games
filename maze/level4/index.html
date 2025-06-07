@@ -539,209 +539,289 @@
             }
             
             generateMaze() {
-                try {
-                    const mazeData = {
-                        walls: [
-                            // Outer walls
-                            {x: 0, y: 0, w: 2400, h: 20}, {x: 0, y: 0, w: 20, h: 1400},
-                            {x: 0, y: 1380, w: 2400, h: 20}, {x: 2380, y: 0, w: 20, h: 1400},
-                            
-                            // Enhanced edge protrusions
-                            {x: 20, y: 100, w: 180, h: 20}, // From left
-                            {x: 20, y: 500, w: 150, h: 20}, // From left
-                            {x: 20, y: 700, w: 170, h: 20}, // From left
-                            {x: 20, y: 900, w: 160, h: 20}, // From left
-                            {x: 20, y: 1100, w: 190, h: 20}, // From left
-                            
-                            {x: 2200, y: 150, w: 180, h: 20}, // From right
-                            {x: 2180, y: 350, w: 200, h: 20}, // From right
-                            {x: 2220, y: 550, w: 160, h: 20}, // From right
-                            {x: 2200, y: 750, w: 180, h: 20}, // From right
-                            {x: 2210, y: 950, w: 170, h: 20}, // From right
-                            {x: 2190, y: 1150, w: 190, h: 20}, // From right
-                            
-                            {x: 300, y: 20, w: 20, h: 150}, // From top
-                            {x: 600, y: 20, w: 20, h: 180}, // From top
-                            {x: 900, y: 20, w: 20, h: 160}, // From top
-                            {x: 1200, y: 20, w: 20, h: 170}, // From top
-                            {x: 1500, y: 20, w: 20, h: 140}, // From top
-                            {x: 1800, y: 20, w: 20, h: 190}, // From top
-                            {x: 2100, y: 20, w: 20, h: 160}, // From top
-                            
-                            {x: 400, y: 1230, w: 20, h: 150}, // From bottom
-                            {x: 700, y: 1200, w: 20, h: 180}, // From bottom
-                            {x: 1000, y: 1220, w: 20, h: 160}, // From bottom
-                            {x: 1300, y: 1210, w: 20, h: 170}, // From bottom
-                            {x: 1600, y: 1240, w: 20, h: 140}, // From bottom
-                            {x: 1900, y: 1190, w: 20, h: 190}, // From bottom
-                            {x: 2200, y: 1220, w: 20, h: 160}, // From bottom
-                            
-                            // Inner maze walls
-                            {x: 200, y: 100, w: 20, h: 220}, {x: 180, y: 420, w: 180, h: 20},
-                            {x: 300, y: 60, w: 20, h: 280}, {x: 280, y: 500, w: 200, h: 20},
-                            {x: 400, y: 140, w: 20, h: 300}, {x: 380, y: 580, w: 240, h: 20},
-                            {x: 500, y: 200, w: 20, h: 240}, {x: 480, y: 660, w: 200, h: 20},
-                            {x: 600, y: 100, w: 20, h: 340}, {x: 320, y: 740, w: 420, h: 20},
-                            {x: 700, y: 200, w: 20, h: 280}, {x: 680, y: 460, w: 280, h: 20},
-                            {x: 800, y: 280, w: 20, h: 320}, {x: 780, y: 580, w: 220, h: 20},
-                            {x: 900, y: 140, w: 20, h: 360}, {x: 880, y: 480, w: 180, h: 20},
-                            {x: 1000, y: 240, w: 20, h: 340}, {x: 980, y: 660, w: 160, h: 20},
-                            {x: 1100, y: 340, w: 20, h: 300}, {x: 1080, y: 760, w: 240, h: 20},
-                            {x: 1200, y: 100, w: 20, h: 420}, {x: 1180, y: 660, w: 220, h: 20},
-                            {x: 1300, y: 200, w: 20, h: 360}, {x: 1280, y: 580, w: 200, h: 20},
-                            {x: 1400, y: 300, w: 20, h: 380}, {x: 1380, y: 860, w: 180, h: 20},
-                            {x: 1500, y: 140, w: 20, h: 420}, {x: 1480, y: 700, w: 220, h: 20},
-                            {x: 1600, y: 240, w: 20, h: 400}, {x: 1580, y: 780, w: 200, h: 20},
-                            {x: 1700, y: 300, w: 20, h: 420}, {x: 1680, y: 920, w: 180, h: 20},
-                            {x: 1800, y: 200, w: 20, h: 460}, {x: 1780, y: 820, w: 160, h: 20},
-                            {x: 1900, y: 300, w: 20, h: 400}, {x: 1880, y: 900, w: 200, h: 20},
-                            {x: 2000, y: 400, w: 20, h: 380}, {x: 1980, y: 980, w: 180, h: 20},
-                            {x: 2100, y: 200, w: 20, h: 420}, {x: 2080, y: 1100, w: 200, h: 20},
-                            {x: 2200, y: 300, w: 20, h: 400}, {x: 2180, y: 1000, w: 160, h: 20},
-                            {x: 200, y: 920, w: 420, h: 20}, {x: 720, y: 980, w: 300, h: 20},
-                            {x: 1100, y: 940, w: 240, h: 20}, {x: 1400, y: 1020, w: 320, h: 20},
-                            {x: 1800, y: 1100, w: 200, h: 20}, {x: 2100, y: 1200, w: 180, h: 20}
-                        ],
-                        playerStart: {x: 60, y: 60},
-                        enemies: [
-                            {x: 180, y: 140, moveX: 160, moveY: 140, range: 120, axis: 'x', speed: 1.62},
-                            {x: 360, y: 240, moveX: 360, moveY: 200, range: 100, axis: 'y', speed: 1.35},
-                            {x: 540, y: 160, moveX: 520, moveY: 160, range: 140, axis: 'x', speed: 1.89},
-                            {x: 740, y: 340, moveX: 740, moveY: 320, range: 80, axis: 'y', speed: 1.62},
-                            {x: 940, y: 280, moveX: 920, moveY: 280, range: 100, axis: 'x', speed: 2.16},
-                            {x: 640, y: 460, moveX: 640, moveY: 440, range: 120, axis: 'y', speed: 1.35},
-                            {x: 1100, y: 500, moveX: 1080, moveY: 500, range: 100, axis: 'x', speed: 1.89},
-                            {x: 1200, y: 640, moveX: 1200, moveY: 620, range: 80, axis: 'y', speed: 1.62},
-                            {x: 800, y: 700, moveX: 780, moveY: 700, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1300, y: 300, moveX: 1300, moveY: 280, range: 100, axis: 'y', speed: 1.89},
-                            {x: 1500, y: 500, moveX: 1480, moveY: 500, range: 140, axis: 'x', speed: 1.62},
-                            {x: 1700, y: 600, moveX: 1700, moveY: 580, range: 80, axis: 'y', speed: 1.35},
-                            {x: 2200, y: 900, moveX: 2180, moveY: 900, range: 120, axis: 'x', speed: 2.16},
-                            {x: 2000, y: 800, moveX: 2000, moveY: 780, range: 100, axis: 'y', speed: 1.62},
-                            {x: 900, y: 1000, moveX: 880, moveY: 1000, range: 140, axis: 'x', speed: 1.89},
-                            {x: 400, y: 600, moveX: 380, moveY: 600, range: 100, axis: 'x', speed: 1.62},
-                            {x: 600, y: 800, moveX: 600, moveY: 780, range: 80, axis: 'y', speed: 1.35},
-                            {x: 1400, y: 400, moveX: 1380, moveY: 400, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1600, y: 900, moveX: 1600, moveY: 880, range: 100, axis: 'y', speed: 1.89},
-                            {x: 1800, y: 300, moveX: 1780, moveY: 300, range: 140, axis: 'x', speed: 1.62},
-                            {x: 500, y: 1100, moveX: 500, moveY: 1080, range: 80, axis: 'y', speed: 1.35},
-                            {x: 700, y: 500, moveX: 680, moveY: 500, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1000, y: 700, moveX: 1000, moveY: 680, range: 100, axis: 'y', speed: 1.89},
-                            {x: 1200, y: 900, moveX: 1180, moveY: 900, range: 140, axis: 'x', speed: 1.62},
-                            {x: 1500, y: 1100, moveX: 1500, moveY: 1080, range: 80, axis: 'y', speed: 1.35},
-                            {x: 1700, y: 400, moveX: 1680, moveY: 400, range: 120, axis: 'x', speed: 2.16},
-                            {x: 1900, y: 600, moveX: 1900, moveY: 580, range: 100, axis: 'y', speed: 1.89},
-                            {x: 2100, y: 800, moveX: 2080, moveY: 800, range: 140, axis: 'x', speed: 1.62},
-                            {x: 2300, y: 500, moveX: 2300, moveY: 480, range: 80, axis: 'y', speed: 1.35},
-                            {x: 1100, y: 1200, moveX: 1080, moveY: 1200, range: 120, axis: 'x', speed: 2.16},
-                            {x: 250, y: 450, moveX: 230, moveY: 450, range: 100, axis: 'x', speed: 1.8},
-                            {x: 350, y: 350, moveX: 350, moveY: 330, range: 90, axis: 'y', speed: 1.5},
-                            {x: 450, y: 750, moveX: 430, moveY: 750, range: 110, axis: 'x', speed: 2.0},
-                            {x: 750, y: 350, moveX: 750, moveY: 330, range: 80, axis: 'y', speed: 1.7},
-                            {x: 850, y: 1050, moveX: 830, moveY: 1050, range: 120, axis: 'x', speed: 1.9},
-                            {x: 1050, y: 450, moveX: 1050, moveY: 430, range: 90, axis: 'y', speed: 1.6},
-                            {x: 1250, y: 550, moveX: 1230, moveY: 550, range: 100, axis: 'x', speed: 2.1},
-                            {x: 1450, y: 750, moveX: 1450, moveY: 730, range: 110, axis: 'y', speed: 1.4},
-                            {x: 1650, y: 200, moveX: 1630, moveY: 200, range: 80, axis: 'x', speed: 1.8},
-                            {x: 1850, y: 550, moveX: 1850, moveY: 530, range: 100, axis: 'y', speed: 1.7},
-                            {x: 2050, y: 350, moveX: 2030, moveY: 350, range: 90, axis: 'x', speed: 2.0}
-                        ],
-                        friendlies: [
-                            {x: 700, y: 300, message: "🔑ほしいなら、800円ちょうだい"},
-                            {x: 1300, y: 500, message: "このゾンビに🔫がきかない"}
-                        ],
-                        hearts: [{x: 450, y: 750}, {x: 2370, y: 30}, {x: 1100, y: 500}],
-                        money: [
-                            {x: 2370, y: 1370}, {x: 800, y: 720},
-                            {x: 1200, y: 640}, {x: 1300, y: 300},
-                            {x: 1900, y: 900}, {x: 600, y: 400},
-                            {x: 1200, y: 1370}, {x: 1500, y: 800}
-                        ],
-                        exit: {x: 60, y: 1300}
-                    };
-                    
-                    // Set player position
-                    this.playerX = mazeData.playerStart.x;
-                    this.playerY = mazeData.playerStart.y;
-                    
-                    // Create walls
-                    mazeData.walls.forEach(wall => {
-                        const wallEl = document.createElement('div');
-                        wallEl.className = 'maze-wall';
-                        wallEl.style.left = wall.x + 'px';
-                        wallEl.style.top = wall.y + 'px';
-                        wallEl.style.width = wall.w + 'px';
-                        wallEl.style.height = wall.h + 'px';
-                        this.gameWorld.appendChild(wallEl);
-                    });
-                    
-                    // Create enemies
-                    const enemyEmojis = ['🧟‍♂️', '🔫', '🧟‍♀️', '🧌'];
-                    mazeData.enemies.forEach((enemy, index) => {
-                        const enemyEl = document.createElement('div');
-                        enemyEl.className = 'enemy';
-                        enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
-                        enemyEl.style.left = enemy.x + 'px';
-                        enemyEl.style.top = enemy.y + 'px';
-                        this.gameWorld.appendChild(enemyEl);
-                        
-                        this.movingEnemies.push({
-                            element: enemyEl,
-                            startX: enemy.moveX,
-                            startY: enemy.moveY,
-                            currentX: enemy.x,
-                            currentY: enemy.y,
-                            range: enemy.range,
-                            axis: enemy.axis,
-                            direction: 1,
-                            speed: enemy.speed
-                        });
-                    });
-                    
-                    // Create friendlies
-                    const friendlyEmojis = ['👴🏻', '🤠'];
-                    mazeData.friendlies.forEach((friendly, index) => {
-                        const friendlyEl = document.createElement('div');
-                        friendlyEl.className = 'friendly';
-                        friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
-                        friendlyEl.style.left = friendly.x + 'px';
-                        friendlyEl.style.top = friendly.y + 'px';
-                        friendlyEl.dataset.message = friendly.message;
-                        this.gameWorld.appendChild(friendlyEl);
-                    });
-                    
-                    // Create hearts
-                    mazeData.hearts.forEach(heart => {
-                        const heartEl = document.createElement('div');
-                        heartEl.className = 'heart-pickup';
-                        heartEl.textContent = '❤️';
-                        heartEl.style.left = heart.x + 'px';
-                        heartEl.style.top = heart.y + 'px';
-                        this.gameWorld.appendChild(heartEl);
-                    });
-                    
-                    // Create money
-                    mazeData.money.forEach(money => {
-                        const moneyEl = document.createElement('div');
-                        moneyEl.className = 'money-pickup';
-                        moneyEl.textContent = '💰';
-                        moneyEl.style.left = money.x + 'px';
-                        moneyEl.style.top = money.y + 'px';
-                        this.gameWorld.appendChild(moneyEl);
-                    });
-                    
-                    // Create exit
-                    const exitEl = document.createElement('div');
-                    exitEl.className = 'exit';
-                    exitEl.textContent = '🚪';
-                    exitEl.style.left = mazeData.exit.x + 'px';
-                    exitEl.style.top = mazeData.exit.y + 'px';
-                    this.gameWorld.appendChild(exitEl);
-                    
-                } catch (error) {
-                    console.error('Error generating maze:', error);
-                }
-            }
+    try {
+        const mazeData = {
+            walls: [
+                // Outer walls
+                {x: 0, y: 0, w: 2400, h: 20}, {x: 0, y: 0, w: 20, h: 1400},
+                {x: 0, y: 1380, w: 2400, h: 20}, {x: 2380, y: 0, w: 20, h: 1400},
+                
+                // Main Street (horizontal corridor through middle)
+                {x: 100, y: 600, w: 800, h: 20}, // Upper street wall
+                {x: 100, y: 780, w: 800, h: 20}, // Lower street wall
+                {x: 1000, y: 600, w: 600, h: 20}, // Upper street wall continued
+                {x: 1000, y: 780, w: 600, h: 20}, // Lower street wall continued
+                {x: 1700, y: 600, w: 600, h: 20}, // Upper street wall end
+                {x: 1700, y: 780, w: 600, h: 20}, // Lower street wall end
+                
+                // Saloon area (bottom left)
+                {x: 100, y: 1000, w: 300, h: 20}, // Top wall
+                {x: 100, y: 1000, w: 20, h: 280}, // Left wall
+                {x: 100, y: 1280, w: 300, h: 20}, // Bottom wall
+                {x: 400, y: 1000, w: 20, h: 300}, // Right wall
+                {x: 200, y: 1100, w: 20, h: 100}, // Interior wall
+                
+                // Sheriff's office (bottom center)
+                {x: 600, y: 1100, w: 200, h: 20}, // Top wall
+                {x: 600, y: 1100, w: 20, h: 180}, // Left wall
+                {x: 800, y: 1100, w: 20, h: 180}, // Right wall
+                {x: 600, y: 1280, w: 220, h: 20}, // Bottom wall
+                
+                // Bank building (bottom right area)
+                {x: 1000, y: 1050, w: 250, h: 20}, // Top wall
+                {x: 1000, y: 1050, w: 20, h: 230}, // Left wall
+                {x: 1250, y: 1050, w: 20, h: 230}, // Right wall
+                {x: 1000, y: 1280, w: 270, h: 20}, // Bottom wall
+                {x: 1100, y: 1150, w: 70, h: 20}, // Vault wall
+                
+                // Church ruins (top left - near exit)
+                {x: 100, y: 100, w: 20, h: 300}, // Left wall
+                {x: 100, y: 100, w: 200, h: 20}, // Top wall
+                {x: 300, y: 100, w: 20, h: 150}, // Right wall partial
+                {x: 200, y: 250, w: 100, h: 20}, // Broken pew
+                {x: 150, y: 350, w: 100, h: 20}, // Broken pew
+                
+                // Graveyard walls (top left area)
+                {x: 400, y: 200, w: 20, h: 20}, // Tombstone
+                {x: 500, y: 150, w: 20, h: 20}, // Tombstone
+                {x: 450, y: 300, w: 20, h: 20}, // Tombstone
+                {x: 550, y: 250, w: 20, h: 20}, // Tombstone
+                
+                // General store (middle left)
+                {x: 200, y: 450, w: 250, h: 20}, // Top wall
+                {x: 200, y: 450, w: 20, h: 100}, // Left wall
+                {x: 450, y: 450, w: 20, h: 100}, // Right wall
+                {x: 200, y: 550, w: 270, h: 20}, // Bottom wall
+                
+                // Hotel ruins (middle area)
+                {x: 700, y: 300, w: 300, h: 20}, // Top wall
+                {x: 700, y: 300, w: 20, h: 200}, // Left wall
+                {x: 1000, y: 300, w: 20, h: 200}, // Right wall
+                {x: 700, y: 500, w: 100, h: 20}, // Bottom wall partial
+                {x: 900, y: 500, w: 120, h: 20}, // Bottom wall partial
+                {x: 850, y: 400, w: 20, h: 100}, // Interior wall
+                
+                // Corral/Stable area (middle right)
+                {x: 1400, y: 400, w: 200, h: 20}, // Top fence
+                {x: 1400, y: 400, w: 20, h: 150}, // Left fence
+                {x: 1600, y: 400, w: 20, h: 150}, // Right fence
+                {x: 1400, y: 550, w: 220, h: 20}, // Bottom fence
+                {x: 1500, y: 450, w: 20, h: 50}, // Stall divider
+                
+                // Trading post (far right - key seller location)
+                {x: 1900, y: 700, w: 180, h: 20}, // Top wall
+                {x: 1900, y: 700, w: 20, h: 150}, // Left wall
+                {x: 2080, y: 700, w: 20, h: 150}, // Right wall
+                {x: 1900, y: 850, w: 200, h: 20}, // Bottom wall
+                
+                // Water tower base (top right)
+                {x: 2100, y: 200, w: 100, h: 100}, // Square base
+                
+                // Broken wagons and barriers
+                {x: 600, y: 900, w: 80, h: 20}, // Wagon
+                {x: 1300, y: 300, w: 80, h: 20}, // Wagon
+                {x: 1700, y: 900, w: 60, h: 20}, // Barrier
+                {x: 300, y: 700, w: 60, h: 20}, // Barrier
+                
+                // Additional rubble and debris
+                {x: 900, y: 100, w: 40, h: 40}, // Rubble pile
+                {x: 1200, y: 200, w: 40, h: 40}, // Rubble pile
+                {x: 1600, y: 1100, w: 40, h: 40}, // Rubble pile
+                {x: 800, y: 850, w: 30, h: 30}, // Small debris
+                {x: 1500, y: 250, w: 30, h: 30}, // Small debris
+            ],
+            playerStart: {x: 2300, y: 1300}, // Bottom right corner
+            enemies: [
+                // Main street zombies
+                {x: 300, y: 690, moveX: 280, moveY: 690, range: 200, axis: 'x', speed: 1.5},
+                {x: 700, y: 690, moveX: 680, moveY: 690, range: 150, axis: 'x', speed: 1.8},
+                {x: 1200, y: 690, moveX: 1180, moveY: 690, range: 180, axis: 'x', speed: 1.6},
+                {x: 1800, y: 690, moveX: 1780, moveY: 690, range: 160, axis: 'x', speed: 2.0},
+                
+                // Saloon area zombies
+                {x: 250, y: 1150, moveX: 230, moveY: 1150, range: 100, axis: 'x', speed: 1.4},
+                {x: 150, y: 1200, moveX: 150, moveY: 1180, range: 80, axis: 'y', speed: 1.3},
+                
+                // Sheriff's office zombie
+                {x: 700, y: 1190, moveX: 680, moveY: 1190, range: 80, axis: 'x', speed: 1.7},
+                
+                // Bank area zombies
+                {x: 1100, y: 1200, moveX: 1100, moveY: 1180, range: 70, axis: 'y', speed: 1.5},
+                {x: 1150, y: 1100, moveX: 1130, moveY: 1100, range: 90, axis: 'x', speed: 1.8},
+                
+                // Church/Graveyard zombies
+                {x: 200, y: 200, moveX: 200, moveY: 180, range: 120, axis: 'y', speed: 1.2},
+                {x: 350, y: 250, moveX: 330, moveY: 250, range: 100, axis: 'x', speed: 1.4},
+                {x: 480, y: 200, moveX: 480, moveY: 180, range: 80, axis: 'y', speed: 1.6},
+                
+                // General store zombie
+                {x: 330, y: 500, moveX: 310, moveY: 500, range: 100, axis: 'x', speed: 1.7},
+                
+                // Hotel zombies
+                {x: 800, y: 400, moveX: 780, moveY: 400, range: 120, axis: 'x', speed: 1.5},
+                {x: 900, y: 350, moveX: 900, moveY: 330, range: 100, axis: 'y', speed: 1.8},
+                
+                // Corral zombies
+                {x: 1450, y: 475, moveX: 1430, moveY: 475, range: 120, axis: 'x', speed: 1.9},
+                {x: 1550, y: 475, moveX: 1550, moveY: 460, range: 70, axis: 'y', speed: 1.6},
+                
+                // Water tower zombie
+                {x: 2150, y: 150, moveX: 2150, moveY: 130, range: 100, axis: 'y', speed: 2.1},
+                
+                // Open area zombies
+                {x: 600, y: 150, moveX: 580, moveY: 150, range: 140, axis: 'x', speed: 1.7},
+                {x: 1000, y: 900, moveX: 1000, moveY: 880, range: 100, axis: 'y', speed: 1.5},
+                {x: 1400, y: 150, moveX: 1400, moveY: 130, range: 120, axis: 'y', speed: 1.8},
+                {x: 1700, y: 350, moveX: 1680, moveY: 350, range: 100, axis: 'x', speed: 2.0},
+                {x: 500, y: 900, moveX: 480, moveY: 900, range: 120, axis: 'x', speed: 1.4},
+                
+                // Additional roaming zombies
+                {x: 1100, y: 500, moveX: 1080, moveY: 500, range: 150, axis: 'x', speed: 1.6},
+                {x: 1600, y: 800, moveX: 1600, moveY: 780, range: 100, axis: 'y', speed: 1.7},
+                {x: 400, y: 600, moveX: 400, moveY: 580, range: 80, axis: 'y', speed: 1.9},
+                {x: 2000, y: 500, moveX: 1980, moveY: 500, range: 140, axis: 'x', speed: 1.5},
+                {x: 200, y: 900, moveX: 180, moveY: 900, range: 100, axis: 'x', speed: 2.0},
+                
+                // Path blockers
+                {x: 150, y: 50, moveX: 130, moveY: 50, range: 100, axis: 'x', speed: 2.2},
+                {x: 50, y: 150, moveX: 50, moveY: 130, range: 120, axis: 'y', speed: 2.1},
+                {x: 300, y: 50, moveX: 300, moveY: 30, range: 80, axis: 'y', speed: 2.0},
+            ],
+            friendlies: [
+                {x: 2000, y: 775, message: "🔑ほしいなら、800円ちょうだい"}, // Key seller in trading post
+                {x: 700, y: 1000, message: "このゾンビに🔫がきかない"}, // Cowboy near sheriff's office
+            ],
+            // Add the wandering NPC
+            wanderingNpc: {
+                x: 1100, y: 700, 
+                emoji: '🏃‍♂️', 
+                message: "逃げないと！ゾンビが来る！",
+                waypoints: [
+                    {x: 1100, y: 700},
+                    {x: 1300, y: 700},
+                    {x: 1300, y: 900},
+                    {x: 1100, y: 900},
+                ],
+                currentWaypoint: 0,
+                speed: 1.0
+            },
+            hearts: [
+                {x: 150, y: 1150}, // In saloon
+                {x: 2150, y: 300}, // Near water tower
+                {x: 850, y: 400}, // In hotel
+            ],
+            money: [
+                {x: 1150, y: 1150}, // In bank vault
+                {x: 350, y: 500}, // In general store
+                {x: 250, y: 200}, // In graveyard
+                {x: 1500, y: 500}, // In corral
+                {x: 900, y: 350}, // In hotel
+                {x: 1800, y: 1100}, // Near bottom
+                {x: 600, y: 300}, // Open area
+                {x: 2200, y: 800}, // Far right
+            ],
+            exit: {x: 60, y: 60} // Top left corner (in church ruins)
+        };
+        
+        // Set player position
+        this.playerX = mazeData.playerStart.x;
+        this.playerY = mazeData.playerStart.y;
+        
+        // Create walls
+        mazeData.walls.forEach(wall => {
+            const wallEl = document.createElement('div');
+            wallEl.className = 'maze-wall';
+            wallEl.style.left = wall.x + 'px';
+            wallEl.style.top = wall.y + 'px';
+            wallEl.style.width = wall.w + 'px';
+            wallEl.style.height = wall.h + 'px';
+            this.gameWorld.appendChild(wallEl);
+        });
+        
+        // Create enemies
+        const enemyEmojis = ['🧟‍♂️', '🧟‍♀️', '🧟', '🧟‍♂️'];
+        mazeData.enemies.forEach((enemy, index) => {
+            const enemyEl = document.createElement('div');
+            enemyEl.className = 'enemy';
+            enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
+            enemyEl.style.left = enemy.x + 'px';
+            enemyEl.style.top = enemy.y + 'px';
+            this.gameWorld.appendChild(enemyEl);
+            
+            this.movingEnemies.push({
+                element: enemyEl,
+                startX: enemy.moveX,
+                startY: enemy.moveY,
+                currentX: enemy.x,
+                currentY: enemy.y,
+                range: enemy.range,
+                axis: enemy.axis,
+                direction: 1,
+                speed: enemy.speed
+            });
+        });
+        
+        // Create static friendlies
+        const friendlyEmojis = ['👴🏻', '🤠'];
+        mazeData.friendlies.forEach((friendly, index) => {
+            const friendlyEl = document.createElement('div');
+            friendlyEl.className = 'friendly';
+            friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
+            friendlyEl.style.left = friendly.x + 'px';
+            friendlyEl.style.top = friendly.y + 'px';
+            friendlyEl.dataset.message = friendly.message;
+            this.gameWorld.appendChild(friendlyEl);
+        });
+        
+        // Create wandering NPC
+        if (mazeData.wanderingNpc) {
+            const wandererEl = document.createElement('div');
+            wandererEl.className = 'friendly';
+            wandererEl.textContent = mazeData.wanderingNpc.emoji;
+            wandererEl.style.left = mazeData.wanderingNpc.x + 'px';
+            wandererEl.style.top = mazeData.wanderingNpc.y + 'px';
+            wandererEl.dataset.message = mazeData.wanderingNpc.message;
+            this.gameWorld.appendChild(wandererEl);
+            
+            // Store wandering NPC data
+            this.wanderingNpc = {
+                element: wandererEl,
+                ...mazeData.wanderingNpc
+            };
+        }
+        
+        // Create hearts
+        mazeData.hearts.forEach(heart => {
+            const heartEl = document.createElement('div');
+            heartEl.className = 'heart-pickup';
+            heartEl.textContent = '❤️';
+            heartEl.style.left = heart.x + 'px';
+            heartEl.style.top = heart.y + 'px';
+            this.gameWorld.appendChild(heartEl);
+        });
+        
+        // Create money
+        mazeData.money.forEach(money => {
+            const moneyEl = document.createElement('div');
+            moneyEl.className = 'money-pickup';
+            moneyEl.textContent = '💰';
+            moneyEl.style.left = money.x + 'px';
+            moneyEl.style.top = money.y + 'px';
+            this.gameWorld.appendChild(moneyEl);
+        });
+        
+        // Create exit
+        const exitEl = document.createElement('div');
+        exitEl.className = 'exit';
+        exitEl.textContent = '🚪';
+        exitEl.style.left = mazeData.exit.x + 'px';
+        exitEl.style.top = mazeData.exit.y + 'px';
+        this.gameWorld.appendChild(exitEl);
+        
+    } catch (error) {
+        console.error('Error generating maze:', error);
+    }
+}
             
             startGameLoop() {
                 const gameLoop = () => {
@@ -872,7 +952,30 @@
                     }
                 }
             }
-            
+
+            updateWanderingNpc() {
+    if (!this.wanderingNpc || !this.gameStarted) return;
+    
+    const waypoint = this.wanderingNpc.waypoints[this.wanderingNpc.currentWaypoint];
+    const dx = waypoint.x - this.wanderingNpc.x;
+    const dy = waypoint.y - this.wanderingNpc.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distance < 5) {
+        // Reached waypoint, go to next
+        this.wanderingNpc.currentWaypoint = (this.wanderingNpc.currentWaypoint + 1) % this.wanderingNpc.waypoints.length;
+    } else {
+        // Move towards waypoint
+        const moveX = (dx / distance) * this.wanderingNpc.speed;
+        const moveY = (dy / distance) * this.wanderingNpc.speed;
+        
+        this.wanderingNpc.x += moveX;
+        this.wanderingNpc.y += moveY;
+        
+        this.wanderingNpc.element.style.left = this.wanderingNpc.x + 'px';
+        this.wanderingNpc.element.style.top = this.wanderingNpc.y + 'px';
+    }
+}
             checkCollisions() {
                 if (this.isInvulnerable) return;
                 
@@ -1094,7 +1197,7 @@ showDeathScreen() {
     document.getElementById('levelCompleteTitle').textContent = '💀 Game Over';
     document.getElementById('levelCompleteText').textContent = 'What would you like to do?';
     document.getElementById('timeBonus').style.display = 'none';
-    document.getElementById('nextLevelButton').style.display = 'none';
+    document.getElementById('startOverButton').style.display = 'none'; // Hide the boss button
     
     // Show retry button
     const retryButton = document.getElementById('retryButton');
@@ -1104,18 +1207,21 @@ showDeathScreen() {
         window.location.reload(); // Reload to retry
     };
     
-    // Create and add start over button
-    const startOverButton = document.createElement('button');
-    startOverButton.textContent = '最初から (Start Over)';
-    startOverButton.onclick = () => {
-        clearMazeGameData();
-        window.location.href = 'https://thedepression.github.io/games/maze/level1';
-    };
-    
-    // Add start over button if it doesn't exist
+    // Create start over button if it doesn't exist
     const levelCompleteDiv = document.getElementById('levelComplete');
-    if (!levelCompleteDiv.querySelector('button:nth-child(5)')) {
-        levelCompleteDiv.appendChild(startOverButton);
+    let startOverBtn = document.getElementById('startOverFromBeginning');
+    
+    if (!startOverBtn) {
+        startOverBtn = document.createElement('button');
+        startOverBtn.id = 'startOverFromBeginning';
+        startOverBtn.textContent = '最初から (Start Over)';
+        startOverBtn.onclick = () => {
+            clearMazeGameData();
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        };
+        levelCompleteDiv.appendChild(startOverBtn);
+    } else {
+        startOverBtn.style.display = 'block';
     }
     
     levelCompleteDiv.style.display = 'flex';
