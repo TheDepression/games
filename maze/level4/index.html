@@ -829,6 +829,7 @@
                         this.updatePlayer();
                         this.updateMovingEnemies();
                         this.updateForegroundEnemy();
+                        this.updateWanderingNpc(); // Add this line
                         this.checkCollisions();
                     }
                     requestAnimationFrame(gameLoop);
