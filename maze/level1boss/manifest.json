@@ -1,6 +1,6 @@
 {
   "name": "Maze Level 1 Boss",
-  "short_name": "level1boss",
+  "short_name": "maze1boss",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
