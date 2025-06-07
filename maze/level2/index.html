@@ -1057,7 +1057,6 @@ class MazeGame {
     document.getElementById('levelCompleteText').textContent = 'What would you like to do?';
     document.getElementById('timeBonus').style.display = 'none';
     document.getElementById('nextLevelButton').style.display = 'none';
-    document.getElementById('timeBonus').style.display = 'none'; // Hide time bonus
     
     // Show retry button
     const retryButton = document.getElementById('retryButton');
@@ -1067,18 +1066,21 @@ class MazeGame {
         window.location.reload(); // Reload to retry
     };
     
-    // Create and add start over button
-    const startOverButton = document.createElement('button');
-    startOverButton.textContent = '最初から (Start Over)';
-    startOverButton.onclick = () => {
-        clearMazeGameData(); // Instead of localStorage.clear()
-        window.location.href = 'https://thedepression.github.io/games/maze/level1';
-    };
-    
-    // Add start over button if it doesn't exist
+    // Create start over button if it doesn't exist
     const levelCompleteDiv = document.getElementById('levelComplete');
-    if (!levelCompleteDiv.querySelector('button:nth-child(5)')) {
-        levelCompleteDiv.appendChild(startOverButton);
+    let startOverBtn = document.getElementById('startOverFromBeginning');
+    
+    if (!startOverBtn) {
+        startOverBtn = document.createElement('button');
+        startOverBtn.id = 'startOverFromBeginning';
+        startOverBtn.textContent = '最初から (Start Over)';
+        startOverBtn.onclick = () => {
+            clearMazeGameData(); // You'll need to add the clearMazeGameData function too
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        };
+        levelCompleteDiv.appendChild(startOverBtn);
+    } else {
+        startOverBtn.style.display = 'block';
     }
     
     levelCompleteDiv.style.display = 'flex';
@@ -1157,6 +1159,8 @@ function clearMazeGameData() {
     localStorage.removeItem('key2b');
     localStorage.removeItem('key3');
     localStorage.removeItem('key3b');
+    localStorage.removeItem('key4');
+    localStorage.removeItem('key4b');
     
     // Clear all level times
     localStorage.removeItem('level1Time');
