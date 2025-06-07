@@ -1052,8 +1052,7 @@ function startGame() {
     try {
         console.log('Start Game button clicked!');
         
-        // Clear ALL localStorage when starting Level 1
-        localStorage.clear();
+        clearMazeGameData();
         console.log('All localStorage cleared for fresh start');
         
         const startScreen = document.getElementById('startScreen');
@@ -1085,6 +1084,30 @@ function restartGame() {
     } catch (error) {
         console.error('Error restarting game:', error);
     }
+}
+        function clearMazeGameData() {
+    // Clear all maze game specific data
+    localStorage.removeItem('hearts');
+    localStorage.removeItem('selectedCharacter');
+    localStorage.removeItem('money');
+    
+    // Clear all keys
+    localStorage.removeItem('key1');
+    localStorage.removeItem('key1b');
+    localStorage.removeItem('key2');
+    localStorage.removeItem('key2b');
+    localStorage.removeItem('key3');
+    localStorage.removeItem('key3b');
+    
+    // Clear all level times
+    localStorage.removeItem('level1Time');
+    localStorage.removeItem('level1BossTime');
+    localStorage.removeItem('level2Time');
+    localStorage.removeItem('level2BossTime');
+    localStorage.removeItem('level3Time');
+    localStorage.removeItem('level3BossTime');
+    localStorage.removeItem('level4Time');
+    localStorage.removeItem('level4BossTime');
 }
     </script>
 </body>
