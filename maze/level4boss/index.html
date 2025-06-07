@@ -768,3 +768,311 @@
                 {x: x + padding, y: y + padding},
                 {x: x + playerSize - padding, y: y + padding},
                 {x: x + padding, y: y + playerSize - padding},
+                {x: x + playerSize - padding, y: y + playerSize - padding}
+           ];
+           
+           const walls = this.gameWorld.querySelectorAll('.maze-wall');
+           
+           for (let wall of walls) {
+               const wallRect = {
+                   left: parseInt(wall.style.left),
+                   top: parseInt(wall.style.top),
+                   right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                   bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+               };
+               
+               for (let point of points) {
+                   if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                       point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                       return false;
+                   }
+               }
+           }
+           
+           return true;
+       }
+
+       checkCollisions() {
+           if (this.isInvulnerable) return;
+           
+           const playerRect = {
+               left: this.playerX,
+               top: this.playerY,
+               right: this.playerX + 24,
+               bottom: this.playerY + 24
+           };
+           
+           // Check boss collision (instant death)
+           if (!this.bossDefeated) {
+               const bossRect = {
+                   left: this.bossX,
+                   top: this.bossY,
+                   right: this.bossX + 100,
+                   bottom: this.bossY + 100
+               };
+               if (this.rectsOverlap(playerRect, bossRect)) {
+                   this.hearts = 0;
+                   this.takeDamage();
+                   return;
+               }
+           }
+           
+           // Check projectile collisions
+           this.projectiles.forEach((projectile, index) => {
+               const projRect = {
+                   left: projectile.x,
+                   top: projectile.y,
+                   right: projectile.x + 20,
+                   bottom: projectile.y + 20
+               };
+               if (this.rectsOverlap(playerRect, projRect)) {
+                   this.takeDamage();
+                   projectile.element.remove();
+                   this.projectiles.splice(index, 1);
+               }
+           });
+           
+           // Check TNT collision
+           if (this.currentTnt) {
+               const tntX = parseInt(this.currentTnt.style.left);
+               const tntY = parseInt(this.currentTnt.style.top);
+               const tntRect = {
+                   left: tntX,
+                   top: tntY,
+                   right: tntX + 30,
+                   bottom: tntY + 30
+               };
+               if (this.rectsOverlap(playerRect, tntRect)) {
+                   this.hitTnt();
+               }
+           }
+           
+           // Check exit collision
+           if (this.exit) {
+               const exitX = parseInt(this.exit.style.left);
+               const exitY = parseInt(this.exit.style.top);
+               const exitRect = {
+                   left: exitX,
+                   top: exitY,
+                   right: exitX + 30,
+                   bottom: exitY + 30
+               };
+               if (this.rectsOverlap(playerRect, exitRect)) {
+                   this.completeGame();
+               }
+           }
+       }
+
+       rectsOverlap(rect1, rect2) {
+           return rect1.left < rect2.right &&
+                  rect1.right > rect2.left &&
+                  rect1.top < rect2.bottom &&
+                  rect1.bottom > rect2.top;
+       }
+
+       takeDamage() {
+           if (this.isInvulnerable) return;
+           
+           this.hearts--;
+           this.showMessage('💔 Ouch!');
+           this.updateUI();
+           
+           this.isInvulnerable = true;
+           this.player.classList.add('invulnerable');
+           
+           setTimeout(() => {
+               this.isInvulnerable = false;
+               this.player.classList.remove('invulnerable');
+           }, 1000);
+           
+           if (this.hearts <= 0) {
+               this.gameOver();
+           }
+       }
+
+       showMessage(text) {
+           const message = document.getElementById('message');
+           message.textContent = text;
+           message.style.display = 'block';
+           
+           clearTimeout(this.messageTimeout);
+           this.messageTimeout = setTimeout(() => {
+               message.style.display = 'none';
+           }, 2000);
+       }
+
+       updateUI() {
+           document.getElementById('hearts').textContent = this.hearts;
+           document.getElementById('tntHits').textContent = this.tntHits;
+           document.getElementById('bossHp').textContent = this.bossHp;
+       }
+
+       defeatBoss() {
+           this.bossDefeated = true;
+           this.bgMusic.pause();
+           
+           // Play explosion sound
+           const explosionSound = document.getElementById('explosionSound');
+           if (explosionSound) {
+               explosionSound.load();
+               explosionSound.currentTime = 0;
+               explosionSound.play().catch(e => console.log('Explosion sound failed:', e));
+           }
+           
+           // Remove boss and remaining elements
+           if (this.boss) {
+               this.boss.remove();
+           }
+           if (this.currentTnt) {
+               this.currentTnt.remove();
+           }
+           this.projectiles.forEach(proj => proj.element.remove());
+           this.projectiles = [];
+           
+           // Show explosion effect
+           this.showMessage('💥 BOSS DEFEATED! 💥');
+           
+           // Create exit door
+           setTimeout(() => {
+               const exitEl = document.createElement('div');
+               exitEl.className = 'exit';
+               exitEl.textContent = '🚪';
+               exitEl.style.left = '285px';
+               exitEl.style.top = '215px';
+               this.gameWorld.appendChild(exitEl);
+               this.exit = exitEl;
+               this.showMessage('🚪 Exit appeared! Step on it to complete the game!');
+           }, 2000);
+       }
+
+       completeGame() {
+           clearInterval(this.elapsedInterval);
+           
+           // Save elapsed time for boss fight
+           localStorage.setItem('level4BossTime', this.elapsedTime);
+           
+           // Remove key4 and add key4b
+           localStorage.removeItem('key4');
+           localStorage.setItem('key4b', 'unlocked');
+           
+           this.victoryMusic.play().catch(e => console.log('Victory music play failed:', e));
+           this.showLevelComplete();
+           
+           this.gameCompleted = true;
+       }
+
+       gameOver() {
+           clearInterval(this.elapsedInterval);
+           this.gameStarted = false;
+           this.bgMusic.pause();
+           this.showMessage('💀 Game Over!');
+           
+           setTimeout(() => {
+               // Go back to Level 4
+               window.location.href = 'https://thedepression.github.io/games/maze/level4';
+           }, 3000);
+       }
+
+       showLevelComplete() {
+           document.getElementById('levelCompleteTitle').textContent = 'Boss Defeated!';
+           document.getElementById('levelCompleteText').textContent = '🎉 You defeated the Zombie Sheriff!';
+           document.getElementById('levelComplete').style.display = 'flex';
+       }
+   }
+
+   let game;
+
+   function startBoss() {
+       document.getElementById('startScreen').style.display = 'none';
+       document.getElementById('ui').style.display = 'block';
+       game = new BossBattle();
+       game.startGame();
+   }
+
+   function goToCutscene() {
+       game.victoryMusic.pause();
+       document.getElementById('levelComplete').style.display = 'none';
+       document.getElementById('cutsceneScreen').style.display = 'flex';
+       
+       // Calculate total time for leaderboard later
+       const totalTime = calculateTotalTime();
+       localStorage.setItem('totalGameTime', totalTime);
+       
+       // If you have a video, uncomment this:
+       // const video = document.getElementById('cutsceneVideo');
+       // video.style.display = 'block';
+       // document.getElementById('placeholderCutscene').style.display = 'none';
+       // video.play();
+       // video.onended = () => {
+       //     document.getElementById('skipCutscene').style.display = 'block';
+       // };
+   }
+
+   function endCutscene() {
+       // Save progress for true final boss
+       localStorage.setItem('hearts', '3');
+       localStorage.setItem('money', '0');
+       // key4b is already set
+       
+       // Redirect to true final boss
+       window.location.href = 'https://thedepression.github.io/games/maze/truefinalboss';
+   }
+
+   function calculateTotalTime() {
+       let totalTime = 0;
+       totalTime += parseInt(localStorage.getItem('level1Time') || 0);
+       totalTime += parseInt(localStorage.getItem('level1BossTime') || 0);
+       totalTime += parseInt(localStorage.getItem('level2Time') || 0);
+       totalTime += parseInt(localStorage.getItem('level2BossTime') || 0);
+       totalTime += parseInt(localStorage.getItem('level3Time') || 0);
+       totalTime += parseInt(localStorage.getItem('level3BossTime') || 0);
+       totalTime += parseInt(localStorage.getItem('level4Time') || 0);
+       totalTime += parseInt(localStorage.getItem('level4BossTime') || 0);
+       return totalTime;
+   }
+
+   // Initialize the game when page loads
+   window.onload = function() {
+       // Check for level 4 key
+       if (localStorage.getItem('key4') !== 'unlocked') {
+           alert('You must complete Level 4 first!');
+           window.location.href = 'https://thedepression.github.io/games/maze/level4';
+           return;
+       }
+       
+       // Set character from localStorage
+       const savedCharacter = localStorage.getItem('selectedCharacter') || '😐';
+       document.getElementById('player').textContent = savedCharacter;
+       document.getElementById('hearts').textContent = hearts;
+   };
+
+   function clearMazeGameData() {
+       // Clear all maze game specific data
+       localStorage.removeItem('hearts');
+       localStorage.removeItem('selectedCharacter');
+       localStorage.removeItem('money');
+       
+       // Clear all keys
+       localStorage.removeItem('key1');
+       localStorage.removeItem('key1b');
+       localStorage.removeItem('key2');
+       localStorage.removeItem('key2b');
+       localStorage.removeItem('key3');
+       localStorage.removeItem('key3b');
+       localStorage.removeItem('key4');
+       localStorage.removeItem('key4b');
+       
+       // Clear all level times
+       localStorage.removeItem('level1Time');
+       localStorage.removeItem('level1BossTime');
+       localStorage.removeItem('level2Time');
+       localStorage.removeItem('level2BossTime');
+       localStorage.removeItem('level3Time');
+       localStorage.removeItem('level3BossTime');
+       localStorage.removeItem('level4Time');
+       localStorage.removeItem('level4BossTime');
+       localStorage.removeItem('totalGameTime');
+   }
+</script>
+</body>
+</html>
