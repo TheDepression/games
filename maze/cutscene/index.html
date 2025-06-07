@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Adventure: Story Cutscene</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #cutsceneContainer {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #imageContainer {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: #222;
+            border: 3px solid #555;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #cutsceneImage {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        #subtitleBox {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        #navigationContainer {
+            display: flex;
+            gap: 20px;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        #finalButton {
+            background: #ff6b35;
+            display: none;
+        }
+        
+        #finalButton:hover {
+            background: #ff5722;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="cutsceneContainer">
+        <div id="imageContainer">
+            <img id="cutsceneImage" src="" alt="Cutscene">
+        </div>
+        <div id="subtitleBox">
+            <p id="subtitleText">Loading...</p>
+        </div>
+        <div id="navigationContainer">
+            <button id="prevButton" onclick="previousSlide()" disabled>Previous</button>
+            <button id="nextButton" onclick="nextSlide()">Next</button>
+            <button id="finalButton" onclick="goToFinalBoss()">最終ボスに行く！</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/Quizmusic.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Check if player has the required key
+        if (localStorage.getItem('key4b') !== 'unlocked') {
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        }
+
+        // Character data
+        const characterData = {
+            '😐': {
+                name: 'Bald Bill',
+                images: [
+                    'https://thedepression.github.io/photos/IMG_0514.png',
+                    'https://thedepression.github.io/photos/IMG_0172.jpg',
+                    'https://thedepression.github.io/photos/IMG_4732.jpg'
+                ],
+                subtitles: [
+                    'Bill is a man.',
+                    'Bill is bald.',
+                    'Let\'s go Bill!'
+                ]
+            },
+            '🥸': {
+                name: 'Angry Tom',
+                images: [
+                    'https://thedepression.github.io/photos/IMG_9202.png',
+                    'https://thedepression.github.io/photos/IMG_9300.png',
+                    'https://thedepression.github.io/photos/IMG_9303.png'
+                ],
+                subtitles: [
+                    'Tom is a man.',
+                    'Tom is angry.',
+                    'Let\'s go Tom!'
+                ]
+            },
+            '😺': {
+                name: 'Jenny the Cat',
+                images: [
+                    'https://thedepression.github.io/photos/jc1.jpg',
+                    'https://thedepression.github.io/photos/jc2.jpg',
+                    'https://thedepression.github.io/photos/jc3.jpg'
+                ],
+                subtitles: [
+                    'Jenny is a cat.',
+                    'Jenny is clever.',
+                    'Let\'s go Jenny!'
+                ]
+            },
+            '👩🏻': {
+                name: 'Yakiko',
+                images: [
+                    'https://thedepression.github.io/photos/yk1.jpg',
+                    'https://thedepression.github.io/photos/yk2.jpg',
+                    'https://thedepression.github.io/photos/yk3.jpg'
+                ],
+                subtitles: [
+                    'Yakiko is a woman.',
+                    'Yakiko is brave.',
+                    'Let\'s go Yakiko!'
+                ]
+            },
+            '😎': {
+                name: 'Mr. Cool',
+                images: [
+                    'https://thedepression.github.io/photos/mc1.jpg',
+                    'https://thedepression.github.io/photos/mc2.jpg',
+                    'https://thedepression.github.io/photos/mc3.jpg'
+                ],
+                subtitles: [
+                    'Mr. Cool is a man.',
+                    'Mr. Cool is cool.',
+                    'Let\'s go Mr. Cool!'
+                ]
+            },
+            '🙍🏻‍♂️': {
+                name: 'Satoshi',
+                images: [
+                    'https://thedepression.github.io/photos/st1.jpg',
+                    'https://thedepression.github.io/photos/st2.jpg',
+                    'https://thedepression.github.io/photos/st3.jpg'
+                ],
+                subtitles: [
+                    'Satoshi is a man.',
+                    'Satoshi is determined.',
+                    'Let\'s go Satoshi!'
+                ]
+            }
+        };
+
+        // Get selected character
+        const selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
+        const currentCharacterData = characterData[selectedCharacter] || characterData['😐'];
+        
+        let currentSlide = 0;
+        
+        // Initialize
+        function init() {
+            // Start music
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.play().catch(e => console.log('Music play failed:', e));
+            
+            // Show first slide
+            showSlide(0);
+        }
+        
+        function showSlide(index) {
+            const image = document.getElementById('cutsceneImage');
+            const subtitle = document.getElementById('subtitleText');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const finalButton = document.getElementById('finalButton');
+            
+            // Update image and subtitle
+            image.src = currentCharacterData.images[index];
+            subtitle.textContent = currentCharacterData.subtitles[index];
+            
+            // Add fade effect
+            image.classList.add('fade-in');
+            setTimeout(() => image.classList.remove('fade-in'), 500);
+            
+            // Update button states
+            prevButton.disabled = index === 0;
+            
+            if (index === currentCharacterData.images.length - 1) {
+                nextButton.style.display = 'none';
+                finalButton.style.display = 'block';
+            } else {
+                nextButton.style.display = 'block';
+                finalButton.style.display = 'none';
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < currentCharacterData.images.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+        
+        function goToFinalBoss() {
+            // Stop music
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.pause();
+            
+            // Go to final boss
+            window.location.href = 'https://thedepression.github.io/games/maze/final';
+        }
+        
+        // Start when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
