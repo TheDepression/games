@@ -371,6 +371,7 @@
             this.explosionSound = document.getElementById('explosionSound');
             this.bossDefeated = false;
             this.gameCompleted = false;
+            this.retryCount = parseInt(localStorage.getItem('bossRetryCount')) || 0;
             this.exit = null
             this.bindEvents();
             this.initRoom();
@@ -958,7 +959,7 @@
            }, 2000);
        }
 
-       completeGame() {
+       completeGame() {localStorage.removeItem('bossRetryCount');
            clearInterval(this.elapsedInterval);
            
            // Save final boss time
@@ -992,7 +993,8 @@
     }, 2000);
 }
 
-showDeathScreen() {
+showDeathScreen() {this.retryCount++;
+localStorage.setItem('bossRetryCount', this.retryCount);
     // Create a custom death screen with choices
     document.getElementById('levelCompleteTitle').textContent = '💀 Game Over';
     document.getElementById('levelCompleteText').textContent = 'What would you like to do?';
@@ -1019,11 +1021,19 @@ showDeathScreen() {
         retryBtn.id = 'retryFinalBoss';
         levelCompleteDiv.appendChild(retryBtn);
     }
-    retryBtn.textContent = 'Retry Final Boss';
+    if (this.retryCount < 4) {
+    retryBtn.textContent = `Retry (x${4 - this.retryCount})`;
     retryBtn.style.display = 'block';
     retryBtn.onclick = () => {
         window.location.reload();
     };
+} else {
+    retryBtn.textContent = 'Retry Level 4';
+    retryBtn.style.display = 'block';
+    retryBtn.onclick = () => {
+        window.location.href = 'https://thedepression.github.io/games/maze/level4';
+    };
+}
     
     // Create start over button
     let startOverBtn = document.getElementById('startOverFromBeginning');
@@ -1106,6 +1116,7 @@ showDeathScreen() {
        localStorage.removeItem('finalBossTime');
        localStorage.removeItem('totalGameTime');
        localStorage.removeItem('gameCompleted');
+       localStorage.removeItem('bossRetryCount');
    }
 
    // Initialize the game when page loads
