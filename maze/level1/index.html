@@ -346,7 +346,12 @@ button:hover:not(.selected) {
         <button onclick="selectCharacter('😎')">😎</button>
         <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
     </div>
-    
+    <div id="continueSection" style="display: none; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+        <p style="font-size: 14px; margin-bottom: 10px;"></p>
+        <p style="font-size: 16px; margin-bottom: 15px;">
+            Character: <span id="savedCharacter" style="font-size: 20px;"></span>
+        </p>
+    </div>
     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
         <button id="continueButton" class="start-button" style="display: none; background: #2196F3;" onclick="continueGame()">
             <span id="continueText">Continue</span>
