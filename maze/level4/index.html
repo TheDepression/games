@@ -1282,6 +1282,7 @@ showDeathScreen() {
 
         function startGame() {
             try {
+                localStorage.removeItem('bossRetryCount');
                 console.log('Start Game button clicked!');
                 const startScreen = document.getElementById('startScreen');
                 if (!startScreen) throw new Error('Start screen element not found!');
