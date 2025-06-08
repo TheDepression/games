@@ -291,22 +291,22 @@
     <div class="password-text" style="color: gold; font-weight: bold; margin: 15px 0; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 8px; border: 1px solid gold;">
         🤠まだおわってない...🧟‍♂️
     </div>
-    <button onclick="goToCutscene()">🚪 Continue...</button>
+    <button onclick="goToCutscene()">🚪 つずく</button>
 </div>
 
 <div id="cutsceneScreen" style="display: none;">
     <h3>🎬 Story Cutscene</h3>
     <video id="cutsceneVideo" controls style="display: none;">
-        <!-- Add your video source here later -->
+        <!-- A loud noise -->
         <source src="your-cutscene.mp4" type="video/mp4">
     </video>
     <div id="placeholderCutscene" style="margin: 20px;">
-        <p style="font-size: 18px; margin-bottom: 20px;">📽️ Cutscene Placeholder</p>
-        <p style="opacity: 0.8;">The hero defeated all the bosses...</p>
-        <p style="opacity: 0.8;">But something stirs in the darkness...</p>
-        <p style="opacity: 0.8;">One final challenge awaits...</p>
+        <p style="font-size: 18px; margin-bottom: 20px;">💥😰💥</p>
+        <p style="opacity: 0.8;">ぜんぶのボスをたおした...</p>
+        <p style="opacity: 0.8;">大きい音がでた...</p>
+        <p style="opacity: 0.8;">なにかな😰...</p>
     </div>
-    <button id="skipCutscene" onclick="endCutscene()">Continue to Final Boss</button>
+    <button id="skipCutscene" onclick="endCutscene()">つづき</button>
 </div>
 </div>
 
@@ -314,8 +314,8 @@
     <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/Mazeboss.m4a" type="audio/mp4">
     Your browser does not support the audio element.
 </audio>
-<audio id="victoryMusic">
-    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/vc2.mp3" type="audio/mpeg">
+<audio id="victoryMusic" loop>
+    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/boom.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
 <audio id="explosionSound">
