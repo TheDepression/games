@@ -1142,7 +1142,7 @@ function restartGame() {
 // Check for saved progress
 function checkSavedProgress() {
     // Check all keys to find highest progress
-    const keys = ['key4b', 'key4', 'key3b', 'key3', 'key2b', 'key2', 'key1b', 'key1'];
+    const keys = ['key4b', 'key4', 'key3b', 'key3', 'key2b', 'key2', 'key1b'];
     let highestKey = null;
     let continueLevel = 1;
     
@@ -1171,9 +1171,6 @@ function checkSavedProgress() {
             case 'key1b':
                 continueLevel = 2;
                 break;
-            case 'key1':
-                // No continue for key1 only
-                return false;
         }
         
         // Show continue option
