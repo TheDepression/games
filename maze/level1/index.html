@@ -346,16 +346,10 @@ button:hover:not(.selected) {
         <button onclick="selectCharacter('😎')">😎</button>
         <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
     </div>
-    <div id="continueSection" style="display: none; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-        <p style="font-size: 14px; margin-bottom: 10px;">セーブデータがあります！</p>
-        <p style="font-size: 0px; margin-bottom: 10px;">
-            hello <span id="savedCharacter" style="font-size: 0px;"></span>
-        </p>
+    <div id="continueSection" style="display: none; margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+        <p style="font-size: 14px; margin: 0;">セーブデータがあります！</p>
     </div>
-    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-        <button id="continueButton" class="start-button" style="display: none; background: #2196F3;" onclick="continueGame()">
-            <span id="continueText">Continue</span>
-        </button>
+    <div id="buttonContainer" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
         <button class="start-button" onclick="startGame()">最初から</button>
     </div>
 </div>
@@ -1141,47 +1135,40 @@ function restartGame() {
 
 // Check for saved progress
 function checkSavedProgress() {
-    // Check all keys to find highest progress
-    const keys = ['key4b', 'key4', 'key3b', 'key3', 'key2b', 'key2', 'key1b'];
-    let highestKey = null;
-    let continueLevel = 1;
+    // First, make sure the keys are actually "unlocked"
+    let continueLevel = 0;
     
-    for (let key of keys) {
-        if (localStorage.getItem(key) === 'unlocked') {
-            highestKey = key;
-            break;
-        }
+    // Check for Level 4 access (need key3b, key4, or key4b)
+    if (localStorage.getItem('key3b') === 'unlocked' || 
+        localStorage.getItem('key4') === 'unlocked' || 
+        localStorage.getItem('key4b') === 'unlocked') {
+        continueLevel = 4;
+    }
+    // Check for Level 3 access (need key2b or key3)
+    else if (localStorage.getItem('key2b') === 'unlocked' || 
+             localStorage.getItem('key3') === 'unlocked') {
+        continueLevel = 3;
+    }
+    // Check for Level 2 access (need key1b or key2)
+    else if (localStorage.getItem('key1b') === 'unlocked' || 
+             localStorage.getItem('key2') === 'unlocked') {
+        continueLevel = 2;
     }
     
-    // Determine continue level based on highest key
-    if (highestKey) {
-        switch(highestKey) {
-            case 'key4b':
-                continueLevel = 4;
-                break;
-            case 'key4':
-            case 'key3b':
-                continueLevel = 4;
-                break;
-            case 'key3':
-            case 'key2b':
-                continueLevel = 3;
-                break;
-            case 'key2':
-            case 'key1b':
-                continueLevel = 2;
-                break;
-        }
-        
-        // Show continue option
-        const savedChar = localStorage.getItem('selectedCharacter') || '😐';
-        document.getElementById('savedCharacter').textContent = savedChar;
+    // If we found a valid continue level
+    if (continueLevel > 0) {
+        // Show continue section
         document.getElementById('continueSection').style.display = 'block';
-        document.getElementById('continueButton').style.display = 'inline-block';
-        document.getElementById('continueText').textContent = `すすむ ${continueLevel}`;
         
-        // Store continue level for later use
-        window.continueToLevel = continueLevel;
+        // Replace button container with continue/new game buttons
+        const buttonContainer = document.getElementById('buttonContainer');
+        buttonContainer.innerHTML = `
+            <button class="start-button" style="background: #2196F3;" onclick="continueGame(${continueLevel})">
+                すすむ L${continueLevel}
+            </button>
+            <button class="start-button" onclick="startGame()">最初から</button>
+        `;
+        
         return true;
     }
     
@@ -1189,12 +1176,12 @@ function checkSavedProgress() {
 }
 
 // Continue game function
-function continueGame() {
-    // Get saved character
+function continueGame(level) {
+    // Don't change selected character - use saved one
     selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
     
     // Redirect to appropriate level
-    switch(window.continueToLevel) {
+    switch(level) {
         case 2:
             window.location.href = 'https://thedepression.github.io/games/maze/level2';
             break;
@@ -1207,12 +1194,42 @@ function continueGame() {
     }
 }
 
+// Make sure clearMazeGameData is complete
+function clearMazeGameData() {
+    // Clear all maze game specific data
+    localStorage.removeItem('hearts');
+    localStorage.removeItem('selectedCharacter');
+    localStorage.removeItem('money');
+    
+    // Clear all keys - IMPORTANT: Make sure all are removed
+    localStorage.removeItem('key1');
+    localStorage.removeItem('key1b');
+    localStorage.removeItem('key2');
+    localStorage.removeItem('key2b');
+    localStorage.removeItem('key3');
+    localStorage.removeItem('key3b');
+    localStorage.removeItem('key4');
+    localStorage.removeItem('key4b');
+    
+    // Clear all level times
+    localStorage.removeItem('level1Time');
+    localStorage.removeItem('level1BossTime');
+    localStorage.removeItem('level2Time');
+    localStorage.removeItem('level2BossTime');
+    localStorage.removeItem('level3Time');
+    localStorage.removeItem('level3BossTime');
+    localStorage.removeItem('level4Time');
+    localStorage.removeItem('level4BossTime');
+    localStorage.removeItem('finalBossTime');
+    localStorage.removeItem('totalGameTime');
+    localStorage.removeItem('gameCompleted');
+}
 
-        // Update the existing DOMContentLoaded event
-        document.addEventListener('DOMContentLoaded', () => {
-            selectCharacter('😐'); // Set default selected character
-            checkSavedProgress(); // Check for saved game
-        });
+// Update the existing DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', () => {
+    selectCharacter('😐'); // Set default selected character
+    checkSavedProgress(); // Check for saved game
+});
         
     </script>
 </body>
