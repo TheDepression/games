@@ -30,6 +30,20 @@
             box-sizing: border-box;
         }
         
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
         #imageContainer {
             position: relative;
             width: 100%;
@@ -98,6 +112,16 @@
             background: #ff5722;
         }
         
+        .start-button {
+            background: #ff6b35;
+            font-size: 20px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
@@ -106,10 +130,27 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        h2 {
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        
+        .character-display {
+            font-size: 64px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
-    <div id="cutsceneContainer">
+    <div id="startScreen">
+        <h2>📖 Story Time</h2>
+        <div class="character-display" id="characterDisplay">😐</div>
+        <p style="font-size: 20px; margin-bottom: 30px;" id="characterName">Bald Bill</p>
+        <button class="start-button" onclick="startCutscene()">Begin Story</button>
+    </div>
+    
+    <div id="cutsceneContainer" style="display: none;">
         <div id="imageContainer">
             <img id="cutsceneImage" src="" alt="Cutscene">
         </div>
@@ -134,14 +175,14 @@
             window.location.href = 'https://thedepression.github.io/games/maze/level1';
         }
 
-        // Character data
+        // Character data with corrected URLs
         const characterData = {
             '😐': {
                 name: 'Bald Bill',
                 images: [
-                    'https://thedepression.github.io/photos/IMG_0514.png',
-                    'https://thedepression.github.io/photos/IMG_0172.jpg',
-                    'https://thedepression.github.io/photos/IMG_4732.jpg'
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_0514.png',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_0172.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_4732.jpg'
                 ],
                 subtitles: [
                     'Bill is a man.',
@@ -152,9 +193,9 @@
             '🥸': {
                 name: 'Angry Tom',
                 images: [
-                    'https://thedepression.github.io/photos/IMG_9202.png',
-                    'https://thedepression.github.io/photos/IMG_9300.png',
-                    'https://thedepression.github.io/photos/IMG_9303.png'
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_9202.png',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_9300.png',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_9303.png'
                 ],
                 subtitles: [
                     'Tom is a man.',
@@ -165,9 +206,9 @@
             '😺': {
                 name: 'Jenny the Cat',
                 images: [
-                    'https://thedepression.github.io/photos/jc1.jpg',
-                    'https://thedepression.github.io/photos/jc2.jpg',
-                    'https://thedepression.github.io/photos/jc3.jpg'
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/jc1.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/jc2.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/jc3.jpg'
                 ],
                 subtitles: [
                     'Jenny is a cat.',
@@ -178,9 +219,9 @@
             '👩🏻': {
                 name: 'Yakiko',
                 images: [
-                    'https://thedepression.github.io/photos/yk1.jpg',
-                    'https://thedepression.github.io/photos/yk2.jpg',
-                    'https://thedepression.github.io/photos/yk3.jpg'
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/yk1.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/yk2.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/yk3.jpg'
                 ],
                 subtitles: [
                     'Yakiko is a woman.',
@@ -191,9 +232,9 @@
             '😎': {
                 name: 'Mr. Cool',
                 images: [
-                    'https://thedepression.github.io/photos/mc1.jpg',
-                    'https://thedepression.github.io/photos/mc2.jpg',
-                    'https://thedepression.github.io/photos/mc3.jpg'
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/mc1.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/mc2.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/mc3.jpg'
                 ],
                 subtitles: [
                     'Mr. Cool is a man.',
@@ -204,9 +245,9 @@
             '🙍🏻‍♂️': {
                 name: 'Satoshi',
                 images: [
-                    'https://thedepression.github.io/photos/st1.jpg',
-                    'https://thedepression.github.io/photos/st2.jpg',
-                    'https://thedepression.github.io/photos/st3.jpg'
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/st1.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/st2.jpg',
+                    'https://raw.githubusercontent.com/TheDepression/Photos/main/st3.jpg'
                 ],
                 subtitles: [
                     'Satoshi is a man.',
@@ -222,9 +263,18 @@
         
         let currentSlide = 0;
         
-        // Initialize
+        // Initialize start screen
         function init() {
-            // Start music
+            document.getElementById('characterDisplay').textContent = selectedCharacter;
+            document.getElementById('characterName').textContent = currentCharacterData.name;
+        }
+        
+        function startCutscene() {
+            // Hide start screen
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('cutsceneContainer').style.display = 'flex';
+            
+            // Start music with user interaction
             const bgMusic = document.getElementById('bgMusic');
             bgMusic.play().catch(e => console.log('Music play failed:', e));
             
