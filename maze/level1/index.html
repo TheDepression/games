@@ -287,6 +287,24 @@ button:hover:not(.selected) {
             margin-top: 10px;
             font-size: 12px;
         }
+
+        #continueButton {
+    background: #2196F3 !important;
+}
+
+#continueButton:hover {
+    background: #1976D2 !important;
+}
+
+#continueSection {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+        
     </style>
 </head>
 <body>
@@ -316,20 +334,31 @@ button:hover:not(.selected) {
     </div>
         
         <div id="startScreen">
-            <h2>🏥 Hospital</h2>
-            <p style="margin: 20px 0;">🏥は　大きいな🦠と　マホの💉に　のっとられた</p>
-            <p style="font-size: 12px; opacity: 0.8;">👴🏻鍵屋から🔑鍵を買って💰、ボス部屋に入ろう🚪</p>
-            <p style="font-size: 14px; margin: 10px 0;">好きなエモジにして:</p>
-            <div>
-                <button onclick="selectCharacter('😐')">😐</button>
-                <button onclick="selectCharacter('🥸')">🥸</button>
-                <button onclick="selectCharacter('😺')">😺</button>
-                <button onclick="selectCharacter('👩🏻')">👩🏻</button>
-                <button onclick="selectCharacter('😎')">😎</button>
-                <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
-            </div>
-            <button class="start-button" onclick="startGame()">START GAME</button>
-        </div>
+    <h2>🏥 Hospital</h2>
+    <p style="margin: 20px 0;">🏥は　大きいな🦠と　マホの💉に　のっとられた</p>
+    <p style="font-size: 12px; opacity: 0.8;">👴🏻鍵屋から🔑鍵を買って💰、ボス部屋に入ろう🚪</p>
+    <p style="font-size: 14px; margin: 10px 0;">好きなエモジにして:</p>
+    <div>
+        <button onclick="selectCharacter('😐')">😐</button>
+        <button onclick="selectCharacter('🥸')">🥸</button>
+        <button onclick="selectCharacter('😺')">😺</button>
+        <button onclick="selectCharacter('👩🏻')">👩🏻</button>
+        <button onclick="selectCharacter('😎')">😎</button>
+        <button onclick="selectCharacter('🙍🏻‍♂️')">🙍🏻‍♂️</button>
+    </div>
+    <div id="continueSection" style="display: none; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+        <p style="font-size: 14px; margin-bottom: 10px;">セーブデータがあります！</p>
+        <p style="font-size: 16px; margin-bottom: 15px;">
+            Character: <span id="savedCharacter" style="font-size: 20px;"></span>
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+        <button id="continueButton" class="start-button" style="display: none; background: #2196F3;" onclick="continueGame()">
+            <span id="continueText">Continue</span>
+        </button>
+        <button class="start-button" onclick="startGame()">NEW GAME</button>
+    </div>
+</div>
         
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
@@ -1109,6 +1138,85 @@ function restartGame() {
     localStorage.removeItem('level4Time');
     localStorage.removeItem('level4BossTime');
 }
+
+// Check for saved progress
+function checkSavedProgress() {
+    // Check all keys to find highest progress
+    const keys = ['key4b', 'key4', 'key3b', 'key3', 'key2b', 'key2', 'key1b', 'key1'];
+    let highestKey = null;
+    let continueLevel = 1;
+    
+    for (let key of keys) {
+        if (localStorage.getItem(key) === 'unlocked') {
+            highestKey = key;
+            break;
+        }
+    }
+    
+    // Determine continue level based on highest key
+    if (highestKey) {
+        switch(highestKey) {
+            case 'key4b':
+                continueLevel = 4;
+                break;
+            case 'key4':
+            case 'key3b':
+                continueLevel = 3;
+                break;
+            case 'key3':
+            case 'key2b':
+                continueLevel = 2;
+                break;
+            case 'key2':
+            case 'key1b':
+                continueLevel = 2;
+                break;
+            case 'key1':
+                // No continue for key1 only
+                return false;
+        }
+        
+        // Show continue option
+        const savedChar = localStorage.getItem('selectedCharacter') || '😐';
+        document.getElementById('savedCharacter').textContent = savedChar;
+        document.getElementById('continueSection').style.display = 'block';
+        document.getElementById('continueButton').style.display = 'inline-block';
+        document.getElementById('continueText').textContent = `Continue from Level ${continueLevel}`;
+        
+        // Store continue level for later use
+        window.continueToLevel = continueLevel;
+        return true;
+    }
+    
+    return false;
+}
+
+// Continue game function
+function continueGame() {
+    // Get saved character
+    selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
+    
+    // Redirect to appropriate level
+    switch(window.continueToLevel) {
+        case 2:
+            window.location.href = 'https://thedepression.github.io/games/maze/level2';
+            break;
+        case 3:
+            window.location.href = 'https://thedepression.github.io/games/maze/level3';
+            break;
+        case 4:
+            window.location.href = 'https://thedepression.github.io/games/maze/level4';
+            break;
+    }
+}
+
+
+        // Update the existing DOMContentLoaded event
+        document.addEventListener('DOMContentLoaded', () => {
+            selectCharacter('😐'); // Set default selected character
+            checkSavedProgress(); // Check for saved game
+        });
+        
     </script>
 </body>
 </html>
