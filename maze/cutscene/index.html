@@ -144,10 +144,10 @@
 </head>
 <body>
     <div id="startScreen">
-        <h2>📖 Story Time</h2>
+        <h2>あれ？！</h2>
         <div class="character-display" id="characterDisplay">😐</div>
         <p style="font-size: 20px; margin-bottom: 30px;" id="characterName">Bald Bill</p>
-        <button class="start-button" onclick="startCutscene()">Begin Story</button>
+        <button class="start-button" onclick="startCutscene()">見る！</button>
     </div>
     
     <div id="cutsceneContainer" style="display: none;">
@@ -159,7 +159,7 @@
         </div>
         <div id="navigationContainer">
             <button id="prevButton" onclick="previousSlide()" disabled>Previous</button>
-            <button id="nextButton" onclick="nextSlide()">Next</button>
+            <button id="nextButton" onclick="nextSlide()">つぎ</button>
             <button id="finalButton" onclick="goToFinalBoss()">最終ボスに行く！</button>
         </div>
     </div>
@@ -177,85 +177,145 @@
 
         // Character data with corrected URLs
         const characterData = {
-            '😐': {
-                name: 'Bald Bill',
-                images: [
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_0514.png',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_0172.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_4732.jpg'
-                ],
-                subtitles: [
-                    'Bill is a man.',
-                    'Bill is bald.',
-                    'Let\'s go Bill!'
-                ]
-            },
-            '🥸': {
-                name: 'Angry Tom',
-                images: [
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_9202.png',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_9300.png',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/IMG_9303.png'
-                ],
-                subtitles: [
-                    'Tom is a man.',
-                    'Tom is angry.',
-                    'Let\'s go Tom!'
-                ]
-            },
-            '😺': {
-                name: 'Jenny the Cat',
-                images: [
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/jc1.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/jc2.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/jc3.jpg'
-                ],
-                subtitles: [
-                    'Jenny is a cat.',
-                    'Jenny is clever.',
-                    'Let\'s go Jenny!'
-                ]
-            },
-            '👩🏻': {
-                name: 'Yakiko',
-                images: [
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/yk1.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/yk2.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/yk3.jpg'
-                ],
-                subtitles: [
-                    'Yakiko is a woman.',
-                    'Yakiko is brave.',
-                    'Let\'s go Yakiko!'
-                ]
-            },
-            '😎': {
-                name: 'Mr. Cool',
-                images: [
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/mc1.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/mc2.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/mc3.jpg'
-                ],
-                subtitles: [
-                    'Mr. Cool is a man.',
-                    'Mr. Cool is cool.',
-                    'Let\'s go Mr. Cool!'
-                ]
-            },
-            '🙍🏻‍♂️': {
-                name: 'Satoshi',
-                images: [
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/st1.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/st2.jpg',
-                    'https://raw.githubusercontent.com/TheDepression/Photos/main/st3.jpg'
-                ],
-                subtitles: [
-                    'Satoshi is a man.',
-                    'Satoshi is determined.',
-                    'Let\'s go Satoshi!'
-                ]
-            }
-        };
+    '😐': {
+        name: 'Bald Bill',
+        images: [
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/bill.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/bill.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/bill.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/bill.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillashirt.jpg'
+        ],
+        subtitles: [
+            'なんの音？',
+            'ガーーー！！',
+            'うわっ！あれはゴリラボス！？',
+            'おい！ハゲの男！お前、オレのモンスターたちをぜんぶたおしたな！',
+            'お前がこれをやったのか！？どうして！？',
+            'オレはえもじがきらいだ！えもじタウンをこわす！モンスターがいなくてもな！つぎはお前だ！',
+            'そうはいかないぞ！こんどはお前のゲームオーバーだ、ゴリラ！',
+            'ハハハ！やれるもんならやってみろ！'
+        ]
+    },
+    '🥸': {
+        name: 'Angry Tom',
+        images: [
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/tom.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/tom.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/tom.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillashirt.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/tom.jpg'
+        ],
+        subtitles: [
+            'なんの音だ！？',
+            'ガーーー！！',
+            'お前、だれだ？',
+            'オレはゴリラボス！このせかいの王さまだ！',
+            'お前、きらいだ。たおしてやる！',
+            'ハハハ！やれるもんならやってみろ！',
+            'よし、いくぞ！'
+        ]
+    },
+    '😺': {
+        name: 'Jenny the Cat',
+        images: [
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/jenny.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/jenny.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/jenny.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/jenny.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillashirt.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/jenny.jpg'
+        ],
+        subtitles: [
+            'なんの音？にゃーん？',
+            'ガーーー！ねこか！？',
+            'そうよ、でも私の名前はジェニー、にゃーん！お友達になってくれる？',
+            'オレはねこがきらいだ！だからお前をこわす！',
+            'それはまちがいだよ......私のツメはするどいよ。',
+            'このでっかいきんにくを見ろ！こねこちゃん、がんばれよ！',
+            '私をおこらせたね......シャーッ！',
+            'ハハハ！やれるもんならやってみろ！',
+            'にゃーん！いくよ！'
+        ]
+    },
+    '👩🏻': {
+        name: 'Yakiko',
+        images: [
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/yakiko.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/yakiko.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/yakiko.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/yakiko.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillashirt.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/yakiko.jpg'
+        ],
+        subtitles: [
+            'あのね、なにこの音？うそっ、まさか......？',
+            'ガーー！ハハハ！そうだ、ヤキコ、オレだよ！',
+            'ゴリラボス！？サトシがむかし たおしたと 思ってた！',
+            'オレは けいむしょから にげて、モンスターを 作ったんだ！どうだ？',
+            'なんで こんなこと するの！？',
+            'オレは えもじタウンを せいふくする！そして、ヤキコ、お前は オレのものに なるんだ！',
+            'いや！ぜったいに むり！まける じゅんびを しなさい！',
+            'ハハハ！やれるもんならやってみろ！',
+            'いくよ！'
+        ]
+    },
+    '😎': {
+        name: 'Mr. Cool',
+        images: [
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/mrcool.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/mrcool.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/mrcool.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/mrcool.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillashirt.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/mrcool.jpg'
+        ],
+        subtitles: [
+            'よっ！なんだこの おと！？',
+            'ガーー！いいサングラスだな！お前をたおす後に もらうぞ！',
+            'いやだね！お前は クサいゴリラ！このサングラスは お前の ちょきんより たかいんだぞ！',
+            'じゃあ たたかってみろ！お前が どれだけクールか ためそうじゃないか！',
+            'よし、ゲームスタートだ！サル男！',
+            'ハハハ！やれるもんならやってみろ！',
+            'クールに いくぜ！'
+        ]
+    },
+    '🙍🏻‍♂️': {
+        name: 'Satoshi',
+        images: [
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/esatoshi.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/esatoshi.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/esatoshi.jpg',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/gorillapoint.webp',
+            'https://raw.githubusercontent.com/TheDepression/Photos/Thumbnails/esatoshi.jpg'
+        ],
+        subtitles: [
+            'うわっ......この音は いったい！？',
+            'ガーーー！サトシ！ひさしぶりだな！',
+            'ゴリラボス！？で、でも、でも......',
+            'ああ、オレは もどってきた！お前は オレのモンスターを たおしたけど、こんどは オレじしんが お前を たおす！',
+            'うう......でも......やるしかないな！',
+            'ハハハ！やれるもんならやってみろ！',
+            'がんばるぞ！'
+        ]
+    }
+};
 
         // Get selected character
         const selectedCharacter = localStorage.getItem('selectedCharacter') || '😐';
