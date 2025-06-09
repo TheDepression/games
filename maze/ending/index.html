@@ -340,6 +340,8 @@
         }
 
         function showSlide(index) {
+            // Hide replay button when changing slides
+document.getElementById('replayButton').style.display = 'none';
             const video = document.getElementById('endingVideo');
             const image = document.getElementById('endingImage');
             const subtitle = document.getElementById('subtitleText');
