@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Adventure: Ending</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #endingContainer {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #mediaContainer {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: #222;
+            border: 3px solid #555;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #endingVideo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        
+        #endingImage {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        
+        #subtitleBox {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        #navigationContainer {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        #nextButton {
+            display: block;
+        }
+        
+        #congratsButton {
+            background: #ff6b35;
+            display: none;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        #congratsButton:hover {
+            background: #ff5722;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #leaderboardSection {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        #leaderboardTitle {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ff6b35;
+        }
+        
+        #nameInput {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            margin-bottom: 20px;
+            width: 200px;
+        }
+        
+        #leaderboardTable {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+        }
+        
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .rank {
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        
+        #endGameButton {
+            background: #666;
+            margin-top: 20px;
+        }
+        
+        #endGameButton:hover {
+            background: #777;
+        }
+        
+        .loading {
+            color: #ff6b35;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="endingContainer">
+        <div id="mediaContainer">
+            <video id="endingVideo" muted>
+                <source src="" type="video/mp4">
+                Your browser does not support the video element.
+            </video>
+            <img id="endingImage" src="" alt="Ending Scene">
+        </div>
+        <div id="subtitleBox">
+            <p id="subtitleText">Loading...</p>
+        </div>
+        <div id="navigationContainer">
+            <button id="nextButton" onclick="nextSlide()" disabled>つぎ</button>
+            <button id="congratsButton" onclick="showLeaderboard()">おめでとう！</button>
+        </div>
+        
+        <div id="leaderboardSection">
+            <h2 id="leaderboardTitle">リーダーボード</h2>
+            <div id="nameInputSection">
+                <p>お名前を入力してください:</p>
+                <input type="text" id="nameInput" placeholder="お名前" maxlength="20">
+                <br>
+                <button onclick="submitScore()">スコア送信</button>
+            </div>
+            <div id="leaderboardTable">
+                <div class="loading">読み込み中...</div>
+            </div>
+            <button id="endGameButton" onclick="endGame()">ゲーム終了</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/cutscene.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Check if player has the required key
+        if (localStorage.getItem('keyw') !== 'unlocked') {
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        }
+
+        // Ending sequence data
+        const endingSequence = [
+            {
+                type: 'video',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end1.mp4',
+                subtitle: 'ゴリラボスがたおれたあと…'
+            },
+            {
+                type: 'video',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end2.mp4',
+                subtitle: 'えもじタウンの みんなは おいわいした。'
+            },
+            {
+                type: 'image',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/yay.jpg',
+                subtitle: 'ゴリラボスは もう いなくなった。'
+            },
+            {
+                type: 'video',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end3.mp4',
+                subtitle: 'たぶんね。'
+            },
+            {
+                type: 'image',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/outro.jpg',
+                subtitle: 'でも、どちらにしても、えもじたちは いつでも じぶんのまちを まもる じゅんびが できていた！'
+            }
+        ];
+
+        let currentSlide = 0;
+        let nextButtonTimer = null;
+
+        // Supabase configuration (placeholder)
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+        function init() {
+            // Start background music
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.play().catch(e => console.log('Music play failed:', e));
+            
+            // Show first slide
+            showSlide(0);
+        }
+
+        function showSlide(index) {
+            const video = document.getElementById('endingVideo');
+            const image = document.getElementById('endingImage');
+            const subtitle = document.getElementById('subtitleText');
+            const nextButton = document.getElementById('nextButton');
+            const congratsButton = document.getElementById('congratsButton');
+            const currentItem = endingSequence[index];
+
+            // Update subtitle
+            subtitle.textContent = currentItem.subtitle;
+
+            // Clear any existing timer
+            if (nextButtonTimer) {
+                clearTimeout(nextButtonTimer);
+                nextButtonTimer = null;
+            }
+
+            // Disable next button initially
+            nextButton.disabled = true;
+
+            if (currentItem.type === 'video') {
+                // Show video, hide image
+                video.style.display = 'block';
+                image.style.display = 'none';
+                
+                video.src = currentItem.src;
+                video.load();
+                
+                // Enable next button when video ends
+                video.onended = function() {
+                    nextButton.disabled = false;
+                };
+                
+                // Auto-play video
+                video.play().catch(e => console.log('Video play failed:', e));
+                
+            } else {
+                // Show image, hide video
+                video.style.display = 'none';
+                image.style.display = 'block';
+                
+                image.src = currentItem.src;
+                
+                // Add fade effect
+                image.classList.add('fade-in');
+                setTimeout(() => image.classList.remove('fade-in'), 500);
+                
+                // Enable next button after 5 seconds for images
+                nextButtonTimer = setTimeout(() => {
+                    nextButton.disabled = false;
+                }, 5000);
+            }
+
+            // Check if this is the last slide
+            if (index === endingSequence.length - 1) {
+                nextButton.style.display = 'none';
+                congratsButton.style.display = 'block';
+            } else {
+                nextButton.style.display = 'block';
+                congratsButton.style.display = 'none';
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < endingSequence.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function showLeaderboard() {
+            // Hide main container, show leaderboard
+            document.getElementById('endingContainer').style.display = 'none';
+            document.getElementById('leaderboardSection').style.display = 'block';
+            
+            // Check if user name is already saved
+            const savedName = localStorage.getItem('mazename');
+            if (savedName) {
+                document.getElementById('nameInput').value = savedName;
+                document.getElementById('nameInputSection').style.display = 'none';
+                submitScore();
+            } else {
+                loadLeaderboard();
+            }
+        }
+
+        async function submitScore() {
+            const nameInput = document.getElementById('nameInput');
+            const playerName = nameInput.value.trim() || 'Anonymous';
+            const gameTime = localStorage.getItem('mazegamedata') ? 
+                JSON.parse(localStorage.getItem('mazegamedata')).totalTime || 0 : 0;
+
+            // Save name to localStorage
+            localStorage.setItem('mazename', playerName);
+            
+            // Hide name input section
+            document.getElementById('nameInputSection').style.display = 'none';
+
+            try {
+                // Placeholder for Supabase submission
+                // const response = await fetch(`${SUPABASE_URL}/rest/v1/maze_leaderboard`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'apikey': SUPABASE_ANON_KEY,
+                //         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                //         'Content-Type': 'application/json',
+                //         'Prefer': 'return=minimal'
+                //     },
+                //     body: JSON.stringify({
+                //         player_name: playerName,
+                //         completion_time: gameTime,
+                //         completed_at: new Date().toISOString()
+                //     })
+                // });
+
+                console.log('Score submitted:', { playerName, gameTime });
+                
+                // Set leaderboard access key
+                localStorage.setItem('mazeleaderboard', 'unlocked');
+                
+                // Load and display leaderboard
+                await loadLeaderboard();
+                
+            } catch (error) {
+                console.error('Error submitting score:', error);
+                document.getElementById('leaderboardTable').innerHTML = 
+                    '<div style="color: red;">エラー: スコアを送信できませんでした</div>';
+            }
+        }
+
+        async function loadLeaderboard() {
+            try {
+                // Placeholder for Supabase query
+                // const response = await fetch(`${SUPABASE_URL}/rest/v1/maze_leaderboard?select=*&order=completion_time.asc&limit=25`, {
+                //     headers: {
+                //         'apikey': SUPABASE_ANON_KEY,
+                //         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                //     }
+                // });
+                // const leaderboardData = await response.json();
+
+                // Mock data for demonstration
+                const leaderboardData = [
+                    { player_name: 'Player1', completion_time: 12000 },
+                    { player_name: 'Player2', completion_time: 15000 },
+                    { player_name: 'Player3', completion_time: 18000 }
+                ];
+
+                displayLeaderboard(leaderboardData);
+                
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                document.getElementById('leaderboardTable').innerHTML = 
+                    '<div style="color: red;">エラー: リーダーボードを読み込めませんでした</div>';
+            }
+        }
+
+        function displayLeaderboard(data) {
+            const tableDiv = document.getElementById('leaderboardTable');
+            
+            if (data.length === 0) {
+                tableDiv.innerHTML = '<div>まだレコードがありません</div>';
+                return;
+            }
+
+            let html = '';
+            data.forEach((entry, index) => {
+                const minutes = Math.floor(entry.completion_time / 60000);
+                const seconds = Math.floor((entry.completion_time % 60000) / 1000);
+                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                html += `
+                    <div class="leaderboard-entry">
+                        <span class="rank">${index + 1}.</span>
+                        <span>${entry.player_name}</span>
+                        <span>${timeString}</span>
+                    </div>
+                `;
+            });
+            
+            tableDiv.innerHTML = html;
+        }
+
+        function formatTime(milliseconds) {
+            const minutes = Math.floor(milliseconds / 60000);
+            const seconds = Math.floor((milliseconds % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function endGame() {
+            // Stop music
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.pause();
+            
+            // Reset specific game data but keep name and leaderboard access
+            localStorage.removeItem('mazegamedata');
+            localStorage.removeItem('keyw');
+            
+            // Go back to level 1
+            window.location.href = 'https://thedepression.github.io/games/maze/level1';
+        }
+
+        // Start when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
