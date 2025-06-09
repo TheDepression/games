@@ -969,7 +969,10 @@
            const totalTime = calculateTotalTime();
            localStorage.setItem('totalGameTime', totalTime);
            localStorage.setItem('gameCompleted', 'true');
-           
+                       
+           // ADD THIS LINE - Give player the ending key
+    localStorage.setItem('keyw', 'unlocked');
+                       
            // Display total time
            const minutes = Math.floor(totalTime / 60);
            const seconds = totalTime % 60;
