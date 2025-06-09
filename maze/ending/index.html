@@ -568,11 +568,8 @@ document.getElementById('replayButton').style.display = 'none';
             const bgMusic = document.getElementById('bgMusic');
             bgMusic.pause();
             
-            // Reset specific game data but keep name and leaderboard access
-            localStorage.removeItem('totalGameTime');
-    localStorage.removeItem('keyw');
-    localStorage.removeItem('gameCompleted');
-    localStorage.removeItem('finalBossTime');
+            localStorage.removeItem('MazeGameData');
+            localStorage.removeItem('keyw');
             
             // Go back to level 1
             window.location.href = 'https://thedepression.github.io/games/maze/level1';
