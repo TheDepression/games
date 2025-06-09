@@ -419,6 +419,20 @@
             }
         }
 
+        function replayVideo() {
+    const video = document.getElementById('endingVideo');
+    const nextButton = document.getElementById('nextButton');
+    const replayButton = document.getElementById('replayButton');
+    
+    // Hide replay button and disable next button during replay
+    replayButton.style.display = 'none';
+    nextButton.disabled = true;
+    
+    // Restart video
+    video.currentTime = 0;
+    video.play().catch(e => console.log('Replay failed:', e));
+}
+
         function showLeaderboard() {
             // Hide main container, show leaderboard
             document.getElementById('endingContainer').style.display = 'none';
