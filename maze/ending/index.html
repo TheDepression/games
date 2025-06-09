@@ -482,10 +482,9 @@ document.getElementById('replayButton').style.display = 'none';
                          'Prefer': 'return=minimal'
                      },
                      body: JSON.stringify({
-                         player_name: playerName,
-                         completion_time: gameTime,
-                         completed_at: new Date().toISOString()
-                     })
+    player_name: playerName,
+    completion_time: gameTime
+})
                  });
 
                 console.log('Score submitted:', { playerName, gameTime });
