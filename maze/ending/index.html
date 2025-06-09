@@ -320,8 +320,8 @@
         let nextButtonTimer = null;
 
         // Supabase configuration (placeholder)
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://uhvaquliroqvjgfanmfi.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s';
 
         function init() {
             // Don't start anything automatically - wait for user interaction
@@ -465,20 +465,20 @@ document.getElementById('replayButton').style.display = 'none';
 
             try {
                 // Placeholder for Supabase submission
-                // const response = await fetch(`${SUPABASE_URL}/rest/v1/maze_leaderboard`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'apikey': SUPABASE_ANON_KEY,
-                //         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                //         'Content-Type': 'application/json',
-                //         'Prefer': 'return=minimal'
-                //     },
-                //     body: JSON.stringify({
-                //         player_name: playerName,
-                //         completion_time: gameTime,
-                //         completed_at: new Date().toISOString()
-                //     })
-                // });
+                 const response = await fetch(`${https://uhvaquliroqvjgfanmfi.supabase.co}/rest/v1/maze_leaderboard`, {
+                     method: 'POST',
+                     headers: {
+                         'apikey': SUPABASE_ANON_KEY,
+                         'Authorization': `Bearer ${eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s}`,
+                         'Content-Type': 'application/json',
+                         'Prefer': 'return=minimal'
+                     },
+                     body: JSON.stringify({
+                         player_name: playerName,
+                         completion_time: gameTime,
+                         completed_at: new Date().toISOString()
+                     })
+                 });
 
                 console.log('Score submitted:', { playerName, gameTime });
                 
@@ -498,20 +498,22 @@ document.getElementById('replayButton').style.display = 'none';
         async function loadLeaderboard() {
             try {
                 // Placeholder for Supabase query
-                // const response = await fetch(`${SUPABASE_URL}/rest/v1/maze_leaderboard?select=*&order=completion_time.asc&limit=25`, {
-                //     headers: {
-                //         'apikey': SUPABASE_ANON_KEY,
-                //         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                //     }
-                // });
-                // const leaderboardData = await response.json();
+                 const response = await fetch(`${SUPABASE_URL}/rest/v1/maze_leaderboard?select=*&order=completion_time.asc&limit=25`, {
+                     headers: {
+                         'apikey': SUPABASE_ANON_KEY,
+                         'Authorization': `Bearer ${eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s}`
+                     }
+                 });
+                 const leaderboardData = await response.json();
 
                 // Mock data for demonstration
-                const leaderboardData = [
-                    { player_name: 'Player1', completion_time: 12000 },
-                    { player_name: 'Player2', completion_time: 15000 },
-                    { player_name: 'Player3', completion_time: 18000 }
-                ];
+             //   const leaderboardData = [
+                 //   { player_name: 'Player1', completion_time: 12000 },
+                 //   { player_name: 'Player2', completion_time: 15000 },
+                 //   { player_name: 'Player2', completion_time: 15000 },
+                 //   { player_name: 'Player2', completion_time: 15000 },
+              //      { player_name: 'Player3', completion_time: 18000 }
+           //     ];
 
                 displayLeaderboard(leaderboardData);
                 
