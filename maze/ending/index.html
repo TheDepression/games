@@ -188,6 +188,12 @@
     </style>
 </head>
 <body>
+    <div id="startScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center;">
+        <h2>🎬 エンディング</h2>
+        <p style="font-size: 18px; margin: 20px 0;">お疲れ様でした！</p>
+        <button class="start-button" style="background: #ff6b35; font-size: 20px; padding: 15px 30px;" onclick="startEnding()">エンディングを見る</button>
+    </div>
+
     <div id="endingContainer">
         <div id="mediaContainer">
             <video id="endingVideo" muted>
@@ -234,27 +240,27 @@
         const endingSequence = [
             {
                 type: 'video',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end1.MOV',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end1.mp4',
                 subtitle: 'ゴリラボスがたおれたあと…'
             },
             {
                 type: 'video',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end2.MOV',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end2.mp4',
                 subtitle: 'えもじタウンの みんなは おいわいした。'
             },
             {
                 type: 'image',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/endpic1.WEBP',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/yay.jpg',
                 subtitle: 'ゴリラボスは もう いなくなった。'
             },
             {
                 type: 'video',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end3.MOV',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/end3.mp4',
                 subtitle: 'たぶんね。'
             },
             {
                 type: 'image',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/endpic1.jpg',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/outro.jpg',
                 subtitle: 'でも、どちらにしても、えもじたちは いつでも じぶんのまちを まもる じゅんびが できていた！'
             }
         ];
@@ -267,6 +273,13 @@
         const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
         function init() {
+            // Don't start anything automatically - wait for user interaction
+        }
+
+        function startEnding() {
+            // Hide start screen
+            document.getElementById('startScreen').style.display = 'none';
+            
             // Start background music
             const bgMusic = document.getElementById('bgMusic');
             bgMusic.play().catch(e => console.log('Music play failed:', e));
@@ -308,8 +321,16 @@
                     nextButton.disabled = false;
                 };
                 
-                // Auto-play video
-                video.play().catch(e => console.log('Video play failed:', e));
+                // Auto-play video with better error handling
+                video.play().then(() => {
+                    console.log('Video started playing');
+                }).catch(e => {
+                    console.log('Video play failed:', e);
+                    // If video fails to play, enable next button after 3 seconds
+                    setTimeout(() => {
+                        nextButton.disabled = false;
+                    }, 3000);
+                });
                 
             } else {
                 // Show image, hide video
@@ -470,7 +491,7 @@
             bgMusic.pause();
             
             // Reset specific game data but keep name and leaderboard access
-            localStorage.removeItem('MazeGameData');
+            localStorage.removeItem('mazegamedata');
             localStorage.removeItem('keyw');
             
             // Go back to level 1
