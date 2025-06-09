@@ -541,8 +541,8 @@ document.getElementById('replayButton').style.display = 'none';
 
             let html = '';
             data.forEach((entry, index) => {
-                const minutes = Math.floor(entry.completion_time / 60000);
-                const seconds = Math.floor((entry.completion_time % 60000) / 1000);
+                const minutes = Math.floor(entry.completion_time / 60);  
+                const seconds = entry.completion_time % 60;
                 const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 
                 html += `
