@@ -370,7 +370,9 @@
                 // Enable next button when video ends
                 video.onended = function() {
                     nextButton.disabled = false;
-                };
+                // Show replay button for videos only
+    document.getElementById('replayButton').style.display = 'block';
+};
                 
                 // Auto-play video with better error handling
                 video.play().then(() => {
