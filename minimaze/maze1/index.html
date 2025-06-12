@@ -468,6 +468,15 @@
         <div id="forestVisionMask" class="forest-vision-mask"></div>
     </div>
 
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m1.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="forestMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+
     <script>
 class MazeGame {
     constructor() {
@@ -499,6 +508,7 @@ class MazeGame {
         this.lastDragY = 0;
         this.isOnDesert = false;
         this.isInForest = false;
+        this.forestMusic = document.getElementById('forestMusic');
         
         this.movingEnemies = [];
         this.foregroundEnemy = null;
@@ -509,6 +519,7 @@ class MazeGame {
         this.gameWorld = document.getElementById('gameWorld');
         this.gameArea = document.getElementById('gameArea');
         this.controlArea = document.getElementById('controlArea');
+        this.bgMusic = document.getElementById('bgMusic');
         
         this.bindEvents();
         this.startGameLoop();
@@ -516,6 +527,10 @@ class MazeGame {
 
     enterForest() {
         this.isInForest = true;
+        
+        // Switch music
+        this.bgMusic.pause();
+        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
         
         // Show forest overlay and vision mask
         document.getElementById('forestOverlay').classList.add('active');
@@ -526,6 +541,10 @@ class MazeGame {
 
     exitForest() {
         this.isInForest = false;
+        
+        // Switch music back
+        this.forestMusic.pause();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
         
         // Hide forest overlay and vision mask
         document.getElementById('forestOverlay').classList.remove('active');
@@ -589,6 +608,7 @@ class MazeGame {
         this.gameStarted = true;
         this.timeLeft = 180;
         this.updateTimer();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
         
         this.timerInterval = setInterval(() => {
             this.timeLeft--;
@@ -616,6 +636,8 @@ class MazeGame {
     timeUp() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
+        this.bgMusic.pause();
+        this.forestMusic.pause();
         this.showMessage('⏰ Time\'s up!');
         setTimeout(() => {
             this.showLevelComplete('⏰ Time Up!', 'Try again!');
@@ -1479,12 +1501,16 @@ class MazeGame {
     completeLevel() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
+        this.bgMusic.pause();
+        this.forestMusic.pause();
         this.showLevelComplete('🎉 Adventure Complete!', 'You escaped the colorful maze!');
     }
     
     gameOver() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
+        this.bgMusic.pause();
+        this.forestMusic.pause();
         this.showMessage('💀 Game Over!');
         setTimeout(() => {
             this.showLevelComplete('💀 Game Over', 'Try again!');
