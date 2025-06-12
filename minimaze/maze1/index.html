@@ -1256,7 +1256,6 @@ this.playerVelocityY *= friction;
                 this.lastLavaDamage = now;
             }
         }
-    }
 
 	// Check if on desert zones
 const desertZones = this.gameWorld.querySelectorAll('.desert-zone');
@@ -1279,7 +1278,7 @@ for (let zone of desertZones) {
 
 // Update desert status
 this.isOnDesert = onDesert;
-	
+    }	
     handleNPCInteraction(friendly) {
         const message = friendly.dataset.message;
         
