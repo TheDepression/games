@@ -381,47 +381,47 @@
             font-size: 12px;
         }
 
-	    .forest-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-image:
-        radial-gradient(circle at 20% 30%, #2e7d32 8px, transparent 8px),
-        radial-gradient(circle at 60% 20%, #388e3c 6px, transparent 6px),
-        radial-gradient(circle at 80% 60%, #4caf50 10px, transparent 10px),
-        radial-gradient(circle at 30% 80%, #2e7d32 7px, transparent 7px),
-        radial-gradient(circle at 70% 75%, #1b5e20 5px, transparent 5px),
-        linear-gradient(135deg, rgba(46, 125, 50, 0.4) 0%, rgba(27, 94, 32, 0.6) 100%);
-    background-size: 40px 40px, 60px 60px, 35px 35px, 50px 50px, 45px 45px, 100% 100%;
-    background-position: 0 0, 20px 30px, 40px 10px, 10px 40px, 30px 20px, 0 0;
-    pointer-events: none;
-    z-index: 150;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
+        .forest-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image:
+                radial-gradient(circle at 20% 30%, #2e7d32 8px, transparent 8px),
+                radial-gradient(circle at 60% 20%, #388e3c 6px, transparent 6px),
+                radial-gradient(circle at 80% 60%, #4caf50 10px, transparent 10px),
+                radial-gradient(circle at 30% 80%, #2e7d32 7px, transparent 7px),
+                radial-gradient(circle at 70% 75%, #1b5e20 5px, transparent 5px),
+                linear-gradient(135deg, rgba(46, 125, 50, 0.4) 0%, rgba(27, 94, 32, 0.6) 100%);
+            background-size: 40px 40px, 60px 60px, 35px 35px, 50px 50px, 45px 45px, 100% 100%;
+            background-position: 0 0, 20px 30px, 40px 10px, 10px 40px, 30px 20px, 0 0;
+            pointer-events: none;
+            z-index: 150;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
 
-.forest-overlay.active {
-    opacity: 0.8;
-}
+        .forest-overlay.active {
+            opacity: 0.8;
+        }
 
-.forest-vision-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: radial-gradient(circle 111px at 50% 50%, transparent 111px, black 111px);
-    pointer-events: none;
-    z-index: 200;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
+        .forest-vision-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle 111px at 50% 50%, transparent 111px, black 111px);
+            pointer-events: none;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
 
-.forest-vision-mask.active {
-    opacity: 1;
-}
+        .forest-vision-mask.active {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -463,19 +463,11 @@
             <button id="retryButton" onclick="restartGame()">Play Again</button>
         </div>
         
-        <!-- NEW: Forest overlay and vision mask -->
+        <!-- Forest overlay and vision mask -->
         <div id="forestOverlay" class="forest-overlay"></div>
         <div id="forestVisionMask" class="forest-vision-mask"></div>
     </div>
 
-    <audio id="bgMusic" loop>
-        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m1.m4a" type="audio/mp4">
-        Your browser does not support the audio element.
-    </audio>
-<audio id="forestMusic" loop>
-    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">
-    Your browser does not support the audio element.
-</audio>
     <script>
 class MazeGame {
     constructor() {
@@ -505,9 +497,8 @@ class MazeGame {
         this.dragStartY = 0;
         this.lastDragX = 0;
         this.lastDragY = 0;
-	this.isOnDesert = false;
-	this.isInForest = false;
-        this.forestMusic = document.getElementById('forestMusic');
+        this.isOnDesert = false;
+        this.isInForest = false;
         
         this.movingEnemies = [];
         this.foregroundEnemy = null;
@@ -518,38 +509,31 @@ class MazeGame {
         this.gameWorld = document.getElementById('gameWorld');
         this.gameArea = document.getElementById('gameArea');
         this.controlArea = document.getElementById('controlArea');
-        this.bgMusic = document.getElementById('bgMusic');
         
         this.bindEvents();
         this.startGameLoop();
     }
-	enterForest() {
-    this.isInForest = true;
-    
-    // Switch music
-    this.bgMusic.pause();
-    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
-    
-    // Show forest overlay and vision mask
-    document.getElementById('forestOverlay').classList.add('active');
-    document.getElementById('forestVisionMask').classList.add('active');
-    
-    this.showMessage('🌲 Entering the dense forest...');
-}
 
-exitForest() {
-    this.isInForest = false;
-    
-    // Switch music back
-    this.forestMusic.pause();
-    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-    
-    // Hide forest overlay and vision mask
-    document.getElementById('forestOverlay').classList.remove('active');
-    document.getElementById('forestVisionMask').classList.remove('active');
-    
-    this.showMessage('🌞 Exiting the forest...');
-}
+    enterForest() {
+        this.isInForest = true;
+        
+        // Show forest overlay and vision mask
+        document.getElementById('forestOverlay').classList.add('active');
+        document.getElementById('forestVisionMask').classList.add('active');
+        
+        this.showMessage('🌲 Entering the dense forest...');
+    }
+
+    exitForest() {
+        this.isInForest = false;
+        
+        // Hide forest overlay and vision mask
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
+        
+        this.showMessage('🌞 Exiting the forest...');
+    }
+
     bindEvents() {
         this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
         this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
@@ -582,10 +566,10 @@ exitForest() {
         const deltaY = point.clientY - this.lastDragY;
         
         // Reduce sensitivity when on desert (quarter speed)
-const baseSensitivity = 0.5;
-const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
-this.playerVelocityX = deltaX * sensitivity;
-this.playerVelocityY = deltaY * sensitivity;
+        const baseSensitivity = 0.5;
+        const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
+        this.playerVelocityX = deltaX * sensitivity;
+        this.playerVelocityY = deltaY * sensitivity;
 
         const maxVelocity = 14;
         this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
@@ -605,7 +589,6 @@ this.playerVelocityY = deltaY * sensitivity;
         this.gameStarted = true;
         this.timeLeft = 180;
         this.updateTimer();
-        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
         
         this.timerInterval = setInterval(() => {
             this.timeLeft--;
@@ -633,7 +616,6 @@ this.playerVelocityY = deltaY * sensitivity;
     timeUp() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
-        this.bgMusic.pause();
         this.showMessage('⏰ Time\'s up!');
         setTimeout(() => {
             this.showLevelComplete('⏰ Time Up!', 'Try again!');
@@ -705,25 +687,25 @@ this.playerVelocityY = deltaY * sensitivity;
         waterZone.dataset.zoneType = 'water';
         this.gameWorld.appendChild(waterZone);
         
-	// Water zone 2
-const waterZone2 = document.createElement('div');
-waterZone2.className = 'water-zone';
-waterZone2.style.left = '300px';
-waterZone2.style.top = '200px';     // You can change this Y value
-waterZone2.style.width = '100px';
-waterZone2.style.height = '100px';
-waterZone2.dataset.zoneType = 'water';
-this.gameWorld.appendChild(waterZone2);
+        // Water zone 2
+        const waterZone2 = document.createElement('div');
+        waterZone2.className = 'water-zone';
+        waterZone2.style.left = '300px';
+        waterZone2.style.top = '200px';
+        waterZone2.style.width = '100px';
+        waterZone2.style.height = '100px';
+        waterZone2.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone2);
 
-// Water zone 3
-const waterZone3 = document.createElement('div');
-waterZone3.className = 'water-zone';
-waterZone3.style.left = '300px';
-waterZone3.style.top = '400px';     // You can change this Y value
-waterZone3.style.width = '100px';
-waterZone3.style.height = '100px';
-waterZone3.dataset.zoneType = 'water';
-this.gameWorld.appendChild(waterZone3);
+        // Water zone 3
+        const waterZone3 = document.createElement('div');
+        waterZone3.className = 'water-zone';
+        waterZone3.style.left = '300px';
+        waterZone3.style.top = '400px';
+        waterZone3.style.width = '100px';
+        waterZone3.style.height = '100px';
+        waterZone3.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone3);
 
         // Grass zone with nice texture (middle-left)
         const grassZone = document.createElement('div');
@@ -741,6 +723,7 @@ this.gameWorld.appendChild(waterZone3);
         forestZone.style.top = '500px';
         forestZone.style.width = '200px';
         forestZone.style.height = '200px';
+        forestZone.dataset.zoneType = 'forest';
         this.gameWorld.appendChild(forestZone);
         
         // Lava zone - damages player without special shoes
@@ -753,25 +736,25 @@ this.gameWorld.appendChild(waterZone3);
         lavaZone.dataset.zoneType = 'lava';
         this.gameWorld.appendChild(lavaZone);
         
-	// Lava zone 2
-const lavaZone2 = document.createElement('div');
-lavaZone2.className = 'lava-zone';
-lavaZone2.style.left = '300px';
-lavaZone2.style.top = '600px';     // You can change this Y value
-lavaZone2.style.width = '100px';
-lavaZone2.style.height = '100px';
-lavaZone2.dataset.zoneType = 'lava';
-this.gameWorld.appendChild(lavaZone2);
+        // Lava zone 2
+        const lavaZone2 = document.createElement('div');
+        lavaZone2.className = 'lava-zone';
+        lavaZone2.style.left = '300px';
+        lavaZone2.style.top = '600px';
+        lavaZone2.style.width = '100px';
+        lavaZone2.style.height = '100px';
+        lavaZone2.dataset.zoneType = 'lava';
+        this.gameWorld.appendChild(lavaZone2);
 
-// Lava zone 3
-const lavaZone3 = document.createElement('div');
-lavaZone3.className = 'lava-zone';
-lavaZone3.style.left = '300px';
-lavaZone3.style.top = '800px';     // You can change this Y value
-lavaZone3.style.width = '100px';
-lavaZone3.style.height = '100px';
-lavaZone3.dataset.zoneType = 'lava';
-this.gameWorld.appendChild(lavaZone3);
+        // Lava zone 3
+        const lavaZone3 = document.createElement('div');
+        lavaZone3.className = 'lava-zone';
+        lavaZone3.style.left = '300px';
+        lavaZone3.style.top = '800px';
+        lavaZone3.style.width = '100px';
+        lavaZone3.style.height = '100px';
+        lavaZone3.dataset.zoneType = 'lava';
+        this.gameWorld.appendChild(lavaZone3);
 
         // Desert zone with sand pattern (bottom-right)
         const desertZone = document.createElement('div');
@@ -780,6 +763,7 @@ this.gameWorld.appendChild(lavaZone3);
         desertZone.style.top = '1000px';
         desertZone.style.width = '200px';
         desertZone.style.height = '200px';
+        desertZone.dataset.zoneType = 'desert';
         this.gameWorld.appendChild(desertZone);
     }
     
@@ -1011,9 +995,9 @@ this.gameWorld.appendChild(lavaZone3);
             }
             
             // Apply different friction based on terrain
-const friction = this.isOnDesert ? 0.7 : 0.9;  // More friction = slower on desert
-this.playerVelocityX *= friction;
-this.playerVelocityY *= friction;
+            const friction = this.isOnDesert ? 0.7 : 0.9;  // More friction = slower on desert
+            this.playerVelocityX *= friction;
+            this.playerVelocityY *= friction;
         }
     }
     
@@ -1334,53 +1318,55 @@ this.playerVelocityY *= friction;
             }
         }
 
-	// Check if on desert zones
-const desertZones = this.gameWorld.querySelectorAll('.desert-zone');
-let onDesert = false;
+        // Check if on desert zones
+        const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
+        let onDesert = false;
 
-for (let zone of desertZones) {
-    const zoneRect = {
-        left: parseInt(zone.style.left),
-        top: parseInt(zone.style.top),
-        right: parseInt(zone.style.left) + parseInt(zone.style.width),
-        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
-    };
+        for (let zone of desertZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onDesert = true;
+                break;
+            }
+        }
+
+        // Update desert status
+        this.isOnDesert = onDesert;
+
+        // Check if on forest zones
+        const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+        let onForest = false;
+
+        for (let zone of forestZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onForest = true;
+                break;
+            }
+        }
+
+        // Handle forest entry/exit
+        if (onForest && !this.isInForest) {
+            this.enterForest();
+        } else if (!onForest && this.isInForest) {
+            this.exitForest();
+        }
+    }
     
-    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
-        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
-        onDesert = true;
-        break;
-    }
-}
-
-// Update desert status
-this.isOnDesert = onDesert;
-    }
-// Check if on forest zones
-const forestZones = this.gameWorld.querySelectorAll('.forest-zone');
-let onForest = false;
-
-for (let zone of forestZones) {
-    const zoneRect = {
-        left: parseInt(zone.style.left),
-        top: parseInt(zone.style.top),
-        right: parseInt(zone.style.left) + parseInt(zone.style.width),
-        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
-    };
-    
-    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
-        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
-        onForest = true;
-        break;
-    }
-}
-
-// Handle forest entry/exit
-if (onForest && !this.isInForest) {
-    this.enterForest();
-} else if (!onForest && this.isInForest) {
-    this.exitForest();
-}
     handleNPCInteraction(friendly) {
         const message = friendly.dataset.message;
         
@@ -1493,14 +1479,12 @@ if (onForest && !this.isInForest) {
     completeLevel() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
-        this.bgMusic.pause();
         this.showLevelComplete('🎉 Adventure Complete!', 'You escaped the colorful maze!');
     }
     
     gameOver() {
         clearInterval(this.timerInterval);
         this.gameStarted = false;
-        this.bgMusic.pause();
         this.showMessage('💀 Game Over!');
         setTimeout(() => {
             this.showLevelComplete('💀 Game Over', 'Try again!');
@@ -1528,8 +1512,6 @@ function startGame() {
 function restartGame() {
     window.location.reload();
 }
-
-	
     </script>
 </body>
 </html>
