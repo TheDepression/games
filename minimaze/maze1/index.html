@@ -1083,7 +1083,7 @@ this.playerVelocityY *= friction;
     updateForegroundEnemy() {
         if (!this.gameStarted) return;
         const now = Date.now();
-        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 25000) {
+        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 25000 && !this.isInForest) {
             const playerCenterX = this.playerX + 12;
             const direction = playerCenterX < 900 ? 1 : -1;
             const startX = direction > 0 ? -60 : 1860;
