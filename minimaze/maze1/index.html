@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Adventure: Colorful World</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #2a2a2a;
+            border: 3px solid #555;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 1800px;
+            height: 1800px;
+            transform-origin: 0 0;
+        }
+        
+        /* Background zones with tile patterns */
+        .water-zone {
+            position: absolute;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.3) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.2) 1px, transparent 1px),
+                linear-gradient(135deg, #4fc3f7 0%, #29b6f6 50%, #03a9f4 100%);
+            background-size: 20px 20px, 15px 15px, 100% 100%;
+            background-position: 0 0, 10px 10px, 0 0;
+            opacity: 0.8;
+            animation: waterFlow 4s linear infinite;
+        }
+        
+        .forest-zone {
+            position: absolute;
+            background-image:
+                repeating-conic-gradient(from 0deg at 50% 50%, 
+                    #388e3c 0deg 30deg, 
+                    #4caf50 30deg 60deg, 
+                    #66bb6a 60deg 90deg, 
+                    #4caf50 90deg 120deg),
+                radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px, 25px 25px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.8;
+        }
+        
+        .desert-zone {
+            position: absolute;
+            background-image:
+                linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+                linear-gradient(135deg, #ffcc02 0%, #ffc107 50%, #ff8f00 100%);
+            background-size: 30px 30px, 30px 30px, 30px 30px, 30px 30px, 100% 100%;
+            background-position: 0 0, 0 15px, 15px -15px, -15px 0px, 0 0;
+            opacity: 0.7;
+        }
+        
+        .grass-zone {
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(
+                    90deg,
+                    #4caf50 0px,
+                    #66bb6a 2px,
+                    #4caf50 4px,
+                    #388e3c 6px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(255,255,255,0.1) 1px,
+                    transparent 2px
+                );
+            background-size: 8px 8px, 4px 4px;
+            opacity: 0.8;
+        }
+        
+        .lava-zone {
+            position: absolute;
+            background-image:
+                radial-gradient(circle at 25% 25%, #ff5722 30%, transparent 30%),
+                radial-gradient(circle at 75% 75%, #d84315 20%, transparent 20%),
+                linear-gradient(45deg, #ff3d00 25%, transparent 25%),
+                linear-gradient(-45deg, #bf360c 25%, transparent 25%);
+            background-size: 40px 40px, 30px 30px, 20px 20px, 20px 20px;
+            background-color: #ff5722;
+            opacity: 0.8;
+            animation: lavaFlow 3s ease-in-out infinite;
+        }
+        
+        .breakable-wall {
+            position: absolute;
+            background: #8d6e63;
+            border: 2px dashed #6d4c41;
+            opacity: 0.9;
+        }
+        
+        @keyframes waterFlow {
+            0% { background-position: 0 0, 10px 10px, 0 0; }
+            100% { background-position: 20px 0, 30px 10px, 0 0; }
+        }
+        
+        @keyframes lavaFlow {
+            0%, 100% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.2) hue-rotate(10deg); }
+        }
+        
+        #player {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #444;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #666;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 200;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #666;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 200;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #666;
+            pointer-events: none;
+        }
+        
+        .maze-wall {
+            position: absolute;
+            border: 1px solid rgba(0,0,0,0.3);
+        }
+        
+        .tree-wall {
+            position: absolute;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .friendly {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+        }
+        
+        .key {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glow 2s infinite;
+            z-index: 60;
+        }
+        
+        .heart-pickup {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: heartbeat 1s infinite;
+            z-index: 60;
+        }
+        
+        .money-pickup {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glow 2s infinite;
+            z-index: 60;
+        }
+        
+        .exit {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,255,0,0.3);
+            border: 2px solid #00ff00;
+            border-radius: 6px;
+            z-index: 70;
+        }
+        
+        .foreground-enemy {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            font-size: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px gold); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 10px gold); }
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 400;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            opacity: 0.9;
+        }
+        
+        #startScreen, #levelComplete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
+        h2, h3 {
+            margin: 10px 0;
+        }
+        
+        .control-hint {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🌍 Colorful World</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div id="keyStatus">🔑 Find the key!</div>
+            <div>💰 <span id="money">0</span>¥</div>
+        </div>
+        <div id="timer">3:00</div>
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player">🧙‍♂️</div>
+            </div>
+        </div>
+        <div id="message"></div>
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">🌈 Colorful Maze</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
+            </div>
+            <div class="control-hint">
+                <div>🎮 Swipe to explore the colorful world!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Find items, buy upgrades, reach the exit!</div>
+            </div>
+        </div>
+        
+        <div id="startScreen">
+            <h2>🌈 Colorful Maze Adventure</h2>
+            <p style="margin: 20px 0;">Explore a magical world of colors and challenges!</p>
+            <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🚪</p>
+            <button class="start-button" onclick="startGame()">Start Adventure!</button>
+        </div>
+        
+        <div id="levelComplete" style="display: none;">
+            <h3 id="levelCompleteTitle">Level Complete!</h3>
+            <p id="levelCompleteText">Great job!</p>
+            <button id="retryButton" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m1.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+class MazeGame {
+    constructor() {
+        this.hearts = 3;
+        this.hasKey = false;
+        this.gameStarted = false;
+        this.timeLeft = 180;
+        this.timerInterval = null;
+        this.isInvulnerable = false;
+        this.money = 0;
+        
+        // New items
+        this.hasBoat = false;
+        this.hasHammer = false;
+        this.hasLavaShoes = false;
+        this.isOnWater = false;
+        this.originalEmoji = '🧙‍♂️';
+        this.lastLavaDamage = 0;
+        
+        // Movement properties
+        this.playerX = 1300;
+        this.playerY = 1760;
+        this.playerVelocityX = 0;
+        this.playerVelocityY = 0;
+        this.isDragging = false;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
+        this.lastDragX = 0;
+        this.lastDragY = 0;
+        
+        this.movingEnemies = [];
+        this.foregroundEnemy = null;
+        this.lastForegroundSpawn = Date.now();
+        this.lastInteractionTime = {};
+        
+        this.player = document.getElementById('player');
+        this.gameWorld = document.getElementById('gameWorld');
+        this.gameArea = document.getElementById('gameArea');
+        this.controlArea = document.getElementById('controlArea');
+        this.bgMusic = document.getElementById('bgMusic');
+        
+        this.bindEvents();
+        this.startGameLoop();
+    }
+    
+    bindEvents() {
+        this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+        this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+        this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+        
+        this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+        this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+        this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+        this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+    }
+    
+    handleStart(e) {
+        if (!this.gameStarted) return;
+        e.preventDefault();
+        
+        this.isDragging = true;
+        const point = e.touches ? e.touches[0] : e;
+        this.dragStartX = point.clientX;
+        this.dragStartY = point.clientY;
+        this.lastDragX = point.clientX;
+        this.lastDragY = point.clientY;
+    }
+    
+    handleMove(e) {
+        if (!this.isDragging || !this.gameStarted) return;
+        e.preventDefault();
+        
+        const point = e.touches ? e.touches[0] : e;
+        const deltaX = point.clientX - this.lastDragX;
+        const deltaY = point.clientY - this.lastDragY;
+        
+        const sensitivity = 0.5;
+        this.playerVelocityX = deltaX * sensitivity;
+        this.playerVelocityY = deltaY * sensitivity;
+
+        const maxVelocity = 14;
+        this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+        this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+        
+        this.lastDragX = point.clientX;
+        this.lastDragY = point.clientY;
+    }
+    
+    handleEnd(e) {
+        this.isDragging = false;
+        this.playerVelocityX = 0;
+        this.playerVelocityY = 0;
+    }
+    
+    startGameTimer() {
+        this.gameStarted = true;
+        this.timeLeft = 180;
+        this.updateTimer();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        
+        this.timerInterval = setInterval(() => {
+            this.timeLeft--;
+            this.updateTimer();
+            
+            if (this.timeLeft <= 0) {
+                this.timeUp();
+            }
+        }, 1000);
+    }
+    
+    updateTimer() {
+        const minutes = Math.floor(this.timeLeft / 60);
+        const seconds = this.timeLeft % 60;
+        const timerEl = document.getElementById('timer');
+        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (this.timeLeft <= 60) {
+            timerEl.style.background = 'rgba(255,0,0,0.9)';
+        } else if (this.timeLeft <= 180) {
+            timerEl.style.background = 'rgba(255,165,0,0.8)';
+        }
+    }
+    
+    timeUp() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.showMessage('⏰ Time\'s up!');
+        setTimeout(() => {
+            this.showLevelComplete('⏰ Time Up!', 'Try again!');
+        }, 2000);
+    }
+    
+    initLevel() {
+        const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone');
+        elements.forEach(el => el.remove());
+        
+        this.movingEnemies = [];
+        this.foregroundEnemy = null;
+        this.lastForegroundSpawn = Date.now();
+        this.hasKey = false;
+        this.lastInteractionTime = {};
+        
+        this.updateUI();
+        this.generateMaze();
+        
+        // Center camera on player
+        const gameAreaWidth = this.gameArea.offsetWidth;
+        const gameAreaHeight = this.gameArea.offsetHeight;
+        const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+        const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+        this.gameArea.scrollTo({
+            left: scrollX,
+            top: scrollY,
+            behavior: 'auto'
+        });
+    }
+    
+    generateMaze() {
+        // Create background zones
+        this.createBackgroundZones();
+        
+        // Create colored walls from the data
+        this.createColoredWalls();
+        
+        // Add tree walls
+        this.addTreeWalls();
+        
+        // Set player position
+        this.playerX = 1300;
+        this.playerY = 1760;
+        this.player.style.left = this.playerX + 'px';
+        this.player.style.top = this.playerY + 'px';
+        
+        // Create enemies scattered throughout the maze
+        this.createEnemies();
+        
+        // Create friendlies
+        this.createFriendlies();
+        
+        // Create collectibles
+        this.createCollectibles();
+        
+        // Create exit
+        this.createExit();
+    }
+    
+    createBackgroundZones() {
+        // Water zone with animated wave pattern (top-left) - requires boat
+        const waterZone = document.createElement('div');
+        waterZone.className = 'water-zone';
+        waterZone.style.left = '0px';
+        waterZone.style.top = '0px';
+        waterZone.style.width = ‘200px';
+        waterZone.style.height = ‘200px';
+        waterZone.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone);
+        
+	// Water zone 2
+const waterZone2 = document.createElement('div');
+waterZone2.className = 'water-zone';
+waterZone2.style.left = '300px';
+waterZone2.style.top = '200px';     // You can change this Y value
+waterZone2.style.width = '100px';
+waterZone2.style.height = '100px';
+waterZone2.dataset.zoneType = 'water';
+this.gameWorld.appendChild(waterZone2);
+
+// Water zone 3
+const waterZone3 = document.createElement('div');
+waterZone3.className = 'water-zone';
+waterZone3.style.left = '300px';
+waterZone3.style.top = '400px';     // You can change this Y value
+waterZone3.style.width = '100px';
+waterZone3.style.height = '100px';
+waterZone3.dataset.zoneType = 'water';
+this.gameWorld.appendChild(waterZone3);
+
+        // Grass zone with nice texture (middle-left)
+        const grassZone = document.createElement('div');
+        grassZone.className = 'grass-zone';
+        grassZone.style.left = '0px';
+        grassZone.style.top = ‘250px';
+        grassZone.style.width = ‘200px';
+        grassZone.style.height = ‘200px';
+        this.gameWorld.appendChild(grassZone);
+        
+        // Forest zone with geometric leaf pattern (middle-right)
+        const forestZone = document.createElement('div');
+        forestZone.className = 'forest-zone';
+        forestZone.style.left = '0px';
+        forestZone.style.top = ‘500px';
+        forestZone.style.width = ‘200px';
+        forestZone.style.height = ‘200px';
+        this.gameWorld.appendChild(forestZone);
+        
+        // Lava zone - damages player without special shoes
+        const lavaZone = document.createElement('div');
+        lavaZone.className = 'lava-zone';
+        lavaZone.style.left = ‘0px';
+        lavaZone.style.top = ‘750px';
+        lavaZone.style.width = ‘200px';
+        lavaZone.style.height = ‘200px';
+        lavaZone.dataset.zoneType = 'lava';
+        this.gameWorld.appendChild(lavaZone);
+        
+	// Lava zone 2
+const lavaZone2 = document.createElement('div');
+lavaZone2.className = 'lava-zone';
+lavaZone2.style.left = '300px';
+lavaZone2.style.top = '600px';     // You can change this Y value
+lavaZone2.style.width = '100px';
+lavaZone2.style.height = '100px';
+lavaZone2.dataset.zoneType = 'lava';
+this.gameWorld.appendChild(lavaZone2);
+
+// Lava zone 3
+const lavaZone3 = document.createElement('div');
+lavaZone3.className = 'lava-zone';
+lavaZone3.style.left = '300px';
+lavaZone3.style.top = '800px';     // You can change this Y value
+lavaZone3.style.width = '100px';
+lavaZone3.style.height = '100px';
+lavaZone3.dataset.zoneType = 'lava';
+this.gameWorld.appendChild(lavaZone3);
+
+        // Desert zone with sand pattern (bottom-right)
+        const desertZone = document.createElement('div');
+        desertZone.className = 'desert-zone';
+        desertZone.style.left = ‘0px';
+        desertZone.style.top = '1000px';
+        desertZone.style.width = ‘200px';
+        desertZone.style.height = ‘200px';
+        this.gameWorld.appendChild(desertZone);
+    }
+    
+    createColoredWalls() {
+        const wallData = {
+            black: [
+                {x: 0, y: 0, w: 1800, h: 20},
+                {x: 0, y: 0, w: 20, h: 1800},
+                {x: 1800, y: 0, w: 20, h: 1800},
+                {x: 0, y: 1800, w: 1800, h: 20},
+                {x: 1095, y: 266, w: 20, h: 354}
+            ],
+            red: [
+                {x: 1350, y: 0, w: 20, h: 549},
+                {x: 823, y: 1348, w: 386, h: 20}
+            ],
+            green: [
+                {x: 0, y: 655, w: 402, h: 20},
+                {x: 572, y: 211, w: 20, h: 433}
+            ],
+            blue: [
+                {x: 493, y: 632, w: 20, h: 386},
+                {x: 902, y: 892, w: 20, h: 252}
+            ],
+            purple: [
+                {x: 332, y: 471, w: 1019, h: 20},
+                {x: 867, y: 1493, w: 20, h: 307}
+            ],
+            gray: [
+                {x: 1350, y: 1013, w: 450, h: 20},
+                {x: 1590, y: 966, w: 20, h: 476}
+            ],
+            hotpink: [
+                {x: 0, y: 1423, w: 336, h: 20},
+                {x: 225, y: 1364, w: 20, h: 248}
+            ]
+        };
+        
+        Object.entries(wallData).forEach(([color, walls]) => {
+            walls.forEach(wall => {
+                const wallEl = document.createElement('div');
+                wallEl.className = 'maze-wall';
+                wallEl.style.left = wall.x + 'px';
+                wallEl.style.top = wall.y + 'px';
+                wallEl.style.width = wall.w + 'px';
+                wallEl.style.height = wall.h + 'px';
+                wallEl.style.background = color;
+                this.gameWorld.appendChild(wallEl);
+            });
+        });
+        
+        // Add some breakable walls
+        this.createBreakableWalls();
+    }
+    
+    createBreakableWalls() {
+        const breakableWalls = [
+            {x: 1000, y: 600, w: 60, h: 20},
+            {x: 400, y: 1000, w: 20, h: 80}
+        ];
+        
+        breakableWalls.forEach(wall => {
+            const wallEl = document.createElement('div');
+            wallEl.className = 'breakable-wall';
+            wallEl.style.left = wall.x + 'px';
+            wallEl.style.top = wall.y + 'px';
+            wallEl.style.width = wall.w + 'px';
+            wallEl.style.height = wall.h + 'px';
+            wallEl.dataset.breakable = 'true';
+            this.gameWorld.appendChild(wallEl);
+        });
+    }
+    
+    addTreeWalls() {
+        const treePositions = [
+            {x: 600, y: 1300}, {x: 620, y: 1320}, {x: 640, y: 1300},
+            {x: 1500, y: 1200}, {x: 1520, y: 1220}, {x: 1540, y: 1200}
+        ];
+        
+        const treeEmojis = ['🌲', '🌳', '🎄'];
+        
+        treePositions.forEach((pos, index) => {
+            const treeEl = document.createElement('div');
+            treeEl.className = 'tree-wall';
+            treeEl.textContent = treeEmojis[index % treeEmojis.length];
+            treeEl.style.left = pos.x + 'px';
+            treeEl.style.top = pos.y + 'px';
+            treeEl.style.width = '20px';
+            treeEl.style.height = '20px';
+            this.gameWorld.appendChild(treeEl);
+        });
+    }
+    
+    createEnemies() {
+        const enemies = [
+            {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6},
+            {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5},
+            {x: 800, y: 300, moveX: 780, moveY: 300, range: 120, axis: 'x', speed: 0.7},
+            {x: 1000, y: 700, moveX: 980, moveY: 700, range: 100, axis: 'x', speed: 0.7},
+            {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6},
+            {x: 1400, y: 1200, moveX: 1380, moveY: 1200, range: 120, axis: 'x', speed: 0.8},
+            {x: 700, y: 1600, moveX: 700, moveY: 1580, range: 100, axis: 'y', speed: 0.7}
+        ];
+        
+        const enemyEmojis = ['🦠', '💉', '👾', '🐍'];
+        
+        enemies.forEach((enemy, index) => {
+            const enemyEl = document.createElement('div');
+            enemyEl.className = 'enemy';
+            enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
+            enemyEl.style.left = enemy.x + 'px';
+            enemyEl.style.top = enemy.y + 'px';
+            this.gameWorld.appendChild(enemyEl);
+            
+            this.movingEnemies.push({
+                element: enemyEl,
+                startX: enemy.moveX,
+                startY: enemy.moveY,
+                currentX: enemy.x,
+                currentY: enemy.y,
+                range: enemy.range,
+                axis: enemy.axis,
+                direction: 1,
+                speed: enemy.speed
+            });
+        });
+    }
+    
+    createFriendlies() {
+        const friendlies = [
+            {x: 100, y: 300, message: "🔑 Need a key? Give me 500¥!"},
+            {x: 1200, y: 600, message: "⛵ Want a boat? 300¥ and you can sail!"},
+            {x: 500, y: 1400, message: "🔨 Hammer for sale! Break walls for 400¥!"},
+            {x: 1500, y: 800, message: "👠 Lava-proof shoes! Only 600¥!"}
+        ];
+        
+        const friendlyEmojis = ['👴🏻', '👩‍⚕️', '🧙‍♀️', '👷‍♂️'];
+        
+        friendlies.forEach((friendly, index) => {
+            const friendlyEl = document.createElement('div');
+            friendlyEl.className = 'friendly';
+            friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
+            friendlyEl.style.left = friendly.x + 'px';
+            friendlyEl.style.top = friendly.y + 'px';
+            friendlyEl.dataset.message = friendly.message;
+            this.gameWorld.appendChild(friendlyEl);
+        });
+    }
+    
+    createCollectibles() {
+        // Money pickups - positioned in open areas of your maze
+        const moneyPositions = [
+            {x: 300, y: 50}, {x: 400, y: 150}, {x: 800, y: 200},
+            {x: 200, y: 50}, {x: 500, y: 150}, {x: 900, y: 200},
+            {x: 100, y: 50}, {x: 600, y: 150}, {x: 700, y: 200},
+            {x: 1450, y: 350}, {x: 300, y: 700}, {x: 800, y: 500},
+            {x: 1000, y: 1100}, {x: 400, y: 1250}, {x: 1300, y: 900},
+            {x: 700, y: 1400}, {x: 1500, y: 1100}, {x: 150, y: 1500}
+        ];
+        
+        moneyPositions.forEach(pos => {
+            const moneyEl = document.createElement('div');
+            moneyEl.className = 'money-pickup';
+            moneyEl.textContent = '💰';
+            moneyEl.style.left = pos.x + 'px';
+            moneyEl.style.top = pos.y + 'px';
+            this.gameWorld.appendChild(moneyEl);
+        });
+        
+        // Heart pickups - strategically placed
+        const heartPositions = [
+            {x: 600, y: 400}, {x: 300, y: 1100}, {x: 1400, y: 700}
+        ];
+        
+        heartPositions.forEach(pos => {
+            const heartEl = document.createElement('div');
+            heartEl.className = 'heart-pickup';
+            heartEl.textContent = '❤️';
+            heartEl.style.left = pos.x + 'px';
+            heartEl.style.top = pos.y + 'px';
+            this.gameWorld.appendChild(heartEl);
+        });
+    }
+    
+    createExit() {
+        // Place exit in the top-left corner area
+        const exitEl = document.createElement('div');
+        exitEl.className = 'exit';
+        exitEl.textContent = '🚪';
+        exitEl.style.left = '50px';
+        exitEl.style.top = '50px';
+        this.gameWorld.appendChild(exitEl);
+    }
+    
+    startGameLoop() {
+        const gameLoop = () => {
+            if (this.gameStarted) {
+                this.updatePlayer();
+                this.updateMovingEnemies();
+                this.updateForegroundEnemy();
+                this.checkCollisions();
+            }
+            requestAnimationFrame(gameLoop);
+        };
+        gameLoop();
+    }
+    
+    updatePlayer() {
+        if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+            const newX = this.playerX + this.playerVelocityX;
+            const newY = this.playerY + this.playerVelocityY;
+            
+            if (this.canMoveTo(newX, newY)) {
+                this.playerX = newX;
+                this.playerY = newY;
+                this.player.style.left = this.playerX + 'px';
+                this.player.style.top = this.playerY + 'px';
+                
+                // Center player in gameArea
+                const gameAreaWidth = this.gameArea.offsetWidth;
+                const gameAreaHeight = this.gameArea.offsetHeight;
+                const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+                const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+                this.gameArea.scrollTo({
+                    left: scrollX,
+                    top: scrollY,
+                    behavior: 'auto'
+                });
+            }
+            
+            this.playerVelocityX *= 0.9;
+            this.playerVelocityY *= 0.9;
+        }
+    }
+    
+    canMoveTo(x, y) {
+        const playerSize = 24;
+        const padding = 2;
+        
+        const points = [
+            {x: x + padding, y: y + padding},
+            {x: x + playerSize - padding, y: y + padding},
+            {x: x + padding, y: y + playerSize - padding},
+            {x: x + playerSize - padding, y: y + playerSize - padding},
+            {x: x + playerSize/2, y: y + padding},
+            {x: x + playerSize/2, y: y + playerSize - padding},
+            {x: x + padding, y: y + playerSize/2},
+            {x: x + playerSize - padding, y: y + playerSize/2}
+        ];
+        
+        const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall');
+        
+        for (let wall of walls) {
+            const wallRect = {
+                left: parseInt(wall.style.left),
+                top: parseInt(wall.style.top),
+                right: parseInt(wall.style.left) + (parseInt(wall.style.width) || 20),
+                bottom: parseInt(wall.style.top) + (parseInt(wall.style.height) || 20)
+            };
+            
+            for (let point of points) {
+                if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                    point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                    
+                    // Check if it's a breakable wall and player has hammer
+                    if (wall.dataset.breakable === 'true' && this.hasHammer) {
+                        this.breakWall(wall);
+                        return true; // Allow movement through broken wall
+                    }
+                    return false;
+                }
+            }
+        }
+        
+        // Check water zones - need boat to enter
+        const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+        let isEnteringWater = false;
+        
+        for (let zone of waterZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (x + playerSize/2 >= zoneRect.left && x + playerSize/2 <= zoneRect.right &&
+                y + playerSize/2 >= zoneRect.top && y + playerSize/2 <= zoneRect.bottom) {
+                isEnteringWater = true;
+                break;
+            }
+        }
+        
+        if (isEnteringWater && !this.hasBoat) {
+            this.showMessage('🌊 You need a boat to cross water!');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    breakWall(wall) {
+        this.showMessage('🔨 *SMASH* Wall broken!');
+        wall.remove();
+    }
+    
+    updateMovingEnemies() {
+        this.movingEnemies.forEach(enemy => {
+            if (enemy.axis === 'x') {
+                enemy.currentX += enemy.direction * enemy.speed;
+                if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.left = enemy.currentX + 'px';
+            } else {
+                enemy.currentY += enemy.direction * enemy.speed;
+                if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.top = enemy.currentY + 'px';
+            }
+        });
+    }
+    
+    updateForegroundEnemy() {
+        if (!this.gameStarted) return;
+        const now = Date.now();
+        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 25000) {
+            const playerCenterX = this.playerX + 12;
+            const direction = playerCenterX < 900 ? 1 : -1;
+            const startX = direction > 0 ? -60 : 1860;
+            const y = Math.random() * 1740;
+            const speed = (1860 / 25) / 60;
+            
+            const enemyEl = document.createElement('div');
+            enemyEl.className = 'foreground-enemy';
+            enemyEl.textContent = '🌪️';
+            enemyEl.style.left = startX + 'px';
+            enemyEl.style.top = y + 'px';
+            this.gameWorld.appendChild(enemyEl);
+            
+            this.foregroundEnemy = {
+                element: enemyEl,
+                x: startX,
+                y: y,
+                speed: speed,
+                direction: direction
+            };
+            this.lastForegroundSpawn = now;
+        }
+        
+        if (this.foregroundEnemy) {
+            this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
+            this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+            this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+            
+            if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 1860) {
+                this.foregroundEnemy.element.remove();
+                this.foregroundEnemy = null;
+            }
+        }
+    }
+    
+    checkCollisions() {
+        if (this.isInvulnerable) return;
+        
+        const playerRect = {
+            left: this.playerX,
+            top: this.playerY,
+            right: this.playerX + 24,
+            bottom: this.playerY + 24
+        };
+        
+        // Check zone-based effects
+        this.checkZoneEffects();
+        
+        // Check enemy collisions
+        this.movingEnemies.forEach(enemy => {
+            const enemyRect = {
+                left: enemy.currentX,
+                top: enemy.currentY,
+                right: enemy.currentX + 22,
+                bottom: enemy.currentY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, enemyRect)) {
+                this.takeDamage();
+            }
+        });
+        
+        // Check foreground enemy collision
+        if (this.foregroundEnemy) {
+            const fgEnemyRect = {
+                left: this.foregroundEnemy.x,
+                top: this.foregroundEnemy.y,
+                right: this.foregroundEnemy.x + 60,
+                bottom: this.foregroundEnemy.y + 60
+            };
+            
+            if (this.rectsOverlap(playerRect, fgEnemyRect)) {
+                this.hearts = 0;
+                this.takeDamage();
+            }
+        }
+        
+        // Check friendly NPCs
+        const friendlies = this.gameWorld.querySelectorAll('.friendly');
+        friendlies.forEach(friendly => {
+            const friendlyX = parseInt(friendly.style.left);
+            const friendlyY = parseInt(friendly.style.top);
+            const friendlyRect = {
+                left: friendlyX,
+                top: friendlyY,
+                right: friendlyX + 22,
+                bottom: friendlyY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, friendlyRect)) {
+                const now = Date.now();
+                const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
+                if (now - lastTime > 1800) {
+                    this.handleNPCInteraction(friendly);
+                    this.lastInteractionTime[friendly.dataset.message] = now;
+                }
+            }
+        });
+        
+        // Check heart pickup
+        const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
+        hearts.forEach(heart => {
+            const heartX = parseInt(heart.style.left);
+            const heartY = parseInt(heart.style.top);
+            const heartRect = {
+                left: heartX,
+                top: heartY,
+                right: heartX + 22,
+                bottom: heartY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, heartRect)) {
+                if (this.hearts < 3) {
+                    this.hearts++;
+                    this.showMessage('❤️ Health restored!');
+                    this.updateUI();
+                    heart.remove();
+                }
+            }
+        });
+        
+        // Check money pickup
+        const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
+        moneyItems.forEach(money => {
+            const moneyX = parseInt(money.style.left);
+            const moneyY = parseInt(money.style.top);
+            const moneyRect = {
+                left: moneyX,
+                top: moneyY,
+                right: moneyX + 22,
+                bottom: moneyY + 22
+            };
+            
+            if (this.rectsOverlap(playerRect, moneyRect)) {
+                this.money += 100;
+                this.showMessage('💰 +100¥ collected!');
+                this.updateUI();
+                money.remove();
+            }
+        });
+        
+        // Check exit
+        const exit = this.gameWorld.querySelector('.exit');
+        if (exit) {
+            const exitX = parseInt(exit.style.left);
+            const exitY = parseInt(exit.style.top);
+            const exitRect = {
+                left: exitX,
+                top: exitY,
+                right: exitX + 30,
+                bottom: exitY + 30
+            };
+            
+            if (this.rectsOverlap(playerRect, exitRect)) {
+                if (this.hasKey) {
+                    this.completeLevel();
+                } else {
+                    this.showMessage('🔑 You need a key to exit!');
+                }
+            }
+        }
+    }
+    
+    checkZoneEffects() {
+        const playerCenterX = this.playerX + 12;
+        const playerCenterY = this.playerY + 12;
+        
+        // Check if on water
+        const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+        let onWater = false;
+        
+        for (let zone of waterZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onWater = true;
+                break;
+            }
+        }
+        
+        // Update player emoji based on water status
+        if (onWater && this.hasBoat && !this.isOnWater) {
+            this.isOnWater = true;
+            this.player.textContent = '⛵';
+        } else if (!onWater && this.isOnWater) {
+            this.isOnWater = false;
+            this.player.textContent = this.originalEmoji;
+        }
+        
+        // Check if on lava
+        const lavaZones = this.gameWorld.querySelectorAll('[data-zone-type="lava"]');
+        let onLava = false;
+        
+        for (let zone of lavaZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onLava = true;
+                break;
+            }
+        }
+        
+        // Lava damage
+        if (onLava && !this.hasLavaShoes) {
+            const now = Date.now();
+            if (now - this.lastLavaDamage > 1000) { // Damage every second
+                this.takeDamage();
+                this.showMessage('🔥 Lava burns! You need special shoes!');
+                this.lastLavaDamage = now;
+            }
+        }
+    }
+    
+    handleNPCInteraction(friendly) {
+        const message = friendly.dataset.message;
+        
+        if (message === "🔑 Need a key? Give me 500¥!" && !this.hasKey) {
+            if (this.money >= 500) {
+                this.money -= 500;
+                this.hasKey = true;
+                this.showMessage('Thank you! Here\'s your key! 🔑');
+                friendly.dataset.message = 'Thank you for your business!';
+                this.updateUI();
+            } else {
+                this.showMessage('🔑 Need a key? Give me 500¥!');
+            }
+        } else if (message === "⛵ Want a boat? 300¥ and you can sail!" && !this.hasBoat) {
+            if (this.money >= 300) {
+                this.money -= 300;
+                this.hasBoat = true;
+                this.showMessage('⛵ Boat purchased! Now you can sail!');
+                friendly.dataset.message = 'Enjoy your boat!';
+                this.updateUI();
+            } else {
+                this.showMessage('⛵ Want a boat? 300¥ and you can sail!');
+            }
+        } else if (message === "🔨 Hammer for sale! Break walls for 400¥!" && !this.hasHammer) {
+            if (this.money >= 400) {
+                this.money -= 400;
+                this.hasHammer = true;
+                this.showMessage('🔨 Hammer purchased! Break through walls!');
+                friendly.dataset.message = 'Use that hammer wisely!';
+                this.updateUI();
+            } else {
+                this.showMessage('🔨 Hammer for sale! Break walls for 400¥!');
+            }
+        } else if (message === "👠 Lava-proof shoes! Only 600¥!" && !this.hasLavaShoes) {
+            if (this.money >= 600) {
+                this.money -= 600;
+                this.hasLavaShoes = true;
+                this.showMessage('👠 Lava shoes purchased! Walk on lava safely!');
+                friendly.dataset.message = 'Those shoes will protect you!';
+                this.updateUI();
+            } else {
+                this.showMessage('👠 Lava-proof shoes! Only 600¥!');
+            }
+        } else {
+            this.showMessage(message);
+        }
+    }
+    
+    rectsOverlap(rect1, rect2) {
+        return rect1.left < rect2.right &&
+               rect1.right > rect2.left &&
+               rect1.top < rect2.bottom &&
+               rect1.bottom > rect2.top;
+    }
+    
+    takeDamage() {
+        if (this.isInvulnerable) return;
+        
+        this.hearts--;
+        this.showMessage('💔 Ouch!');
+        this.updateUI();
+        
+        this.isInvulnerable = true;
+        this.player.classList.add('invulnerable');
+        
+        setTimeout(() => {
+            this.isInvulnerable = false;
+            this.player.classList.remove('invulnerable');
+        }, 1000);
+        
+        if (this.hearts <= 0) {
+            this.gameOver();
+        }
+    }
+    
+    showMessage(text) {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.style.display = 'block';
+        
+        clearTimeout(this.messageTimeout);
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+    
+    updateUI() {
+        document.getElementById('hearts').textContent = this.hearts;
+        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Got it!' : '🔑 Find the key!';
+        document.getElementById('money').textContent = this.money;
+        
+        // Update UI to show owned items
+        const ui = document.getElementById('ui');
+        let itemsText = '';
+        if (this.hasBoat) itemsText += ' ⛵';
+        if (this.hasHammer) itemsText += ' 🔨';
+        if (this.hasLavaShoes) itemsText += ' 👠';
+        
+        // Add items display if not already there
+        if (!document.getElementById('items')) {
+            const itemsDiv = document.createElement('div');
+            itemsDiv.id = 'items';
+            itemsDiv.textContent = 'Items:' + itemsText;
+            ui.appendChild(itemsDiv);
+        } else {
+            document.getElementById('items').textContent = 'Items:' + itemsText;
+        }
+    }
+    
+    completeLevel() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.showLevelComplete('🎉 Adventure Complete!', 'You escaped the colorful maze!');
+    }
+    
+    gameOver() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.showMessage('💀 Game Over!');
+        setTimeout(() => {
+            this.showLevelComplete('💀 Game Over', 'Try again!');
+        }, 2000);
+    }
+    
+    showLevelComplete(title, text) {
+        document.getElementById('levelCompleteTitle').textContent = title;
+        document.getElementById('levelCompleteText').textContent = text;
+        document.getElementById('levelComplete').style.display = 'flex';
+    }
+}
+
+let game;
+
+function startGame() {
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none';
+    
+    game = new MazeGame();
+    game.initLevel();
+    game.startGameTimer();
+}
+
+function restartGame() {
+    window.location.reload();
+}
+    </script>
+</body>
+</html>
