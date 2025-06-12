@@ -522,7 +522,7 @@ class MazeGame {
         
         this.bindEvents();
         this.startGameLoop();
-    }
+
 
 enterForest() {
     this.isInForest = true;
@@ -551,7 +551,7 @@ exitForest() {
     
     this.showMessage('🌞 Exiting the forest...');
 }
-
+    }
 	
     bindEvents() {
         this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
