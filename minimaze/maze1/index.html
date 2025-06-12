@@ -504,9 +504,11 @@ class MazeGame {
         const deltaX = point.clientX - this.lastDragX;
         const deltaY = point.clientY - this.lastDragY;
         
-        const sensitivity = 0.5;
-        this.playerVelocityX = deltaX * sensitivity;
-        this.playerVelocityY = deltaY * sensitivity;
+        // Reduce sensitivity when on desert (quarter speed)
+const baseSensitivity = 0.5;
+const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
+this.playerVelocityX = deltaX * sensitivity;
+this.playerVelocityY = deltaY * sensitivity;
 
         const maxVelocity = 14;
         this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
@@ -931,8 +933,10 @@ this.gameWorld.appendChild(lavaZone3);
                 });
             }
             
-            this.playerVelocityX *= 0.9;
-            this.playerVelocityY *= 0.9;
+            // Apply different friction based on terrain
+const friction = this.isOnDesert ? 0.7 : 0.9;  // More friction = slower on desert
+this.playerVelocityX *= friction;
+this.playerVelocityY *= friction;
         }
     }
     
