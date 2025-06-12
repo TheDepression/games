@@ -523,7 +523,36 @@ class MazeGame {
         this.bindEvents();
         this.startGameLoop();
     }
+
+enterForest() {
+    this.isInForest = true;
     
+    // Switch music
+    this.bgMusic.pause();
+    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+    
+    // Show forest overlay and vision mask
+    document.getElementById('forestOverlay').classList.add('active');
+    document.getElementById('forestVisionMask').classList.add('active');
+    
+    this.showMessage('🌲 Entering the dense forest...');
+}
+
+exitForest() {
+    this.isInForest = false;
+    
+    // Switch music back
+    this.forestMusic.pause();
+    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    // Hide forest overlay and vision mask
+    document.getElementById('forestOverlay').classList.remove('active');
+    document.getElementById('forestVisionMask').classList.remove('active');
+    
+    this.showMessage('🌞 Exiting the forest...');
+}
+
+	
     bindEvents() {
         this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
         this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
@@ -1503,33 +1532,7 @@ function restartGame() {
     window.location.reload();
 }
 
-	enterForest() {
-    this.isInForest = true;
-    
-    // Switch music
-    this.bgMusic.pause();
-    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
-    
-    // Show forest overlay and vision mask
-    document.getElementById('forestOverlay').classList.add('active');
-    document.getElementById('forestVisionMask').classList.add('active');
-    
-    this.showMessage('🌲 Entering the dense forest...');
-}
-
-exitForest() {
-    this.isInForest = false;
-    
-    // Switch music back
-    this.forestMusic.pause();
-    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-    
-    // Hide forest overlay and vision mask
-    document.getElementById('forestOverlay').classList.remove('active');
-    document.getElementById('forestVisionMask').classList.remove('active');
-    
-    this.showMessage('🌞 Exiting the forest...');
-}
+	
     </script>
 </body>
 </html>
