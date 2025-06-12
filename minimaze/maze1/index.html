@@ -380,6 +380,48 @@
             margin-top: 10px;
             font-size: 12px;
         }
+
+	    .forest-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image:
+        radial-gradient(circle at 20% 30%, #2e7d32 8px, transparent 8px),
+        radial-gradient(circle at 60% 20%, #388e3c 6px, transparent 6px),
+        radial-gradient(circle at 80% 60%, #4caf50 10px, transparent 10px),
+        radial-gradient(circle at 30% 80%, #2e7d32 7px, transparent 7px),
+        radial-gradient(circle at 70% 75%, #1b5e20 5px, transparent 5px),
+        linear-gradient(135deg, rgba(46, 125, 50, 0.4) 0%, rgba(27, 94, 32, 0.6) 100%);
+    background-size: 40px 40px, 60px 60px, 35px 35px, 50px 50px, 45px 45px, 100% 100%;
+    background-position: 0 0, 20px 30px, 40px 10px, 10px 40px, 30px 20px, 0 0;
+    pointer-events: none;
+    z-index: 150;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.forest-overlay.active {
+    opacity: 0.8;
+}
+
+.forest-vision-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle 111px at 50% 50%, transparent 111px, black 111px);
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.forest-vision-mask.active {
+    opacity: 1;
+}
     </style>
 </head>
 <body>
@@ -420,13 +462,20 @@
             <p id="levelCompleteText">Great job!</p>
             <button id="retryButton" onclick="restartGame()">Play Again</button>
         </div>
+        
+        <!-- NEW: Forest overlay and vision mask -->
+        <div id="forestOverlay" class="forest-overlay"></div>
+        <div id="forestVisionMask" class="forest-vision-mask"></div>
     </div>
 
     <audio id="bgMusic" loop>
         <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m1.m4a" type="audio/mp4">
         Your browser does not support the audio element.
     </audio>
-
+<audio id="forestMusic" loop>
+    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">
+    Your browser does not support the audio element.
+</audio>
     <script>
 class MazeGame {
     constructor() {
@@ -457,6 +506,8 @@ class MazeGame {
         this.lastDragX = 0;
         this.lastDragY = 0;
 	this.isOnDesert = false;
+	this.isInForest = false;
+        this.forestMusic = document.getElementById('forestMusic');
         
         this.movingEnemies = [];
         this.foregroundEnemy = null;
@@ -1278,7 +1329,32 @@ for (let zone of desertZones) {
 
 // Update desert status
 this.isOnDesert = onDesert;
-    }	
+
+// Check if on forest zones
+const forestZones = this.gameWorld.querySelectorAll('.forest-zone');
+let onForest = false;
+
+for (let zone of forestZones) {
+    const zoneRect = {
+        left: parseInt(zone.style.left),
+        top: parseInt(zone.style.top),
+        right: parseInt(zone.style.left) + parseInt(zone.style.width),
+        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+    };
+    
+    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+        onForest = true;
+        break;
+    }
+}
+
+// Handle forest entry/exit
+if (onForest && !this.isInForest) {
+    this.enterForest();
+} else if (!onForest && this.isInForest) {
+    this.exitForest();
+}
     handleNPCInteraction(friendly) {
         const message = friendly.dataset.message;
         
@@ -1425,6 +1501,34 @@ function startGame() {
 
 function restartGame() {
     window.location.reload();
+}
+
+	enterForest() {
+    this.isInForest = true;
+    
+    // Switch music
+    this.bgMusic.pause();
+    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+    
+    // Show forest overlay and vision mask
+    document.getElementById('forestOverlay').classList.add('active');
+    document.getElementById('forestVisionMask').classList.add('active');
+    
+    this.showMessage('🌲 Entering the dense forest...');
+}
+
+exitForest() {
+    this.isInForest = false;
+    
+    // Switch music back
+    this.forestMusic.pause();
+    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    // Hide forest overlay and vision mask
+    document.getElementById('forestOverlay').classList.remove('active');
+    document.getElementById('forestVisionMask').classList.remove('active');
+    
+    this.showMessage('🌞 Exiting the forest...');
 }
     </script>
 </body>
