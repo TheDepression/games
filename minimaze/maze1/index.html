@@ -456,6 +456,7 @@ class MazeGame {
         this.dragStartY = 0;
         this.lastDragX = 0;
         this.lastDragY = 0;
+	this.isOnDesert = false;
         
         this.movingEnemies = [];
         this.foregroundEnemy = null;
@@ -1252,7 +1253,29 @@ this.gameWorld.appendChild(lavaZone3);
             }
         }
     }
+
+	// Check if on desert zones
+const desertZones = this.gameWorld.querySelectorAll('.desert-zone');
+let onDesert = false;
+
+for (let zone of desertZones) {
+    const zoneRect = {
+        left: parseInt(zone.style.left),
+        top: parseInt(zone.style.top),
+        right: parseInt(zone.style.left) + parseInt(zone.style.width),
+        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+    };
     
+    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+        onDesert = true;
+        break;
+    }
+}
+
+// Update desert status
+this.isOnDesert = onDesert;
+	
     handleNPCInteraction(friendly) {
         const message = friendly.dataset.message;
         
