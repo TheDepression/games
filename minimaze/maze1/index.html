@@ -785,7 +785,7 @@ this.playerVelocityY = deltaY * sensitivity;
         this.addTreeWalls();
         
         // Set player position
-this.playerX = 1300;
+this.playerX = 420;
 this.playerY = 1760;
 this.player.style.left = this.playerX + 'px';
 this.player.style.top = this.playerY + 'px';
@@ -810,29 +810,29 @@ this.updatePlayerImage('s'); // Start facing south
         const waterZone = document.createElement('div');
         waterZone.className = 'water-zone';
         waterZone.style.left = '0px';
-        waterZone.style.top = '0px';
-        waterZone.style.width = '200px';
-        waterZone.style.height = '200px';
+        waterZone.style.top = ‘70px';
+        waterZone.style.width = '250px';
+        waterZone.style.height = ‘580px';
         waterZone.dataset.zoneType = 'water';
         this.gameWorld.appendChild(waterZone);
         
         // Water zone 2
         const waterZone2 = document.createElement('div');
         waterZone2.className = 'water-zone';
-        waterZone2.style.left = '300px';
-        waterZone2.style.top = '200px';
-        waterZone2.style.width = '100px';
-        waterZone2.style.height = '100px';
+        waterZone2.style.left = ‘250px';
+        waterZone2.style.top = '0px';
+        waterZone2.style.width = ‘950px';
+        waterZone2.style.height = ‘300px';
         waterZone2.dataset.zoneType = 'water';
         this.gameWorld.appendChild(waterZone2);
 
         // Water zone 3
         const waterZone3 = document.createElement('div');
         waterZone3.className = 'water-zone';
-        waterZone3.style.left = '300px';
-        waterZone3.style.top = '400px';
+        waterZone3.style.left = ‘1290px';
+        waterZone3.style.top = ‘1060px';
         waterZone3.style.width = '100px';
-        waterZone3.style.height = '100px';
+        waterZone3.style.height = '120px';
         waterZone3.dataset.zoneType = 'water';
         this.gameWorld.appendChild(waterZone3);
 
@@ -840,66 +840,66 @@ this.updatePlayerImage('s'); // Start facing south
         const grassZone = document.createElement('div');
         grassZone.className = 'grass-zone';
         grassZone.style.left = '0px';
-        grassZone.style.top = '250px';
-        grassZone.style.width = '200px';
-        grassZone.style.height = '200px';
+        grassZone.style.top = ‘0px';
+        grassZone.style.width = '250px';
+        grassZone.style.height = ‘70px';
         this.gameWorld.appendChild(grassZone);
         
         // Forest zone with geometric leaf pattern (middle-right)
         const forestZone = document.createElement('div');
         forestZone.className = 'forest-zone';
-        forestZone.style.left = '0px';
-        forestZone.style.top = '500px';
-        forestZone.style.width = '200px';
-        forestZone.style.height = '200px';
+        forestZone.style.left = ‘260px';
+        forestZone.style.top = ‘310px';
+        forestZone.style.width = ‘750px';
+        forestZone.style.height = ‘360px';
         forestZone.dataset.zoneType = 'forest';
         this.gameWorld.appendChild(forestZone);
         
         // Lava zone - damages player without special shoes
         const lavaZone = document.createElement('div');
         lavaZone.className = 'lava-zone';
-        lavaZone.style.left = '0px';
-        lavaZone.style.top = '750px';
-        lavaZone.style.width = '200px';
-        lavaZone.style.height = '200px';
+        lavaZone.style.left = ‘1540px';
+        lavaZone.style.top = '0px';
+        lavaZone.style.width = ‘170px';
+        lavaZone.style.height = '260px';
         lavaZone.dataset.zoneType = 'lava';
         this.gameWorld.appendChild(lavaZone);
         
         // Lava zone 2
         const lavaZone2 = document.createElement('div');
         lavaZone2.className = 'lava-zone';
-        lavaZone2.style.left = '300px';
-        lavaZone2.style.top = '600px';
-        lavaZone2.style.width = '100px';
-        lavaZone2.style.height = '100px';
+        lavaZone2.style.left = ‘1540px';
+        lavaZone2.style.top = ‘250px';
+        lavaZone2.style.width = ‘240px';
+        lavaZone2.style.height = ‘200px';
         lavaZone2.dataset.zoneType = 'lava';
         this.gameWorld.appendChild(lavaZone2);
 
         // Lava zone 3
         const lavaZone3 = document.createElement('div');
         lavaZone3.className = 'lava-zone';
-        lavaZone3.style.left = '300px';
-        lavaZone3.style.top = '800px';
+        lavaZone3.style.left = ‘1290px';
+        lavaZone3.style.top = '810px';
         lavaZone3.style.width = '100px';
-        lavaZone3.style.height = '100px';
+        lavaZone3.style.height = ‘200px';
         lavaZone3.dataset.zoneType = 'lava';
         this.gameWorld.appendChild(lavaZone3);
 
         // Desert zone with sand pattern (bottom-right)
         const desertZone = document.createElement('div');
         desertZone.className = 'desert-zone';
-        desertZone.style.left = '0px';
-        desertZone.style.top = '1000px';
-        desertZone.style.width = '200px';
-        desertZone.style.height = '200px';
+        desertZone.style.left = ‘1100px';
+        desertZone.style.top = ‘1220px';
+        desertZone.style.width = ‘690px';
+        desertZone.style.height = ‘580px';
         desertZone.dataset.zoneType = 'desert';
         this.gameWorld.appendChild(desertZone);
 
         // Castle zone with custom image
 const castleZone = document.createElement('div');
 castleZone.className = 'castle-zone';
-castleZone.style.left = '1000px';
-castleZone.style.top = '1000px';
+castleZone.style.left = '1215px';
+castleZone.style.top = ‘520px';
 castleZone.style.width = '150px';
 castleZone.style.height = '250px';
 this.gameWorld.appendChild(castleZone);
@@ -912,31 +912,239 @@ this.gameWorld.appendChild(castleZone);
                 {x: 0, y: 0, w: 20, h: 1800},
                 {x: 1800, y: 0, w: 20, h: 1800},
                 {x: 0, y: 1800, w: 1800, h: 20},
-                {x: 1095, y: 266, w: 20, h: 354}
+                {x: 370, y: 1680, w: 20, h: 120},
+  {x: 480, y: 1680, w: 20, h: 120},
+  {x: 380, y: 1460, w: 20, h: 90},
+  {x: 290, y: 1600, w: 80, h: 20},
+  {x: 250, y: 1610, w: 20, h: 80},
+  {x: 100, y: 1690, w: 150, h: 20},
+  {x: 0, y: 1590, w: 140, h: 20},
+  {x: 130, y: 1300, w: 20, h: 190},
+  {x: 140, y: 1580, w: 50, h: 20},
+  {x: 190, y: 1240, w: 20, h: 340},
+  {x: 70, y: 1220, w: 140, h: 20},
+  {x: 80, y: 1180, w: 20, h: 40},
+  {x: 80, y: 1180, w: 200, h: 20},
+  {x: 240, y: 1050, w: 60, h: 20},
+  {x: 0, y: 1040, w: 170, h: 20},
+  {x: 0, y: 1090, w: 220, h: 20},
+  {x: 280, y: 1110, w: 90, h: 20},
+  {x: 370, y: 1110, w: 20, h: 180},
+  {x: 290, y: 1230, w: 80, h: 20},
+  {x: 290, y: 1230, w: 20, h: 200},
+  {x: 240, y: 1490, w: 60, h: 20},
+  {x: 350, y: 1340, w: 290, h: 20},
+  {x: 380, y: 1420, w: 20, h: 50},
+  {x: 290, y: 1420, w: 90, h: 20},
+  {x: 180, y: 1750, w: 20, h: 50},
+  {x: 610, y: 1610, w: 20, h: 190},
+  {x: 730, y: 1040, w: 20, h: 160},
+  {x: 530, y: 1190, w: 20, h: 150},
+  {x: 450, y: 940, w: 20, h: 290},
+  {x: 280, y: 1100, w: 20, h: 70},
+  {x: 240, y: 1240, w: 20, h: 60},
+  {x: 460, y: 1460, w: 270, h: 20},
+  {x: 450, y: 1010, w: 130, h: 20},
+  {x: 640, y: 1010, w: 230, h: 20},
+  {x: 750, y: 1020, w: 20, h: 50},
+  {x: 690, y: 1250, w: 150, h: 20},
+  {x: 790, y: 1250, w: 20, h: 210},
+  {x: 740, y: 1630, w: 350, h: 20},
+  {x: 1090, y: 1620, w: 20, h: 180},
+  {x: 700, y: 1710, w: 320, h: 20},
+  {x: 730, y: 1380, w: 20, h: 160},
+  {x: 810, y: 1540, w: 290, h: 20},
+  {x: 1100, y: 1220, w: 20, h: 310},
+  {x: 1200, y: 1230, w: 90, h: 20},
+  {x: 1290, y: 650, w: 20, h: 570},
+  {x: 1290, y: 640, w: 90, h: 20},
+  {x: 1380, y: 650, w: 20, h: 570},
+  {x: 1290, y: 850, w: 40, h: 20},
+  {x: 1330, y: 890, w: 50, h: 20},
+  {x: 1290, y: 940, w: 40, h: 20},
+  {x: 1340, y: 990, w: 40, h: 20},
+  {x: 1290, y: 790, w: 30, h: 20},
+  {x: 1350, y: 790, w: 30, h: 20},
+  {x: 1210, y: 1020, w: 20, h: 210},
+  {x: 1250, y: 1070, w: 20, h: 80},
+  {x: 1390, y: 1230, w: 330, h: 20},
+  {x: 1720, y: 1220, w: 20, h: 190},
+  {x: 1510, y: 1340, w: 210, h: 20},
+  {x: 1570, y: 1310, w: 20, h: 140},
+  {x: 1570, y: 1430, w: 60, h: 20},
+  {x: 1610, y: 1430, w: 20, h: 110},
+  {x: 1330, y: 1510, w: 280, h: 20},
+  {x: 1330, y: 1400, w: 20, h: 110},
+  {x: 1300, y: 1400, w: 120, h: 20},
+  {x: 1350, y: 1350, w: 20, h: 50},
+  {x: 1150, y: 1360, w: 200, h: 20},
+  {x: 1150, y: 1330, w: 20, h: 160},
+  {x: 1030, y: 1480, w: 160, h: 20},
+  {x: 1230, y: 1390, w: 20, h: 150},
+  {x: 1280, y: 1460, w: 50, h: 20},
+  {x: 1190, y: 1540, w: 40, h: 20},
+  {x: 1190, y: 1540, w: 20, h: 60},
+  {x: 1390, y: 1510, w: 20, h: 40},
+  {x: 1320, y: 1630, w: 20, h: 170},
+  {x: 1460, y: 1650, w: 20, h: 60},
+  {x: 1460, y: 1670, w: 110, h: 20},
+  {x: 1570, y: 1670, w: 20, h: 40},
+  {x: 1570, y: 1710, w: 70, h: 20},
+  {x: 1640, y: 1630, w: 20, h: 70},
+  {x: 1640, y: 1630, w: 90, h: 20},
+  {x: 1700, y: 1450, w: 20, h: 170},
+  {x: 1610, y: 1480, w: 90, h: 20},
+  {x: 1770, y: 1370, w: 30, h: 20},
+  {x: 1670, y: 1290, w: 20, h: 100},
+  {x: 1510, y: 1270, w: 100, h: 20},
+  {x: 1490, y: 1380, w: 20, h: 120},
+  {x: 1240, y: 1230, w: 20, h: 60},
+  {x: 1250, y: 1280, w: 180, h: 20},
+  {x: 1410, y: 1280, w: 20, h: 60},
+  {x: 1150, y: 1160, w: 60, h: 20},
+  {x: 1100, y: 1100, w: 20, h: 120},
+  {x: 980, y: 1190, w: 120, h: 20},
+  {x: 1030, y: 990, w: 20, h: 290},
+  {x: 1030, y: 1060, w: 120, h: 20},
+  {x: 1130, y: 900, w: 20, h: 190},
+  {x: 950, y: 840, w: 20, h: 260},
+  {x: 890, y: 1090, w: 20, h: 300},
+  {x: 590, y: 1100, w: 130, h: 20},
+  {x: 250, y: 670, w: 640, h: 20},
+  {x: 980, y: 670, w: 40, h: 20},
+  {x: 860, y: 310, w: 150, h: 20},
+  {x: 260, y: 310, w: 530, h: 20},
+  {x: 260, y: 310, w: 20, h: 490},
+  {x: 170, y: 720, w: 140, h: 20},
+  {x: 100, y: 850, w: 230, h: 20},
+  {x: 120, y: 760, w: 20, h: 220},
+  {x: 0, y: 920, w: 60, h: 20},
+  {x: 50, y: 720, w: 20, h: 50},
+  {x: 570, y: 730, w: 20, h: 140},
+  {x: 570, y: 820, w: 270, h: 20},
+  {x: 730, y: 820, w: 20, h: 170},
+  {x: 660, y: 910, w: 20, h: 30},
+  {x: 200, y: 930, w: 180, h: 20},
+  {x: 390, y: 830, w: 20, h: 190},
+  {x: 380, y: 730, w: 40, h: 20},
+  {x: 450, y: 810, w: 40, h: 20},
+  {x: 1750, y: 1720, w: 50, h: 20},
+  {x: 1180, y: 1660, w: 20, h: 140},
+  {x: 1260, y: 1620, w: 20, h: 90},
+  {x: 1390, y: 1630, w: 20, h: 170},
+  {x: 1390, y: 1610, w: 120, h: 20},
+  {x: 1500, y: 1560, w: 70, h: 20},
+  {x: 1670, y: 1560, w: 20, h: 20},
+  {x: 1210, y: 0, w: 20, h: 120},
+  {x: 1210, y: 180, w: 20, h: 120},
+  {x: 1020, y: 300, w: 190, h: 20},
+  {x: 1020, y: 380, w: 20, h: 290},
+  {x: 1030, y: 770, w: 130, h: 20},
+  {x: 1640, y: 620, w: 20, h: 210},
+  {x: 1730, y: 700, w: 70, h: 20},
+  {x: 1600, y: 890, w: 200, h: 20},
+  {x: 1380, y: 730, w: 170, h: 20},
+  {x: 1220, y: 280, w: 120, h: 20},
+  {x: 1290, y: 290, w: 20, h: 200},
+  {x: 1190, y: 430, w: 150, h: 20},
+  {x: 1240, y: 430, w: 20, h: 150},
+  {x: 1240, y: 560, w: 270, h: 20},
+  {x: 1520, y: 540, w: 20, h: 150},
+  {x: 1470, y: 640, w: 50, h: 20},
+  {x: 1450, y: 630, w: 20, h: 180},
+  {x: 1460, y: 640, w: 10, h: 20},
+  {x: 1330, y: 100, w: 20, h: 60},
+  {x: 1250, y: 190, w: 90, h: 20},
+  {x: 1280, y: 60, w: 10, h: 20},
+  {x: 1360, y: 60, w: 100, h: 20},
+  {x: 1450, y: 110, w: 20, h: 220},
+  {x: 1390, y: 250, w: 20, h: 130},
+  {x: 1390, y: 380, w: 60, h: 20},
+  {x: 1450, y: 380, w: 20, h: 170},
+  {x: 1400, y: 420, w: 20, h: 140},
+  {x: 1350, y: 490, w: 40, h: 20},
+  {x: 1100, y: 360, w: 130, h: 20},
+  {x: 1140, y: 360, w: 20, h: 220},
+  {x: 1090, y: 630, w: 140, h: 20},
+  {x: 1190, y: 630, w: 20, h: 80},
+  {x: 1130, y: 820, w: 150, h: 20},
+  {x: 1210, y: 890, w: 20, h: 80},
+  {x: 1620, y: 510, w: 180, h: 20},
+  {x: 1720, y: 570, w: 20, h: 80},
+  {x: 1720, y: 770, w: 20, h: 50},
+  {x: 1530, y: 610, w: 110, h: 20},
+  {x: 1650, y: 710, w: 80, h: 20},
+  {x: 1690, y: 980, w: 20, h: 170},
+  {x: 1530, y: 980, w: 160, h: 20},
+  {x: 1530, y: 860, w: 20, h: 120},
+  {x: 1550, y: 860, w: 70, h: 20},
+  {x: 1620, y: 880, w: 20, h: 50},
+  {x: 1700, y: 930, w: 40, h: 20},
+  {x: 1740, y: 940, w: 20, h: 140},
+  {x: 1620, y: 1060, w: 20, h: 90},
+  {x: 1480, y: 1060, w: 140, h: 20},
+  {x: 1480, y: 910, w: 20, h: 180},
+  {x: 1490, y: 730, w: 20, h: 120},
+  {x: 1510, y: 760, w: 50, h: 20},
+  {x: 1540, y: 800, w: 90, h: 20},
+  {x: 1390, y: 880, w: 50, h: 20},
+  {x: 1400, y: 1140, w: 110, h: 20},
+  {x: 1470, y: 1180, w: 80, h: 20},
+  {x: 1380, y: 910, w: 100, h: 20},
+  {x: 1430, y: 910, w: 20, h: 80},
+  {x: 1530, y: 10, w: 20, h: 350},
+  {x: 1580, y: 450, w: 140, h: 20},
+  {x: 520, y: 1460, w: 20, h: 110},
+  {x: 590, y: 1500, w: 80, h: 20},
+  {x: 60, y: 1330, w: 70, h: 20}
             ],
             red: [
-                {x: 1350, y: 0, w: 20, h: 549},
-                {x: 823, y: 1348, w: 386, h: 20}
+                {x: 1620, y: 0, w: 20, h: 50},
+  {x: 1620, y: 150, w: 20, h: 70},
+  {x: 1630, y: 330, w: 110, h: 20}
             ],
             green: [
-                {x: 0, y: 655, w: 402, h: 20},
-                {x: 572, y: 211, w: 20, h: 433}
+  {x: 510, y: 370, w: 20, h: 100},
+  {x: 360, y: 490, w: 20, h: 130},
+  {x: 260, y: 520, w: 150, h: 20},
+  {x: 360, y: 580, w: 60, h: 20},
+  {x: 480, y: 510, w: 130, h: 20},
+  {x: 490, y: 510, w: 20, h: 60},
+  {x: 480, y: 570, w: 250, h: 20},
+  {x: 630, y: 580, w: 20, h: 40},
+  {x: 480, y: 580, w: 20, h: 70},
+  {x: 600, y: 310, w: 20, h: 50},
+  {x: 430, y: 310, w: 20, h: 60},
+  {x: 690, y: 360, w: 20, h: 110},
+  {x: 740, y: 500, w: 20, h: 110},
+  {x: 790, y: 610, w: 20, h: 50},
+  {x: 820, y: 580, w: 110, h: 20},
+  {x: 980, y: 620, w: 20, h: 40},
+  {x: 820, y: 480, w: 140, h: 20},
+  {x: 960, y: 470, w: 20, h: 70},
+  {x: 870, y: 490, w: 20, h: 30},
+  {x: 830, y: 390, w: 20, h: 20},
+  {x: 790, y: 310, w: 20, h: 50},
+  {x: 890, y: 310, w: 20, h: 120},
+  {x: 920, y: 310, w: 20, h: 70},
+  {x: 960, y: 390, w: 50, h: 20},
+  {x: 970, y: 370, w: 20, h: 60}
             ],
             blue: [
-                {x: 493, y: 632, w: 20, h: 386},
-                {x: 902, y: 892, w: 20, h: 252}
+                {x: 410, y: 130, w: 20, h: 150},
+  {x: 80, y: 360, w: 80, h: 20},
+  {x: 710, y: 190, w: 210, h: 20}
             ],
             purple: [
-                {x: 332, y: 471, w: 1019, h: 20},
-                {x: 867, y: 1493, w: 20, h: 307}
+                {x: 332, y: 471, w: 20, h: 20},
+                {x: 867, y: 1493, w: 20, h: 20}
             ],
             gray: [
-                {x: 1350, y: 1013, w: 450, h: 20},
-                {x: 1590, y: 966, w: 20, h: 476}
+                {x: 1350, y: 1013, w: 20, h: 20},
+                {x: 1590, y: 966, w: 20, h: 20}
             ],
             hotpink: [
-                {x: 0, y: 1423, w: 336, h: 20},
-                {x: 225, y: 1364, w: 20, h: 248}
+                {x: 0, y: 1423, w: 20, h: 20}
             ]
         };
         
@@ -959,8 +1167,14 @@ this.gameWorld.appendChild(castleZone);
     
     createBreakableWalls() {
         const breakableWalls = [
-            {x: 1000, y: 600, w: 60, h: 20},
-            {x: 400, y: 1000, w: 20, h: 80}
+            {x: 1300, y: 1200, w: 80, h: 20},
+           {x: 360, y: 430, w: 20, h: 60},
+{x: 120, y: 460, w: 120, h: 20},
+  {x: 0, y: 310, w: 190, h: 20},
+  {x: 0, y: 560, w: 150, h: 20},
+  {x: 450, y: 1200, w: 80, h: 20},
+  {x: 610, y: 1510, w: 20, h: 100},
+  {x: 740, y: 900, w: 210, h: 20}
         ];
         
         breakableWalls.forEach(wall => {
@@ -977,8 +1191,16 @@ this.gameWorld.appendChild(castleZone);
     
     addTreeWalls() {
         const treePositions = [
-            {x: 600, y: 1300}, {x: 620, y: 1320}, {x: 640, y: 1300},
-            {x: 1500, y: 1200}, {x: 1520, y: 1220}, {x: 1540, y: 1200}
+            {x: 610, y: 420}, {x: 630, y: 440}, {x: 650, y: 420},
+            {x: 810, y: 640}, {x: 830, y: 660}, {x: 850, y: 640},
+            {x: 420, y: 640}, {x: 440, y: 660}, {x: 460, y: 640},
+            {x: 470, y: 370}, {x: 490, y: 390}, {x: 510, y: 370},
+            {x: 320, y: 610}, {x: 340, y: 630}, {x: 360, y: 610},
+            {x: 980, y: 570}, {x: 1000, y: 590}, {x: 1020, y: 570},
+            {x: 670, y: 490}, {x: 690, y: 510}, {x: 710, y: 490},
+            {x: 960, y: 330}, {x: 980, y: 350}, {x: 1000, y: 330},
+            {x: 830, y: 380}, {x: 850, y: 400}, {x: 870, y: 380},
+            {x: 760, y: 420}, {x: 780, y: 440}, {x: 800, y: 420}
         ];
         
         const treeEmojis = ['🌲', '🌳', '🎄'];
