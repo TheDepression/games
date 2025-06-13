@@ -536,9 +536,6 @@ class MazeGame {
         document.getElementById('forestOverlay').classList.add('active');
         document.getElementById('forestVisionMask').classList.add('active');
         
-        // Initialize forest vision mask position
-        this.updateForestVisionMask();
-        
         this.showMessage('🌲 Entering the dense forest...');
     }
 
@@ -1007,9 +1004,6 @@ class MazeGame {
                 this.player.style.left = this.playerX + 'px';
                 this.player.style.top = this.playerY + 'px';
                 
-                // Update forest vision mask position
-                this.updateForestVisionMask();
-                
                 // Center player in gameArea
                 const gameAreaWidth = this.gameArea.offsetWidth;
                 const gameAreaHeight = this.gameArea.offsetHeight;
@@ -1026,21 +1020,6 @@ class MazeGame {
             const friction = this.isOnDesert ? 0.7 : 0.9;  // More friction = slower on desert
             this.playerVelocityX *= friction;
             this.playerVelocityY *= friction;
-        }
-    }
-    
-    updateForestVisionMask() {
-        if (this.isInForest) {
-            const mask = document.getElementById('forestVisionMask');
-            const playerCenterX = this.playerX + 12; // Player center
-            const playerCenterY = this.playerY + 12;
-            
-            // Calculate percentage position within the game world
-            const percentX = (playerCenterX / 1800) * 100;
-            const percentY = (playerCenterY / 1800) * 100;
-            
-            // Update the radial gradient position to follow the player
-            mask.style.background = `radial-gradient(circle 111px at ${percentX}% ${percentY}%, transparent 111px, black 111px)`;
         }
     }
     
