@@ -602,7 +602,6 @@ preloadPlayerImages() {
   document.getElementById('confirmText').textContent = '🌲 You are entering the dense forest...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'enterForest';
-        this.updateForestVisibility();
 }
 
     exitForest() {
@@ -613,12 +612,11 @@ preloadPlayerImages() {
   document.getElementById('confirmText').textContent = '🌞 You are exiting the forest...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'exitForest';
-        this.updateForestVisibility();
 }
 
 updateForestVisibility() {
     const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
-    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy');
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .money-pickup, .heart-pickup, .exit');
     
     // First, reset all walls to visible
     walls.forEach(wall => {
@@ -1909,6 +1907,7 @@ function restartGame() {
     document.getElementById('forestOverlay').classList.add('active');
     document.getElementById('forestVisionMask').classList.add('active');
     game.showMessage('🌲 Entering the dense forest...');
+      this.updateForestVisibility();
   } else if (game.pendingAction === 'exitForest') {
     game.isInForest = false;
     game.forestMusic.pause();
@@ -1916,6 +1915,7 @@ function restartGame() {
     document.getElementById('forestOverlay').classList.remove('active');
     document.getElementById('forestVisionMask').classList.remove('active');
     game.showMessage('🌞 Exiting the forest...');
+      this.updateForestVisibility();
   }
   
   game.pendingAction = null;
