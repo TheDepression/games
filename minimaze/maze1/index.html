@@ -549,12 +549,14 @@ class MazeGame {
   document.getElementById('confirmText').textContent = '🌲 You are entering the dense forest...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'enterForest';
+        this.updateForestVisibility();
 }
 
     exitForest() {
   document.getElementById('confirmText').textContent = '🌞 You are exiting the forest...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'exitForest';
+        this.updateForestVisibility();
 }
 
 updateForestVisibility() {
