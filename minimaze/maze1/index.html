@@ -1052,8 +1052,8 @@ updateForestVisibility() {
 if (this.isInForest) {
   const mask = document.getElementById('forestVisionMask');
   const gameAreaRect = this.gameArea.getBoundingClientRect();
-  const playerScreenX = this.playerX - this.gameArea.scrollLeft + 12;
-  const playerScreenY = this.playerY - this.gameArea.scrollTop + 12;
+  const playerScreenX = gameAreaRect.left + (this.gameArea.offsetWidth / 2);
+  const playerScreenY = gameAreaRect.top + (this.gameArea.offsetHeight / 2);
   mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
 }
             }
