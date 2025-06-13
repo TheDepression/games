@@ -973,15 +973,27 @@ updateForestVisibility() {
         const friendlyEmojis = ['👴🏻', '👩‍⚕️', '🧙‍♀️', '👷‍♂️'];
         
         friendlies.forEach((friendly, index) => {
-            const friendlyEl = document.createElement('div');
-            friendlyEl.className = 'friendly';
-            friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
-            friendlyEl.style.left = friendly.x + 'px';
-            friendlyEl.style.top = friendly.y + 'px';
-            friendlyEl.dataset.message = friendly.message;
-            this.gameWorld.appendChild(friendlyEl);
-        });
+    const friendlyEl = document.createElement('div');
+    friendlyEl.className = 'friendly';
+    
+    // Special handling for key dealer (index 0)
+    if (index === 0) {
+        friendlyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png")';
+        friendlyEl.style.backgroundSize = 'contain';
+        friendlyEl.style.backgroundRepeat = 'no-repeat';
+        friendlyEl.style.backgroundPosition = 'center';
+        friendlyEl.style.width = '22px';
+        friendlyEl.style.height = '44px';  // Double height as you mentioned
+        friendlyEl.textContent = '';  // No emoji
+    } else {
+        friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
     }
+    
+    friendlyEl.style.left = friendly.x + 'px';
+    friendlyEl.style.top = friendly.y + 'px';
+    friendlyEl.dataset.message = friendly.message;
+    this.gameWorld.appendChild(friendlyEl);
+});
     
     createCollectibles() {
         // Money pickups - positioned in open areas of your maze
