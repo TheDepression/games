@@ -523,6 +523,18 @@ updatePlayerImage(direction) {
     this.player.textContent = ''; // Remove emoji
 }
 
+
+preloadPlayerImages() {
+    const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+    this.playerImages = {};
+    
+    directions.forEach(direction => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+        this.playerImages[direction] = img;
+    });
+}
+    
     
     constructor() {
         this.hearts = 3;
@@ -541,6 +553,7 @@ updatePlayerImage(direction) {
         this.originalEmoji = '🧙‍♂️';
         this.currentDirection = 's'; // Start facing south
         this.lastMoveDirection = 's';
+        this.preloadPlayerImages();
         this.lastLavaDamage = 0;
         
         // Movement properties
@@ -659,7 +672,7 @@ updateForestVisibility() {
 const deltaY = point.clientY - this.lastDragY;
 
 // Update player direction based on movement
-if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
+if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
     const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
     if (newDirection !== this.currentDirection) {
         this.updatePlayerImage(newDirection);
