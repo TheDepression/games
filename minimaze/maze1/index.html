@@ -137,16 +137,15 @@
         }
         
         #player {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: none;
-        }
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 100;
+    transition: none;
+}
         
         .invulnerable {
             animation: blink 0.2s infinite;
@@ -499,6 +498,32 @@
 
     <script>
 class MazeGame {
+
+getDirectionFromMovement(deltaX, deltaY) {
+    // Calculate angle in radians, then convert to degrees
+    let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+    
+    // Normalize to 0-360 degrees
+    if (angle < 0) angle += 360;
+    
+    // Map to 8 directions (each direction covers 45 degrees)
+    if (angle >= 337.5 || angle < 22.5) return 'e';      // East
+    else if (angle >= 22.5 && angle < 67.5) return 'se';  // Southeast  
+    else if (angle >= 67.5 && angle < 112.5) return 's';  // South
+    else if (angle >= 112.5 && angle < 157.5) return 'sw'; // Southwest
+    else if (angle >= 157.5 && angle < 202.5) return 'w';  // West
+    else if (angle >= 202.5 && angle < 247.5) return 'nw'; // Northwest
+    else if (angle >= 247.5 && angle < 292.5) return 'n';  // North
+    else return 'ne'; // Northeast (292.5 to 337.5)
+}
+
+updatePlayerImage(direction) {
+    this.currentDirection = direction;
+    this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+    this.player.textContent = ''; // Remove emoji
+}
+
+    
     constructor() {
         this.hearts = 3;
         this.hasKey = false;
@@ -514,6 +539,8 @@ class MazeGame {
         this.hasLavaShoes = false;
         this.isOnWater = false;
         this.originalEmoji = '🧙‍♂️';
+        this.currentDirection = 's'; // Start facing south
+        this.lastMoveDirection = 's';
         this.lastLavaDamage = 0;
         
         // Movement properties
@@ -727,10 +754,11 @@ updateForestVisibility() {
         this.addTreeWalls();
         
         // Set player position
-        this.playerX = 1300;
-        this.playerY = 1760;
-        this.player.style.left = this.playerX + 'px';
-        this.player.style.top = this.playerY + 'px';
+this.playerX = 1300;
+this.playerY = 1760;
+this.player.style.left = this.playerX + 'px';
+this.player.style.top = this.playerY + 'px';
+this.updatePlayerImage('s'); // Start facing south
         
         // Create enemies scattered throughout the maze
         this.createEnemies();
