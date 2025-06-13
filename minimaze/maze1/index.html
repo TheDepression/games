@@ -171,13 +171,14 @@
             align-items: center;
             font-size: 14px;
             color: #ccc;
+            z-index: 250; /* Add this line */
         }
         
         #ui {
             position: fixed;
             top: 10px;
             left: 10px;
-            z-index: 200;
+            z-index: 250; /* Change from 200 to 250 */
             background: rgba(0,0,0,0.8);
             padding: 8px 12px;
             border-radius: 8px;
@@ -190,7 +191,7 @@
             position: fixed;
             top: 10px;
             right: 10px;
-            z-index: 200;
+            z-index: 250; /* Change from 200 to 250 */
             background: rgba(255,0,0,0.8);
             padding: 8px 12px;
             border-radius: 8px;
@@ -422,6 +423,19 @@
         .forest-vision-mask.active {
             opacity: 1;
         }
+
+        #confirmDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
     </style>
 </head>
 <body>
@@ -439,6 +453,12 @@
             </div>
         </div>
         <div id="message"></div>
+<div id="confirmDialog" style="display: none;">
+  <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+    <p id="confirmText">You are entering the forest...</p>
+    <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
+  </div>
+</div>
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
                 <div style="font-size: 18px; font-weight: bold;">🌈 Colorful Maze</div>
@@ -1014,6 +1034,14 @@ class MazeGame {
                     top: scrollY,
                     behavior: 'auto'
                 });
+                // Add this after the scrollTo code:
+if (this.isInForest) {
+  const mask = document.getElementById('forestVisionMask');
+  const gameAreaRect = this.gameArea.getBoundingClientRect();
+  const playerScreenX = this.playerX - this.gameArea.scrollLeft + 12;
+  const playerScreenY = this.playerY - this.gameArea.scrollTop + 12;
+  mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
+}
             }
             
             // Apply different friction based on terrain
