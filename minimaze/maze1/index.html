@@ -534,7 +534,7 @@ class MazeGame {
         this.foregroundEnemy = null;
         this.lastForegroundSpawn = Date.now();
         this.lastInteractionTime = {};
-        
+        this.pendingAction: null,
         this.player = document.getElementById('player');
         this.gameWorld = document.getElementById('gameWorld');
         this.gameArea = document.getElementById('gameArea');
@@ -546,33 +546,44 @@ class MazeGame {
     }
 
     enterForest() {
-        this.isInForest = true;
-        
-        // Switch music
-        this.bgMusic.pause();
-        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
-        
-        // Show forest overlay and vision mask
-        document.getElementById('forestOverlay').classList.add('active');
-        document.getElementById('forestVisionMask').classList.add('active');
-        
-        this.showMessage('🌲 Entering the dense forest...');
-    }
+  document.getElementById('confirmText').textContent = '🌲 You are entering the dense forest...';
+  document.getElementById('confirmDialog').style.display = 'flex';
+  this.pendingAction = 'enterForest';
+}
 
     exitForest() {
-        this.isInForest = false;
-        
-        // Switch music back
-        this.forestMusic.pause();
-        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-        
-        // Hide forest overlay and vision mask
-        document.getElementById('forestOverlay').classList.remove('active');
-        document.getElementById('forestVisionMask').classList.remove('active');
-        
-        this.showMessage('🌞 Exiting the forest...');
-    }
+  document.getElementById('confirmText').textContent = '🌞 You are exiting the forest...';
+  document.getElementById('confirmDialog').style.display = 'flex';
+  this.pendingAction = 'exitForest';
+}
 
+updateForestVisibility() {
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy');
+    
+    walls.forEach(wall => {
+        let inForest = false;
+        const wallX = parseInt(wall.style.left) + 10; // center of wall
+        const wallY = parseInt(wall.style.top) + 10;
+        
+        forestZones.forEach(zone => {
+            const zoneLeft = parseInt(zone.style.left);
+            const zoneTop = parseInt(zone.style.top);
+            const zoneRight = zoneLeft + parseInt(zone.style.width);
+            const zoneBottom = zoneTop + parseInt(zone.style.height);
+            
+            if (wallX >= zoneLeft && wallX <= zoneRight && 
+                wallY >= zoneTop && wallY <= zoneBottom) {
+                inForest = true;
+            }
+        });
+        
+        if (inForest) {
+            wall.style.visibility = this.isInForest ? 'visible' : 'hidden';
+        }
+    });
+}
+    
     bindEvents() {
         this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
         this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
@@ -1565,6 +1576,28 @@ function startGame() {
 
 function restartGame() {
     window.location.reload();
+}
+
+        function confirmAction() {
+  document.getElementById('confirmDialog').style.display = 'none';
+  
+  if (game.pendingAction === 'enterForest') {
+    game.isInForest = true;
+    game.bgMusic.pause();
+    game.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+    document.getElementById('forestOverlay').classList.add('active');
+    document.getElementById('forestVisionMask').classList.add('active');
+    game.showMessage('🌲 Entering the dense forest...');
+  } else if (game.pendingAction === 'exitForest') {
+    game.isInForest = false;
+    game.forestMusic.pause();
+    game.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    document.getElementById('forestOverlay').classList.remove('active');
+    document.getElementById('forestVisionMask').classList.remove('active');
+    game.showMessage('🌞 Exiting the forest...');
+  }
+  
+  game.pendingAction = null;
 }
     </script>
 </body>
