@@ -546,6 +546,10 @@ class MazeGame {
     }
 
     enterForest() {
+        this.playerVelocityX = 0;  // Stop movement immediately
+    this.playerVelocityY = 0;
+    this.isDragging = false;   // Stop any dragging
+    this.gameStarted = false;  // Freeze game temporarily
   document.getElementById('confirmText').textContent = '🌲 You are entering the dense forest...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'enterForest';
@@ -553,6 +557,10 @@ class MazeGame {
 }
 
     exitForest() {
+        this.playerVelocityX = 0;  // Stop movement immediately
+    this.playerVelocityY = 0;
+    this.isDragging = false;   // Stop any dragging
+    this.gameStarted = false;  // Freeze game temporarily
   document.getElementById('confirmText').textContent = '🌞 You are exiting the forest...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'exitForest';
@@ -563,6 +571,12 @@ updateForestVisibility() {
     const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
     const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy');
     
+    // First, reset all walls to visible
+    walls.forEach(wall => {
+        wall.style.visibility = 'visible';
+    });
+    
+    // Then hide forest walls if not in forest
     walls.forEach(wall => {
         let inForest = false;
         const wallX = parseInt(wall.style.left) + 10; // center of wall
@@ -1583,7 +1597,7 @@ function restartGame() {
 
         function confirmAction() {
   document.getElementById('confirmDialog').style.display = 'none';
-  
+  game.gameStarted = true;  // Resume game immediately
   if (game.pendingAction === 'enterForest') {
     game.isInForest = true;
     game.bgMusic.pause();
