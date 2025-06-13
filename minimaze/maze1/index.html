@@ -681,7 +681,7 @@ updateForestVisibility() {
 const deltaY = point.clientY - this.lastDragY;
 
 // Update player direction based on movement
-if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+if (Math.abs(deltaX) > 1.5 || Math.abs(deltaY) > 1.5) {
     const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
     if (newDirection !== this.currentDirection) {
         this.updatePlayerImage(newDirection);
@@ -901,7 +901,7 @@ castleZone.className = 'castle-zone';
 castleZone.style.left = '1000px';
 castleZone.style.top = '1000px';
 castleZone.style.width = '150px';
-castleZone.style.height = '200px';
+castleZone.style.height = '250px';
 this.gameWorld.appendChild(castleZone);
     }
     
