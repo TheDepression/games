@@ -85,6 +85,15 @@
             background-position: 0 0, 0 15px, 15px -15px, -15px 0px, 0 0;
             opacity: 0.7;
         }
+
+.castle-zone {
+    position: absolute;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/castle.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.9;
+}
         
         .grass-zone {
             position: absolute;
@@ -885,6 +894,15 @@ this.updatePlayerImage('s'); // Start facing south
         desertZone.style.height = '200px';
         desertZone.dataset.zoneType = 'desert';
         this.gameWorld.appendChild(desertZone);
+
+        // Castle zone with custom image
+const castleZone = document.createElement('div');
+castleZone.className = 'castle-zone';
+castleZone.style.left = '1000px';
+castleZone.style.top = '1000px';
+castleZone.style.width = '150px';
+castleZone.style.height = '150px';
+this.gameWorld.appendChild(castleZone);
     }
     
     createColoredWalls() {
