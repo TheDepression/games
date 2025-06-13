@@ -326,7 +326,7 @@
             opacity: 0.9;
         }
         
-        #startScreen, #levelComplete {
+        #startScreen, #levelComplete, #forestDialog {
             position: absolute;
             top: 0;
             left: 0;
@@ -381,42 +381,41 @@
             font-size: 12px;
         }
 
-        .forest-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+        /* Forest cover that hides the forest zone when not inside */
+        .forest-cover {
+            position: absolute;
             background-image:
                 radial-gradient(circle at 20% 30%, #2e7d32 8px, transparent 8px),
                 radial-gradient(circle at 60% 20%, #388e3c 6px, transparent 6px),
                 radial-gradient(circle at 80% 60%, #4caf50 10px, transparent 10px),
                 radial-gradient(circle at 30% 80%, #2e7d32 7px, transparent 7px),
                 radial-gradient(circle at 70% 75%, #1b5e20 5px, transparent 5px),
-                linear-gradient(135deg, rgba(46, 125, 50, 0.4) 0%, rgba(27, 94, 32, 0.6) 100%);
+                linear-gradient(135deg, rgba(46, 125, 50, 0.9) 0%, rgba(27, 94, 32, 0.95) 100%);
             background-size: 40px 40px, 60px 60px, 35px 35px, 50px 50px, 45px 45px, 100% 100%;
             background-position: 0 0, 20px 30px, 40px 10px, 10px 40px, 30px 20px, 0 0;
-            pointer-events: none;
-            z-index: 150;
+            z-index: 80;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .forest-cover.hidden {
             opacity: 0;
-            transition: opacity 0.5s ease;
+            pointer-events: none;
         }
 
-        .forest-overlay.active {
-            opacity: 0.8;
-        }
-
+        /* Limited vision mask for inside forest - only covers game area */
         .forest-vision-mask {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle 111px at 50% 50%, transparent 111px, black 111px);
+            width: 350px;
+            height: 357.5px;
+            background: black;
             pointer-events: none;
             z-index: 200;
             opacity: 0;
             transition: opacity 0.5s ease;
+            clip-path: circle(0px at 50% 50%);
         }
 
         .forest-vision-mask.active {
@@ -437,6 +436,8 @@
             <div id="gameWorld">
                 <div id="player">🧙‍♂️</div>
             </div>
+            <!-- Vision mask only covers game area -->
+            <div id="forestVisionMask" class="forest-vision-mask"></div>
         </div>
         <div id="message"></div>
         <div id="controlArea">
@@ -463,9 +464,11 @@
             <button id="retryButton" onclick="restartGame()">Play Again</button>
         </div>
         
-        <!-- Forest overlay and vision mask -->
-        <div id="forestOverlay" class="forest-overlay"></div>
-        <div id="forestVisionMask" class="forest-vision-mask"></div>
+        <div id="forestDialog" style="display: none;">
+            <h3 id="forestDialogTitle">🌲 Entering Forest</h3>
+            <p id="forestDialogText">You are entering the mysterious forest...</p>
+            <button id="forestOkButton">OK</button>
+        </div>
     </div>
 
     <audio id="bgMusic" loop>
@@ -509,6 +512,8 @@ class MazeGame {
         this.isOnDesert = false;
         this.isInForest = false;
         this.forestMusic = document.getElementById('forestMusic');
+        this.forestZones = []; // Store forest zone coordinates
+        this.forestCovers = []; // Store forest covers
         
         this.movingEnemies = [];
         this.foregroundEnemy = null;
@@ -526,31 +531,90 @@ class MazeGame {
     }
 
     enterForest() {
-        this.isInForest = true;
+        if (this.isInForest) return;
         
-        // Switch music
-        this.bgMusic.pause();
-        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
-        
-        // Show forest overlay and vision mask
-        document.getElementById('forestOverlay').classList.add('active');
-        document.getElementById('forestVisionMask').classList.add('active');
-        
-        this.showMessage('🌲 Entering the dense forest...');
+        // Show dialog first
+        this.showForestDialog(true);
     }
 
     exitForest() {
-        this.isInForest = false;
+        if (!this.isInForest) return;
         
-        // Switch music back
-        this.forestMusic.pause();
-        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        // Show dialog first
+        this.showForestDialog(false);
+    }
+
+    showForestDialog(entering) {
+        const dialog = document.getElementById('forestDialog');
+        const title = document.getElementById('forestDialogTitle');
+        const text = document.getElementById('forestDialogText');
+        const button = document.getElementById('forestOkButton');
         
-        // Hide forest overlay and vision mask
-        document.getElementById('forestOverlay').classList.remove('active');
-        document.getElementById('forestVisionMask').classList.remove('active');
+        if (entering) {
+            title.textContent = '🌲 Entering Forest';
+            text.textContent = 'You are entering the mysterious forest... Your vision will be limited.';
+        } else {
+            title.textContent = '🌞 Exiting Forest';
+            text.textContent = 'You are leaving the forest and returning to daylight.';
+        }
         
-        this.showMessage('🌞 Exiting the forest...');
+        dialog.style.display = 'flex';
+        
+        // Remove previous event listeners
+        button.onclick = null;
+        
+        button.onclick = () => {
+            dialog.style.display = 'none';
+            
+            if (entering) {
+                this.isInForest = true;
+                
+                // Switch music
+                this.bgMusic.pause();
+                this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+                
+                // Hide forest covers and show vision mask
+                this.forestCovers.forEach(cover => cover.classList.add('hidden'));
+                document.getElementById('forestVisionMask').classList.add('active');
+                
+                this.showMessage('🌲 You are in the dense forest...');
+            } else {
+                this.isInForest = false;
+                
+                // Switch music back
+                this.forestMusic.pause();
+                this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+                
+                // Show forest covers and hide vision mask
+                this.forestCovers.forEach(cover => cover.classList.remove('hidden'));
+                document.getElementById('forestVisionMask').classList.remove('active');
+                
+                this.showMessage('🌞 Back in the daylight...');
+            }
+        };
+    }
+
+    updateForestVision() {
+        if (!this.isInForest) return;
+        
+        const mask = document.getElementById('forestVisionMask');
+        const gameAreaRect = this.gameArea.getBoundingClientRect();
+        
+        // Calculate player position relative to game area viewport
+        const scrollLeft = this.gameArea.scrollLeft;
+        const scrollTop = this.gameArea.scrollTop;
+        
+        const playerScreenX = this.playerX - scrollLeft + 12; // +12 for center of player
+        const playerScreenY = this.playerY - scrollTop + 12;
+        
+        // Constrain to game area bounds
+        const constrainedX = Math.max(111, Math.min(350 - 111, playerScreenX));
+        const constrainedY = Math.max(111, Math.min(357.5 - 111, playerScreenY));
+        
+        const xPercent = (constrainedX / 350) * 100;
+        const yPercent = (constrainedY / 357.5) * 100;
+        
+        mask.style.clipPath = `circle(111px at ${xPercent}% ${yPercent}%)`;
     }
 
     bindEvents() {
@@ -645,7 +709,7 @@ class MazeGame {
     }
     
     initLevel() {
-        const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone');
+        const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone, .forest-cover');
         elements.forEach(el => el.remove());
         
         this.movingEnemies = [];
@@ -653,6 +717,9 @@ class MazeGame {
         this.lastForegroundSpawn = Date.now();
         this.hasKey = false;
         this.lastInteractionTime = {};
+        this.forestZones = [];
+        this.forestCovers = [];
+        this.isInForest = false;
         
         this.updateUI();
         this.generateMaze();
@@ -747,6 +814,24 @@ class MazeGame {
         forestZone.style.height = '200px';
         forestZone.dataset.zoneType = 'forest';
         this.gameWorld.appendChild(forestZone);
+        
+        // Store forest zone coordinates for cover placement
+        this.forestZones.push({
+            left: 0,
+            top: 500,
+            width: 200,
+            height: 200
+        });
+        
+        // Create forest cover that hides the forest zone
+        const forestCover = document.createElement('div');
+        forestCover.className = 'forest-cover';
+        forestCover.style.left = '0px';
+        forestCover.style.top = '500px';
+        forestCover.style.width = '200px';
+        forestCover.style.height = '200px';
+        this.gameWorld.appendChild(forestCover);
+        this.forestCovers.push(forestCover);
         
         // Lava zone - damages player without special shoes
         const lavaZone = document.createElement('div');
@@ -887,7 +972,10 @@ class MazeGame {
             {x: 1000, y: 700, moveX: 980, moveY: 700, range: 100, axis: 'x', speed: 0.7},
             {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6},
             {x: 1400, y: 1200, moveX: 1380, moveY: 1200, range: 120, axis: 'x', speed: 0.8},
-            {x: 700, y: 1600, moveX: 700, moveY: 1580, range: 100, axis: 'y', speed: 0.7}
+            {x: 700, y: 1600, moveX: 700, moveY: 1580, range: 100, axis: 'y', speed: 0.7},
+            // Add enemies inside the forest zone (these will be hidden by cover)
+            {x: 100, y: 550, moveX: 80, moveY: 550, range: 80, axis: 'x', speed: 0.5},
+            {x: 50, y: 600, moveX: 50, moveY: 580, range: 60, axis: 'y', speed: 0.4}
         ];
         
         const enemyEmojis = ['🦠', '💉', '👾', '🐍'];
@@ -943,7 +1031,9 @@ class MazeGame {
             {x: 100, y: 50}, {x: 600, y: 150}, {x: 700, y: 200},
             {x: 1450, y: 350}, {x: 300, y: 700}, {x: 800, y: 500},
             {x: 1000, y: 1100}, {x: 400, y: 1250}, {x: 1300, y: 900},
-            {x: 700, y: 1400}, {x: 1500, y: 1100}, {x: 150, y: 1500}
+            {x: 700, y: 1400}, {x: 1500, y: 1100}, {x: 150, y: 1500},
+            // Add money inside forest zone (will be hidden by cover)
+            {x: 150, y: 650}, {x: 80, y: 580}
         ];
         
         moneyPositions.forEach(pos => {
@@ -986,6 +1076,7 @@ class MazeGame {
                 this.updatePlayer();
                 this.updateMovingEnemies();
                 this.updateForegroundEnemy();
+                this.updateForestVision();
                 this.checkCollisions();
             }
             requestAnimationFrame(gameLoop);
@@ -1296,6 +1387,172 @@ class MazeGame {
             };
             
             if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onForest = true;
+                break;
+            }
+        }
+
+        // Handle forest entry/exit
+        if (onForest && !this.isInForest) {
+            this.enterForest();
+        } else if (!onForest && this.isInForest) {
+            this.exitForest();
+        }
+    }
+    
+    handleNPCInteraction(friendly) {
+        const message = friendly.dataset.message;
+        
+        if (message === "🔑 Need a key? Give me 500¥!" && !this.hasKey) {
+            if (this.money >= 500) {
+                this.money -= 500;
+                this.hasKey = true;
+                this.showMessage('Thank you! Here\'s your key! 🔑');
+                friendly.dataset.message = 'Thank you for your business!';
+                this.updateUI();
+            } else {
+                this.showMessage('🔑 Need a key? Give me 500¥!');
+            }
+        } else if (message === "⛵ Want a boat? 300¥ and you can sail!" && !this.hasBoat) {
+            if (this.money >= 300) {
+                this.money -= 300;
+                this.hasBoat = true;
+                this.showMessage('⛵ Boat purchased! Now you can sail!');
+                friendly.dataset.message = 'Enjoy your boat!';
+                this.updateUI();
+            } else {
+                this.showMessage('⛵ Want a boat? 300¥ and you can sail!');
+            }
+        } else if (message === "🔨 Hammer for sale! Break walls for 400¥!" && !this.hasHammer) {
+            if (this.money >= 400) {
+                this.money -= 400;
+                this.hasHammer = true;
+                this.showMessage('🔨 Hammer purchased! Break through walls!');
+                friendly.dataset.message = 'Use that hammer wisely!';
+                this.updateUI();
+            } else {
+                this.showMessage('🔨 Hammer for sale! Break walls for 400¥!');
+            }
+        } else if (message === "👠 Lava-proof shoes! Only 600¥!" && !this.hasLavaShoes) {
+            if (this.money >= 600) {
+                this.money -= 600;
+                this.hasLavaShoes = true;
+                this.showMessage('👠 Lava shoes purchased! Walk on lava safely!');
+                friendly.dataset.message = 'Those shoes will protect you!';
+                this.updateUI();
+            } else {
+                this.showMessage('👠 Lava-proof shoes! Only 600¥!');
+            }
+        } else {
+            this.showMessage(message);
+        }
+    }
+    
+    rectsOverlap(rect1, rect2) {
+        return rect1.left < rect2.right &&
+               rect1.right > rect2.left &&
+               rect1.top < rect2.bottom &&
+               rect1.bottom > rect2.top;
+    }
+    
+    takeDamage() {
+        if (this.isInvulnerable) return;
+        
+        this.hearts--;
+        this.showMessage('💔 Ouch!');
+        this.updateUI();
+        
+        this.isInvulnerable = true;
+        this.player.classList.add('invulnerable');
+        
+        setTimeout(() => {
+            this.isInvulnerable = false;
+            this.player.classList.remove('invulnerable');
+        }, 1000);
+        
+        if (this.hearts <= 0) {
+            this.gameOver();
+        }
+    }
+    
+    showMessage(text) {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.style.display = 'block';
+        
+        clearTimeout(this.messageTimeout);
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+    
+    updateUI() {
+        document.getElementById('hearts').textContent = this.hearts;
+        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Got it!' : '🔑 Find the key!';
+        document.getElementById('money').textContent = this.money;
+        
+        // Update UI to show owned items
+        const ui = document.getElementById('ui');
+        let itemsText = '';
+        if (this.hasBoat) itemsText += ' ⛵';
+        if (this.hasHammer) itemsText += ' 🔨';
+        if (this.hasLavaShoes) itemsText += ' 👠';
+        
+        // Add items display if not already there
+        if (!document.getElementById('items')) {
+            const itemsDiv = document.createElement('div');
+            itemsDiv.id = 'items';
+            itemsDiv.textContent = 'Items:' + itemsText;
+            ui.appendChild(itemsDiv);
+        } else {
+            document.getElementById('items').textContent = 'Items:' + itemsText;
+        }
+    }
+    
+    completeLevel() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.forestMusic.pause();
+        this.showLevelComplete('🎉 Adventure Complete!', 'You escaped the colorful maze!');
+    }
+    
+    gameOver() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.forestMusic.pause();
+        this.showMessage('💀 Game Over!');
+        setTimeout(() => {
+            this.showLevelComplete('💀 Game Over', 'Try again!');
+        }, 2000);
+    }
+    
+    showLevelComplete(title, text) {
+        document.getElementById('levelCompleteTitle').textContent = title;
+        document.getElementById('levelCompleteText').textContent = text;
+        document.getElementById('levelComplete').style.display = 'flex';
+    }
+}
+
+let game;
+
+function startGame() {
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none';
+    
+    game = new MazeGame();
+    game.initLevel();
+    game.startGameTimer();
+}
+
+function restartGame() {
+    window.location.reload();
+}
+    </script>
+</body>
+</html>oneRect.right &&
                 playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
                 onWater = true;
                 break;
