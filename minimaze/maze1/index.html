@@ -454,7 +454,7 @@
             <div id="keyStatus">🔑 Find the key!</div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
-        <div id="timer">3:00</div>
+        <div id="timer">15:00</div>
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player">🧙‍♂️</div>
@@ -549,7 +549,7 @@ preloadPlayerImages() {
         this.hearts = 3;
         this.hasKey = false;
         this.gameStarted = false;
-        this.timeLeft = 180;
+        this.timeLeft = 900;
         this.timerInterval = null;
         this.isInvulnerable = false;
         this.money = 0;
@@ -711,7 +711,7 @@ this.playerVelocityY = deltaY * sensitivity;
     
     startGameTimer() {
         this.gameStarted = true;
-        this.timeLeft = 180;
+        this.timeLeft = 900;
         this.updateTimer();
         this.bgMusic.play().catch(e => console.log('Music play failed:', e));
         
@@ -733,7 +733,7 @@ this.playerVelocityY = deltaY * sensitivity;
         
         if (this.timeLeft <= 60) {
             timerEl.style.background = 'rgba(255,0,0,0.9)';
-        } else if (this.timeLeft <= 180) {
+        } else if (this.timeLeft <= 900) {
             timerEl.style.background = 'rgba(255,165,0,0.8)';
         }
     }
@@ -1566,7 +1566,7 @@ if (this.isInForest) {
             if (this.rectsOverlap(playerRect, friendlyRect)) {
                 const now = Date.now();
                 const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                if (now - lastTime > 1800) {
+                if (now - lastTime > 3000) {
                     this.handleNPCInteraction(friendly);
                     this.lastInteractionTime[friendly.dataset.message] = now;
                 }
