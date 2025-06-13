@@ -656,13 +656,22 @@ updateForestVisibility() {
         
         const point = e.touches ? e.touches[0] : e;
         const deltaX = point.clientX - this.lastDragX;
-        const deltaY = point.clientY - this.lastDragY;
-        
-        // Reduce sensitivity when on desert (quarter speed)
-        const baseSensitivity = 0.5;
-        const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
-        this.playerVelocityX = deltaX * sensitivity;
-        this.playerVelocityY = deltaY * sensitivity;
+const deltaY = point.clientY - this.lastDragY;
+
+// Update player direction based on movement
+if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
+    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+    if (newDirection !== this.currentDirection) {
+        this.updatePlayerImage(newDirection);
+        this.lastMoveDirection = newDirection;
+    }
+}
+
+// Reduce sensitivity when on desert (quarter speed)
+const baseSensitivity = 0.5;
+const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
+this.playerVelocityX = deltaX * sensitivity;
+this.playerVelocityY = deltaY * sensitivity;
 
         const maxVelocity = 14;
         this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
