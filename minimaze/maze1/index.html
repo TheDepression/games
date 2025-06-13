@@ -1407,14 +1407,16 @@ if (this.isInForest) {
             }
         }
         
-        // Update player emoji based on water status
-        if (onWater && this.hasBoat && !this.isOnWater) {
-            this.isOnWater = true;
-            this.player.textContent = '⛵';
-        } else if (!onWater && this.isOnWater) {
-            this.isOnWater = false;
-            this.player.textContent = this.originalEmoji;
-        }
+       // Update player emoji based on water status
+if (onWater && this.hasBoat && !this.isOnWater) {
+    this.isOnWater = true;
+    this.player.style.backgroundImage = '';
+    this.player.textContent = '⛵';
+} else if (!onWater && this.isOnWater) {
+    this.isOnWater = false;
+    this.player.textContent = '';
+    this.updatePlayerImage(this.lastMoveDirection);
+}
         
         // Check if on lava
         const lavaZones = this.gameWorld.querySelectorAll('[data-zone-type="lava"]');
