@@ -1,0 +1,8 @@
+{
+  "name": "Mini Maze2",
+  "short_name": "mm2",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}
