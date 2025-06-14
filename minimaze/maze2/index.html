@@ -616,7 +616,7 @@ preloadPlayerImages() {
 
 updateForestVisibility() {
     const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
-    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .money-pickup, .heart-pickup, .exit');
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .breakable-wall, .money-pickup, .heart-pickup, .exit');
     
     // First, reset all walls to visible
     walls.forEach(wall => {
@@ -893,14 +893,23 @@ this.updatePlayerImage('s'); // Start facing south
         grassZone3.style.width = '280px';
         grassZone3.style.height = '360px';
         this.gameWorld.appendChild(grassZone3);
+
+        // Grass zone4 with nice texture (forest hint)
+        const grassZone4 = document.createElement('div');
+        grassZone4.className = 'grass-zone';
+        grassZone4.style.left = '1600';
+        grassZone4.style.top = '400px';
+        grassZone4.style.width = '5px';
+        grassZone4.style.height = '50px';
+        this.gameWorld.appendChild(grassZone4);
       
         // Forest zone with geometric leaf pattern (middle-right)
         const forestZone = document.createElement('div');
         forestZone.className = 'forest-zone';
         forestZone.style.left = '600px';
         forestZone.style.top = '360px';
-        forestZone.style.width = '980px';
-        forestZone.style.height = '920px';
+        forestZone.style.width = '1000px';
+        forestZone.style.height = '940px';
         forestZone.dataset.zoneType = 'forest';
         this.gameWorld.appendChild(forestZone);
         
@@ -968,9 +977,7 @@ this.gameWorld.appendChild(castleZone);
   {x: 1580, y: 460, w: 20, h: 820},
   {x: 600, y: 1280, w: 780, h: 20},
   {x: 1500, y: 1280, w: 80, h: 20},
-  {x: 1380, y: 1300, w: 20, h: 20},
-  {x: 1400, y: 1300, w: 20, h: 60},
-  {x: 1480, y: 1300, w: 20, h: 20},
+  {x: 1380, y: 1300, w: 20, h: 60},
   {x: 1480, y: 1300, w: 20, h: 60}
                 
             ],
@@ -1028,6 +1035,8 @@ this.gameWorld.appendChild(castleZone);
   {x: 1380, y: 360, w: 20, h: 120},
   {x: 1200, y: 440, w: 60, h: 20},
   {x: 1260, y: 440, w: 20, h: 80},
+  {x: 980, y: 350, w: 20, h: 10},
+  {x: 1060, y: 350, w: 20, h: 10},
   {x: 970, y: 370, w: 20, h: 60}
 ],
             blue: [
@@ -1221,8 +1230,8 @@ this.gameWorld.appendChild(castleZone);
         const exitEl = document.createElement('div');
         exitEl.className = 'exit';
         exitEl.textContent = '🚪';
-        exitEl.style.left = '2240px';
-        exitEl.style.top = '240px';
+        exitEl.style.left = '2250px';
+        exitEl.style.top = '260px';
         this.gameWorld.appendChild(exitEl);
     }
     
