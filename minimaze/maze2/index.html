@@ -837,13 +837,23 @@ this.updatePlayerImage('s'); // Start facing south
         waterZone3.dataset.zoneType = 'water';
         this.gameWorld.appendChild(waterZone3);
 
+        // Water zone 4
+        const waterZone4 = document.createElement('div');
+        waterZone4.className = 'water-zone';
+        waterZone4.style.left = '1200px';
+        waterZone4.style.top = '360px';
+        waterZone4.style.width = '920px';
+        waterZone4.style.height = '200px';
+        waterZone4.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone4);
+
         // Grass zone with nice texture (middle-left)
         const grassZone = document.createElement('div');
         grassZone.className = 'grass-zone';
         grassZone.style.left = '0px';
         grassZone.style.top = '0px';
-        grassZone.style.width = '360px';
-        grassZone.style.height = '160px';
+        grassZone.style.width = '260px';
+        grassZone.style.height = '110px';
         this.gameWorld.appendChild(grassZone);
 
       // Grass zone2 with nice texture (middle-left)
@@ -917,7 +927,7 @@ this.updatePlayerImage('s'); // Start facing south
         // Castle zone with custom image
 const castleZone = document.createElement('div');
 castleZone.className = 'castle-zone';
-castleZone.style.left = '2175px';
+castleZone.style.left = '2190px';
 castleZone.style.top = '70px';
 castleZone.style.width = '150px';
 castleZone.style.height = '240px';
@@ -1126,8 +1136,8 @@ this.gameWorld.appendChild(castleZone);
         const exitEl = document.createElement('div');
         exitEl.className = 'exit';
         exitEl.textContent = '🚪';
-        exitEl.style.left = '1320px';
-        exitEl.style.top = '760px';
+        exitEl.style.left = '2260px';
+        exitEl.style.top = '280px';
         this.gameWorld.appendChild(exitEl);
     }
     
