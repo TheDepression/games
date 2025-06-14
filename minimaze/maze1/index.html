@@ -896,10 +896,10 @@ this.updatePlayerImage('s'); // Start facing south
         // Castle zone with custom image
 const castleZone = document.createElement('div');
 castleZone.className = 'castle-zone';
-castleZone.style.left = '1215px';
-castleZone.style.top = '520px';
+castleZone.style.left = '1275px';
+castleZone.style.top = '540px';
 castleZone.style.width = '150px';
-castleZone.style.height = '250px';
+castleZone.style.height = '240px';
 this.gameWorld.appendChild(castleZone);
     }
     
@@ -1214,7 +1214,7 @@ this.gameWorld.appendChild(castleZone);
         const enemies = [
             {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6},
             {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5},
-            {x: 800, y: 300, moveX: 780, moveY: 300, range: 120, axis: 'x', speed: 0.7},
+            {x: 800, y: 400, moveX: 780, moveY: 400, range: 120, axis: 'x', speed: 0.7},
             {x: 1000, y: 700, moveX: 980, moveY: 700, range: 100, axis: 'x', speed: 0.7},
             {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6},
             {x: 1400, y: 1200, moveX: 1380, moveY: 1200, range: 120, axis: 'x', speed: 0.8},
@@ -1318,8 +1318,8 @@ this.gameWorld.appendChild(castleZone);
         const exitEl = document.createElement('div');
         exitEl.className = 'exit';
         exitEl.textContent = '🚪';
-        exitEl.style.left = '50px';
-        exitEl.style.top = '50px';
+        exitEl.style.left = '1340px';
+        exitEl.style.top = '780px';
         this.gameWorld.appendChild(exitEl);
     }
     
