@@ -840,12 +840,22 @@ this.updatePlayerImage('s'); // Start facing south
         // Water zone 4
         const waterZone4 = document.createElement('div');
         waterZone4.className = 'water-zone';
-        waterZone4.style.left = '1200px';
-        waterZone4.style.top = '360px';
-        waterZone4.style.width = '920px';
+        waterZone4.style.left = '1180px';
+        waterZone4.style.top = '220px';
+        waterZone4.style.width = '940px';
         waterZone4.style.height = '200px';
         waterZone4.dataset.zoneType = 'water';
         this.gameWorld.appendChild(waterZone4);
+
+        // Water zone 5
+        const waterZone5 = document.createElement('div');
+        waterZone5.className = 'water-zone';
+        waterZone5.style.left = '0px';
+        waterZone5.style.top = '110px';
+        waterZone5.style.width = '360px';
+        waterZone5.style.height = '50px';
+        waterZone5.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone5);
 
         // Grass zone with nice texture (middle-left)
         const grassZone = document.createElement('div');
