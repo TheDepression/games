@@ -1904,7 +1904,7 @@ function restartGame() {
     document.getElementById('forestOverlay').classList.add('active');
     document.getElementById('forestVisionMask').classList.add('active');
     game.showMessage('🌲 Entering the dense forest...');
-      this.updateForestVisibility();
+      game.updateForestVisibility();
   } else if (game.pendingAction === 'exitForest') {
     game.isInForest = false;
     game.forestMusic.pause();
@@ -1912,7 +1912,7 @@ function restartGame() {
     document.getElementById('forestOverlay').classList.remove('active');
     document.getElementById('forestVisionMask').classList.remove('active');
     game.showMessage('🌞 Exiting the forest...');
-      this.updateForestVisibility();
+      game.updateForestVisibility();
   }
   
   game.pendingAction = null;
