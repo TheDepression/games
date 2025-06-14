@@ -41,8 +41,8 @@
         
         #gameWorld {
             position: absolute;
-            width: 1800px;
-            height: 1800px;
+            width: 2400px;
+            height: 2400px;
             transform-origin: 0 0;
         }
         
@@ -888,7 +888,7 @@ this.updatePlayerImage('s'); // Start facing south
         const lavaZone2 = document.createElement('div');
         lavaZone2.className = 'lava-zone';
         lavaZone2.style.left = '1600px';
-        lavaZone2.style.top = '740px';
+        lavaZone2.style.top = '1740px';
         lavaZone2.style.width = '800px';
         lavaZone2.style.height = '240px';
         lavaZone2.dataset.zoneType = 'lava';
@@ -897,20 +897,20 @@ this.updatePlayerImage('s'); // Start facing south
         // Lava zone 3
         const lavaZone3 = document.createElement('div');
         lavaZone3.className = 'lava-zone';
-        lavaZone3.style.left = '1290px';
-        lavaZone3.style.top = '810px';
-        lavaZone3.style.width = '100px';
-        lavaZone3.style.height = '200px';
+        lavaZone3.style.left = '1800px';
+        lavaZone3.style.top = '2100px';
+        lavaZone3.style.width = '380px';
+        lavaZone3.style.height = '160px';
         lavaZone3.dataset.zoneType = 'lava';
         this.gameWorld.appendChild(lavaZone3);
 
         // Desert zone with sand pattern (bottom-right)
         const desertZone = document.createElement('div');
         desertZone.className = 'desert-zone';
-        desertZone.style.left = '1880px';
-        desertZone.style.top = '2100px';
-        desertZone.style.width = '380px';
-        desertZone.style.height = '160px';
+        desertZone.style.left = '1580px';
+        desertZone.style.top = '1000px';
+        desertZone.style.width = '820px';
+        desertZone.style.height = '540px';
         desertZone.dataset.zoneType = 'desert';
         this.gameWorld.appendChild(desertZone);
 
@@ -918,7 +918,7 @@ this.updatePlayerImage('s'); // Start facing south
 const castleZone = document.createElement('div');
 castleZone.className = 'castle-zone';
 castleZone.style.left = '2175px';
-castleZone.style.top = '290px';
+castleZone.style.top = '70px';
 castleZone.style.width = '150px';
 castleZone.style.height = '240px';
 this.gameWorld.appendChild(castleZone);
