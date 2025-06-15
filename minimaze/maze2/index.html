@@ -688,7 +688,7 @@ updateForestVisibility() {
 const deltaY = point.clientY - this.lastDragY;
 
 // Update player direction based on movement
-if (Math.abs(deltaX) > 1.5 || Math.abs(deltaY) > 1.5) {
+if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
     const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
     if (newDirection !== this.currentDirection) {
         // Only update player image if not on water
