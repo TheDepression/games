@@ -453,7 +453,7 @@
             <div>❤️ <span id="hearts">3</span></div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
-        <div id="timer">15:00</div>
+        <div id="timer">0:00</div>
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player">🧙‍♂️</div>
@@ -548,7 +548,7 @@ preloadPlayerImages() {
         this.hearts = 3;
         this.hasKey = false;
         this.gameStarted = false;
-        this.timeLeft = 900;
+        this.timeElapsed = 0;
         this.timerInterval = null;
         this.isInvulnerable = false;
         this.money = 0;
@@ -710,44 +710,43 @@ this.playerVelocityY = deltaY * sensitivity;
     }
     
     startGameTimer() {
-        this.gameStarted = true;
-        this.timeLeft = 900;
+    this.gameStarted = true;
+    this.timeElapsed = 0;
+    this.updateTimer();
+    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    this.timerInterval = setInterval(() => {
+        this.timeElapsed++;
         this.updateTimer();
-        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
-        
-        this.timerInterval = setInterval(() => {
-            this.timeLeft--;
-            this.updateTimer();
-            
-            if (this.timeLeft <= 0) {
-                this.timeUp();
-            }
-        }, 1000);
-    }
+    }, 1000);
+}
     
     updateTimer() {
-        const minutes = Math.floor(this.timeLeft / 60);
-        const seconds = this.timeLeft % 60;
-        const timerEl = document.getElementById('timer');
-        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (this.timeLeft <= 60) {
-            timerEl.style.background = 'rgba(255,0,0,0.9)';
-        } else if (this.timeLeft <= 900) {
-            timerEl.style.background = 'rgba(255,165,0,0.8)';
-        }
-    }
+    const minutes = Math.floor(this.timeElapsed / 60);
+    const seconds = this.timeElapsed % 60;
+    const timerEl = document.getElementById('timer');
+    timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     
-    timeUp() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        this.forestMusic.pause();
-        this.showMessage('⏰ Time\'s up!');
-        setTimeout(() => {
-            this.showLevelComplete('⏰ Time Up!', 'Try again!');
-        }, 2000);
+    // Change color as time progresses
+    if (this.timeElapsed >= 600) { // 10+ minutes = red
+        timerEl.style.background = 'rgba(255,0,0,0.8)';
+    } else if (this.timeElapsed >= 300) { // 5+ minutes = orange
+        timerEl.style.background = 'rgba(255,165,0,0.8)';
+    } else {
+        timerEl.style.background = 'rgba(0,128,0,0.8)'; // Under 5 minutes = green
     }
+}
+    
+    //timeUp() {
+      //  clearInterval(this.timerInterval);
+        //this.gameStarted = false;
+        //this.bgMusic.pause();
+        //this.forestMusic.pause();
+        //this.showMessage('⏰ Time\'s up!');
+        //setTimeout(() => {
+          //  this.showLevelComplete('⏰ Time Up!', 'Try again!');
+        //}, 2000);
+    //}
     
     initLevel() {
         const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone');
