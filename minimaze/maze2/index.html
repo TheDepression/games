@@ -1229,7 +1229,7 @@ this.createForestBees();
             {x: 100, y: 700, message: "🔑 Need a key? Give me 500¥!"},
             {x: 1200, y: 600, message: "⛵ Want a boat? 300¥ and you can sail!"},
             {x: 640, y: 440, message: "🔨 Hammer for sale! Break walls for 400¥!"},
-            {x: 1500, y: 800, message: "👠 Lava-proof shoes! Only 600¥!"}
+            {x: 1500, y: 800, message: "🥾 Lava-proof shoes! Only 600¥!"}
         ];
         
         const friendlyEmojis = ['👴🏻', '👩‍⚕️', '🧙‍♀️', '👷‍♂️'];
@@ -1821,7 +1821,7 @@ if (onLava) {
         if (!this.lavaProtectionActive) {
             this.lavaProtectionActive = true;
             this.lavaProtectionTime = 5; // 5 seconds of protection
-            this.showMessage('👠 Lava shoes protecting you! 5 seconds');
+            this.showMessage('🥾 Lava shoes protecting you! 5 seconds');
         }
         
         // Count down protection time
@@ -1830,11 +1830,11 @@ if (onLava) {
             this.lastLavaZoneTime = now;
             
             if (this.lavaProtectionTime > 0) {
-                this.showMessage(`👠 Protection: ${this.lavaProtectionTime} seconds left`);
+                this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
             } else {
                 // Protection expired
                 this.lavaProtectionActive = false;
-                this.showMessage('👠 Protection expired! Get out of lava!');
+                this.showMessage('🥾 Protection expired! Get out of lava!');
             }
         }
         
@@ -1859,7 +1859,7 @@ if (onLava) {
     if (this.hasLavaShoes && this.lavaProtectionActive) {
         this.lavaProtectionActive = false;
         this.lavaProtectionTime = 0;
-        this.showMessage('👠 Stepped off lava! Shoes recharged for next time');
+        this.showMessage('🥾 Stepped off lava! Shoes recharged for next time');
     }
 }
 
@@ -1945,17 +1945,17 @@ if (onLava) {
             } else {
                 this.showMessage('🔨 Hammer for sale! Break walls for 400¥!');
             }
-        } else if (message === "👠 Lava-proof shoes! Only 600¥!" && !this.hasLavaShoes) {
+        } else if (message === "🥾 Lava-proof shoes! Only 600¥!" && !this.hasLavaShoes) {
     if (this.money >= 600) {
         this.money -= 600;
         this.hasLavaShoes = true;
         this.lavaProtectionTime = 0;
         this.lavaProtectionActive = false;
-        this.showMessage('👠 Lava shoes purchased! 5 seconds protection per entry!');
+        this.showMessage('🥾 Lava shoes purchased! 5 seconds protection per entry!');
         friendly.dataset.message = 'Those shoes will protect you!';
         this.updateUI();
     } else {
-        this.showMessage('👠 Lava-proof shoes! Only 600¥!');
+        this.showMessage('🥾 Lava-proof shoes! Only 600¥!');
     }
 } else {
             this.showMessage(message);
@@ -2010,7 +2010,7 @@ if (onLava) {
 if (this.hasKey) itemsText += ' 🔑';
 if (this.hasBoat) itemsText += ' ⛵';
 if (this.hasHammer) itemsText += ' 🔨';
-if (this.hasLavaShoes) itemsText += ' 👠';
+if (this.hasLavaShoes) itemsText += ' 🥾';
         
         // Add items display if not already there
         if (!document.getElementById('items')) {
