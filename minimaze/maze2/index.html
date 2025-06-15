@@ -557,6 +557,9 @@ preloadPlayerImages() {
         this.hasBoat = false;
         this.hasHammer = false;
         this.hasLavaShoes = false;
+        this.lavaProtectionTime = 0;
+this.lavaProtectionActive = false;
+this.lastLavaZoneTime = 0;
         this.isOnWater = false;
         this.originalEmoji = '🧙‍♂️';
         this.currentDirection = 's'; // Start facing south
@@ -1809,15 +1812,56 @@ if (onWater && this.hasBoat && !this.isOnWater) {
             }
         }
         
-        // Lava damage
-        if (onLava && !this.hasLavaShoes) {
-            const now = Date.now();
-            if (now - this.lastLavaDamage > 1000) { // Damage every second
+        // Lava damage and protection system
+if (onLava) {
+    const now = Date.now();
+    
+    if (this.hasLavaShoes) {
+        // If just entered lava zone, start/reset protection
+        if (!this.lavaProtectionActive) {
+            this.lavaProtectionActive = true;
+            this.lavaProtectionTime = 5; // 5 seconds of protection
+            this.showMessage('👠 Lava shoes protecting you! 5 seconds');
+        }
+        
+        // Count down protection time
+        if (now - this.lastLavaZoneTime > 1000) {
+            this.lavaProtectionTime--;
+            this.lastLavaZoneTime = now;
+            
+            if (this.lavaProtectionTime > 0) {
+                this.showMessage(`👠 Protection: ${this.lavaProtectionTime} seconds left`);
+            } else {
+                // Protection expired
+                this.lavaProtectionActive = false;
+                this.showMessage('👠 Protection expired! Get out of lava!');
+            }
+        }
+        
+        // Take damage if protection expired
+        if (this.lavaProtectionTime <= 0) {
+            if (now - this.lastLavaDamage > 1000) {
                 this.takeDamage();
-                this.showMessage('🔥 Lava burns! You need special shoes!');
+                this.showMessage('🔥 Lava burns! Shoes can\'t protect you anymore!');
                 this.lastLavaDamage = now;
             }
         }
+    } else {
+        // No shoes - take damage
+        if (now - this.lastLavaDamage > 1000) {
+            this.takeDamage();
+            this.showMessage('🔥 Lava burns! You need special shoes!');
+            this.lastLavaDamage = now;
+        }
+    }
+} else {
+    // Not on lava - reset protection for next time
+    if (this.hasLavaShoes && this.lavaProtectionActive) {
+        this.lavaProtectionActive = false;
+        this.lavaProtectionTime = 0;
+        this.showMessage('👠 Stepped off lava! Shoes recharged for next time');
+    }
+}
 
         // Check if on desert zones
         const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
@@ -1902,16 +1946,18 @@ if (onWater && this.hasBoat && !this.isOnWater) {
                 this.showMessage('🔨 Hammer for sale! Break walls for 400¥!');
             }
         } else if (message === "👠 Lava-proof shoes! Only 600¥!" && !this.hasLavaShoes) {
-            if (this.money >= 600) {
-                this.money -= 600;
-                this.hasLavaShoes = true;
-                this.showMessage('👠 Lava shoes purchased! Walk on lava safely!');
-                friendly.dataset.message = 'Those shoes will protect you!';
-                this.updateUI();
-            } else {
-                this.showMessage('👠 Lava-proof shoes! Only 600¥!');
-            }
-        } else {
+    if (this.money >= 600) {
+        this.money -= 600;
+        this.hasLavaShoes = true;
+        this.lavaProtectionTime = 0;
+        this.lavaProtectionActive = false;
+        this.showMessage('👠 Lava shoes purchased! 5 seconds protection per entry!');
+        friendly.dataset.message = 'Those shoes will protect you!';
+        this.updateUI();
+    } else {
+        this.showMessage('👠 Lava-proof shoes! Only 600¥!');
+    }
+} else {
             this.showMessage(message);
         }
     }
