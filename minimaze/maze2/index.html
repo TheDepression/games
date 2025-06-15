@@ -134,7 +134,14 @@
             border: 2px dashed #6d4c41;
             opacity: 0.9;
         }
-        
+        .tiled-wall {
+    position: absolute;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    border: 1px solid rgba(0,0,0,0.2);
+    opacity: 0.9;
+}
         @keyframes waterFlow {
             0% { background-position: 0 0, 10px 10px, 0 0; }
             100% { background-position: 20px 0, 30px 10px, 0 0; }
@@ -1057,20 +1064,31 @@ this.gameWorld.appendChild(castleZone);
             hotpink: [
                 {x: 0, y: 1423, w: 20, h: 20}
             ]
+            tiled: [
+    {x: 1800, y: 2200, w: 100, h: 20},
+    {x: 1000, y: 2100, w: 20, h: 100},
+    {x: 800, y: 2000, w: 60, h: 60}
+]
         };
         
         Object.entries(wallData).forEach(([color, walls]) => {
-            walls.forEach(wall => {
-                const wallEl = document.createElement('div');
-                wallEl.className = 'maze-wall';
-                wallEl.style.left = wall.x + 'px';
-                wallEl.style.top = wall.y + 'px';
-                wallEl.style.width = wall.w + 'px';
-                wallEl.style.height = wall.h + 'px';
-                wallEl.style.background = color;
-                this.gameWorld.appendChild(wallEl);
-            });
-        });
+    walls.forEach(wall => {
+        const wallEl = document.createElement('div');
+        
+        if (color === 'tiled') {
+            wallEl.className = 'tiled-wall';
+        } else {
+            wallEl.className = 'maze-wall';
+            wallEl.style.background = color;
+        }
+        
+        wallEl.style.left = wall.x + 'px';
+        wallEl.style.top = wall.y + 'px';
+        wallEl.style.width = wall.w + 'px';
+        wallEl.style.height = wall.h + 'px';
+        this.gameWorld.appendChild(wallEl);
+    });
+});
         
         // Add some breakable walls
         this.createBreakableWalls();
