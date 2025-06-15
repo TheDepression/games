@@ -147,8 +147,8 @@
         
         #player {
     position: absolute;
-    width: 25px;
-    height: 25px;
+    width: 37px;
+    height: 37px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -449,9 +449,8 @@
 <body>
     <div id="gameContainer">
         <div id="ui">
-            <div>🌍 Colorful World</div>
+            <div>🐸 You have:</div>
             <div>❤️ <span id="hearts">3</span></div>
-            <div id="keyStatus">🔑 Find the key!</div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
         <div id="timer">15:00</div>
@@ -469,7 +468,7 @@
 </div>
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">🌈 Colorful Maze</div>
+                <div style="font-size: 18px; font-weight: bold;">🐸 Master Frog's Adventure</div>
                 <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
             </div>
             <div class="control-hint">
@@ -479,8 +478,8 @@
         </div>
         
         <div id="startScreen">
-            <h2>🌈 Colorful Maze Adventure</h2>
-            <p style="margin: 20px 0;">Explore a magical world of colors and challenges!</p>
+            <h2>🐸 Master Frog's Adventure</h2>
+            <p style="margin: 20px 0;">Save the World</p>
             <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
             <button class="start-button" onclick="startGame()">Start Adventure!</button>
         </div>
@@ -1212,11 +1211,13 @@ this.createForestBees();
         currentX: gorillaX,
         currentY: gorillaY,
         startX: gorillaX,
+        startY: gorillaY,  // Add this line for return behavior
         patrolRange: 80,
         direction: 1,
         speed: 0.8,
         isChasing: false,
-        chaseSpeed: 2.0
+        chaseSpeed: 1.5
+        returning: false   // Add this line for return behavior
     };
 }
     createFriendlies() {
@@ -1482,36 +1483,57 @@ if (this.isInForest) {
     }
     
     // Stop chasing if player escapes forest or gets far enough away
-    if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
-        this.gorilla.isChasing = false;
-        this.showMessage('🦍 Gorilla calmed down...');
-    }
+if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
+    this.gorilla.isChasing = false;
+    this.gorilla.returning = true;  // Add this line
+    this.showMessage('🦍 Gorilla calmed down...');
+}
     
     if (this.gorilla.isChasing) {
-        // Chase the player
-        const deltaX = this.playerX - this.gorilla.currentX;
-        const deltaY = this.playerY - this.gorilla.currentY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    // Chase the player
+    const deltaX = this.playerX - this.gorilla.currentX;
+    const deltaY = this.playerY - this.gorilla.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        const moveX = (deltaX / distance) * this.gorilla.chaseSpeed;
+        const moveY = (deltaY / distance) * this.gorilla.chaseSpeed;
         
-        if (distance > 5) {
-            const moveX = (deltaX / distance) * this.gorilla.chaseSpeed;
-            const moveY = (deltaY / distance) * this.gorilla.chaseSpeed;
-            
-            // Check if gorilla can move to new position (don't pass through walls)
-            if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
-                this.gorilla.currentX += moveX;
-                this.gorilla.currentY += moveY;
-            }
-        }
-    } else {
-        // Patrol behavior
-        this.gorilla.currentX += this.gorilla.direction * this.gorilla.speed;
-        
-        if (this.gorilla.currentX <= this.gorilla.startX || 
-            this.gorilla.currentX >= this.gorilla.startX + this.gorilla.patrolRange) {
-            this.gorilla.direction *= -1;
+        // Check if gorilla can move to new position (don't pass through walls)
+        if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+            this.gorilla.currentX += moveX;
+            this.gorilla.currentY += moveY;
         }
     }
+} else if (this.gorilla.returning) {
+    // Return to starting position
+    const deltaX = this.gorilla.startX - this.gorilla.currentX;
+    const deltaY = this.gorilla.startY - this.gorilla.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        const moveX = (deltaX / distance) * this.gorilla.speed * 1.5; // Move faster when returning
+        const moveY = (deltaY / distance) * this.gorilla.speed * 1.5;
+        
+        if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+            this.gorilla.currentX += moveX;
+            this.gorilla.currentY += moveY;
+        }
+    } else {
+        // Reached starting position, resume patrol
+        this.gorilla.returning = false;
+        this.gorilla.currentX = this.gorilla.startX;
+        this.gorilla.currentY = this.gorilla.startY;
+    }
+} else {
+    // Patrol behavior
+    this.gorilla.currentX += this.gorilla.direction * this.gorilla.speed;
+    
+    if (this.gorilla.currentX <= this.gorilla.startX || 
+        this.gorilla.currentX >= this.gorilla.startX + this.gorilla.patrolRange) {
+        this.gorilla.direction *= -1;
+    }
+}
     
     this.gorilla.element.style.left = this.gorilla.currentX + 'px';
     this.gorilla.element.style.top = this.gorilla.currentY + 'px';
@@ -1930,15 +1952,15 @@ if (onWater && this.hasBoat && !this.isOnWater) {
     
     updateUI() {
         document.getElementById('hearts').textContent = this.hearts;
-        document.getElementById('keyStatus').textContent = this.hasKey ? '🔑 Got it!' : '🔑 Find the key!';
         document.getElementById('money').textContent = this.money;
         
         // Update UI to show owned items
         const ui = document.getElementById('ui');
         let itemsText = '';
-        if (this.hasBoat) itemsText += ' ⛵';
-        if (this.hasHammer) itemsText += ' 🔨';
-        if (this.hasLavaShoes) itemsText += ' 👠';
+if (this.hasKey) itemsText += ' 🔑';
+if (this.hasBoat) itemsText += ' ⛵';
+if (this.hasHammer) itemsText += ' 🔨';
+if (this.hasLavaShoes) itemsText += ' 👠';
         
         // Add items display if not already there
         if (!document.getElementById('items')) {
