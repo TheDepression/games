@@ -1971,10 +1971,10 @@ if (this.hasLavaShoes) itemsText += ' 👠';
         if (!document.getElementById('items')) {
             const itemsDiv = document.createElement('div');
             itemsDiv.id = 'items';
-            itemsDiv.textContent = 'Items:' + itemsText;
+            itemsDiv.textContent = '+' + itemsText;
             ui.appendChild(itemsDiv);
         } else {
-            document.getElementById('items').textContent = 'Items:' + itemsText;
+            document.getElementById('items').textContent = '+' + itemsText;
         }
     }
     
