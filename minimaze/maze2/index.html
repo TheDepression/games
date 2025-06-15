@@ -1389,7 +1389,7 @@ if (this.isInForest) {
             {x: x + playerSize - padding, y: y + playerSize/2}
         ];
         
-        const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall');
+        const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .tiled-wall');
         
         for (let wall of walls) {
             const wallRect = {
@@ -1575,7 +1575,7 @@ canGorillaMoveTo(x, y) {
         {x: x + gorillaSize - padding, y: y + gorillaSize - padding}
     ];
     
-    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall');
+   const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .tiled-wall');
     
     for (let wall of walls) {
         const wallRect = {
