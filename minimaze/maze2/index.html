@@ -147,8 +147,8 @@
         
         #player {
     position: absolute;
-    width: 37px;
-    height: 37px;
+    width: 32px;
+    height: 32px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -788,7 +788,7 @@ this.playerVelocityY = deltaY * sensitivity;
 this.playerX = 420;
 this.playerY = 1760;
 // Center the larger visual character over the smaller hitbox
-const visualOffset = (37 - 24) / 2; // 6.5px offset to center
+const visualOffset = (32 - 24) / 2; // 6.5px offset to center
 this.player.style.left = (this.playerX - visualOffset) + 'px';
 this.player.style.top = (this.playerY - visualOffset) + 'px';
 this.updatePlayerImage('s'); // Start facing south
@@ -1323,7 +1323,7 @@ this.createForestBees();
                 this.playerX = newX;
                 this.playerY = newY;
                 // Center the larger visual character over the smaller hitbox
-const visualOffset = (37 - 24) / 2; // 6.5px offset to center
+const visualOffset = (32 - 24) / 2; // 6.5px offset to center
 this.player.style.left = (this.playerX - visualOffset) + 'px';
 this.player.style.top = (this.playerY - visualOffset) + 'px';
                 
