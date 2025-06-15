@@ -787,8 +787,10 @@ this.playerVelocityY = deltaY * sensitivity;
         // Set player position
 this.playerX = 420;
 this.playerY = 1760;
-this.player.style.left = this.playerX + 'px';
-this.player.style.top = this.playerY + 'px';
+// Center the larger visual character over the smaller hitbox
+const visualOffset = (37 - 24) / 2; // 6.5px offset to center
+this.player.style.left = (this.playerX - visualOffset) + 'px';
+this.player.style.top = (this.playerY - visualOffset) + 'px';
 this.updatePlayerImage('s'); // Start facing south
         
         // Create enemies scattered throughout the maze
@@ -1320,8 +1322,10 @@ this.createForestBees();
             if (this.canMoveTo(newX, newY)) {
                 this.playerX = newX;
                 this.playerY = newY;
-                this.player.style.left = this.playerX + 'px';
-                this.player.style.top = this.playerY + 'px';
+                // Center the larger visual character over the smaller hitbox
+const visualOffset = (37 - 24) / 2; // 6.5px offset to center
+this.player.style.left = (this.playerX - visualOffset) + 'px';
+this.player.style.top = (this.playerY - visualOffset) + 'px';
                 
                 // Center player in gameArea
                 const gameAreaWidth = this.gameArea.offsetWidth;
@@ -1524,6 +1528,7 @@ if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
         this.gorilla.returning = false;
         this.gorilla.currentX = this.gorilla.startX;
         this.gorilla.currentY = this.gorilla.startY;
+        this.gorilla.direction = 1; // Reset to move right first
     }
 } else {
     // Patrol behavior
