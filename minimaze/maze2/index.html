@@ -1603,18 +1603,32 @@ canGorillaMoveTo(x, y) {
         this.checkZoneEffects();
         
         // Check enemy collisions
-        this.movingEnemies.forEach(enemy => {
-            const enemyRect = {
-                left: enemy.currentX,
-                top: enemy.currentY,
-                right: enemy.currentX + 22,
-                bottom: enemy.currentY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, enemyRect)) {
-                this.takeDamage();
-            }
-        });
+this.movingEnemies.forEach(enemy => {
+    const enemyRect = {
+        left: enemy.currentX,
+        top: enemy.currentY,
+        right: enemy.currentX + 22,
+        bottom: enemy.currentY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage();
+    }
+});
+
+// Check gorilla collision
+if (this.gorilla) {
+    const gorillaRect = {
+        left: this.gorilla.currentX,
+        top: this.gorilla.currentY,
+        right: this.gorilla.currentX + 33,
+        bottom: this.gorilla.currentY + 33
+    };
+    
+    if (this.rectsOverlap(playerRect, gorillaRect)) {
+        this.takeDamage();
+    }
+}
         
         // Check foreground enemy collision
         if (this.foregroundEnemy) {
