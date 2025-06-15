@@ -1553,12 +1553,12 @@ canGorillaMoveTo(x, y) {
     updateForegroundEnemy() {
         if (!this.gameStarted) return;
         const now = Date.now();
-        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 25000 && !this.isInForest) {
+        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000 && !this.isInForest) {
             const playerCenterX = this.playerX + 12;
             const direction = playerCenterX < 900 ? 1 : -1;
-            const startX = direction > 0 ? -60 : 1860;
-            const y = Math.random() * 1740;
-            const speed = (1860 / 25) / 60;
+            const startX = direction > 0 ? -60 : 2460;
+            const y = Math.random() * 2340;
+            const speed = (2460 / 25) / 60;
             
             const enemyEl = document.createElement('div');
             enemyEl.className = 'foreground-enemy';
