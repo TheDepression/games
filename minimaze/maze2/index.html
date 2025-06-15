@@ -1122,15 +1122,14 @@ this.gameWorld.appendChild(castleZone);
     }
     
     createEnemies() {
-        const enemies = [
-            {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6},
-            {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5},
-            {x: 800, y: 400, moveX: 780, moveY: 400, range: 120, axis: 'x', speed: 0.7},
-            {x: 1000, y: 700, moveX: 980, moveY: 700, range: 100, axis: 'x', speed: 0.7},
-            {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6},
-            {x: 1400, y: 1200, moveX: 1380, moveY: 1200, range: 120, axis: 'x', speed: 0.8},
-            {x: 700, y: 1600, moveX: 700, moveY: 1580, range: 100, axis: 'y', speed: 0.7}
-        ];
+    const enemies = [
+        {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6},
+        {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5},
+        {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6},
+        {x: 200, y: 1600, moveX: 200, moveY: 1580, range: 100, axis: 'y', speed: 0.7},
+        {x: 1700, y: 1400, moveX: 1680, moveY: 1400, range: 120, axis: 'x', speed: 0.8},
+        {x: 2000, y: 800, moveX: 1980, moveY: 800, range: 100, axis: 'x', speed: 0.7}
+    ];
         
         const enemyEmojis = ['🦠', '💉', '👾', '🐍'];
         
@@ -1153,9 +1152,74 @@ this.gameWorld.appendChild(castleZone);
                 direction: 1,
                 speed: enemy.speed
             });
+
+            // Add forest bees
+this.createForestBees();
         });
     }
+    createForestBees() {
+    // Create 5 bees in the forest zone with 120px margin from edges
+    const forestLeft = 600 + 120;
+    const forestRight = 1600 - 120;
+    const forestTop = 360 + 120;
+    const forestBottom = 1300 - 120;
     
+    for (let i = 0; i < 5; i++) {
+        const startX = forestLeft + Math.random() * (forestRight - forestLeft);
+        const startY = forestTop + Math.random() * (forestBottom - forestTop);
+        
+        const beeEl = document.createElement('div');
+        beeEl.className = 'enemy forest-bee';
+        beeEl.textContent = '🐝';
+        beeEl.style.left = startX + 'px';
+        beeEl.style.top = startY + 'px';
+        beeEl.style.zIndex = '80'; // Higher z-index so they fly over walls
+        this.gameWorld.appendChild(beeEl);
+        
+        this.movingEnemies.push({
+            element: beeEl,
+            type: 'bee',
+            currentX: startX,
+            currentY: startY,
+            targetX: startX,
+            targetY: startY,
+            speed: 1.2,
+            changeDirectionTimer: 0,
+            forestBounds: {
+                left: forestLeft,
+                right: forestRight,
+                top: forestTop,
+                bottom: forestBottom
+            }
+        });
+    }
+        // Add gorilla near the heart in the northeast forest area
+    const gorillaX = 1400;
+    const gorillaY = 1280;
+    
+    const gorillaEl = document.createElement('div');
+    gorillaEl.className = 'enemy forest-gorilla';
+    gorillaEl.textContent = '🦍';
+    gorillaEl.style.left = gorillaX + 'px';
+    gorillaEl.style.top = gorillaY + 'px';
+    gorillaEl.style.fontSize = '27px'; // 50% larger
+    gorillaEl.style.width = '33px';
+    gorillaEl.style.height = '33px';
+    this.gameWorld.appendChild(gorillaEl);
+    
+    this.gorilla = {
+        element: gorillaEl,
+        type: 'gorilla',
+        currentX: gorillaX,
+        currentY: gorillaY,
+        startX: gorillaX,
+        patrolRange: 80,
+        direction: 1,
+        speed: 0.8,
+        isChasing: false,
+        chaseSpeed: 2.0
+    };
+}
     createFriendlies() {
         const friendlies = [
             {x: 100, y: 700, message: "🔑 Need a key? Give me 500¥!"},
@@ -1358,7 +1422,32 @@ if (this.isInForest) {
     }
     
     updateMovingEnemies() {
-        this.movingEnemies.forEach(enemy => {
+    this.movingEnemies.forEach(enemy => {
+        if (enemy.type === 'bee') {
+            // Update bee movement
+            enemy.changeDirectionTimer--;
+            
+            if (enemy.changeDirectionTimer <= 0) {
+                // Pick new random target within forest bounds
+                enemy.targetX = enemy.forestBounds.left + Math.random() * (enemy.forestBounds.right - enemy.forestBounds.left);
+                enemy.targetY = enemy.forestBounds.top + Math.random() * (enemy.forestBounds.bottom - enemy.forestBounds.top);
+                enemy.changeDirectionTimer = 60 + Math.random() * 120; // 1-3 seconds at 60fps
+            }
+            
+            // Move towards target
+            const deltaX = enemy.targetX - enemy.currentX;
+            const deltaY = enemy.targetY - enemy.currentY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            if (distance > 5) {
+                enemy.currentX += (deltaX / distance) * enemy.speed;
+                enemy.currentY += (deltaY / distance) * enemy.speed;
+            }
+            
+            enemy.element.style.left = enemy.currentX + 'px';
+            enemy.element.style.top = enemy.currentY + 'px';
+        } else {
+            // Original enemy movement for non-bee enemies
             if (enemy.axis === 'x') {
                 enemy.currentX += enemy.direction * enemy.speed;
                 if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
@@ -1372,8 +1461,94 @@ if (this.isInForest) {
                 }
                 enemy.element.style.top = enemy.currentY + 'px';
             }
-        });
+        }
+    });
+    
+    // Update gorilla
+    this.updateGorilla();
+}
+
+    updateGorilla() {
+    if (!this.gorilla) return;
+    
+    const playerDistance = Math.sqrt(
+        Math.pow(this.playerX - this.gorilla.currentX, 2) + 
+        Math.pow(this.playerY - this.gorilla.currentY, 2)
+    );
+    
+    // Check if player is in forest and close enough to start chasing
+    if (this.isInForest && playerDistance <= 60 && !this.gorilla.isChasing) {
+        this.gorilla.isChasing = true;
+        this.showMessage('🦍 ROAR! Gorilla is angry!');
     }
+    
+    // Stop chasing if player escapes forest or gets far enough away
+    if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
+        this.gorilla.isChasing = false;
+        this.showMessage('🦍 Gorilla calmed down...');
+    }
+    
+    if (this.gorilla.isChasing) {
+        // Chase the player
+        const deltaX = this.playerX - this.gorilla.currentX;
+        const deltaY = this.playerY - this.gorilla.currentY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (distance > 5) {
+            const moveX = (deltaX / distance) * this.gorilla.chaseSpeed;
+            const moveY = (deltaY / distance) * this.gorilla.chaseSpeed;
+            
+            // Check if gorilla can move to new position (don't pass through walls)
+            if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+                this.gorilla.currentX += moveX;
+                this.gorilla.currentY += moveY;
+            }
+        }
+    } else {
+        // Patrol behavior
+        this.gorilla.currentX += this.gorilla.direction * this.gorilla.speed;
+        
+        if (this.gorilla.currentX <= this.gorilla.startX || 
+            this.gorilla.currentX >= this.gorilla.startX + this.gorilla.patrolRange) {
+            this.gorilla.direction *= -1;
+        }
+    }
+    
+    this.gorilla.element.style.left = this.gorilla.currentX + 'px';
+    this.gorilla.element.style.top = this.gorilla.currentY + 'px';
+}
+
+canGorillaMoveTo(x, y) {
+    const gorillaSize = 33;
+    const padding = 2;
+    
+    const points = [
+        {x: x + padding, y: y + padding},
+        {x: x + gorillaSize - padding, y: y + padding},
+        {x: x + padding, y: y + gorillaSize - padding},
+        {x: x + gorillaSize - padding, y: y + gorillaSize - padding}
+    ];
+    
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall');
+    
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + (parseInt(wall.style.width) || 20),
+            bottom: parseInt(wall.style.top) + (parseInt(wall.style.height) || 20)
+        };
+        
+        for (let point of points) {
+            if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
     
     updateForegroundEnemy() {
         if (!this.gameStarted) return;
