@@ -396,6 +396,31 @@
       <div class="mode-btn" data-mode="items">🎯 Items</div>
     </div>
 
+    <div style="display: flex; gap: 15px; justify-content: center; align-items: center; margin: 15px 0; flex-wrap: wrap;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="color-label">Line Thickness:</span>
+        <select id="thicknessSelect" style="background: #333; border: 2px solid #666; border-radius: 6px; color: #fff; padding: 4px; font-size: 11px;">
+          <option value="1">1px</option>
+          <option value="10">10px</option>
+          <option value="20" selected>20px</option>
+          <option value="30">30px</option>
+          <option value="50">50px</option>
+          <option value="100">100px</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="color-label">Snap Grid:</span>
+        <select id="snapSelect" style="background: #333; border: 2px solid #666; border-radius: 6px; color: #fff; padding: 4px; font-size: 11px;">
+          <option value="1">No Snap</option>
+          <option value="5">5px</option>
+          <option value="10">10px</option>
+          <option value="20" selected>20px</option>
+          <option value="30">30px</option>
+          <option value="50">50px</option>
+        </select>
+      </div>
+    </div>
+
     <div id="wallsControls">
       <div class="color-palette">
         <span class="color-label">Wall Color:</span>
@@ -465,7 +490,10 @@
     </div>
 
     <div id="loadBox" style="display:none; margin:10px 0; padding:10px; background:#2a2a2a; border-radius:8px;">
-      <div style="margin-bottom:8px; color:#aaa; font-size:12px;">Paste coordinate data (will add to existing content):</div>
+      <div style="margin-bottom:8px; color:#aaa; font-size:12px;">
+        Paste coordinate data (will add to existing content)<br>
+        <strong>Tip:</strong> Add a minus sign (-) before coordinates to remove them: <code>-{x: 100, y: 200, w: 20, h: 100}</code>
+      </div>
       <textarea id="loadInput" style="width:100%; height:80px; background:#1a1a1a; border:2px solid #666; border-radius:6px; color:#fff; padding:8px; font-family:monospace; font-size:11px; box-sizing:border-box;"></textarea>
       <div style="margin-top:8px; display:flex; gap:8px;">
         <button class="load-btn" onclick="loadMaze()" style="padding:6px 12px; font-size:12px;">Load</button>
@@ -582,6 +610,8 @@
     let gridHeight = 2400;
     let history = [];
     let historyIndex = -1;
+    let lineThickness = 20;
+    let snapSize = 20;
 
     let walls = [];
     let zones = [];
@@ -593,16 +623,17 @@
       'hotpink': '#FC8EAC', 'gold': '#FFD700', 'brown': '#8B4513'
     };
 
+    // Initialize
     initializeGrid();
     setupEventListeners();
     saveState();
 
     function initializeGrid() {
       walls = [
-        {startX: 0, startY: 0, endX: gridWidth, endY: 0, color: '#333', type: 'black'},
-        {startX: 0, startY: 0, endX: 0, endY: gridHeight, color: '#333', type: 'black'},
-        {startX: gridWidth, startY: 0, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'},
-        {startX: 0, startY: gridHeight, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'}
+        {startX: 0, startY: 0, endX: gridWidth, endY: 0, color: '#333', type: 'black', thickness: 20},
+        {startX: 0, startY: 0, endX: 0, endY: gridHeight, color: '#333', type: 'black', thickness: 20},
+        {startX: gridWidth, startY: 0, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black', thickness: 20},
+        {startX: 0, startY: gridHeight, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black', thickness: 20}
       ];
       zones = [];
       items = [];
@@ -662,6 +693,15 @@
           document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
           this.classList.add('active');
         });
+      });
+
+      // Thickness and snap controls
+      document.getElementById('thicknessSelect').addEventListener('change', function() {
+        lineThickness = parseInt(this.value);
+      });
+      
+      document.getElementById('snapSelect').addEventListener('change', function() {
+        snapSize = parseInt(this.value);
       });
 
       // Canvas events
@@ -801,10 +841,10 @@
 
     function clearAll() {
       walls = [
-        {startX: 0, startY: 0, endX: gridWidth, endY: 0, color: '#333', type: 'black'},
-        {startX: 0, startY: 0, endX: 0, endY: gridHeight, color: '#333', type: 'black'},
-        {startX: gridWidth, startY: 0, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'},
-        {startX: 0, startY: gridHeight, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'}
+        {startX: 0, startY: 0, endX: gridWidth, endY: 0, color: '#333', type: 'black', thickness: 20},
+        {startX: 0, startY: 0, endX: 0, endY: gridHeight, color: '#333', type: 'black', thickness: 20},
+        {startX: gridWidth, startY: 0, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black', thickness: 20},
+        {startX: 0, startY: gridHeight, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black', thickness: 20}
       ];
       zones = [];
       items = [];
@@ -1042,7 +1082,8 @@
     }
 
     function snapToGrid(coord) {
-      return Math.round(coord / 20) * 20;
+      if (snapSize === 1) return coord;
+      return Math.round(coord / snapSize) * snapSize;
     }
 
     function getCanvasCoordinates(clientX, clientY) {
@@ -1060,29 +1101,29 @@
     }
 
     function findElementAtPosition(x, y) {
-      // Check items first (smallest targets)
-      for (let i = items.length - 1; i >= 0; i--) {
-        const item = items[i];
-        if (Math.abs(item.x - x) <= 25 && Math.abs(item.y - y) <= 25) {
-          return { type: 'item', index: i };
+      // Only find elements matching current mode
+      if (currentMode === 'items') {
+        for (let i = items.length - 1; i >= 0; i--) {
+          const item = items[i];
+          if (Math.abs(item.x - x) <= 25 && Math.abs(item.y - y) <= 25) {
+            return { type: 'item', index: i };
+          }
         }
-      }
-      
-      // Check zones
-      for (let i = zones.length - 1; i >= 0; i--) {
-        const zone = zones[i];
-        if (x >= zone.x && x <= zone.x + zone.w && y >= zone.y && y <= zone.y + zone.h) {
-          return { type: 'zone', index: i };
+      } else if (currentMode === 'zones') {
+        for (let i = zones.length - 1; i >= 0; i--) {
+          const zone = zones[i];
+          if (x >= zone.x && x <= zone.x + zone.w && y >= zone.y && y <= zone.y + zone.h) {
+            return { type: 'zone', index: i };
+          }
         }
-      }
-      
-      // Check walls (skip border walls)
-      for (let i = walls.length - 1; i >= 4; i--) {
-        const wall = walls[i];
-        const tolerance = 25;
-        const dist = distanceToLine(x, y, wall.startX, wall.startY, wall.endX, wall.endY);
-        if (dist <= tolerance) {
-          return { type: 'wall', index: i };
+      } else if (currentMode === 'walls') {
+        for (let i = walls.length - 1; i >= 4; i--) {
+          const wall = walls[i];
+          const tolerance = Math.max(25, lineThickness);
+          const dist = distanceToLine(x, y, wall.startX, wall.startY, wall.endX, wall.endY);
+          if (dist <= tolerance) {
+            return { type: 'wall', index: i };
+          }
         }
       }
       
@@ -1151,7 +1192,7 @@
         isDrawing = true;
         currentWall = { 
           startX: pos.x, startY: pos.y, endX: pos.x, endY: pos.y,
-          color: currentColor, type: currentType
+          color: currentColor, type: currentType, thickness: lineThickness
         };
       }
     }
@@ -1242,7 +1283,7 @@
 
     function drawWall(wall) {
       ctx.strokeStyle = wall.color;
-      ctx.lineWidth = 20;
+      ctx.lineWidth = wall.thickness || lineThickness;
       ctx.lineCap = 'butt';
       ctx.beginPath();
       ctx.moveTo(wall.startX, wall.startY);
@@ -1253,7 +1294,7 @@
     function drawCurrentWall() {
       if (!currentWall) return;
       ctx.strokeStyle = currentWall.color;
-      ctx.lineWidth = 20;
+      ctx.lineWidth = lineThickness;
       ctx.lineCap = 'butt';
       ctx.beginPath();
       ctx.moveTo(currentWall.startX, currentWall.startY);
@@ -1310,20 +1351,24 @@
             x = Math.min(wall.startX, wall.endX);
             y = Math.min(wall.startY, wall.endY);
             w = Math.round(deltaX);
-            h = 20;
+            h = wall.thickness || 20;
           } else {
             x = Math.min(wall.startX, wall.endX);
             y = Math.min(wall.startY, wall.endY);
-            w = 20;
+            w = wall.thickness || 20;
             h = Math.round(deltaY);
           }
-          wallsByType[type].push({x: Math.round(x), y: Math.round(y), w, h});
+          wallsByType[type].push({x: Math.round(x), y: Math.round(y), w, h, thickness: wall.thickness || 20});
         });
 
         Object.entries(wallsByType).forEach(([type, coords]) => {
           outputText += `// ${type.toUpperCase()} WALLS (${coords.length} items)\nconst ${type}Walls = [\n`;
           coords.forEach(coord => {
-            outputText += `  {x: ${coord.x}, y: ${coord.y}, w: ${coord.w}, h: ${coord.h}},\n`;
+            if (coord.thickness && coord.thickness !== 20) {
+              outputText += `  {x: ${coord.x}, y: ${coord.y}, w: ${coord.w}, h: ${coord.h}, thickness: ${coord.thickness}},\n`;
+            } else {
+              outputText += `  {x: ${coord.x}, y: ${coord.y}, w: ${coord.w}, h: ${coord.h}},\n`;
+            }
           });
           outputText += `];\n\n`;
         });
@@ -1378,19 +1423,15 @@
     }
 
     function parseOutputToCanvas() {
-      // This would parse the textarea content back to canvas elements
-      // Implementation would be similar to loadMaze but parsing all element types
-      // For now, we'll keep the existing loadMaze functionality
-    }
-
-    function loadMaze() {
-      const input = document.getElementById('loadInput').value.trim();
-      if (!input) {
-        alert('Please paste coordinate data first!');
-        return;
-      }
-
       try {
+        const input = output.value.trim();
+        if (!input) return;
+
+        // Clear existing non-border elements
+        walls = walls.slice(0, 4); // Keep border walls
+        zones = [];
+        items = [];
+
         const lines = input.split('\n');
         let currentColor = '';
         let currentType = '';
@@ -1439,12 +1480,13 @@
                 items.push({ x, y, emoji });
               }
             } else {
-              const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+),\s*w:\s*(\d+),\s*h:\s*(\d+)\s*\}/);
+              const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+),\s*w:\s*(\d+),\s*h:\s*(\d+)(?:,\s*thickness:\s*(\d+))?\s*\}/);
               if (coordMatch) {
                 const x = parseInt(coordMatch[1]);
                 const y = parseInt(coordMatch[2]);
                 const w = parseInt(coordMatch[3]);
                 const h = parseInt(coordMatch[4]);
+                const thickness = coordMatch[5] ? parseInt(coordMatch[5]) : 20;
                 
                 if (currentArrayType === 'zones') {
                   zones.push({
@@ -1463,7 +1505,8 @@
                   walls.push({
                     startX, startY, endX, endY,
                     color: currentColor,
-                    type: currentType
+                    type: currentType,
+                    thickness: thickness
                   });
                 }
               }
@@ -1473,12 +1516,9 @@
         
         redrawCanvas();
         updateCoordsCount();
-        saveState();
-        toggleLoadBox();
-        alert(`Loaded additional elements successfully!`);
         
       } catch (error) {
-        alert('Error parsing coordinates. Please check the format and try again.');
+        // Silently handle parsing errors to avoid disrupting real-time editing
       }
     }
 
@@ -1488,6 +1528,176 @@
         'gem': '💎', 'trophy': '🏆', 'door': '🚪', 'crystal': '🔮', 'star': '⭐'
       };
       return nameToEmoji[name] || '❤️';
+    }
+
+    function loadMaze() {
+      const input = document.getElementById('loadInput').value.trim();
+      if (!input) {
+        alert('Please paste coordinate data first!');
+        return;
+      }
+
+      try {
+        const lines = input.split('\n');
+        let currentColor = '';
+        let currentType = '';
+        let currentArrayType = '';
+        let inArray = false;
+        let removeMode = false;
+        let elementsToRemove = [];
+        
+        for (let line of lines) {
+          line = line.trim();
+          
+          // Check for removal syntax
+          if (line.startsWith('-{')) {
+            removeMode = true;
+            line = line.substring(1); // Remove the minus sign
+          } else {
+            removeMode = false;
+          }
+          
+          if (!line || (line.startsWith('//') && !line.includes('const'))) continue;
+          
+          const constMatch = line.match(/const\s+(\w+)\s*=\s*\[/);
+          if (constMatch) {
+            const fullName = constMatch[1].toLowerCase();
+            
+            if (fullName.includes('walls')) {
+              currentArrayType = 'walls';
+              currentType = fullName.replace('walls', '');
+            } else if (fullName.includes('zones')) {
+              currentArrayType = 'zones';
+              currentType = fullName.replace('zones', '');
+            } else if (fullName.includes('items')) {
+              currentArrayType = 'items';
+              currentType = fullName.replace('items', '');
+            } else {
+              currentArrayType = 'walls';
+              currentType = fullName;
+            }
+            
+            currentColor = colorMap[currentType] || '#333';
+            inArray = true;
+            continue;
+          }
+          
+          if (line.includes('];')) {
+            inArray = false;
+            continue;
+          }
+          
+          if (inArray && line.includes('{') && line.includes('}')) {
+            if (removeMode) {
+              // Store coordinates to remove
+              if (currentArrayType === 'items') {
+                const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+)\s*\}/);
+                if (coordMatch) {
+                  elementsToRemove.push({
+                    type: 'item',
+                    x: parseInt(coordMatch[1]),
+                    y: parseInt(coordMatch[2])
+                  });
+                }
+              } else {
+                const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+),\s*w:\s*(\d+),\s*h:\s*(\d+)(?:,\s*thickness:\s*(\d+))?\s*\}/);
+                if (coordMatch) {
+                  elementsToRemove.push({
+                    type: currentArrayType,
+                    x: parseInt(coordMatch[1]),
+                    y: parseInt(coordMatch[2]),
+                    w: parseInt(coordMatch[3]),
+                    h: parseInt(coordMatch[4])
+                  });
+                }
+              }
+            } else {
+              // Add elements normally
+              if (currentArrayType === 'items') {
+                const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+)\s*\}/);
+                if (coordMatch) {
+                  const x = parseInt(coordMatch[1]);
+                  const y = parseInt(coordMatch[2]);
+                  const emoji = getEmojiFromName(currentType);
+                  items.push({ x, y, emoji });
+                }
+              } else {
+                const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+),\s*w:\s*(\d+),\s*h:\s*(\d+)(?:,\s*thickness:\s*(\d+))?\s*\}/);
+                if (coordMatch) {
+                  const x = parseInt(coordMatch[1]);
+                  const y = parseInt(coordMatch[2]);
+                  const w = parseInt(coordMatch[3]);
+                  const h = parseInt(coordMatch[4]);
+                  const thickness = coordMatch[5] ? parseInt(coordMatch[5]) : 20;
+                  
+                  if (currentArrayType === 'zones') {
+                    zones.push({
+                      x, y, w, h,
+                      color: currentColor,
+                      type: currentType
+                    });
+                  } else {
+                    let startX, startY, endX, endY;
+                    if (w > h) {
+                      startX = x; startY = y; endX = x + w; endY = y;
+                    } else {
+                      startX = x; startY = y; endX = x; endY = y + h;
+                    }
+                    
+                    walls.push({
+                      startX, startY, endX, endY,
+                      color: currentColor,
+                      type: currentType,
+                      thickness: thickness
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        // Remove specified elements
+        elementsToRemove.forEach(toRemove => {
+          if (toRemove.type === 'item') {
+            items = items.filter(item => !(item.x === toRemove.x && item.y === toRemove.y));
+          } else if (toRemove.type === 'zones') {
+            zones = zones.filter(zone => !(zone.x === toRemove.x && zone.y === toRemove.y && zone.w === toRemove.w && zone.h === toRemove.h));
+          } else if (toRemove.type === 'walls') {
+            walls = walls.filter((wall, index) => {
+              if (index < 4) return true; // Don't remove border walls
+              const isHorizontal = Math.abs(wall.endX - wall.startX) > Math.abs(wall.endY - wall.startY);
+              let x, y, w, h;
+              if (isHorizontal) {
+                x = Math.min(wall.startX, wall.endX);
+                y = Math.min(wall.startY, wall.endY);
+                w = Math.abs(wall.endX - wall.startX);
+                h = wall.thickness || 20;
+              } else {
+                x = Math.min(wall.startX, wall.endX);
+                y = Math.min(wall.startY, wall.endY);
+                w = wall.thickness || 20;
+                h = Math.abs(wall.endY - wall.startY);
+              }
+              return !(x === toRemove.x && y === toRemove.y && w === toRemove.w && h === toRemove.h);
+            });
+          }
+        });
+        
+        redrawCanvas();
+        updateCoordsCount();
+        saveState();
+        toggleLoadBox();
+        
+        if (elementsToRemove.length > 0) {
+          alert(`Loaded additional elements and removed ${elementsToRemove.length} specified elements!`);
+        } else {
+          alert(`Loaded additional elements successfully!`);
+        }
+        
+      } catch (error) {
+        alert('Error parsing coordinates. Please check the format and try again.');
+      }
     }
 
     function setupCanvasEvents() {
@@ -1610,124 +1820,6 @@
         }
       });
     });
-
-    // Load saved mazes from localStorage
-    function loadSavedMazes() {
-      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
-      return Object.keys(saves).map(name => ({
-        name,
-        data: saves[name],
-        timestamp: saves[name].timestamp
-      })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    }
-
-    // Add load from localStorage functionality
-    function showLoadFromStorageModal() {
-      const saves = loadSavedMazes();
-      if (saves.length === 0) {
-        alert('No saved mazes found in local storage.');
-        return;
-      }
-
-      let modalHTML = `
-        <div class="modal" id="loadStorageModal" style="display: block;">
-          <div class="modal-content">
-            <h3>Load from Local Storage</h3>
-            <div style="max-height: 300px; overflow-y: auto;">
-      `;
-
-      saves.forEach(save => {
-        const date = new Date(save.timestamp).toLocaleDateString();
-        modalHTML += `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid #666; border-radius: 4px; margin: 4px 0;">
-            <span>${save.name} (${date})</span>
-            <button onclick="loadFromStorage('${save.name}')" style="background: #2196f3; padding: 4px 8px; font-size: 11px;">Load</button>
-          </div>
-        `;
-      });
-
-      modalHTML += `
-            </div>
-            <button onclick="closeModal('loadStorageModal')" style="background: #666; margin-top: 10px;">Cancel</button>
-          </div>
-        </div>
-      `;
-
-      // Remove existing modal if any
-      const existingModal = document.getElementById('loadStorageModal');
-      if (existingModal) existingModal.remove();
-
-      document.body.insertAdjacentHTML('beforeend', modalHTML);
-    }
-
-    function loadFromStorage(saveName) {
-      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
-      const saveData = saves[saveName];
-      
-      if (saveData) {
-        walls = saveData.walls || [];
-        zones = saveData.zones || [];
-        items = saveData.items || [];
-        
-        if (saveData.gridWidth && saveData.gridHeight) {
-          gridWidth = saveData.gridWidth;
-          gridHeight = saveData.gridHeight;
-          canvas.width = gridWidth;
-          canvas.height = gridHeight;
-        }
-        
-        drawGrid();
-        redrawCanvas();
-        updateCoordsCount();
-        updateZoomInfo();
-        saveState();
-        closeModal('loadStorageModal');
-        alert(`Loaded "${saveName}" successfully!`);
-      }
-    }
-
-    // Update the load button to show both options
-    function enhancedToggleLoadBox() {
-      const loadBox = document.getElementById('loadBox');
-      if (loadBox.style.display === 'none') {
-        // Show options for file or localStorage
-        const optionsHTML = `
-          <div style="display: flex; gap: 8px; margin-bottom: 10px; justify-content: center;">
-            <button onclick="showLoadFromFile()" style="background: #ffa726; padding: 6px 12px; font-size: 12px;">📄 From Text</button>
-            <button onclick="showLoadFromStorageModal()" style="background: #2196f3; padding: 6px 12px; font-size: 12px;">💾 From Storage</button>
-          </div>
-        `;
-        loadBox.innerHTML = optionsHTML + loadBox.innerHTML;
-        loadBox.style.display = 'block';
-      } else {
-        loadBox.style.display = 'none';
-        // Reset to original content
-        const textarea = loadBox.querySelector('textarea');
-        const buttons = loadBox.querySelector('div:last-child');
-        loadBox.innerHTML = `
-          <div style="margin-bottom:8px; color:#aaa; font-size:12px;">Paste coordinate data (will add to existing content):</div>
-          ${textarea.outerHTML}
-          ${buttons.outerHTML}
-        `;
-      }
-    }
-
-    function showLoadFromFile() {
-      // Hide the options and show the file input
-      const loadBox = document.getElementById('loadBox');
-      const textarea = loadBox.querySelector('textarea');
-      const buttons = loadBox.querySelector('div:last-child');
-      loadBox.innerHTML = `
-        <div style="margin-bottom:8px; color:#aaa; font-size:12px;">Paste coordinate data (will add to existing content):</div>
-        ${textarea.outerHTML}
-        ${buttons.outerHTML}
-      `;
-    }
-
-    // Update the toggleLoadBox function call
-    function toggleLoadBox() {
-      enhancedToggleLoadBox();
-    }
   </script>
 </body>
 </html>
