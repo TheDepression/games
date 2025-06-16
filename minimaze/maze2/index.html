@@ -114,7 +114,20 @@
             background-size: 8px 8px, 4px 4px;
             opacity: 0.8;
         }
-        
+        .village-zone {
+position: absolute;
+background-image:
+repeating-linear-gradient(
+45deg,
+rgba(144, 238, 144, 0.3) 0px,
+rgba(173, 255, 173, 0.3) 4px,
+rgba(144, 238, 144, 0.3) 8px,
+rgba(152, 251, 152, 0.3) 12px
+);
+background-size: 16px 16px;
+background-color: rgba(144, 238, 144, 0.2);
+opacity: 0.6;
+}
         .lava-zone {
             position: absolute;
             background-image:
@@ -141,6 +154,13 @@
     background-size: 20px 20px;
     border: 1px solid rgba(0,0,0,0.2);
     opacity: 0.9;
+}
+        .pathway {
+position: absolute;
+background: linear-gradient(135deg, #fffacd 0%, #fff8dc 50%, #ffefd5 100%);
+border: 1px solid rgba(255,235,205,0.3);
+opacity: 0.7;
+z-index: 25;
 }
         @keyframes waterFlow {
             0% { background-position: 0 0, 10px 10px, 0 0; }
@@ -963,6 +983,16 @@ this.updatePlayerImage('s'); // Start facing south
         desertZone.dataset.zoneType = 'desert';
         this.gameWorld.appendChild(desertZone);
 
+        // Village zone with subtle pale green pattern
+const villageZone = document.createElement('div');
+villageZone.className = 'village-zone';
+villageZone.style.left = '80px';
+villageZone.style.top = '1800px';
+villageZone.style.width = '200px';
+villageZone.style.height = '200px';
+villageZone.dataset.zoneType = 'village';
+this.gameWorld.appendChild(villageZone);
+
         // Castle zone with custom image
 const castleZone = document.createElement('div');
 castleZone.className = 'castle-zone';
@@ -1068,6 +1098,11 @@ this.gameWorld.appendChild(castleZone);
     {x: 1800, y: 2200, w: 100, h: 20},
     {x: 1000, y: 2100, w: 20, h: 100},
     {x: 800, y: 2000, w: 60, h: 60}
+],
+            pathway: [
+{x: 100, y: 500, w: 200, h: 20},
+{x: 300, y: 520, w: 20, h: 80},
+{x: 300, y: 600, w: 150, h: 20}
 ]
         };
         
@@ -1076,11 +1111,13 @@ this.gameWorld.appendChild(castleZone);
         const wallEl = document.createElement('div');
         
         if (color === 'tiled') {
-            wallEl.className = 'tiled-wall';
-        } else {
-            wallEl.className = 'maze-wall';
-            wallEl.style.background = color;
-        }
+wallEl.className = 'tiled-wall';
+} else if (color === 'pathway') {
+wallEl.className = 'pathway';
+} else {
+wallEl.className = 'maze-wall';
+wallEl.style.background = color;
+}
         
         wallEl.style.left = wall.x + 'px';
         wallEl.style.top = wall.y + 'px';
@@ -1140,6 +1177,25 @@ this.gameWorld.appendChild(castleZone);
             treeEl.style.height = '20px';
             this.gameWorld.appendChild(treeEl);
         });
+        // Add village furniture
+const furniturePositions = [
+{x: 120, y: 1820, emoji: '🚽'},
+{x: 140, y: 1840, emoji: '🛌'},
+{x: 180, y: 1820, emoji: '🖥️'},
+{x: 200, y: 1860, emoji: '🪑'},
+{x: 160, y: 1880, emoji: '🛋️'}
+];
+
+furniturePositions.forEach(pos => {
+const furnitureEl = document.createElement('div');
+furnitureEl.className = 'tree-wall'; // Reuse tree-wall class for collision
+furnitureEl.textContent = pos.emoji;
+furnitureEl.style.left = pos.x + 'px';
+furnitureEl.style.top = pos.y + 'px';
+furnitureEl.style.width = '20px';
+furnitureEl.style.height = '20px';
+this.gameWorld.appendChild(furnitureEl);
+});
     }
     
     createEnemies() {
