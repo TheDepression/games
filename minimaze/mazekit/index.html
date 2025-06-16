@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enhanced Maze Kit - Complete Builder</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 15px 0;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .back-btn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    }
+
+    .done-btn {
+      background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    }
+
+    .load-btn {
+      background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+    }
+
+    .delete-btn {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    }
+
+    .delete-btn.active {
+      background: linear-gradient(135deg, #ff5722 0%, #d84315 100%);
+      box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+    }
+
+    .lock-btn {
+      background: linear-gradient(135deg, #795548 0%, #5d4037 100%);
+    }
+
+    .lock-btn.active {
+      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+    }
+
+    .clear-btn {
+      background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+    }
+
+    .erase-all-btn {
+      background: linear-gradient(135deg, #ff5722 0%, #d84315 100%);
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    }
+
+    .zoom-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .zoom-controls button {
+      font-size: 16px;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 50%;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      border: 2px solid #666;
+      background: #333;
+      color: #fff;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .color-palette {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .color-btn {
+      width: 35px;
+      height: 35px;
+      border: 3px solid #666;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .color-btn.active {
+      border-color: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    .color-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .color-label {
+      color: #aaa;
+      font-size: 11px;
+      margin: 0 8px;
+    }
+
+    .item-palette {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .item-btn {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #666;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      background: #333;
+      color: #fff;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .item-btn.active {
+      border-color: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    .grid-selector {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .grid-btn {
+      padding: 6px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      border: 2px solid #666;
+      background: #333;
+      color: #fff;
+      transition: all 0.2s;
+    }
+
+    .grid-btn.active {
+      border-color: #51cf66;
+      background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    }
+
+    .custom-grid {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 10px 0;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .custom-grid input {
+      width: 80px;
+      padding: 6px;
+      border: 2px solid #666;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .canvas-wrapper {
+      width: 90vw;
+      max-width: 800px;
+      height: 600px;
+      max-height: 600px;
+      overflow: hidden;
+      position: relative;
+      border: 3px solid #444;
+      border-radius: 8px;
+      background: #f8f8f8;
+      touch-action: none;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+
+    canvas {
+      display: block;
+      touch-action: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: center center;
+    }
+
+    .output-area {
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      overflow-y: auto;
+      background: #1a1a1a;
+      border: 2px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+
+    .info {
+      text-align: center;
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    .coords-count {
+      color: #51cf66;
+      font-weight: bold;
+      margin: 10px 0;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .zoom-info {
+      text-align: center;
+      color: #51cf66;
+      font-size: 12px;
+      margin: 5px 0;
+    }
+
+    .hover-coords {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+      pointer-events: none;
+      z-index: 1000;
+      display: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #2a2a2a;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 400px;
+      color: white;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .section-divider {
+      height: 2px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 15px 0;
+      border-radius: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="hover-coords" id="hoverCoords"></div>
+
+  <div class="container">
+    <h1 class="title">Enhanced Maze Kit</h1>
+    <div class="info">Build complete mazes with walls, items, and background zones</div>
+    <div class="zoom-info" id="zoomInfo">Zoom: 50% | Grid: 2400x2400</div>
+
+    <div class="grid-selector">
+      <span class="color-label">Grid Size:</span>
+      <div class="grid-btn active" data-size="2400,2400">2400×2400</div>
+      <div class="grid-btn" data-size="1200,1200">1200×1200</div>
+      <div class="grid-btn" data-size="350,357.5">Maze View</div>
+      <div class="grid-btn" data-size="1920,1080">HD Wide</div>
+      <div class="grid-btn" data-size="842,595">A4 Shape</div>
+    </div>
+
+    <div class="custom-grid">
+      <span class="color-label">Custom:</span>
+      <input type="number" id="customWidth" placeholder="Width" min="100" max="5000">
+      <span style="color: #aaa;">×</span>
+      <input type="number" id="customHeight" placeholder="Height" min="100" max="5000">
+      <button onclick="setCustomGrid()" style="padding: 6px 12px; font-size: 11px;">Set</button>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="mode-selector">
+      <div class="mode-btn active" data-mode="walls">🧱 Walls</div>
+      <div class="mode-btn" data-mode="zones">🎨 Zones</div>
+      <div class="mode-btn" data-mode="items">🎯 Items</div>
+    </div>
+
+    <div id="wallsControls">
+      <div class="color-palette">
+        <span class="color-label">Wall Color:</span>
+        <div class="color-btn active" style="background: #333;" data-color="#333" data-type="black" title="Black"></div>
+        <div class="color-btn" style="background: #ff4444;" data-color="#ff4444" data-type="red" title="Red"></div>
+        <div class="color-btn" style="background: #4488ff;" data-color="#4488ff" data-type="blue" title="Blue"></div>
+        <div class="color-btn" style="background: #B65FCF;" data-color="#B65FCF" data-type="purple" title="Purple"></div>
+        <div class="color-btn" style="background: #999;" data-color="#999" data-type="gray" title="Gray"></div>
+        <div class="color-btn" style="background: #22cc22;" data-color="#22cc22" data-type="green" title="Green"></div>
+        <div class="color-btn" style="background: #FC8EAC;" data-color="#FC8EAC" data-type="hotpink" title="Hot Pink"></div>
+        <div class="color-btn" style="background: #FFD700;" data-color="#FFD700" data-type="gold" title="Gold"></div>
+        <div class="color-btn" style="background: #8B4513;" data-color="#8B4513" data-type="brown" title="Brown"></div>
+      </div>
+    </div>
+
+    <div id="zonesControls" style="display: none;">
+      <div class="color-palette">
+        <span class="color-label">Zone Color:</span>
+        <div class="color-btn active" style="background: #333;" data-color="#333" data-type="black" title="Black"></div>
+        <div class="color-btn" style="background: #ff4444;" data-color="#ff4444" data-type="red" title="Red"></div>
+        <div class="color-btn" style="background: #4488ff;" data-color="#4488ff" data-type="blue" title="Blue"></div>
+        <div class="color-btn" style="background: #B65FCF;" data-color="#B65FCF" data-type="purple" title="Purple"></div>
+        <div class="color-btn" style="background: #999;" data-color="#999" data-type="gray" title="Gray"></div>
+        <div class="color-btn" style="background: #22cc22;" data-color="#22cc22" data-type="green" title="Green"></div>
+        <div class="color-btn" style="background: #FC8EAC;" data-color="#FC8EAC" data-type="hotpink" title="Hot Pink"></div>
+        <div class="color-btn" style="background: #FFD700;" data-color="#FFD700" data-type="gold" title="Gold"></div>
+        <div class="color-btn" style="background: #8B4513;" data-color="#8B4513" data-type="brown" title="Brown"></div>
+      </div>
+    </div>
+
+    <div id="itemsControls" style="display: none;">
+      <div class="item-palette">
+        <span class="color-label">Items:</span>
+        <div class="item-btn active" data-item="❤️" title="Heart">❤️</div>
+        <div class="item-btn" data-item="🗝️" title="Key">🗝️</div>
+        <div class="item-btn" data-item="💰" title="Money">💰</div>
+        <div class="item-btn" data-item="👢" title="Boots">👢</div>
+        <div class="item-btn" data-item="⚔️" title="Sword">⚔️</div>
+        <div class="item-btn" data-item="💎" title="Gem">💎</div>
+        <div class="item-btn" data-item="🏆" title="Trophy">🏆</div>
+        <div class="item-btn" data-item="🚪" title="Door">🚪</div>
+        <div class="item-btn" data-item="🔮" title="Crystal">🔮</div>
+        <div class="item-btn" data-item="⭐" title="Star">⭐</div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="zoom-controls">
+      <button onclick="zoomOut()">−</button>
+      <button onclick="resetZoom()">⌂</button>
+      <button onclick="zoomIn()">+</button>
+    </div>
+
+    <div class="controls">
+      <button class="back-btn" onclick="undoLast()">↶ Undo</button>
+      <button class="delete-btn" id="deleteBtn" onclick="toggleDeleteMode()">🗑️ Delete</button>
+      <button class="lock-btn" id="lockBtn" onclick="toggleLockMode()">🔓 Unlock</button>
+      <button class="erase-all-btn" onclick="showEraseAllModal()">🧹 Erase All</button>
+    </div>
+
+    <div class="controls">
+      <button class="load-btn" onclick="toggleLoadBox()">📁 Load</button>
+      <button class="save-btn" onclick="showSaveModal()">💾 Save</button>
+      <button class="clear-btn" onclick="confirmClearAll()">⚠️ Clear All</button>
+      <button class="done-btn" onclick="generateCoordinates()">✓ Generate</button>
+    </div>
+
+    <div id="loadBox" style="display:none; margin:10px 0; padding:10px; background:#2a2a2a; border-radius:8px;">
+      <div style="margin-bottom:8px; color:#aaa; font-size:12px;">Paste coordinate data (will add to existing content):</div>
+      <textarea id="loadInput" style="width:100%; height:80px; background:#1a1a1a; border:2px solid #666; border-radius:6px; color:#fff; padding:8px; font-family:monospace; font-size:11px; box-sizing:border-box;"></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button class="load-btn" onclick="loadMaze()" style="padding:6px 12px; font-size:12px;">Load</button>
+        <button onclick="toggleLoadBox()" style="padding:6px 12px; font-size:12px;">Cancel</button>
+      </div>
+    </div>
+
+    <div class="canvas-wrapper" id="canvasWrapper">
+      <canvas id="mazeCanvas" width="2400" height="2400"></canvas>
+    </div>
+  </div>
+
+  <div class="output-area">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div class="coords-count" id="coordsCount">Elements: 0</div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="copyCoordinates()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; font-weight: 600;">📋 Copy</button>
+        <button onclick="saveToFile()" style="background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; font-weight: 600;">💾 Save File</button>
+      </div>
+    </div>
+    <textarea id="coordinatesOutput" placeholder="Coordinates will appear here after clicking 'Generate'..."></textarea>
+  </div>
+
+  <!-- Modals -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h3 id="confirmTitle">Confirm Action</h3>
+      <p id="confirmMessage">Are you sure?</p>
+      <div class="modal-buttons">
+        <button onclick="closeModal('confirmModal')" style="background: #666;">Cancel</button>
+        <button id="confirmButton" onclick="confirmAction()" style="background: #f44336;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="eraseAllModal" class="modal">
+    <div class="modal-content">
+      <h3>Erase All Elements</h3>
+      <p>What would you like to erase?</p>
+      <div class="modal-buttons" style="flex-direction: column; gap: 8px;">
+        <button onclick="selectEraseType('walls')" style="background: #ff5722;">All Walls</button>
+        <button onclick="selectEraseType('zones')" style="background: #ff5722;">All Zones</button>
+        <button onclick="selectEraseType('items')" style="background: #ff5722;">All Items</button>
+        <button onclick="closeModal('eraseAllModal')" style="background: #666;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="eraseColorModal" class="modal">
+    <div class="modal-content">
+      <h3 id="eraseColorTitle">Select Color to Erase</h3>
+      <div id="eraseColorOptions" class="modal-buttons" style="flex-wrap: wrap;">
+      </div>
+      <button onclick="closeModal('eraseColorModal')" style="background: #666; margin-top: 10px;">Cancel</button>
+    </div>
+  </div>
+
+  <div id="eraseItemModal" class="modal">
+    <div class="modal-content">
+      <h3>Select Item to Erase</h3>
+      <div id="eraseItemOptions" class="modal-buttons" style="flex-wrap: wrap;">
+      </div>
+      <button onclick="closeModal('eraseItemModal')" style="background: #666; margin-top: 10px;">Cancel</button>
+    </div>
+  </div>
+
+  <div id="saveModal" class="modal">
+    <div class="modal-content">
+      <h3>Save Options</h3>
+      <div class="modal-buttons" style="flex-direction: column; gap: 8px;">
+        <button onclick="saveToFile()" style="background: #4caf50;">Save to Device</button>
+        <button onclick="showLocalSaveModal()" style="background: #2196f3;">Save to Local Storage</button>
+        <button onclick="closeModal('saveModal')" style="background: #666;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="localSaveModal" class="modal">
+    <div class="modal-content">
+      <h3>Save to Local Storage</h3>
+      <input type="text" id="saveNameInput" placeholder="Enter save name..." style="width: 100%; padding: 8px; margin: 10px 0; background: #333; border: 2px solid #666; border-radius: 6px; color: #fff;">
+      <div class="modal-buttons">
+        <button onclick="saveToLocalStorage()" style="background: #2196f3;">Save</button>
+        <button onclick="closeModal('localSaveModal')" style="background: #666;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('mazeCanvas');
+    const ctx = canvas.getContext('2d');
+    const output = document.getElementById('coordinatesOutput');
+    const coordsCount = document.getElementById('coordsCount');
+    const wrapper = document.getElementById('canvasWrapper');
+    const zoomInfo = document.getElementById('zoomInfo');
+    const hoverCoords = document.getElementById('hoverCoords');
+
+    let scale = 0.5;
+    let translateX = 0;
+    let translateY = 0;
+    let isDrawing = false;
+    let isDeleteMode = false;
+    let isLocked = false;
+    let currentMode = 'walls';
+    let currentColor = '#333';
+    let currentType = 'black';
+    let currentItem = '❤️';
+    let currentWall = null;
+    let currentZone = null;
+    let isGesturing = false;
+    let lastTouchDistance = 0;
+    let lastTouchCenter = { x: 0, y: 0 };
+    let gridWidth = 2400;
+    let gridHeight = 2400;
+    let history = [];
+    let historyIndex = -1;
+
+    let walls = [];
+    let zones = [];
+    let items = [];
+
+    const colorMap = {
+      'black': '#333', 'red': '#ff4444', 'blue': '#4488ff',
+      'purple': '#B65FCF', 'gray': '#999', 'green': '#22cc22', 
+      'hotpink': '#FC8EAC', 'gold': '#FFD700', 'brown': '#8B4513'
+    };
+
+    initializeGrid();
+    setupEventListeners();
+    saveState();
+
+    function initializeGrid() {
+      walls = [
+        {startX: 0, startY: 0, endX: gridWidth, endY: 0, color: '#333', type: 'black'},
+        {startX: 0, startY: 0, endX: 0, endY: gridHeight, color: '#333', type: 'black'},
+        {startX: gridWidth, startY: 0, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'},
+        {startX: 0, startY: gridHeight, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'}
+      ];
+      zones = [];
+      items = [];
+      canvas.width = gridWidth;
+      canvas.height = gridHeight;
+      drawGrid();
+      redrawCanvas();
+      updateTransform();
+      updateCoordsCount();
+    }
+
+    function setupEventListeners() {
+      // Mode selector
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          currentMode = this.getAttribute('data-mode');
+          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          updateModeControls();
+        });
+      });
+
+      // Color buttons for walls
+      document.querySelector('#wallsControls').querySelectorAll('.color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          currentColor = this.getAttribute('data-color');
+          currentType = this.getAttribute('data-type');
+          document.querySelector('#wallsControls').querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Color buttons for zones
+      document.querySelector('#zonesControls').querySelectorAll('.color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          currentColor = this.getAttribute('data-color');
+          currentType = this.getAttribute('data-type');
+          document.querySelector('#zonesControls').querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Item buttons
+      document.querySelectorAll('.item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          currentItem = this.getAttribute('data-item');
+          document.querySelectorAll('.item-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Grid size buttons
+      document.querySelectorAll('.grid-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const [w, h] = this.getAttribute('data-size').split(',');
+          setGridSize(parseInt(w), parseFloat(h));
+          document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // Canvas events
+      setupCanvasEvents();
+
+      // Output textarea real-time editing
+      output.addEventListener('input', function() {
+        parseOutputToCanvas();
+      });
+
+      // Hover coordinates
+      wrapper.addEventListener('mousemove', showHoverCoords);
+      wrapper.addEventListener('mouseleave', hideHoverCoords);
+    }
+
+    function updateModeControls() {
+      document.getElementById('wallsControls').style.display = currentMode === 'walls' ? 'block' : 'none';
+      document.getElementById('zonesControls').style.display = currentMode === 'zones' ? 'block' : 'none';
+      document.getElementById('itemsControls').style.display = currentMode === 'items' ? 'block' : 'none';
+    }
+
+    function setGridSize(w, h) {
+      gridWidth = w;
+      gridHeight = h;
+      initializeGrid();
+      resetZoom();
+      saveState();
+    }
+
+    function setCustomGrid() {
+      const w = parseInt(document.getElementById('customWidth').value);
+      const h = parseInt(document.getElementById('customHeight').value);
+      if (w >= 100 && w <= 5000 && h >= 100 && h <= 5000) {
+        setGridSize(w, h);
+        document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+      } else {
+        alert('Please enter valid dimensions (100-5000 pixels)');
+      }
+    }
+
+    function showHoverCoords(e) {
+      if (isLocked) return;
+      const pos = getCanvasCoordinates(e.clientX, e.clientY);
+      hoverCoords.textContent = `(${pos.x}, ${pos.y})`;
+      hoverCoords.style.left = e.clientX + 10 + 'px';
+      hoverCoords.style.top = e.clientY - 30 + 'px';
+      hoverCoords.style.display = 'block';
+    }
+
+    function hideHoverCoords() {
+      hoverCoords.style.display = 'none';
+    }
+
+    function saveState() {
+      const state = {
+        walls: JSON.parse(JSON.stringify(walls)),
+        zones: JSON.parse(JSON.stringify(zones)),
+        items: JSON.parse(JSON.stringify(items)),
+        gridWidth,
+        gridHeight
+      };
+      history = history.slice(0, historyIndex + 1);
+      history.push(state);
+      historyIndex++;
+      if (history.length > 50) {
+        history.shift();
+        historyIndex--;
+      }
+    }
+
+    function undoLast() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        const state = history[historyIndex];
+        walls = JSON.parse(JSON.stringify(state.walls));
+        zones = JSON.parse(JSON.stringify(state.zones));
+        items = JSON.parse(JSON.stringify(state.items));
+        if (state.gridWidth && state.gridHeight) {
+          gridWidth = state.gridWidth;
+          gridHeight = state.gridHeight;
+          canvas.width = gridWidth;
+          canvas.height = gridHeight;
+        }
+        drawGrid();
+        redrawCanvas();
+        updateCoordsCount();
+      }
+    }
+
+    function toggleDeleteMode() {
+      if (isLocked) return;
+      isDeleteMode = !isDeleteMode;
+      const btn = document.getElementById('deleteBtn');
+      if (isDeleteMode) {
+        btn.classList.add('active');
+        btn.textContent = '🗑️ Cancel';
+        wrapper.style.cursor = 'crosshair';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '🗑️ Delete';
+        wrapper.style.cursor = 'default';
+      }
+    }
+
+    function toggleLockMode() {
+      isLocked = !isLocked;
+      const btn = document.getElementById('lockBtn');
+      if (isLocked) {
+        btn.classList.add('active');
+        btn.textContent = '🔒 Locked';
+        wrapper.style.cursor = 'grab';
+        if (isDeleteMode) toggleDeleteMode();
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '🔓 Unlock';
+        wrapper.style.cursor = 'default';
+      }
+    }
+
+    function toggleLoadBox() {
+      const box = document.getElementById('loadBox');
+      if (box.style.display === 'none') {
+        box.style.display = 'block';
+      } else {
+        box.style.display = 'none';
+        document.getElementById('loadInput').value = '';
+      }
+    }
+
+    function confirmClearAll() {
+      showConfirmModal(
+        'Clear All Content',
+        'This will delete ALL walls, zones, and items. Are you sure?',
+        clearAll
+      );
+    }
+
+    function clearAll() {
+      walls = [
+        {startX: 0, startY: 0, endX: gridWidth, endY: 0, color: '#333', type: 'black'},
+        {startX: 0, startY: 0, endX: 0, endY: gridHeight, color: '#333', type: 'black'},
+        {startX: gridWidth, startY: 0, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'},
+        {startX: 0, startY: gridHeight, endX: gridWidth, endY: gridHeight, color: '#333', type: 'black'}
+      ];
+      zones = [];
+      items = [];
+      redrawCanvas();
+      updateCoordsCount();
+      output.value = '';
+      saveState();
+      closeModal('confirmModal');
+    }
+
+    function showEraseAllModal() {
+      document.getElementById('eraseAllModal').style.display = 'block';
+    }
+
+    function selectEraseType(type) {
+      closeModal('eraseAllModal');
+      if (type === 'items') {
+        showEraseItemModal();
+      } else {
+        showEraseColorModal(type);
+      }
+    }
+
+    function showEraseColorModal(type) {
+      const modal = document.getElementById('eraseColorModal');
+      const title = document.getElementById('eraseColorTitle');
+      const options = document.getElementById('eraseColorOptions');
+      
+      title.textContent = `Select ${type.charAt(0).toUpperCase() + type.slice(1)} Color to Erase`;
+      
+      const elements = type === 'walls' ? walls.slice(4) : zones;
+      const uniqueTypes = [...new Set(elements.map(el => el.type))];
+      
+      options.innerHTML = '';
+      uniqueTypes.forEach(colorType => {
+        const btn = document.createElement('button');
+        btn.textContent = colorType.charAt(0).toUpperCase() + colorType.slice(1);
+        btn.style.background = colorMap[colorType] || '#333';
+        btn.onclick = () => eraseByColor(type, colorType);
+        options.appendChild(btn);
+      });
+      
+      modal.style.display = 'block';
+    }
+
+    function showEraseItemModal() {
+      const modal = document.getElementById('eraseItemModal');
+      const options = document.getElementById('eraseItemOptions');
+      
+      const uniqueItems = [...new Set(items.map(item => item.emoji))];
+      
+      options.innerHTML = '';
+      uniqueItems.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.textContent = emoji;
+        btn.style.fontSize = '20px';
+        btn.onclick = () => eraseByItem(emoji);
+        options.appendChild(btn);
+      });
+      
+      modal.style.display = 'block';
+    }
+
+    function eraseByColor(type, colorType) {
+      if (type === 'walls') {
+        walls = walls.filter((wall, index) => index < 4 || wall.type !== colorType);
+      } else if (type === 'zones') {
+        zones = zones.filter(zone => zone.type !== colorType);
+      }
+      redrawCanvas();
+      updateCoordsCount();
+      saveState();
+      closeModal('eraseColorModal');
+    }
+
+    function eraseByItem(emoji) {
+      items = items.filter(item => item.emoji !== emoji);
+      redrawCanvas();
+      updateCoordsCount();
+      saveState();
+      closeModal('eraseItemModal');
+    }
+
+    function showSaveModal() {
+      document.getElementById('saveModal').style.display = 'block';
+    }
+
+    function showLocalSaveModal() {
+      closeModal('saveModal');
+      document.getElementById('localSaveModal').style.display = 'block';
+    }
+
+    function saveToLocalStorage() {
+      const name = document.getElementById('saveNameInput').value.trim();
+      if (!name) {
+        alert('Please enter a save name');
+        return;
+      }
+      
+      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
+      const saveData = {
+        walls: walls,
+        zones: zones,
+        items: items,
+        gridWidth: gridWidth,
+        gridHeight: gridHeight,
+        timestamp: new Date().toISOString()
+      };
+      
+      saves[name] = saveData;
+      
+      // Keep only last 20 saves
+      const saveNames = Object.keys(saves);
+      if (saveNames.length > 20) {
+        const sorted = saveNames.sort((a, b) => 
+          new Date(saves[b].timestamp) - new Date(saves[a].timestamp)
+        );
+        const toKeep = sorted.slice(0, 20);
+        const newSaves = {};
+        toKeep.forEach(saveName => {
+          newSaves[saveName] = saves[saveName];
+        });
+        localStorage.setItem('mazeSaves', JSON.stringify(newSaves));
+      } else {
+        localStorage.setItem('mazeSaves', JSON.stringify(saves));
+      }
+      
+      alert(`Saved as "${name}"`);
+      closeModal('localSaveModal');
+      document.getElementById('saveNameInput').value = '';
+    }
+
+    function saveToFile() {
+      generateCoordinates();
+      const content = output.value;
+      if (!content.trim()) {
+        alert('No content to save! Click "Generate" first.');
+        return;
+      }
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `maze_${gridWidth}x${gridHeight}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      closeModal('saveModal');
+    }
+
+    function showConfirmModal(title, message, callback) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      document.getElementById('confirmButton').onclick = callback;
+      document.getElementById('confirmModal').style.display = 'block';
+    }
+
+    function confirmAction() {
+      closeModal('confirmModal');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    function copyCoordinates() {
+      generateCoordinates();
+      const text = output.value;
+      if (!text || text.trim() === '') {
+        alert('No coordinates to copy! Click "Generate" first to generate coordinates.');
+        return;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        btn.style.background = 'linear-gradient(135deg, #51cf66 0%, #40c057 100%)';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        }, 1500);
+      }).catch(() => {
+        output.select();
+        document.execCommand('copy');
+        alert('Coordinates copied to clipboard!');
+      });
+    }
+
+    function updateTransform() {
+      canvas.style.transform = `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      updateZoomInfo();
+    }
+
+    function updateZoomInfo() {
+      const zoomPercent = Math.round(scale * 100);
+      zoomInfo.textContent = `Zoom: ${zoomPercent}% | Grid: ${gridWidth}x${gridHeight}`;
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = '#e0e0e0';
+      ctx.lineWidth = 1;
+      
+      // Main grid lines every 20px
+      for (let i = 0; i <= gridWidth; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, gridHeight);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= gridHeight; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(gridWidth, i);
+        ctx.stroke();
+      }
+      
+      // Major grid lines every 100px
+      ctx.strokeStyle = '#c0c0c0';
+      ctx.lineWidth = 2;
+      for (let i = 0; i <= gridWidth; i += 100) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, gridHeight);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= gridHeight; i += 100) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(gridWidth, i);
+        ctx.stroke();
+      }
+    }
+
+    function snapToGrid(coord) {
+      return Math.round(coord / 20) * 20;
+    }
+
+    function getCanvasCoordinates(clientX, clientY) {
+      const rect = wrapper.getBoundingClientRect();
+      const wrapperCenterX = rect.left + rect.width / 2;
+      const wrapperCenterY = rect.top + rect.height / 2;
+      const relativeX = clientX - wrapperCenterX;
+      const relativeY = clientY - wrapperCenterY;
+      const canvasX = (relativeX - translateX) / scale + gridWidth / 2;
+      const canvasY = (relativeY - translateY) / scale + gridHeight / 2;
+      return { 
+        x: Math.max(0, Math.min(gridWidth, snapToGrid(canvasX))), 
+        y: Math.max(0, Math.min(gridHeight, snapToGrid(canvasY))) 
+      };
+    }
+
+    function findElementAtPosition(x, y) {
+      // Check items first (smallest targets)
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        if (Math.abs(item.x - x) <= 25 && Math.abs(item.y - y) <= 25) {
+          return { type: 'item', index: i };
+        }
+      }
+      
+      // Check zones
+      for (let i = zones.length - 1; i >= 0; i--) {
+        const zone = zones[i];
+        if (x >= zone.x && x <= zone.x + zone.w && y >= zone.y && y <= zone.y + zone.h) {
+          return { type: 'zone', index: i };
+        }
+      }
+      
+      // Check walls (skip border walls)
+      for (let i = walls.length - 1; i >= 4; i--) {
+        const wall = walls[i];
+        const tolerance = 25;
+        const dist = distanceToLine(x, y, wall.startX, wall.startY, wall.endX, wall.endY);
+        if (dist <= tolerance) {
+          return { type: 'wall', index: i };
+        }
+      }
+      
+      return null;
+    }
+
+    function distanceToLine(x, y, x1, y1, x2, y2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      if (length === 0) return Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
+      const t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (length * length)));
+      const projX = x1 + t * dx;
+      const projY = y1 + t * dy;
+      return Math.sqrt((x - projX) * (x - projX) + (y - projY) * (y - projY));
+    }
+
+    function deleteElementAt(x, y) {
+      const element = findElementAtPosition(x, y);
+      if (element) {
+        if (element.type === 'wall') {
+          walls.splice(element.index, 1);
+        } else if (element.type === 'zone') {
+          zones.splice(element.index, 1);
+        } else if (element.type === 'item') {
+          items.splice(element.index, 1);
+        }
+        redrawCanvas();
+        updateCoordsCount();
+        saveState();
+        return true;
+      }
+      return false;
+    }
+
+    function startDrawing(pos) {
+      if (isLocked) return;
+      
+      if (isDeleteMode) {
+        deleteElementAt(pos.x, pos.y);
+        return;
+      }
+
+      if (currentMode === 'items') {
+        items.push({
+          x: pos.x,
+          y: pos.y,
+          emoji: currentItem
+        });
+        redrawCanvas();
+        updateCoordsCount();
+        saveState();
+        return;
+      }
+
+      if (currentMode === 'zones') {
+        isDrawing = true;
+        currentZone = { 
+          x: pos.x, y: pos.y, w: 0, h: 0,
+          color: currentColor, type: currentType
+        };
+        return;
+      }
+
+      if (currentMode === 'walls') {
+        isDrawing = true;
+        currentWall = { 
+          startX: pos.x, startY: pos.y, endX: pos.x, endY: pos.y,
+          color: currentColor, type: currentType
+        };
+      }
+    }
+
+    function draw(pos) {
+      if (!isDrawing || isDeleteMode || isLocked) return;
+
+      if (currentMode === 'zones' && currentZone) {
+        currentZone.w = Math.abs(pos.x - currentZone.x);
+        currentZone.h = Math.abs(pos.y - currentZone.y);
+        if (pos.x < currentZone.x) {
+          currentZone.w = Math.abs(pos.x - currentZone.x);
+          currentZone.x = pos.x;
+        }
+        if (pos.y < currentZone.y) {
+          currentZone.h = Math.abs(pos.y - currentZone.y);
+          currentZone.y = pos.y;
+        }
+        redrawCanvas();
+        drawCurrentZone();
+        return;
+      }
+
+      if (currentMode === 'walls' && currentWall) {
+        const dx = Math.abs(pos.x - currentWall.startX);
+        const dy = Math.abs(pos.y - currentWall.startY);
+        if (dx > dy) {
+          currentWall.endY = currentWall.startY;
+          currentWall.endX = pos.x;
+        } else {
+          currentWall.endX = currentWall.startX;
+          currentWall.endY = pos.y;
+        }
+        redrawCanvas();
+        drawCurrentWall();
+      }
+    }
+
+    function stopDrawing() {
+      if (!isDrawing || isDeleteMode || isLocked) return;
+
+      if (currentMode === 'zones' && currentZone) {
+        if (currentZone.w > 10 && currentZone.h > 10) {
+          zones.push(currentZone);
+          updateCoordsCount();
+          saveState();
+        }
+        isDrawing = false;
+        currentZone = null;
+        redrawCanvas();
+        return;
+      }
+
+      if (currentMode === 'walls' && currentWall) {
+        const length = Math.hypot(currentWall.endX - currentWall.startX, currentWall.endY - currentWall.startY);
+        if (length > 5) {
+          currentWall.startX = snapToGrid(currentWall.startX);
+          currentWall.startY = snapToGrid(currentWall.startY);
+          currentWall.endX = snapToGrid(currentWall.endX);
+          currentWall.endY = snapToGrid(currentWall.endY);
+          
+          walls.push(currentWall);
+          updateCoordsCount();
+          saveState();
+        }
+        isDrawing = false;
+        currentWall = null;
+        redrawCanvas();
+      }
+    }
+
+    function drawZone(zone) {
+      ctx.fillStyle = zone.color + '40'; // Add transparency
+      ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+      ctx.strokeStyle = zone.color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(zone.x, zone.y, zone.w, zone.h);
+    }
+
+    function drawCurrentZone() {
+      if (!currentZone) return;
+      ctx.fillStyle = currentZone.color + '40';
+      ctx.fillRect(currentZone.x, currentZone.y, currentZone.w, currentZone.h);
+      ctx.strokeStyle = currentZone.color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(currentZone.x, currentZone.y, currentZone.w, currentZone.h);
+    }
+
+    function drawWall(wall) {
+      ctx.strokeStyle = wall.color;
+      ctx.lineWidth = 20;
+      ctx.lineCap = 'butt';
+      ctx.beginPath();
+      ctx.moveTo(wall.startX, wall.startY);
+      ctx.lineTo(wall.endX, wall.endY);
+      ctx.stroke();
+    }
+
+    function drawCurrentWall() {
+      if (!currentWall) return;
+      ctx.strokeStyle = currentWall.color;
+      ctx.lineWidth = 20;
+      ctx.lineCap = 'butt';
+      ctx.beginPath();
+      ctx.moveTo(currentWall.startX, currentWall.startY);
+      ctx.lineTo(currentWall.endX, currentWall.endY);
+      ctx.stroke();
+    }
+
+    function drawItem(item) {
+      ctx.font = '30px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#000';
+      ctx.fillText(item.emoji, item.x, item.y);
+    }
+
+    function redrawCanvas() {
+      ctx.clearRect(0, 0, gridWidth, gridHeight);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, gridWidth, gridHeight);
+      drawGrid();
+      
+      // Draw zones first (background)
+      zones.forEach(drawZone);
+      
+      // Draw walls
+      walls.forEach(drawWall);
+      
+      // Draw items last (foreground)
+      items.forEach(drawItem);
+    }
+
+    function updateCoordsCount() {
+      const userWalls = walls.length - 4;
+      const totalElements = userWalls + zones.length + items.length;
+      
+      let countText = `Total: ${totalElements} (${userWalls} walls, ${zones.length} zones, ${items.length} items)`;
+      coordsCount.textContent = countText;
+    }
+
+    function generateCoordinates() {
+      let outputText = `// Maze elements - Grid: ${gridWidth}x${gridHeight}\n\n`;
+      
+      // Walls by type
+      if (walls.length > 0) {
+        const wallsByType = {};
+        walls.forEach(wall => {
+          const type = wall.type;
+          if (!wallsByType[type]) wallsByType[type] = [];
+          const deltaX = Math.abs(wall.endX - wall.startX);
+          const deltaY = Math.abs(wall.endY - wall.startY);
+          const isHorizontal = deltaX > deltaY;
+          let x, y, w, h;
+          if (isHorizontal) {
+            x = Math.min(wall.startX, wall.endX);
+            y = Math.min(wall.startY, wall.endY);
+            w = Math.round(deltaX);
+            h = 20;
+          } else {
+            x = Math.min(wall.startX, wall.endX);
+            y = Math.min(wall.startY, wall.endY);
+            w = 20;
+            h = Math.round(deltaY);
+          }
+          wallsByType[type].push({x: Math.round(x), y: Math.round(y), w, h});
+        });
+
+        Object.entries(wallsByType).forEach(([type, coords]) => {
+          outputText += `// ${type.toUpperCase()} WALLS (${coords.length} items)\nconst ${type}Walls = [\n`;
+          coords.forEach(coord => {
+            outputText += `  {x: ${coord.x}, y: ${coord.y}, w: ${coord.w}, h: ${coord.h}},\n`;
+          });
+          outputText += `];\n\n`;
+        });
+      }
+      
+      // Zones by type
+      if (zones.length > 0) {
+        const zonesByType = {};
+        zones.forEach(zone => {
+          const type = zone.type;
+          if (!zonesByType[type]) zonesByType[type] = [];
+          zonesByType[type].push({x: zone.x, y: zone.y, w: zone.w, h: zone.h});
+        });
+
+        Object.entries(zonesByType).forEach(([type, coords]) => {
+          outputText += `// ${type.toUpperCase()} ZONES (${coords.length} items)\nconst ${type}Zones = [\n`;
+          coords.forEach(coord => {
+            outputText += `  {x: ${coord.x}, y: ${coord.y}, w: ${coord.w}, h: ${coord.h}},\n`;
+          });
+          outputText += `];\n\n`;
+        });
+      }
+      
+      // Items by emoji
+      if (items.length > 0) {
+        const itemsByEmoji = {};
+        items.forEach(item => {
+          const emoji = item.emoji;
+          if (!itemsByEmoji[emoji]) itemsByEmoji[emoji] = [];
+          itemsByEmoji[emoji].push({x: item.x, y: item.y});
+        });
+
+        Object.entries(itemsByEmoji).forEach(([emoji, coords]) => {
+          const name = getEmojiName(emoji);
+          outputText += `// ${name.toUpperCase()} ITEMS (${coords.length} items)\nconst ${name}Items = [\n`;
+          coords.forEach(coord => {
+            outputText += `  {x: ${coord.x}, y: ${coord.y}},\n`;
+          });
+          outputText += `];\n\n`;
+        });
+      }
+      
+      output.value = outputText.trim();
+    }
+
+    function getEmojiName(emoji) {
+      const emojiNames = {
+        '❤️': 'heart', '🗝️': 'key', '💰': 'money', '👢': 'boots', '⚔️': 'sword',
+        '💎': 'gem', '🏆': 'trophy', '🚪': 'door', '🔮': 'crystal', '⭐': 'star'
+      };
+      return emojiNames[emoji] || 'item';
+    }
+
+    function parseOutputToCanvas() {
+      // This would parse the textarea content back to canvas elements
+      // Implementation would be similar to loadMaze but parsing all element types
+      // For now, we'll keep the existing loadMaze functionality
+    }
+
+    function loadMaze() {
+      const input = document.getElementById('loadInput').value.trim();
+      if (!input) {
+        alert('Please paste coordinate data first!');
+        return;
+      }
+
+      try {
+        const lines = input.split('\n');
+        let currentColor = '';
+        let currentType = '';
+        let currentArrayType = '';
+        let inArray = false;
+        
+        for (let line of lines) {
+          line = line.trim();
+          if (!line || (line.startsWith('//') && !line.includes('const'))) continue;
+          
+          const constMatch = line.match(/const\s+(\w+)\s*=\s*\[/);
+          if (constMatch) {
+            const fullName = constMatch[1].toLowerCase();
+            
+            if (fullName.includes('walls')) {
+              currentArrayType = 'walls';
+              currentType = fullName.replace('walls', '');
+            } else if (fullName.includes('zones')) {
+              currentArrayType = 'zones';
+              currentType = fullName.replace('zones', '');
+            } else if (fullName.includes('items')) {
+              currentArrayType = 'items';
+              currentType = fullName.replace('items', '');
+            } else {
+              currentArrayType = 'walls';
+              currentType = fullName;
+            }
+            
+            currentColor = colorMap[currentType] || '#333';
+            inArray = true;
+            continue;
+          }
+          
+          if (line.includes('];')) {
+            inArray = false;
+            continue;
+          }
+          
+          if (inArray && line.includes('{') && line.includes('}')) {
+            if (currentArrayType === 'items') {
+              const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+)\s*\}/);
+              if (coordMatch) {
+                const x = parseInt(coordMatch[1]);
+                const y = parseInt(coordMatch[2]);
+                const emoji = getEmojiFromName(currentType);
+                items.push({ x, y, emoji });
+              }
+            } else {
+              const coordMatch = line.match(/\{\s*x:\s*(\d+),\s*y:\s*(\d+),\s*w:\s*(\d+),\s*h:\s*(\d+)\s*\}/);
+              if (coordMatch) {
+                const x = parseInt(coordMatch[1]);
+                const y = parseInt(coordMatch[2]);
+                const w = parseInt(coordMatch[3]);
+                const h = parseInt(coordMatch[4]);
+                
+                if (currentArrayType === 'zones') {
+                  zones.push({
+                    x, y, w, h,
+                    color: currentColor,
+                    type: currentType
+                  });
+                } else {
+                  let startX, startY, endX, endY;
+                  if (w > h) {
+                    startX = x; startY = y; endX = x + w; endY = y;
+                  } else {
+                    startX = x; startY = y; endX = x; endY = y + h;
+                  }
+                  
+                  walls.push({
+                    startX, startY, endX, endY,
+                    color: currentColor,
+                    type: currentType
+                  });
+                }
+              }
+            }
+          }
+        }
+        
+        redrawCanvas();
+        updateCoordsCount();
+        saveState();
+        toggleLoadBox();
+        alert(`Loaded additional elements successfully!`);
+        
+      } catch (error) {
+        alert('Error parsing coordinates. Please check the format and try again.');
+      }
+    }
+
+    function getEmojiFromName(name) {
+      const nameToEmoji = {
+        'heart': '❤️', 'key': '🗝️', 'money': '💰', 'boots': '👢', 'sword': '⚔️',
+        'gem': '💎', 'trophy': '🏆', 'door': '🚪', 'crystal': '🔮', 'star': '⭐'
+      };
+      return nameToEmoji[name] || '❤️';
+    }
+
+    function setupCanvasEvents() {
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 1 && !isGesturing) {
+          const pos = getCanvasCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+          startDrawing(pos);
+        } else if (e.touches.length === 2) {
+          isGesturing = true;
+          if (isDrawing) stopDrawing();
+          lastTouchDistance = getTouchDistance(e.touches);
+          lastTouchCenter = getTouchCenter(e.touches);
+        }
+      });
+
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 1 && !isGesturing) {
+          const pos = getCanvasCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+          draw(pos);
+        } else if (e.touches.length === 2 && isGesturing) {
+          const currentDistance = getTouchDistance(e.touches);
+          const currentCenter = getTouchCenter(e.touches);
+          const zoomFactor = currentDistance / lastTouchDistance;
+          const newScale = Math.max(0.1, Math.min(3, scale * zoomFactor));
+          const deltaX = currentCenter.x - lastTouchCenter.x;
+          const deltaY = currentCenter.y - lastTouchCenter.y;
+          scale = newScale;
+          translateX += deltaX;
+          translateY += deltaY;
+          updateTransform();
+          lastTouchDistance = currentDistance;
+          lastTouchCenter = currentCenter;
+        }
+      });
+
+      canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (e.touches.length === 0) {
+          if (isDrawing) stopDrawing();
+          isGesturing = false;
+        } else if (e.touches.length === 1 && isGesturing) {
+          isGesturing = false;
+        }
+      });
+
+      canvas.addEventListener('mousedown', (e) => {
+        const pos = getCanvasCoordinates(e.clientX, e.clientY);
+        startDrawing(pos);
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (isDrawing) {
+          const pos = getCanvasCoordinates(e.clientX, e.clientY);
+          draw(pos);
+        }
+      });
+
+      document.addEventListener('mouseup', (e) => {
+        if (isDrawing) stopDrawing();
+      });
+
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (e.ctrlKey) {
+          const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05263;
+          scale = Math.max(0.1, Math.min(3, scale * zoomFactor));
+          updateTransform();
+        } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          translateX -= e.deltaX * 0.5;
+          updateTransform();
+        } else if (e.shiftKey || Math.abs(e.deltaY) < 50) {
+          translateY -= e.deltaY * 0.5;
+          updateTransform();
+        } else {
+          const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05263;
+          scale = Math.max(0.1, Math.min(3, scale * zoomFactor));
+          updateTransform();
+        }
+      });
+    }
+
+    function zoomIn() {
+      scale = Math.min(scale * 1.05263, 3); // ~5% increments
+      updateTransform();
+    }
+
+    function zoomOut() {
+      scale = Math.max(scale * 0.95, 0.1); // ~5% decrements
+      updateTransform();
+    }
+
+    function resetZoom() {
+      scale = 0.5;
+      translateX = 0;
+      translateY = 0;
+      updateTransform();
+    }
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function getTouchCenter(touches) {
+      return {
+        x: (touches[0].clientX + touches[1].clientX) / 2,
+        y: (touches[0].clientY + touches[1].clientY) / 2
+      };
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+
+    // Load saved mazes from localStorage
+    function loadSavedMazes() {
+      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
+      return Object.keys(saves).map(name => ({
+        name,
+        data: saves[name],
+        timestamp: saves[name].timestamp
+      })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // Add load from localStorage functionality
+    function showLoadFromStorageModal() {
+      const saves = loadSavedMazes();
+      if (saves.length === 0) {
+        alert('No saved mazes found in local storage.');
+        return;
+      }
+
+      let modalHTML = `
+        <div class="modal" id="loadStorageModal" style="display: block;">
+          <div class="modal-content">
+            <h3>Load from Local Storage</h3>
+            <div style="max-height: 300px; overflow-y: auto;">
+      `;
+
+      saves.forEach(save => {
+        const date = new Date(save.timestamp).toLocaleDateString();
+        modalHTML += `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid #666; border-radius: 4px; margin: 4px 0;">
+            <span>${save.name} (${date})</span>
+            <button onclick="loadFromStorage('${save.name}')" style="background: #2196f3; padding: 4px 8px; font-size: 11px;">Load</button>
+          </div>
+        `;
+      });
+
+      modalHTML += `
+            </div>
+            <button onclick="closeModal('loadStorageModal')" style="background: #666; margin-top: 10px;">Cancel</button>
+          </div>
+        </div>
+      `;
+
+      // Remove existing modal if any
+      const existingModal = document.getElementById('loadStorageModal');
+      if (existingModal) existingModal.remove();
+
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    function loadFromStorage(saveName) {
+      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
+      const saveData = saves[saveName];
+      
+      if (saveData) {
+        walls = saveData.walls || [];
+        zones = saveData.zones || [];
+        items = saveData.items || [];
+        
+        if (saveData.gridWidth && saveData.gridHeight) {
+          gridWidth = saveData.gridWidth;
+          gridHeight = saveData.gridHeight;
+          canvas.width = gridWidth;
+          canvas.height = gridHeight;
+        }
+        
+        drawGrid();
+        redrawCanvas();
+        updateCoordsCount();
+        updateZoomInfo();
+        saveState();
+        closeModal('loadStorageModal');
+        alert(`Loaded "${saveName}" successfully!`);
+      }
+    }
+
+    // Update the load button to show both options
+    function enhancedToggleLoadBox() {
+      const loadBox = document.getElementById('loadBox');
+      if (loadBox.style.display === 'none') {
+        // Show options for file or localStorage
+        const optionsHTML = `
+          <div style="display: flex; gap: 8px; margin-bottom: 10px; justify-content: center;">
+            <button onclick="showLoadFromFile()" style="background: #ffa726; padding: 6px 12px; font-size: 12px;">📄 From Text</button>
+            <button onclick="showLoadFromStorageModal()" style="background: #2196f3; padding: 6px 12px; font-size: 12px;">💾 From Storage</button>
+          </div>
+        `;
+        loadBox.innerHTML = optionsHTML + loadBox.innerHTML;
+        loadBox.style.display = 'block';
+      } else {
+        loadBox.style.display = 'none';
+        // Reset to original content
+        const textarea = loadBox.querySelector('textarea');
+        const buttons = loadBox.querySelector('div:last-child');
+        loadBox.innerHTML = `
+          <div style="margin-bottom:8px; color:#aaa; font-size:12px;">Paste coordinate data (will add to existing content):</div>
+          ${textarea.outerHTML}
+          ${buttons.outerHTML}
+        `;
+      }
+    }
+
+    function showLoadFromFile() {
+      // Hide the options and show the file input
+      const loadBox = document.getElementById('loadBox');
+      const textarea = loadBox.querySelector('textarea');
+      const buttons = loadBox.querySelector('div:last-child');
+      loadBox.innerHTML = `
+        <div style="margin-bottom:8px; color:#aaa; font-size:12px;">Paste coordinate data (will add to existing content):</div>
+        ${textarea.outerHTML}
+        ${buttons.outerHTML}
+      `;
+    }
+
+    // Update the toggleLoadBox function call
+    function toggleLoadBox() {
+      enhancedToggleLoadBox();
+    }
+  </script>
+</body>
+</html>
