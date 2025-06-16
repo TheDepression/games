@@ -367,7 +367,7 @@
   <div class="hover-coords" id="hoverCoords"></div>
 
   <div class="container">
-    <h1 class="title">出日土 Maze Kit</h1>
+    <h1 class="title">Enhanced Maze Kit</h1>
     <div class="info">Build complete mazes with walls, items, and background zones</div>
     <div class="zoom-info" id="zoomInfo">Zoom: 50% | Grid: 2400x2400</div>
 
@@ -477,15 +477,16 @@
 
     <div class="controls">
       <button class="back-btn" onclick="undoLast()">↶ Undo</button>
-      <button class="delete-btn" id="deleteBtn" onclick="toggleDeleteMode()">🗑️Delete1</button>
-      <button class="lock-btn" id="lockBtn" onclick="toggleLockMode()">🔓Unlocked</button>
-      <button class="erase-all-btn" onclick="showEraseAllModal()">🧹EraseGroup</button>
+      <button class="delete-btn" id="deleteBtn" onclick="toggleDeleteMode()">🗑️ Delete</button>
+      <button class="lock-btn" id="lockBtn" onclick="toggleLockMode()">🔓 Unlock</button>
+      <button class="erase-all-btn" onclick="showEraseAllModal()">🧹 Erase All</button>
     </div>
 
     <div class="controls">
-      <button class="load-btn" onclick="toggleLoadBox()">📁Load</button>
-      <button class="save-btn" onclick="showSaveModal()">💾Save</button>
-      <button class="clear-btn" onclick="confirmClearAll()">⚠️Clear All</button>
+      <button class="load-btn" onclick="toggleLoadBox()">📁 Load Text</button>
+      <button class="load-btn" onclick="showLoadStorageModal()" style="background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);">💾 Load Saved</button>
+      <button class="save-btn" onclick="showSaveModal()">💾 Save</button>
+      <button class="clear-btn" onclick="confirmClearAll()">⚠️ Clear All</button>
       <button class="done-btn" onclick="generateCoordinates()">✓ Generate</button>
     </div>
 
@@ -578,6 +579,18 @@
       <div class="modal-buttons">
         <button onclick="saveToLocalStorage()" style="background: #2196f3;">Save</button>
         <button onclick="closeModal('localSaveModal')" style="background: #666;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loadStorageModal" class="modal">
+    <div class="modal-content">
+      <h3>Load from Local Storage</h3>
+      <div id="savedMazesList" style="max-height: 300px; overflow-y: auto; margin: 15px 0;">
+        <!-- Saved mazes will be populated here -->
+      </div>
+      <div class="modal-buttons">
+        <button onclick="closeModal('loadStorageModal')" style="background: #666;">Cancel</button>
       </div>
     </div>
   </div>
@@ -1820,6 +1833,126 @@
         }
       });
     });
+
+    // Load saved mazes from localStorage
+    function showLoadStorageModal() {
+      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
+      const saveNames = Object.keys(saves);
+      
+      if (saveNames.length === 0) {
+        alert('No saved mazes found in local storage.');
+        return;
+      }
+
+      const modal = document.getElementById('loadStorageModal');
+      const list = document.getElementById('savedMazesList');
+      
+      // Sort by timestamp (newest first)
+      const sortedSaves = saveNames.map(name => ({
+        name,
+        data: saves[name]
+      })).sort((a, b) => new Date(b.data.timestamp) - new Date(a.data.timestamp));
+
+      list.innerHTML = '';
+      
+      sortedSaves.forEach(save => {
+        const date = new Date(save.data.timestamp).toLocaleDateString();
+        const time = new Date(save.data.timestamp).toLocaleTimeString();
+        const gridInfo = `${save.data.gridWidth}×${save.data.gridHeight}`;
+        const elementCount = (save.data.walls ? save.data.walls.length - 4 : 0) + 
+                            (save.data.zones ? save.data.zones.length : 0) + 
+                            (save.data.items ? save.data.items.length : 0);
+        
+        const saveDiv = document.createElement('div');
+        saveDiv.style.cssText = `
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
+          padding: 12px; 
+          border: 2px solid #666; 
+          border-radius: 8px; 
+          margin: 8px 0; 
+          background: #333;
+          transition: background 0.2s;
+        `;
+        
+        saveDiv.innerHTML = `
+          <div style="flex: 1;">
+            <div style="font-weight: bold; color: #fff; margin-bottom: 4px;">${save.name}</div>
+            <div style="font-size: 11px; color: #aaa;">
+              ${date} ${time} | ${gridInfo} | ${elementCount} elements
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="loadFromStorage('${save.name}')" 
+                    style="background: #2196f3; padding: 6px 12px; font-size: 11px; border-radius: 4px; border: none; color: white; cursor: pointer;">
+              Load
+            </button>
+            <button onclick="deleteFromStorage('${save.name}')" 
+                    style="background: #f44336; padding: 6px 12px; font-size: 11px; border-radius: 4px; border: none; color: white; cursor: pointer;">
+              Delete
+            </button>
+          </div>
+        `;
+        
+        saveDiv.onmouseenter = () => saveDiv.style.background = '#444';
+        saveDiv.onmouseleave = () => saveDiv.style.background = '#333';
+        
+        list.appendChild(saveDiv);
+      });
+
+      modal.style.display = 'block';
+    }
+
+    function loadFromStorage(saveName) {
+      const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
+      const saveData = saves[saveName];
+      
+      if (saveData) {
+        // Replace all content (this is different from the text load which adds)
+        walls = saveData.walls || [];
+        zones = saveData.zones || [];
+        items = saveData.items || [];
+        
+        if (saveData.gridWidth && saveData.gridHeight) {
+          gridWidth = saveData.gridWidth;
+          gridHeight = saveData.gridHeight;
+          canvas.width = gridWidth;
+          canvas.height = gridHeight;
+          
+          // Update grid selector
+          document.querySelectorAll('.grid-btn').forEach(btn => {
+            const [w, h] = btn.getAttribute('data-size').split(',');
+            if (parseInt(w) === gridWidth && parseFloat(h) === gridHeight) {
+              document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+            }
+          });
+        }
+        
+        drawGrid();
+        redrawCanvas();
+        updateCoordsCount();
+        updateZoomInfo();
+        saveState();
+        closeModal('loadStorageModal');
+        alert(`Loaded "${saveName}" successfully! Content replaced.`);
+      } else {
+        alert('Save file not found!');
+      }
+    }
+
+    function deleteFromStorage(saveName) {
+      if (confirm(`Are you sure you want to delete "${saveName}"? This cannot be undone.`)) {
+        const saves = JSON.parse(localStorage.getItem('mazeSaves') || '{}');
+        delete saves[saveName];
+        localStorage.setItem('mazeSaves', JSON.stringify(saves));
+        
+        // Refresh the modal
+        showLoadStorageModal();
+        alert(`"${saveName}" deleted successfully.`);
+      }
+    }
   </script>
 </body>
 </html>
