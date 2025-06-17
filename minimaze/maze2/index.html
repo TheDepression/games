@@ -791,7 +791,13 @@ this.playerVelocityY = deltaY * sensitivity;
         this.lastForegroundSpawn = Date.now();
         this.hasKey = false;
         this.lastInteractionTime = {};
-        
+        // Check if returning from battle
+    if (this.bullyDefeated) {
+        const bully = document.getElementById('forestBully');
+        if (bully) {
+            bully.remove();
+        }
+    }
         this.updateUI();
         this.generateMaze();
         
