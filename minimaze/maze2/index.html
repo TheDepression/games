@@ -1714,7 +1714,7 @@ this.gameWorld.appendChild(furnitureEl);
     createFriendlies() {
         const friendlies = [
             {x: 2280, y: 860, message: "🔑 Need a key? Give me 500¥!"},
-            {x: 1200, y: 600, message: "⛵ Want a boat? 300¥ and you can sail!"},
+            {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!"},
             {x: 60, y: 60, message: "🔨 Hammer for sale! Break walls for 400¥!"},
             {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 600¥!"}
         ];
@@ -2484,15 +2484,15 @@ if (onLava) {
             } else {
                 this.showMessage('🔑 Need a key? Give me 500¥!');
             }
-        } else if (message === "⛵ Want a boat? 300¥ and you can sail!" && !this.hasBoat) {
-            if (this.money >= 300) {
-                this.money -= 300;
+        } else if (message === "⛵ Want a boat? 500¥ and you can sail!" && !this.hasBoat) {
+            if (this.money >= 500) {
+                this.money -= 500;
                 this.hasBoat = true;
                 this.showMessage('⛵ Boat purchased! Now you can sail!');
                 friendly.dataset.message = 'Enjoy your boat!';
                 this.updateUI();
             } else {
-                this.showMessage('⛵ Want a boat? 300¥ and you can sail!');
+                this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
             }
         } else if (message === "🔨 Hammer for sale! Break walls for 400¥!" && !this.hasHammer) {
             if (this.money >= 400) {
