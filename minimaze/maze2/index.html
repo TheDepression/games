@@ -593,6 +593,9 @@ this.lastLavaZoneTime = 0;
         this.lastMoveDirection = 's';
         this.preloadPlayerImages();
         this.lastLavaDamage = 0;
+        this.hasBaby = false;
+this.bullyDefeated = false;
+this.motherPaid = false;
         
         // Movement properties
         this.playerX = 1300;
@@ -621,6 +624,7 @@ this.lastLavaZoneTime = 0;
         
         this.bindEvents();
         this.startGameLoop();
+        this.loadGameState(); // Load saved game state if exists
     }
 
     enterForest() {
@@ -1031,6 +1035,22 @@ castleZone.style.top = '70px';
 castleZone.style.width = '150px';
 castleZone.style.height = '240px';
 this.gameWorld.appendChild(castleZone);
+
+        // Bully blocking the baby
+const bullyEl = document.createElement('div');
+bullyEl.style.position = 'absolute';
+bullyEl.style.left = '640px';
+bullyEl.style.top = '480px';
+bullyEl.style.width = '40px';
+bullyEl.style.height = '40px';
+bullyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png")';
+bullyEl.style.backgroundSize = 'contain';
+bullyEl.style.backgroundRepeat = 'no-repeat';
+bullyEl.style.backgroundPosition = 'center';
+bullyEl.style.zIndex = '45';
+bullyEl.dataset.type = 'bully';
+bullyEl.id = 'forestBully';
+this.gameWorld.appendChild(bullyEl);
 
     // Pyramid decoration
 const pyramidEl = document.createElement('div');
@@ -1712,38 +1732,42 @@ this.gameWorld.appendChild(furnitureEl);
     };
 }
     createFriendlies() {
-        const friendlies = [
-            {x: 2280, y: 860, message: "🔑 Need a key? Give me 500¥!"},
-            {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!"},
-            {x: 60, y: 60, message: "🔨 Hammer for sale! Break walls for 400¥!"},
-            {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 600¥!"}
-        ];
-        
-        const friendlyEmojis = ['👴🏻', '👩‍⚕️', '🧙‍♀️', '👷‍♂️'];
-        
-        friendlies.forEach((friendly, index) => {
-    const friendlyEl = document.createElement('div');
-    friendlyEl.className = 'friendly';
+    const friendlies = [
+        {x: 2280, y: 860, message: "🔑 Need a key? Give me 500¥!", customEmoji: "👴🏻"},
+        {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!", customEmoji: "👩‍⚕️"},
+        {x: 60, y: 60, message: "🔨 Hammer for sale! Break walls for 400¥!", customEmoji: "🧙‍♀️"},
+        {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 600¥!", customEmoji: "👷‍♂️"},
+        {x: 380, y: 1760, message: "Thank god you are here, master frog! The bully took my baby and went into the dark forest! If you can rescue him, I will pay you 200¥. It's all I have! PLEASE!", type: "mother", customEmoji: "👩🏻"},
+        {x: 120, y: 1200, message: "I used to be an adventurer like you, then I took an arrow to the knee!", type: "guard", customEmoji: "💂🏻‍♂️"},
+        {x: 1900, y: 1200, message: "The desert is dangerous at night. Many travelers have gone missing...", type: "traveler", customEmoji: "🧓🏻"},
+        {x: 500, y: 500, message: "Have you seen any strange lights in the forest lately?", type: "villager", customEmoji: "👨🏻"},
+        {x: 2100, y: 400, message: "The castle has been abandoned for decades. Some say it's haunted!", type: "historian", customEmoji: "👵🏻"},
+        {x: 800, y: 1400, message: "My grandfather once told me stories of treasure hidden in these lands.", type: "elder", customEmoji: "🤴🏻"}
+    ];
     
-    // Special handling for key dealer (index 0)
-    if (index === 0) {
-        friendlyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png")';
-        friendlyEl.style.backgroundSize = 'contain';
-        friendlyEl.style.backgroundRepeat = 'no-repeat';
-        friendlyEl.style.backgroundPosition = 'center';
-        friendlyEl.style.width = '33px';
-        friendlyEl.style.height = '66px';  // Double height as you mentioned
-        friendlyEl.textContent = '';  // No emoji
-    } else {
-        friendlyEl.textContent = friendlyEmojis[index % friendlyEmojis.length];
-    }
-    
-    friendlyEl.style.left = friendly.x + 'px';
-    friendlyEl.style.top = friendly.y + 'px';
-    friendlyEl.dataset.message = friendly.message;
-    this.gameWorld.appendChild(friendlyEl);
-});
-    }
+    friendlies.forEach((friendly, index) => {
+        const friendlyEl = document.createElement('div');
+        friendlyEl.className = 'friendly';
+        
+        // Special handling for key dealer (index 0) - keep the PNG
+        if (index === 0) {
+            friendlyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png")';
+            friendlyEl.style.backgroundSize = 'contain';
+            friendlyEl.style.backgroundRepeat = 'no-repeat';
+            friendlyEl.style.backgroundPosition = 'center';
+            friendlyEl.style.width = '33px';
+            friendlyEl.style.height = '66px';
+            friendlyEl.textContent = '';
+        } else {
+            friendlyEl.textContent = friendly.customEmoji;
+        }
+        
+        friendlyEl.style.left = friendly.x + 'px';
+        friendlyEl.style.top = friendly.y + 'px';
+        friendlyEl.dataset.message = friendly.message;
+        this.gameWorld.appendChild(friendlyEl);
+    });
+}
     createCollectibles() {
         // Money pickups - positioned in open areas of your maze
         const moneyPositions = [
@@ -1782,6 +1806,15 @@ this.gameWorld.appendChild(furnitureEl);
             heartEl.style.top = pos.y + 'px';
             this.gameWorld.appendChild(heartEl);
         });
+        
+        // Baby collectible in forest
+const babyEl = document.createElement('div');
+babyEl.className = 'heart-pickup';
+babyEl.textContent = '👶🏻';
+babyEl.style.left = '640px';
+babyEl.style.top = '380px';
+babyEl.dataset.type = 'baby';
+this.gameWorld.appendChild(babyEl);
     }
     
     createExit() {
@@ -2253,28 +2286,49 @@ if (this.gorilla) {
                 }
             }
         });
+
+        // Check bully collision
+const bully = document.getElementById('forestBully');
+if (bully && !this.bullyDefeated) {
+    const bullyX = parseInt(bully.style.left);
+    const bullyY = parseInt(bully.style.top);
+    const distance = Math.sqrt(
+        Math.pow(this.playerX - bullyX, 2) + 
+        Math.pow(this.playerY - bullyY, 2)
+    );
+    
+    if (distance <= 30) {
+        this.handleBullyEncounter();
+    }
+}
         
-        // Check heart pickup
-        const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
-        hearts.forEach(heart => {
-            const heartX = parseInt(heart.style.left);
-            const heartY = parseInt(heart.style.top);
-            const heartRect = {
-                left: heartX,
-                top: heartY,
-                right: heartX + 22,
-                bottom: heartY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, heartRect)) {
-                if (this.hearts < 3) {
-                    this.hearts++;
-                    this.showMessage('❤️ Health restored!');
-                    this.updateUI();
-                    heart.remove();
-                }
-            }
-        });
+        // Check heart and baby pickup
+const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
+hearts.forEach(heart => {
+    const heartX = parseInt(heart.style.left);
+    const heartY = parseInt(heart.style.top);
+    const heartRect = {
+        left: heartX,
+        top: heartY,
+        right: heartX + 22,
+        bottom: heartY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, heartRect)) {
+        if (heart.dataset.type === 'baby' && this.bullyDefeated) {
+            this.hasBaby = true;
+            this.showMessage('👶🏻 Baby rescued!');
+            this.updateUI();
+            this.saveGameState();
+            heart.remove();
+        } else if (heart.dataset.type !== 'baby' && this.hearts < 3) {
+            this.hearts++;
+            this.showMessage('❤️ Health restored!');
+            this.updateUI();
+            heart.remove();
+        }
+    }
+});
         
         // Check money pickup
         const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
@@ -2516,10 +2570,21 @@ if (onLava) {
     } else {
         this.showMessage('🥾 Lava-proof shoes! Only 600¥!');
     }
-} else {
-            this.showMessage(message);
-        }
+} else if (message.includes("Thank god you are here, master frog") && !this.motherPaid) {
+    if (this.hasBaby) {
+        this.money += 200;
+        this.hasBaby = false;
+        this.motherPaid = true;
+        this.showMessage('Thank you so much! Here is your reward!');
+        friendly.dataset.message = 'You saved my baby! I am forever grateful!';
+        this.updateUI();
+        this.saveGameState();
+    } else {
+        this.showMessage(message);
     }
+} else {
+    this.showMessage(message);
+}
     
     rectsOverlap(rect1, rect2) {
         return rect1.left < rect2.right &&
@@ -2606,7 +2671,57 @@ if (this.hasLavaShoes) itemsText += ' 🥾';
         document.getElementById('levelCompleteText').textContent = text;
         document.getElementById('levelComplete').style.display = 'flex';
     }
+
+    saveGameState() {
+    const gameState = {
+        hearts: this.hearts,
+        money: this.money,
+        timeElapsed: this.timeElapsed,
+        playerX: this.playerX,
+        playerY: this.playerY,
+        hasKey: this.hasKey,
+        hasBoat: this.hasBoat,
+        hasHammer: this.hasHammer,
+        hasLavaShoes: this.hasLavaShoes,
+        hasBaby: this.hasBaby || false,
+        bullyDefeated: this.bullyDefeated || false,
+        motherPaid: this.motherPaid || false
+    };
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
 }
+
+loadGameState() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        this.hearts = gameState.hearts || 3;
+        this.money = gameState.money || 0;
+        this.timeElapsed = gameState.timeElapsed || 0;
+        this.playerX = gameState.playerX || 420;
+        this.playerY = gameState.playerY || 1760;
+        this.hasKey = gameState.hasKey || false;
+        this.hasBoat = gameState.hasBoat || false;
+        this.hasHammer = gameState.hasHammer || false;
+        this.hasLavaShoes = gameState.hasLavaShoes || false;
+        this.hasBaby = gameState.hasBaby || false;
+        this.bullyDefeated = gameState.bullyDefeated || false;
+        this.motherPaid = gameState.motherPaid || false;
+        return true;
+    }
+    return false;
+}
+  // ADD THIS METHOD HERE:
+    handleBullyEncounter() {
+        this.playerVelocityX = 0;
+        this.playerVelocityY = 0;
+        this.isDragging = false;
+        this.gameStarted = false;
+        
+        document.getElementById('confirmText').textContent = 'You want this baby?! You have to fight me for it!';
+        document.getElementById('confirmDialog').style.display = 'flex';
+        this.pendingAction = 'fightBully';
+    }
+} // This is the END of the MazeGame class
 
 let game;
 
@@ -2642,7 +2757,10 @@ function restartGame() {
     document.getElementById('forestVisionMask').classList.remove('active');
     game.showMessage('🌞 Exiting the forest...');
       game.updateForestVisibility();
-  }
+            } else if (game.pendingAction === 'fightBully') {
+    game.saveGameState();
+    window.location.href = 'https://thedepression.github.io/games/minimaze/forestbully';
+}
   
   game.pendingAction = null;
 }
