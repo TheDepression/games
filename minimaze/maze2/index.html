@@ -1031,8 +1031,22 @@ castleZone.style.top = '70px';
 castleZone.style.width = '150px';
 castleZone.style.height = '240px';
 this.gameWorld.appendChild(castleZone);
+
+    // Pyramid decoration
+const pyramidEl = document.createElement('div');
+pyramidEl.style.position = 'absolute';
+pyramidEl.style.left = '2200px';
+pyramidEl.style.top = '1300px';
+pyramidEl.style.width = '60px';
+pyramidEl.style.height = '60px';
+pyramidEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/pyramid.png")';
+pyramidEl.style.backgroundSize = 'contain';
+pyramidEl.style.backgroundRepeat = 'no-repeat';
+pyramidEl.style.backgroundPosition = 'center';
+pyramidEl.style.zIndex = '35';
+pyramidEl.style.pointerEvents = 'none';
+this.gameWorld.appendChild(pyramidEl);
     }
-    
     createColoredWalls() {
         const wallData = {
             black: [
@@ -1306,6 +1320,49 @@ this.gameWorld.appendChild(castleZone);
             hotpink: [
                 {x: 100, y: 200, w: 20, h: 20}
             ],
+            yellow: [
+    {x: 1840, y: 1140, w: 10, h: 240},
+  {x: 2080, y: 1360, w: 10, h: 140},
+  {x: 2080, y: 1500, w: 200, h: 10},
+  {x: 2280, y: 1360, w: 10, h: 140},
+  {x: 2280, y: 1360, w: 120, h: 10},
+  {x: 1720, y: 1260, w: 10, h: 160},
+  {x: 1930, y: 1210, w: 10, h: 160},
+  {x: 1720, y: 1150, w: 120, h: 10},
+  {x: 1720, y: 990, w: 10, h: 160},
+  {x: 1660, y: 1070, w: 10, h: 180},
+  {x: 1710, y: 1200, w: 130, h: 10},
+  {x: 1850, y: 1080, w: 250, h: 10},
+  {x: 1970, y: 1000, w: 370, h: 10},
+  {x: 2340, y: 1000, w: 10, h: 170},
+  {x: 2340, y: 1170, w: 60, h: 10},
+  {x: 1930, y: 1210, w: 110, h: 10},
+  {x: 2010, y: 1160, w: 10, h: 50},
+  {x: 2090, y: 1160, w: 10, h: 120},
+  {x: 2020, y: 1280, w: 80, h: 10},
+  {x: 2020, y: 1280, w: 10, h: 170},
+  {x: 2020, y: 1440, w: 60, h: 10},
+  {x: 1930, y: 1360, w: 10, h: 140},
+  {x: 1930, y: 1500, w: 150, h: 10},
+  {x: 1650, y: 1370, w: 10, h: 110},
+  {x: 2160, y: 1280, w: 10, h: 100},
+  {x: 2160, y: 1280, w: 100, h: 10},
+  {x: 2180, y: 1160, w: 10, h: 50},
+  {x: 2150, y: 1220, w: 90, h: 10},
+  {x: 2270, y: 1160, w: 10, h: 30},
+  {x: 2300, y: 1210, w: 60, h: 10},
+  {x: 2310, y: 1210, w: 10, h: 70},
+  {x: 2260, y: 1280, w: 10, h: 70},
+  {x: 2200, y: 1220, w: 10, h: 50},
+  {x: 2080, y: 1430, w: 100, h: 10},
+  {x: 2180, y: 1090, w: 110, h: 10},
+  {x: 2290, y: 1090, w: 10, h: 40},
+  {x: 1660, y: 1460, w: 180, h: 10},
+  {x: 1780, y: 1200, w: 10, h: 260},
+  {x: 1820, y: 1000, w: 10, h: 20},
+  {x: 1790, y: 1030, w: 70, h: 10},
+  {x: 1600, y: 1260, w: 110, h: 10}
+],
             tiled: [
      {x: 1850, y: 2050, w: 10, h: 50},
   {x: 1850, y: 2050, w: 70, h: 10},
@@ -1528,40 +1585,67 @@ this.gameWorld.appendChild(furnitureEl);
     }
     
     createEnemies() {
-    const enemies = [
-        {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6},
-        {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5},
-        {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6},
-        {x: 200, y: 1600, moveX: 200, moveY: 1580, range: 100, axis: 'y', speed: 0.7},
-        {x: 1700, y: 1400, moveX: 1680, moveY: 1400, range: 120, axis: 'x', speed: 0.8},
-        {x: 2000, y: 800, moveX: 1980, moveY: 800, range: 100, axis: 'x', speed: 0.7}
+    // Main area enemies (snakes and bad guys)
+    const mainEnemies = [
+        {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6, emoji: '🐍'},
+        {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5, emoji: '🦹🏻‍♂️'},
+        {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6, emoji: '🐍'},
+        {x: 200, y: 1600, moveX: 200, moveY: 1580, range: 100, axis: 'y', speed: 0.7, emoji: '🦹🏻‍♂️'},
+        {x: 500, y: 800, moveX: 480, moveY: 800, range: 120, axis: 'x', speed: 0.8, emoji: '🐍'},
+        {x: 2300, y: 600, moveX: 2280, moveY: 600, range: 100, axis: 'x', speed: 0.7, emoji: '🦹🏻‍♂️'}
     ];
+    
+    // Desert scorpions
+    const desertEnemies = [
+        {x: 1700, y: 1100, moveX: 1680, moveY: 1100, range: 120, axis: 'x', speed: 0.6, emoji: '🦂'},
+        {x: 1800, y: 1200, moveX: 1800, moveY: 1180, range: 100, axis: 'y', speed: 0.5, emoji: '🦂'},
+        {x: 2000, y: 1300, moveX: 1980, moveY: 1300, range: 140, axis: 'x', speed: 0.7, emoji: '🦂'},
+        {x: 2200, y: 1150, moveX: 2200, moveY: 1130, range: 80, axis: 'y', speed: 0.6, emoji: '🦂'}
+    ];
+    
+    // Water puffer fish
+    const waterEnemies = [
+        {x: 200, y: 250, moveX: 180, moveY: 250, range: 100, axis: 'x', speed: 0.4, emoji: '🐡'},
+        {x: 800, y: 80, moveX: 780, moveY: 80, range: 120, axis: 'x', speed: 0.5, emoji: '🐡'},
+        {x: 1300, y: 200, moveX: 1280, moveY: 200, range: 100, axis: 'x', speed: 0.4, emoji: '🐡'},
+        {x: 1700, y: 500, moveX: 1700, moveY: 480, range: 80, axis: 'y', speed: 0.5, emoji: '🐡'}
+    ];
+    
+    // Lava zone enemies
+    const lavaEnemies = [
+        {x: 1400, y: 1800, moveX: 1380, moveY: 1800, range: 100, axis: 'x', speed: 0.6, emoji: '🧌'},
+        {x: 1500, y: 1900, moveX: 1500, moveY: 1880, range: 80, axis: 'y', speed: 0.5, emoji: '👾'},
+        {x: 1800, y: 1850, moveX: 1780, moveY: 1850, range: 120, axis: 'x', speed: 0.7, emoji: '🧌'},
+        {x: 2000, y: 2000, moveX: 2000, moveY: 1980, range: 100, axis: 'y', speed: 0.6, emoji: '👾'}
+    ];
+    
+    // Combine all enemies
+    const allEnemies = [...mainEnemies, ...desertEnemies, ...waterEnemies, ...lavaEnemies];
+    
+    allEnemies.forEach((enemy, index) => {
+        const enemyEl = document.createElement('div');
+        enemyEl.className = 'enemy';
+        enemyEl.textContent = enemy.emoji;
+        enemyEl.style.left = enemy.x + 'px';
+        enemyEl.style.top = enemy.y + 'px';
+        this.gameWorld.appendChild(enemyEl);
         
-        const enemyEmojis = ['🦠', '💉', '👾', '🐍'];
-        
-        enemies.forEach((enemy, index) => {
-            const enemyEl = document.createElement('div');
-            enemyEl.className = 'enemy';
-            enemyEl.textContent = enemyEmojis[index % enemyEmojis.length];
-            enemyEl.style.left = enemy.x + 'px';
-            enemyEl.style.top = enemy.y + 'px';
-            this.gameWorld.appendChild(enemyEl);
-            
-            this.movingEnemies.push({
-                element: enemyEl,
-                startX: enemy.moveX,
-                startY: enemy.moveY,
-                currentX: enemy.x,
-                currentY: enemy.y,
-                range: enemy.range,
-                axis: enemy.axis,
-                direction: 1,
-                speed: enemy.speed
-            });
+        this.movingEnemies.push({
+            element: enemyEl,
+            startX: enemy.moveX,
+            startY: enemy.moveY,
+            currentX: enemy.x,
+            currentY: enemy.y,
+            range: enemy.range,
+            axis: enemy.axis,
+            direction: 1,
+            speed: enemy.speed
         });
-            // Add forest bees
-this.createForestBees();
-    }
+    });
+    
+    // Add forest bees
+    this.createForestBees();
+}
     createForestBees() {
     // Create 5 bees in the forest zone with 120px margin from edges
     const forestLeft = 600 + 120;
@@ -1986,43 +2070,111 @@ canGorillaMoveTo(x, y) {
 }
     
     updateForegroundEnemy() {
-        if (!this.gameStarted) return;
-        const now = Date.now();
-        if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000 && !this.isInForest) {
-            const playerCenterX = this.playerX + 12;
-            const direction = playerCenterX < 900 ? 1 : -1;
-            const startX = direction > 0 ? -60 : 2460;
-            const y = Math.random() * 2340;
-            const speed = (2460 / 25) / 60;
-            
-            const enemyEl = document.createElement('div');
-            enemyEl.className = 'foreground-enemy';
-            enemyEl.textContent = '🌪️';
-            enemyEl.style.left = startX + 'px';
-            enemyEl.style.top = y + 'px';
-            this.gameWorld.appendChild(enemyEl);
-            
-            this.foregroundEnemy = {
-                element: enemyEl,
-                x: startX,
-                y: y,
-                speed: speed,
-                direction: direction
-            };
-            this.lastForegroundSpawn = now;
-        }
+    if (!this.gameStarted) return;
+    const now = Date.now();
+    
+    if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000 && !this.isInForest) {
+        // Spawn in desert zone top-left corner
+        const desertLeft = 1600;
+        const desertTop = 1000;
+        const startX = desertLeft + 50; // 50px from left edge
+        const startY = desertTop + 50;  // 50px from top edge
         
-        if (this.foregroundEnemy) {
-            this.foregroundEnemy.x += this.foregroundEnemy.speed * this.foregroundEnemy.direction;
-            this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
-            this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
-            
-            if (this.foregroundEnemy.x < -60 || this.foregroundEnemy.x > 2460) {
-                this.foregroundEnemy.element.remove();
-                this.foregroundEnemy = null;
+        const enemyEl = document.createElement('div');
+        enemyEl.className = 'foreground-enemy';
+        enemyEl.textContent = '🌪️';
+        enemyEl.style.left = startX + 'px';
+        enemyEl.style.top = startY + 'px';
+        this.gameWorld.appendChild(enemyEl);
+        
+        this.foregroundEnemy = {
+            element: enemyEl,
+            x: startX,
+            y: startY,
+            speed: 2,
+            state: 'moving', // 'moving' or 'riding'
+            direction: Math.random() < 0.5 ? 'left' : 'right', // Initial random direction
+            rideDistance: 0,
+            targetRideDistance: 0,
+            rideDirection: null // 'up' or 'down'
+        };
+        this.lastForegroundSpawn = now;
+    }
+    
+    if (this.foregroundEnemy) {
+        if (this.foregroundEnemy.state === 'moving') {
+            // Move in current direction
+            if (this.foregroundEnemy.direction === 'left') {
+                this.foregroundEnemy.x -= this.foregroundEnemy.speed;
+                // Hit left wall (x = 20)
+                if (this.foregroundEnemy.x <= 20) {
+                    this.foregroundEnemy.state = 'riding';
+                    this.foregroundEnemy.rideDirection = Math.random() < 0.5 ? 'up' : 'down';
+                    // Random ride distances: 200, 600, or 1500
+                    const distances = [200, 600, 1500];
+                    this.foregroundEnemy.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                    this.foregroundEnemy.rideDistance = 0;
+                    this.foregroundEnemy.x = 20;
+                }
+            } else if (this.foregroundEnemy.direction === 'right') {
+                this.foregroundEnemy.x += this.foregroundEnemy.speed;
+                // Hit right wall (x = 2380)
+                if (this.foregroundEnemy.x >= 2380) {
+                    this.foregroundEnemy.state = 'riding';
+                    this.foregroundEnemy.rideDirection = Math.random() < 0.5 ? 'up' : 'down';
+                    // Random ride distances: 200, 600, or 1500
+                    const distances = [200, 600, 1500];
+                    this.foregroundEnemy.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                    this.foregroundEnemy.rideDistance = 0;
+                    this.foregroundEnemy.x = 2380;
+                }
+            }
+        } else if (this.foregroundEnemy.state === 'riding') {
+            // Ride along wall with bouncing
+            if (this.foregroundEnemy.rideDirection === 'up') {
+                this.foregroundEnemy.y -= this.foregroundEnemy.speed;
+                this.foregroundEnemy.rideDistance += this.foregroundEnemy.speed;
+                
+                // Hit top wall - bounce down
+                if (this.foregroundEnemy.y <= 20) {
+                    this.foregroundEnemy.y = 20;
+                    this.foregroundEnemy.rideDirection = 'down'; // Bounce to down
+                }
+                
+                // Completed ride distance
+                if (this.foregroundEnemy.rideDistance >= this.foregroundEnemy.targetRideDistance) {
+                    this.foregroundEnemy.state = 'moving';
+                    this.foregroundEnemy.direction = this.foregroundEnemy.x <= 20 ? 'right' : 'left';
+                }
+            } else if (this.foregroundEnemy.rideDirection === 'down') {
+                this.foregroundEnemy.y += this.foregroundEnemy.speed;
+                this.foregroundEnemy.rideDistance += this.foregroundEnemy.speed;
+                
+                // Hit bottom wall - bounce up
+                if (this.foregroundEnemy.y >= 2380) {
+                    this.foregroundEnemy.y = 2380;
+                    this.foregroundEnemy.rideDirection = 'up'; // Bounce to up
+                }
+                
+                // Completed ride distance
+                if (this.foregroundEnemy.rideDistance >= this.foregroundEnemy.targetRideDistance) {
+                    this.foregroundEnemy.state = 'moving';
+                    this.foregroundEnemy.direction = this.foregroundEnemy.x <= 20 ? 'right' : 'left';
+                }
             }
         }
+        
+        this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+        this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+        
+        // Remove if it goes too far out of bounds
+        if (this.foregroundEnemy.x < -100 || this.foregroundEnemy.x > 2500 || 
+            this.foregroundEnemy.y < -100 || this.foregroundEnemy.y > 2500) {
+            this.foregroundEnemy.element.remove();
+            this.foregroundEnemy = null;
+        }
     }
+}
     
     checkCollisions() {
         if (this.isInvulnerable) return;
