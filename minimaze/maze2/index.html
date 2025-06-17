@@ -2091,7 +2091,7 @@ canGorillaMoveTo(x, y) {
             element: enemyEl,
             x: startX,
             y: startY,
-            speed: 2,
+            speed: 1.8,
             state: 'moving', // 'moving' or 'riding'
             direction: Math.random() < 0.5 ? 'left' : 'right', // Initial random direction
             rideDistance: 0,
@@ -2110,23 +2110,23 @@ canGorillaMoveTo(x, y) {
                 if (this.foregroundEnemy.x <= 20) {
                     this.foregroundEnemy.state = 'riding';
                     this.foregroundEnemy.rideDirection = Math.random() < 0.5 ? 'up' : 'down';
-                    // Random ride distances: 200, 600, or 1500
-                    const distances = [200, 600, 1500];
+                    // Random ride distances: 300, 800, or 1500
+                    const distances = [300, 800, 1500];
                     this.foregroundEnemy.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
                     this.foregroundEnemy.rideDistance = 0;
                     this.foregroundEnemy.x = 20;
                 }
             } else if (this.foregroundEnemy.direction === 'right') {
                 this.foregroundEnemy.x += this.foregroundEnemy.speed;
-                // Hit right wall (x = 2380)
-                if (this.foregroundEnemy.x >= 2380) {
+                // Hit right wall (x = 2360)
+                if (this.foregroundEnemy.x >= 2360) {
                     this.foregroundEnemy.state = 'riding';
                     this.foregroundEnemy.rideDirection = Math.random() < 0.5 ? 'up' : 'down';
-                    // Random ride distances: 200, 600, or 1500
-                    const distances = [200, 600, 1500];
+                    // Random ride distances: 300, 800, or 1500
+                    const distances = [300, 800, 1500];
                     this.foregroundEnemy.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
                     this.foregroundEnemy.rideDistance = 0;
-                    this.foregroundEnemy.x = 2380;
+                    this.foregroundEnemy.x = 2360;
                 }
             }
         } else if (this.foregroundEnemy.state === 'riding') {
@@ -2151,8 +2151,8 @@ canGorillaMoveTo(x, y) {
                 this.foregroundEnemy.rideDistance += this.foregroundEnemy.speed;
                 
                 // Hit bottom wall - bounce up
-                if (this.foregroundEnemy.y >= 2380) {
-                    this.foregroundEnemy.y = 2380;
+                if (this.foregroundEnemy.y >= 2360) {
+                    this.foregroundEnemy.y = 2360;
                     this.foregroundEnemy.rideDirection = 'up'; // Bounce to up
                 }
                 
@@ -2168,8 +2168,8 @@ canGorillaMoveTo(x, y) {
         this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
         
         // Remove if it goes too far out of bounds
-        if (this.foregroundEnemy.x < -100 || this.foregroundEnemy.x > 2500 || 
-            this.foregroundEnemy.y < -100 || this.foregroundEnemy.y > 2500) {
+        if (this.foregroundEnemy.x < -50 || this.foregroundEnemy.x > 2450 || 
+            this.foregroundEnemy.y < -50 || this.foregroundEnemy.y > 2450) {
             this.foregroundEnemy.element.remove();
             this.foregroundEnemy = null;
         }
