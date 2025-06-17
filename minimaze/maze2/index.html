@@ -2273,26 +2273,29 @@ if (this.gorilla) {
         }
         
         // Check friendly NPCs
-        const friendlies = this.gameWorld.querySelectorAll('.friendly');
-        friendlies.forEach(friendly => {
-            const friendlyX = parseInt(friendly.style.left);
-            const friendlyY = parseInt(friendly.style.top);
-            const friendlyRect = {
-                left: friendlyX,
-                top: friendlyY,
-                right: friendlyX + 22,
-                bottom: friendlyY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, friendlyRect)) {
-                const now = Date.now();
-                const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                if (now - lastTime > 3000) {
-                    this.handleNPCInteraction(friendly);
-                    this.lastInteractionTime[friendly.dataset.message] = now;
-                }
-            }
-        });
+const friendlies = this.gameWorld.querySelectorAll('.friendly');
+friendlies.forEach(friendly => {
+    const friendlyX = parseInt(friendly.style.left);
+    const friendlyY = parseInt(friendly.style.top);
+    const friendlyRect = {
+        left: friendlyX,
+        top: friendlyY,
+        right: friendlyX + 22,
+        bottom: friendlyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, friendlyRect)) {
+        const now = Date.now();
+        const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
+        if (now - lastTime > 3000) {
+            this.handleNPCInteraction(friendly);
+            this.lastInteractionTime[friendly.dataset.message] = now;
+        } else {
+            // Keep message visible while touching NPC
+            this.keepMessageVisible();
+        }
+    }
+});
 
         // Check bully collision
 const bully = document.getElementById('forestBully');
@@ -2729,6 +2732,16 @@ loadGameState() {
         document.getElementById('confirmDialog').style.display = 'flex';
         this.pendingAction = 'fightBully';
     }
+    keepMessageVisible() {
+    const message = document.getElementById('message');
+    if (message.style.display === 'block') {
+        clearTimeout(this.messageTimeout);
+        // Reset the timer to keep message visible
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+}
 } // This is the END of the MazeGame class
 
 let game;
