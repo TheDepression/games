@@ -2377,7 +2377,7 @@ if (onLava) {
     
     if (this.hasLavaShoes) {
         // If just entered lava zone, start protection (but only if not already active)
-        if (!this.lavaProtectionActive && this.lavaProtectionTime === 0) {
+        if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
             this.lavaProtectionActive = true;
             this.lavaProtectionTime = 5; // 5 seconds of protection
             this.showMessage('🥾 Lava shoes protecting you! 5 seconds');
