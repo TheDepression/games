@@ -2376,15 +2376,15 @@ if (onLava) {
     const now = Date.now();
     
     if (this.hasLavaShoes) {
-        // If just entered lava zone, start/reset protection
-        if (!this.lavaProtectionActive) {
+        // If just entered lava zone, start protection (but only if not already active)
+        if (!this.lavaProtectionActive && this.lavaProtectionTime === 0) {
             this.lavaProtectionActive = true;
             this.lavaProtectionTime = 5; // 5 seconds of protection
             this.showMessage('🥾 Lava shoes protecting you! 5 seconds');
         }
         
         // Count down protection time
-        if (now - this.lastLavaZoneTime > 1000) {
+        if (this.lavaProtectionActive && now - this.lastLavaZoneTime > 1000) {
             this.lavaProtectionTime--;
             this.lastLavaZoneTime = now;
             
@@ -2398,7 +2398,7 @@ if (onLava) {
         }
         
         // Take damage if protection expired
-        if (this.lavaProtectionTime <= 0) {
+        if (!this.lavaProtectionActive) {
             if (now - this.lastLavaDamage > 1000) {
                 this.takeDamage();
                 this.showMessage('🔥 Lava burns! Shoes can\'t protect you anymore!');
@@ -2414,10 +2414,10 @@ if (onLava) {
         }
     }
 } else {
-    // Not on lava - reset protection for next time
-    if (this.hasLavaShoes && this.lavaProtectionActive) {
+    // Not on lava - reset protection for next time (ONLY HERE)
+    if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
         this.lavaProtectionActive = false;
-        this.lavaProtectionTime = 0;
+        this.lavaProtectionTime = 5; // Reset to full protection
         this.showMessage('🥾 Stepped off lava! Shoes recharged for next time');
     }
 }
