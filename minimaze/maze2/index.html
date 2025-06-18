@@ -362,7 +362,7 @@ z-index: 25;
             opacity: 0.9;
         }
         
-        #startScreen, #levelComplete {
+        #startScreen, #levelComplete, #pauseMenu {
             position: absolute;
             top: 0;
             left: 0;
@@ -1948,6 +1948,7 @@ if (!this.bullyDefeated || (this.bullyDefeated && !this.hasBaby && !this.motherP
     }
     
     updatePlayer() {
+        if (this.isPaused) return;  // ADD THIS LINE
         if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
             const newX = this.playerX + this.playerVelocityX;
             const newY = this.playerY + this.playerVelocityY;
@@ -2059,6 +2060,7 @@ if (this.isInForest) {
     }
     
     updateMovingEnemies() {
+        if (this.isPaused) return;  // ADD THIS LINE
     this.movingEnemies.forEach(enemy => {
         if (enemy.type === 'bee') {
             // Update bee movement
@@ -2210,6 +2212,7 @@ canGorillaMoveTo(x, y) {
 }
     
     updateForegroundEnemy() {
+        if (this.isPaused) return;  // ADD THIS LINE
     if (!this.gameStarted) return;
     const now = Date.now();
     
@@ -2317,6 +2320,7 @@ canGorillaMoveTo(x, y) {
 }
     
     checkCollisions() {
+        if (this.isPaused) return;  // ADD THIS LINE
         if (this.isInvulnerable) return;
         
         const playerRect = {
@@ -3002,11 +3006,33 @@ function restartGame() {
   game.pendingAction = null;
 }
 
-    function saveAndQuit() {
+    function pauseGame() {
+    if (game && game.gameStarted) {
+        game.isPaused = true;
+        game.bgMusic.pause();
+        game.forestMusic.pause();
+        document.getElementById('pauseMenu').style.display = 'flex';
+    }
+}
+
+function resumeGame() {
     if (game) {
-        game.saveGameState();
-        alert('Game saved! You can continue from this exact spot next time.');
-        window.location.href = 'about:blank'; // Or redirect to your main site
+        game.isPaused = false;
+        document.getElementById('pauseMenu').style.display = 'none';
+        
+        // Resume appropriate music
+        if (game.isInForest) {
+            game.forestMusic.play().catch(e => console.log('Forest music resume failed:', e));
+        } else {
+            game.bgMusic.play().catch(e => console.log('Music resume failed:', e));
+        }
+    }
+}
+
+function returnToTitle() {
+    if (game) {
+        game.saveGameState(); // Auto-save before returning
+        window.location.reload(); // This will show the title screen with Continue button
     }
 }
 
