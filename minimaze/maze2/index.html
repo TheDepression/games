@@ -868,7 +868,11 @@ this.playerVelocityY = deltaY * sensitivity;
     this.gameStarted = true;
     // timeElapsed is already set by loadGameState() if continuing
     this.updateTimer();
-    this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    
+    // Don't start background music if already in forest
+    if (!this.isInForest) {
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    }
     
     this.timerInterval = setInterval(() => {
         if (!this.isPaused) {  // Only increment if not paused
