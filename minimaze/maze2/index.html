@@ -2470,7 +2470,7 @@ hearts.forEach(heart => {
             this.hasBaby = true;
             this.showMessage('👶🏻 Baby rescued!');
             this.updateUI();
-            this.saveGameState(); // Auto-save
+            // DON'T auto-save baby pickup - only save when delivered to mother
             heart.remove();
         } else if (heart.dataset.type !== 'baby' && this.hearts < 3) {
             // Regular heart pickup
@@ -2478,7 +2478,7 @@ hearts.forEach(heart => {
             this.collectedHearts.push(heart.dataset.id); // Track collection
             this.showMessage('❤️ Health restored!');
             this.updateUI();
-            this.saveGameState(); // Auto-save
+            this.saveGameState(); // Auto-save hearts
             heart.remove();
         }
     }
