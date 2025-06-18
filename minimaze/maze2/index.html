@@ -551,6 +551,39 @@ z-index: 25;
 
 // Check URL access immediately when page loads
 window.addEventListener('DOMContentLoaded', function() {
+    const savedState = localStorage.getItem('mfGameState');
+    
+    // Check if just returned from boss fight
+    const justReturnedFromBoss = localStorage.getItem('justReturnedFromBoss');
+    if (justReturnedFromBoss) {
+        localStorage.removeItem('justReturnedFromBoss');
+        // Skip start screen, load game directly
+        if (savedState) {
+            continueGame();
+            return;
+        }
+    }
+    
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        
+        // If player should be on a different URL, redirect immediately
+        if (gameState.currentUrl && gameState.currentUrl !== 'main') {
+            window.location.href = `https://thedepression.github.io/games/minimaze/${gameState.currentUrl}`;
+            return;
+        }
+        
+        // Show continue button prominently, new game smaller
+        document.getElementById('continueButton').style.display = 'inline-block';
+        document.getElementById('newGameButton').style.display = 'inline-block';
+    } else {
+        // No save exists, show new game as primary option
+        const newGameBtn = document.getElementById('newGameButton');
+        newGameBtn.style.display = 'inline-block';
+        newGameBtn.className = 'start-button';
+        newGameBtn.textContent = 'New Game';
+    }
+});
         
 class MazeGame {
 
