@@ -481,6 +481,7 @@ z-index: 25;
             <div>💰 <span id="money">0</span>¥</div>
         </div>
         <div id="timer">0:00</div>
+<button id="saveQuitBtn" onclick="saveAndQuit()" style="position: fixed; top: 10px; right: 80px; z-index: 250; background: rgba(0,100,0,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">Save & Quit</button>
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player">🧙‍♂️</div>
@@ -505,11 +506,14 @@ z-index: 25;
         </div>
         
         <div id="startScreen">
-            <h2>🐸 Master Frog's Adventure</h2>
-            <p style="margin: 20px 0;">Save the World</p>
-            <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
-            <button class="start-button" onclick="startGame()">Start Adventure!</button>
-        </div>
+    <h2>🐸 Master Frog's Adventure</h2>
+    <p style="margin: 20px 0;">Save the World</p>
+    <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
+    <div id="gameOptions">
+        <button class="start-button" onclick="startNewGame()">New Game</button>
+        <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">Continue</button>
+    </div>
+</div>
         
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
@@ -596,6 +600,8 @@ this.lastLavaZoneTime = 0;
         this.hasBaby = false;
 this.bullyDefeated = false;
 this.motherPaid = false;
+        this.collectedMoney = [];
+this.collectedHearts = [];
         
         // Movement properties
         this.playerX = 1300;
@@ -1776,53 +1782,62 @@ this.gameWorld.appendChild(furnitureEl);
     });
 }
     createCollectibles() {
-        // Money pickups - positioned in open areas of your maze
-        const moneyPositions = [
-  {x: 150, y: 1730}, {x: 170, y: 1730}, {x: 190, y: 1730},
-  {x: 150, y: 1750}, {x: 170, y: 1750}, {x: 190, y: 1750},
-  {x: 150, y: 1770}, {x: 170, y: 1770}, {x: 190, y: 1770},
-            {x: 650, y: 1120}, {x: 1410, y: 890}, {x: 530, y: 2220},
-  {x: 1390, y: 80}, {x: 2380, y: 30}, {x: 1810, y: 1230},
-  {x: 1830, y: 2070}, {x: 1940, y: 2350},{x: 1490, y: 350}, 
-  {x: 1640, y: 1770}, {x: 30, y: 1520}, {x: 2350, y: 1240}
-        ];
-        
-        moneyPositions.forEach(pos => {
-            const moneyEl = document.createElement('div');
-            moneyEl.className = 'money-pickup';
-            moneyEl.textContent = '💰';
-            moneyEl.style.left = pos.x + 'px';
-            moneyEl.style.top = pos.y + 'px';
-            this.gameWorld.appendChild(moneyEl);
-        });
-        
-        // Heart pickups - strategically placed
-        const heartPositions = [
-            {x: 2370, y: 1140},
-  {x: 650, y: 650}, {x: 1040, y: 540}, {x: 870, y: 1540},
-  {x: 2360, y: 20}, {x: 1940, y: 550}, {x: 1900, y: 2360},
-  {x: 1980, y: 2350}, {x: 20, y: 1130}, {x: 20, y: 1160},
-  {x: 20, y: 1200}, {x: 20, y: 1180}, {x: 20, y: 1140}
-        ];
-        
-        heartPositions.forEach(pos => {
-            const heartEl = document.createElement('div');
-            heartEl.className = 'heart-pickup';
-            heartEl.textContent = '❤️';
-            heartEl.style.left = pos.x + 'px';
-            heartEl.style.top = pos.y + 'px';
-            this.gameWorld.appendChild(heartEl);
-        });
-        
-        // Baby collectible in forest
-const babyEl = document.createElement('div');
-babyEl.className = 'heart-pickup';
-babyEl.textContent = '👶🏻';
-babyEl.style.left = '650px';
-babyEl.style.top = '400px';
-babyEl.dataset.type = 'baby';
-this.gameWorld.appendChild(babyEl);
+        // Money pickups with unique IDs
+const moneyPositions = [
+    {x: 150, y: 1730, id: 'money_1'}, {x: 170, y: 1730, id: 'money_2'}, {x: 190, y: 1730, id: 'money_3'},
+    {x: 150, y: 1750, id: 'money_4'}, {x: 170, y: 1750, id: 'money_5'}, {x: 190, y: 1750, id: 'money_6'},
+    {x: 150, y: 1770, id: 'money_7'}, {x: 170, y: 1770, id: 'money_8'}, {x: 190, y: 1770, id: 'money_9'},
+    {x: 650, y: 1120, id: 'money_10'}, {x: 1410, y: 890, id: 'money_11'}, {x: 530, y: 2220, id: 'money_12'},
+    {x: 1390, y: 80, id: 'money_13'}, {x: 2380, y: 30, id: 'money_14'}, {x: 1810, y: 1230, id: 'money_15'},
+    {x: 1830, y: 2070, id: 'money_16'}, {x: 1940, y: 2350, id: 'money_17'}, {x: 1490, y: 350, id: 'money_18'}, 
+    {x: 1640, y: 1770, id: 'money_19'}, {x: 30, y: 1520, id: 'money_20'}, {x: 2350, y: 1240, id: 'money_21'}
+];
+
+moneyPositions.forEach(pos => {
+    // Only create if not already collected
+    if (!this.collectedMoney.includes(pos.id)) {
+        const moneyEl = document.createElement('div');
+        moneyEl.className = 'money-pickup';
+        moneyEl.textContent = '💰';
+        moneyEl.style.left = pos.x + 'px';
+        moneyEl.style.top = pos.y + 'px';
+        moneyEl.dataset.id = pos.id; // Store the ID
+        this.gameWorld.appendChild(moneyEl);
     }
+});
+        
+        // Heart pickups with unique IDs
+const heartPositions = [
+    {x: 2370, y: 1140, id: 'heart_1'},
+    {x: 650, y: 650, id: 'heart_2'}, {x: 1040, y: 540, id: 'heart_3'}, {x: 870, y: 1540, id: 'heart_4'},
+    {x: 2360, y: 20, id: 'heart_5'}, {x: 1940, y: 550, id: 'heart_6'}, {x: 1900, y: 2360, id: 'heart_7'},
+    {x: 1980, y: 2350, id: 'heart_8'}, {x: 20, y: 1130, id: 'heart_9'}, {x: 20, y: 1160, id: 'heart_10'},
+    {x: 20, y: 1200, id: 'heart_11'}, {x: 20, y: 1180, id: 'heart_12'}, {x: 20, y: 1140, id: 'heart_13'}
+];
+
+heartPositions.forEach(pos => {
+    // Only create if not already collected
+    if (!this.collectedHearts.includes(pos.id)) {
+        const heartEl = document.createElement('div');
+        heartEl.className = 'heart-pickup';
+        heartEl.textContent = '❤️';
+        heartEl.style.left = pos.x + 'px';
+        heartEl.style.top = pos.y + 'px';
+        heartEl.dataset.id = pos.id; // Store the ID
+        this.gameWorld.appendChild(heartEl);
+    }
+});
+
+// Baby collectible (only if bully defeated and not collected)
+if (this.bullyDefeated && !this.hasBaby) {
+    const babyEl = document.createElement('div');
+    babyEl.className = 'heart-pickup';
+    babyEl.textContent = '👶🏻';
+    babyEl.style.left = '640px';
+    babyEl.style.top = '380px';
+    babyEl.dataset.type = 'baby';
+    this.gameWorld.appendChild(babyEl);
+}
     
     createExit() {
         // Place exit in the top-left corner area
@@ -2329,36 +2344,41 @@ hearts.forEach(heart => {
             this.hasBaby = true;
             this.showMessage('👶🏻 Baby rescued!');
             this.updateUI();
-            this.saveGameState();
+            this.saveGameState(); // Auto-save
             heart.remove();
         } else if (heart.dataset.type !== 'baby' && this.hearts < 3) {
+            // Regular heart pickup
             this.hearts++;
+            this.collectedHearts.push(heart.dataset.id); // Track collection
             this.showMessage('❤️ Health restored!');
             this.updateUI();
+            this.saveGameState(); // Auto-save
             heart.remove();
         }
     }
 });
-        
-        // Check money pickup
-        const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
-        moneyItems.forEach(money => {
-            const moneyX = parseInt(money.style.left);
-            const moneyY = parseInt(money.style.top);
-            const moneyRect = {
-                left: moneyX,
-                top: moneyY,
-                right: moneyX + 22,
-                bottom: moneyY + 22
-            };
-            
-            if (this.rectsOverlap(playerRect, moneyRect)) {
-                this.money += 100;
-                this.showMessage('💰 +100¥ collected!');
-                this.updateUI();
-                money.remove();
-            }
-        });
+
+// Check money pickup
+const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
+moneyItems.forEach(money => {
+    const moneyX = parseInt(money.style.left);
+    const moneyY = parseInt(money.style.top);
+    const moneyRect = {
+        left: moneyX,
+        top: moneyY,
+        right: moneyX + 22,
+        bottom: moneyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, moneyRect)) {
+        this.money += 100;
+        this.collectedMoney.push(money.dataset.id); // Track collection
+        this.showMessage('💰 +100¥ collected!');
+        this.updateUI();
+        this.saveGameState(); // Auto-save
+        money.remove();
+    }
+});
         
         // Check exit
         const exit = this.gameWorld.querySelector('.exit');
@@ -2545,6 +2565,8 @@ if (onLava) {
                 this.showMessage('Thank you! Here\'s your key! 🔑');
                 friendly.dataset.message = 'Thank you for your business!';
                 this.updateUI();
+                // After each successful purchase, add:
+this.saveGameState(); // Auto-save after purchase
             } else {
                 this.showMessage('🔑 Need a key? Give me 500¥!');
             }
@@ -2555,6 +2577,8 @@ if (onLava) {
                 this.showMessage('⛵ Boat purchased! Now you can sail!');
                 friendly.dataset.message = 'Enjoy your boat!';
                 this.updateUI();
+                // After each successful purchase, add:
+this.saveGameState(); // Auto-save after purchase
             } else {
                 this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
             }
@@ -2565,6 +2589,8 @@ if (onLava) {
                 this.showMessage('🔨 Hammer purchased! Break through walls!');
                 friendly.dataset.message = 'Use that hammer wisely!';
                 this.updateUI();
+                // After each successful purchase, add:
+this.saveGameState(); // Auto-save after purchase
             } else {
                 this.showMessage('🔨 Hammer for sale! Break walls for 400¥!');
             }
@@ -2577,6 +2603,8 @@ if (onLava) {
         this.showMessage('🥾 Lava shoes purchased! 5 seconds protection per entry!');
         friendly.dataset.message = 'Those shoes will protect you!';
         this.updateUI();
+        // After each successful purchase, add:
+this.saveGameState(); // Auto-save after purchase
     } else {
         this.showMessage('🥾 Lava-proof shoes! Only 600¥!');
     }
@@ -2667,15 +2695,29 @@ if (this.hasBaby) itemsText += ' 👶🏻';
     }
     
     gameOver() {
-        clearInterval(this.timerInterval);
-        this.gameStarted = false;
-        this.bgMusic.pause();
-        this.forestMusic.pause();
+    clearInterval(this.timerInterval);
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    this.forestMusic.pause();
+    
+    // Load last save point instead of full game over
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        this.showMessage('💀 You died! Returning to last save point...');
+        setTimeout(() => {
+            this.loadGameState(); // Load last save
+            this.initLevel(); // Regenerate world
+            this.startGameTimer(); // Restart timer from saved point
+            this.showMessage('🔄 Restored to last save point');
+        }, 3000);
+    } else {
+        // No save exists, show game over
         this.showMessage('💀 Game Over!');
         setTimeout(() => {
-            this.showLevelComplete('💀 Game Over', 'Try again!');
+            this.showLevelComplete('💀 Game Over', 'No save point found. Try again!');
         }, 2000);
     }
+}
     
     showLevelComplete(title, text) {
         document.getElementById('levelCompleteTitle').textContent = title;
@@ -2696,9 +2738,15 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         hasLavaShoes: this.hasLavaShoes,
         hasBaby: this.hasBaby || false,
         bullyDefeated: this.bullyDefeated || false,
-        motherPaid: this.motherPaid || false
+        motherPaid: this.motherPaid || false,
+        collectedMoney: this.collectedMoney || [],
+        collectedHearts: this.collectedHearts || [],
+        currentUrl: 'main',
+        lastSaveTime: Date.now(),
+        isInForest: this.isInForest || false
     };
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    console.log('Game saved:', gameState); // For debugging
 }
 
 loadGameState() {
@@ -2717,21 +2765,33 @@ loadGameState() {
         this.hasBaby = gameState.hasBaby || false;
         this.bullyDefeated = gameState.bullyDefeated || false;
         this.motherPaid = gameState.motherPaid || false;
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.collectedHearts = gameState.collectedHearts || [];
+        this.isInForest = gameState.isInForest || false;
+        
+        // Set the timer to continue from saved time
+        this.updateTimer();
+        
         return true;
     }
     return false;
 }
   // ADD THIS METHOD HERE:
     handleBullyEncounter() {
-        this.playerVelocityX = 0;
-        this.playerVelocityY = 0;
-        this.isDragging = false;
-        this.gameStarted = false;
-        
-        document.getElementById('confirmText').textContent = 'You want this baby?! You have to fight me for it!';
-        document.getElementById('confirmDialog').style.display = 'flex';
-        this.pendingAction = 'fightBully';
-    }
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    this.gameStarted = false;
+    
+    // Update save state to forestbully URL
+    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+    gameState.currentUrl = 'forestbully';
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    document.getElementById('confirmText').textContent = 'You want this baby?! You have to fight me for it!';
+    document.getElementById('confirmDialog').style.display = 'flex';
+    this.pendingAction = 'fightBully';
+}
     keepMessageVisible() {
     const message = document.getElementById('message');
     if (message.style.display === 'block') {
@@ -2742,17 +2802,67 @@ loadGameState() {
         }, 2000);
     }
 }
+
+checkUrlAccess() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        if (gameState.currentUrl && gameState.currentUrl !== 'main') {
+            window.location.href = `https://thedepression.github.io/games/minimaze/${gameState.currentUrl}`;
+            return false; // Prevent game from starting
+        }
+    }
+    return true; // Allow game to continue
+}
+    
 } // This is the END of the MazeGame class
 
 let game;
 
-function startGame() {
+// Check for existing save on page load
+window.addEventListener('load', function() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        document.getElementById('continueButton').style.display = 'inline-block';
+    }
+});
+
+function startNewGame() {
+    // Clear all Master Frog related localStorage
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+        if (key.startsWith('mf')) {
+            localStorage.removeItem(key);
+        }
+    });
+    
     const startScreen = document.getElementById('startScreen');
     startScreen.style.display = 'none';
     
     game = new MazeGame();
     game.initLevel();
     game.startGameTimer();
+}
+
+function continueGame() {
+    // Check URL access first
+    const game_temp = new MazeGame();
+    if (!game_temp.checkUrlAccess()) {
+        return; // Will redirect if needed
+    }
+    
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none';
+    
+    game = new MazeGame();
+    game.loadGameState(); // This loads the saved state
+    game.initLevel();
+    game.startGameTimer();
+}
+
+// Keep the old startGame function for compatibility, but redirect to new game
+function startGame() {
+    startNewGame();
 }
 
 function restartGame() {
@@ -2784,6 +2894,14 @@ function restartGame() {
 }
   
   game.pendingAction = null;
+}
+
+    function saveAndQuit() {
+    if (game) {
+        game.saveGameState();
+        alert('Game saved! You can continue from this exact spot next time.');
+        window.location.href = 'about:blank'; // Or redirect to your main site
+    }
 }
     </script>
 </body>
