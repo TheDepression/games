@@ -2787,23 +2787,25 @@ if (this.hasBaby) itemsText += ' 👶🏻';
     this.bgMusic.pause();
     this.forestMusic.pause();
     
-    // Load last save point instead of full game over
-    const savedState = localStorage.getItem('mfGameState');
-    if (savedState) {
-        this.showMessage('💀 You died! Returning to last save point...');
-        setTimeout(() => {
-            this.loadGameState(); // Load last save
-            this.initLevel(); // Regenerate world
-            this.startGameTimer(); // Restart timer from saved point
-            this.showMessage('🔄 Restored to last save point');
-        }, 3000);
-    } else {
-        // No save exists, show game over
-        this.showMessage('💀 Game Over!');
-        setTimeout(() => {
-            this.showLevelComplete('💀 Game Over', 'No save point found. Try again!');
-        }, 2000);
-    }
+    // Keep timer running through death - it becomes a time penalty
+    const timeAtDeath = this.timeElapsed;
+    
+    this.showMessage('💀 You died! Returning to spawn point...');
+    setTimeout(() => {
+        // Reset position to spawn point
+        this.playerX = 420;
+        this.playerY = 1760;
+        
+        // Keep time penalty
+        this.timeElapsed = timeAtDeath;
+        
+        // Load other saved progress (items, money, etc.) but not position
+        this.loadGameStateExceptPosition();
+        
+        this.initLevel(); // Regenerate world
+        this.startGameTimer(); // Restart timer from death time
+        this.showMessage('🔄 Respawned at start - time penalty applied!');
+    }, 3000);
 }
     
     showLevelComplete(title, text) {
@@ -2863,6 +2865,34 @@ loadGameState() {
     }
     return false;
 }
+
+    loadGameStateExceptPosition() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        // Load everything EXCEPT position and time
+        this.hearts = 3; // Always respawn with full health
+        this.money = gameState.money || 0;
+        // DON'T load timeElapsed - keep current time for penalty
+        // DON'T load playerX/playerY - use spawn point
+        this.hasKey = gameState.hasKey || false;
+        this.hasBoat = gameState.hasBoat || false;
+        this.hasHammer = gameState.hasHammer || false;
+        this.hasLavaShoes = gameState.hasLavaShoes || false;
+        this.hasBaby = gameState.hasBaby || false;
+        this.bullyDefeated = gameState.bullyDefeated || false;
+        this.motherPaid = gameState.motherPaid || false;
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.collectedHearts = gameState.collectedHearts || [];
+        this.isInForest = false; // Always spawn outside forest
+        
+        this.updateUI();
+        return true;
+    }
+    return false;
+}
+
+    
   // ADD THIS METHOD HERE:
     handleBullyEncounter() {
     this.playerVelocityX = 0;
@@ -3027,6 +3057,7 @@ function resumeGame() {
 
 function returnToTitle() {
     if (game) {
+        // DON'T auto-save when returning to title
         window.location.reload(); // This will show the title screen with Continue button
     }
 }
