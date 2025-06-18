@@ -1851,8 +1851,8 @@ heartPositions.forEach(pos => {
     }
 });
 
-// Baby collectible (only if bully defeated and not collected)
-if (this.bullyDefeated && !this.hasBaby) {
+// Baby collectible - FIXED LOGIC: Show if (not defeated OR defeated but not collected)
+if (!this.bullyDefeated || (this.bullyDefeated && !this.hasBaby && !this.motherPaid)) {
     const babyEl = document.createElement('div');
     babyEl.className = 'heart-pickup';
     babyEl.textContent = '👶🏻';
