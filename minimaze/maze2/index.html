@@ -1071,21 +1071,23 @@ castleZone.style.width = '150px';
 castleZone.style.height = '240px';
 this.gameWorld.appendChild(castleZone);
 
-        // Bully blocking the baby
-const bullyEl = document.createElement('div');
-bullyEl.style.position = 'absolute';
-bullyEl.style.left = '640px';
-bullyEl.style.top = '480px';
-bullyEl.style.width = '40px';
-bullyEl.style.height = '40px';
-bullyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png")';
-bullyEl.style.backgroundSize = 'contain';
-bullyEl.style.backgroundRepeat = 'no-repeat';
-bullyEl.style.backgroundPosition = 'center';
-bullyEl.style.zIndex = '45';
-bullyEl.dataset.type = 'bully';
-bullyEl.id = 'forestBully';
-this.gameWorld.appendChild(bullyEl);
+        // Bully blocking the baby - ONLY show if not defeated
+if (!this.bullyDefeated) {
+    const bullyEl = document.createElement('div');
+    bullyEl.style.position = 'absolute';
+    bullyEl.style.left = '640px';
+    bullyEl.style.top = '480px';
+    bullyEl.style.width = '40px';
+    bullyEl.style.height = '40px';
+    bullyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png")';
+    bullyEl.style.backgroundSize = 'contain';
+    bullyEl.style.backgroundRepeat = 'no-repeat';
+    bullyEl.style.backgroundPosition = 'center';
+    bullyEl.style.zIndex = '45';
+    bullyEl.dataset.type = 'bully';
+    bullyEl.id = 'forestBully';
+    this.gameWorld.appendChild(bullyEl);
+}
 
     // Pyramid decoration
 const pyramidEl = document.createElement('div');
