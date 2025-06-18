@@ -2639,8 +2639,10 @@ this.saveGameState(); // Auto-save after purchase
         friendly.dataset.message = 'You saved my baby! I am forever grateful!';
         this.updateUI();
         this.saveGameState();
-    } else {
+    } else if (!this.bullyDefeated) {
         this.showMessage(message);
+    } else {
+        this.showMessage('You already helped me! Thank you so much!');
     }
 } else {
     this.showMessage(message);
