@@ -636,11 +636,8 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
         const newGameBtn = document.getElementById('newGameButton');
         newGameBtn.style.display = 'inline-block';
-        newGameBtn.className = 'start-button';  // This gives it the big orange styling
+        newGameBtn.className = 'start-button';
         newGameBtn.textContent = 'Start Adventure';
-        newGameBtn.style.background = '#ff6b35';  // Force the orange background
-        newGameBtn.style.fontSize = '18px';      // Force the larger font
-        newGameBtn.style.padding = '15px 30px';  // Force the larger padding
     } else {
         // No name - show name input
         document.getElementById('nameInput').style.display = 'block';
