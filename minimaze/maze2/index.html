@@ -883,9 +883,12 @@ this.playerVelocityY = deltaY * sensitivity;
         // Add tree walls
         this.addTreeWalls();
         
-        // Set player position
-this.playerX = 420;
-this.playerY = 1760;
+        /// Set player position (use saved coordinates if available)
+        // Only set default if no saved coordinates exist
+        if (!this.playerX || this.playerX === 420) {
+            this.playerX = 420;
+            this.playerY = 1760;
+        };
 // Center the larger visual character over the smaller hitbox
 const visualOffset = (32 - 24) / 2; // 6.5px offset to center
 this.player.style.left = (this.playerX - visualOffset) + 'px';
@@ -1806,7 +1809,7 @@ this.gameWorld.appendChild(furnitureEl);
         {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!", customEmoji: "👩‍⚕️"},
         {x: 60, y: 60, message: "🔨 Hammer for sale! Break walls for 400¥!", customEmoji: "🧙‍♀️"},
         {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 600¥!", customEmoji: "👷‍♂️"},
-        {x: 380, y: 1760, message: "Thank god you are here, master frog! The bully took my baby and went into the dark forest! If you can rescue him, I will pay you 200¥. It's all I have! PLEASE!", type: "mother", customEmoji: "👩🏻"},
+        {x: 380, y: 1760, message: this.motherPaid ? "You saved my baby! I am forever grateful!" : "Thank god you are here, master frog! The bully took my baby and went into the dark forest! If you can rescue him, I will pay you 200¥. It's all I have! PLEASE!", type: "mother", customEmoji: "👩🏻"},
         {x: 120, y: 1200, message: "I used to be an adventurer like you, then I took an arrow to the knee!", type: "guard", customEmoji: "💂🏻‍♂️"},
         {x: 1900, y: 1200, message: "The desert is dangerous at night. Many travelers have gone missing...", type: "traveler", customEmoji: "🧓🏻"},
         {x: 500, y: 500, message: "Have you seen any strange lights in the forest lately?", type: "villager", customEmoji: "👨🏻"},
