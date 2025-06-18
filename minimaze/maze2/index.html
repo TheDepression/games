@@ -2869,7 +2869,14 @@ loadGameState() {
     gameState.currentUrl = 'forestbully';
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     
-    document.getElementById('confirmText').textContent = 'You want this baby?! You have to fight me for it!';
+    const confirmDialog = document.getElementById('confirmDialog');
+confirmDialog.innerHTML = `
+    <div class="bully-dialogue">
+        <div class="bully-image"></div>
+        <p>You want this baby?! You have to fight me for it!</p>
+        <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">Fight!</button>
+    </div>
+`;
     document.getElementById('confirmDialog').style.display = 'flex';
     this.pendingAction = 'fightBully';
 }
@@ -2958,7 +2965,12 @@ function restartGame() {
 }
 
         function confirmAction() {
-  document.getElementById('confirmDialog').style.display = 'none';
+    // Reset dialog for next use if it was the bully encounter
+    if (game.pendingAction === 'fightBully') {
+        resetConfirmDialog();
+    }
+    
+    document.getElementById('confirmDialog').style.display = 'none';
   game.gameStarted = true;  // Resume game immediately
   if (game.pendingAction === 'enterForest') {
     game.isInForest = true;
@@ -2990,6 +3002,16 @@ function restartGame() {
         alert('Game saved! You can continue from this exact spot next time.');
         window.location.href = 'about:blank'; // Or redirect to your main site
     }
+}
+
+        function resetConfirmDialog() {
+    const confirmDialog = document.getElementById('confirmDialog');
+    confirmDialog.innerHTML = `
+        <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <p id="confirmText">You are entering the forest...</p>
+            <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
+        </div>
+    `;
 }
     </script>
 </body>
