@@ -471,6 +471,18 @@ z-index: 25;
   align-items: center;
   z-index: 300;
 }
+
+        .new-game-button {
+            background: #665;
+            font-size: 12px;
+            padding: 8px 16px;
+            opacity: 0.7;
+        }
+        
+        .new-game-button:hover {
+            background: #555;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -509,9 +521,9 @@ z-index: 25;
     <h2>🐸 Master Frog's Adventure</h2>
     <p style="margin: 20px 0;">Save the World</p>
     <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
-    <div id="gameOptions">
-        <button class="start-button" onclick="startNewGame()">New Game</button>
+        <div id="gameOptions">
         <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">Continue</button>
+        <button class="new-game-button" onclick="startNewGame()" id="newGameButton" style="display: none;">New Game</button>
     </div>
 </div>
         
