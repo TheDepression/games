@@ -587,6 +587,7 @@ z-index: 25;
 // Check URL access immediately when page loads
 window.addEventListener('DOMContentLoaded', function() {
     const savedState = localStorage.getItem('mfGameState');
+    const playerName = localStorage.getItem('mfPlayerName');
     
     // Check if just returned from boss fight
     const justReturnedFromBoss = localStorage.getItem('justReturnedFromBoss');
@@ -599,7 +600,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    if (savedState) {
+    if (savedState && playerName) {
         const gameState = JSON.parse(savedState);
         
         // If player should be on a different URL, redirect immediately
@@ -608,15 +609,38 @@ window.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Personalize welcome message
+        document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
+        
+        // Show save state info
+        const saveInfo = document.getElementById('saveStateInfo');
+        let itemsList = '';
+        if (gameState.hasKey) itemsList += ' 🔑';
+        if (gameState.hasBoat) itemsList += ' ⛵';
+        if (gameState.hasHammer) itemsList += ' 🔨';
+        if (gameState.hasLavaShoes) itemsList += ' 🥾';
+        if (gameState.hasBaby) itemsList += ' 👶🏻';
+        
+        const minutes = Math.floor(gameState.timeElapsed / 60);
+        const seconds = gameState.timeElapsed % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        saveInfo.innerHTML = `❤️ ${gameState.hearts} | 💰 ${gameState.money}¥ | ⏱️ ${timeString}${itemsList ? ' |' + itemsList : ''}`;
+        saveInfo.style.display = 'block';
+        
         // Show continue button prominently, new game smaller
         document.getElementById('continueButton').style.display = 'inline-block';
         document.getElementById('newGameButton').style.display = 'inline-block';
-    } else {
-        // No save exists, show new game as primary option
+    } else if (playerName) {
+        // Has name but no save
+        document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
         const newGameBtn = document.getElementById('newGameButton');
         newGameBtn.style.display = 'inline-block';
         newGameBtn.className = 'start-button';
-        newGameBtn.textContent = 'New Game';
+        newGameBtn.textContent = 'Start Adventure';
+    } else {
+        // No name - show name input
+        document.getElementById('nameInput').style.display = 'block';
     }
 });
         
@@ -3026,6 +3050,15 @@ window.addEventListener('load', function() {
 });
 
 function startNewGame() {
+    const playerName = localStorage.getItem('mfPlayerName');
+    
+    // If no name set, show name input first
+    if (!playerName) {
+        document.getElementById('nameInput').style.display = 'block';
+        document.getElementById('newGameButton').style.display = 'none';
+        return;
+    }
+    
     const savedState = localStorage.getItem('mfGameState');
     if (savedState) {
         if (!confirm('Are you sure? This will delete your current progress and start completely over.')) {
@@ -3033,10 +3066,10 @@ function startNewGame() {
         }
     }
     
-    // Clear all Master Frog related localStorage
+    // Clear all Master Frog related localStorage except name
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
-        if (key.startsWith('mf')) {
+        if (key.startsWith('mf') && key !== 'mfPlayerName') {
             localStorage.removeItem(key);
         }
     });
@@ -3158,6 +3191,35 @@ function returnToTitle() {
         </div>
     `;
 }
+
+        function setPlayerName() {
+    const nameField = document.getElementById('playerNameField');
+    const name = nameField.value.trim();
+    
+    if (name.length < 1) {
+        alert('Please enter your name!');
+        return;
+    }
+    
+    if (name.length > 20) {
+        alert('Name too long! Please use 20 characters or less.');
+        return;
+    }
+    
+    // Save the name
+    localStorage.setItem('mfPlayerName', name);
+    
+    // Update welcome message
+    document.getElementById('welcomeMessage').textContent = `Hello ${name}!`;
+    
+    // Hide name input, show new game button
+    document.getElementById('nameInput').style.display = 'none';
+    const newGameBtn = document.getElementById('newGameButton');
+    newGameBtn.style.display = 'inline-block';
+    newGameBtn.className = 'start-button';
+    newGameBtn.textContent = 'Start Adventure';
+}
+        
     </script>
 </body>
 </html>
