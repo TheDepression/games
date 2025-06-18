@@ -769,13 +769,18 @@ this.playerVelocityY = deltaY * sensitivity;
     
     startGameTimer() {
     this.gameStarted = true;
-    this.timeElapsed = 0;
+    // timeElapsed is already set by loadGameState() if continuing
     this.updateTimer();
     this.bgMusic.play().catch(e => console.log('Music play failed:', e));
     
     this.timerInterval = setInterval(() => {
         this.timeElapsed++;
         this.updateTimer();
+        
+        // Auto-save every minute
+        if (this.timeElapsed % 60 === 0) {
+            this.saveGameState();
+        }
     }, 1000);
 }
     
