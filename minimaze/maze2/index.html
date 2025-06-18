@@ -2709,10 +2709,12 @@ if (onLava) {
     }
     
     // Apply forest effects if spawning in forest
-    if (inForest) {
-        this.isInForest = true;
-        this.bgMusic.pause();
-        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+if (inForest) {
+    this.isInForest = true;
+    this.bgMusic.pause();
+    this.bgMusic.currentTime = 0;  // Reset to beginning
+    this.forestMusic.currentTime = 0;  // Start forest music from beginning
+    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
         document.getElementById('forestOverlay').classList.add('active');
         document.getElementById('forestVisionMask').classList.add('active');
         this.updateForestVisibility();
