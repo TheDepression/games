@@ -867,9 +867,15 @@ this.playerVelocityY = deltaY * sensitivity;
     this.bgMusic.play().catch(e => console.log('Music play failed:', e));
     
     this.timerInterval = setInterval(() => {
-        this.timeElapsed++;
-        this.updateTimer();
-        
+        if (!this.isPaused) {  // Only increment if not paused
+            this.timeElapsed++;
+            this.updateTimer();
+            
+            // Keep strategic auto-saves (every minute for collected items)
+            if (this.timeElapsed % 60 === 0) {
+                this.saveGameState();
+            }
+        }
     }, 1000);
 }
     
@@ -3179,18 +3185,6 @@ function restartGame() {
 function resumeGame() {
     if (game) {
         game.isPaused = false;
-        
-        // Resume timer from where it left off
-        game.timerInterval = setInterval(() => {
-            game.timeElapsed++;
-            game.updateTimer();
-            
-            // Keep strategic auto-saves (every minute for collected items)
-            if (game.timeElapsed % 60 === 0) {
-                game.saveGameState();
-            }
-        }, 1000);
-        
         document.getElementById('pauseMenu').style.display = 'none';
         
         // Resume appropriate music
