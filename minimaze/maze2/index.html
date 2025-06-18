@@ -2697,12 +2697,27 @@ if (onLava) {
     }
     
     // Apply forest effects if spawning in forest
-    if (inForest && !this.isInForest) {
+    if (inForest) {
         this.isInForest = true;
         this.bgMusic.pause();
         this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
         document.getElementById('forestOverlay').classList.add('active');
         document.getElementById('forestVisionMask').classList.add('active');
+        this.updateForestVisibility();
+        
+        // Set the vision mask position immediately
+        const gameAreaRect = this.gameArea.getBoundingClientRect();
+        const playerScreenX = gameAreaRect.left + (this.gameArea.offsetWidth / 2);
+        const playerScreenY = gameAreaRect.top + (this.gameArea.offsetHeight / 2);
+        const mask = document.getElementById('forestVisionMask');
+        mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
+    } else {
+        // Make sure forest effects are OFF if not in forest
+        this.isInForest = false;
+        this.forestMusic.pause();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
         this.updateForestVisibility();
     }
     
@@ -2726,10 +2741,14 @@ if (onLava) {
     }
     
     // Apply boat visual if spawning on water with boat
-    if (onWater && this.hasBoat && !this.isOnWater) {
+    if (onWater && this.hasBoat) {
         this.isOnWater = true;
         this.player.style.backgroundImage = '';
         this.player.textContent = '⛵';
+    } else {
+        this.isOnWater = false;
+        this.player.textContent = '';
+        this.updatePlayerImage(this.lastMoveDirection || 's');
     }
 }
 
