@@ -3031,7 +3031,6 @@ function resumeGame() {
 
 function returnToTitle() {
     if (game) {
-        game.saveGameState(); // Auto-save before returning
         window.location.reload(); // This will show the title screen with Continue button
     }
 }
