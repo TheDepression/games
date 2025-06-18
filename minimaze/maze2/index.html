@@ -1951,8 +1951,8 @@ heartPositions.forEach(pos => {
     }
 });
 
-// Baby collectible - FIXED LOGIC: Show if (not defeated OR defeated but not collected)
-if (!this.bullyDefeated || (this.bullyDefeated && !this.hasBaby && !this.motherPaid)) {
+// Baby collectible - Show if bully defeated but baby not yet delivered to mother
+if (this.bullyDefeated && !this.motherPaid) {
     const babyEl = document.createElement('div');
     babyEl.className = 'heart-pickup';
     babyEl.textContent = '👶🏻';
@@ -1960,7 +1960,7 @@ if (!this.bullyDefeated || (this.bullyDefeated && !this.hasBaby && !this.motherP
     babyEl.style.top = '420px';
     babyEl.dataset.type = 'baby';
     this.gameWorld.appendChild(babyEl);
-}}
+}
     createExit() {
         // Place exit in the top-left corner area
         const exitEl = document.createElement('div');
