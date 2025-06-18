@@ -2805,7 +2805,8 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         this.initLevel(); // Regenerate world
         this.startGameTimer(); // Restart timer from death time
         this.showMessage('🔄 Respawned at start - time penalty applied!');
-    }, 3000);
+    this.saveGameState();
+}, 3000);
 }
     
     showLevelComplete(title, text) {
