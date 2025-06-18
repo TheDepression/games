@@ -639,8 +639,12 @@ window.addEventListener('DOMContentLoaded', function() {
         newGameBtn.className = 'start-button';
         newGameBtn.textContent = 'Start Adventure';
     } else {
-        // No name - show name input
-        document.getElementById('nameInput').style.display = 'block';
+        // No name - show name input  
+        console.log('Showing name input'); // Debug line
+        const nameInput = document.getElementById('nameInput');
+        nameInput.style.display = 'block';
+        nameInput.style.visibility = 'visible';
+        nameInput.style.opacity = '1';
     }
 });
         
