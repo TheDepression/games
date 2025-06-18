@@ -740,6 +740,8 @@ this.collectedHearts = [];
         this.bindEvents();
         this.startGameLoop();
         this.loadGameState(); // Load saved game state if exists
+        this.isPaused = false;
+        this.pauseStartTime = 0; // ADD THIS LINE
     }
 
     enterForest() {
@@ -3001,7 +3003,13 @@ loadGameState() {
         this.motherPaid = gameState.motherPaid || false;
         this.collectedMoney = gameState.collectedMoney || [];
         this.collectedHearts = gameState.collectedHearts || [];
-        this.isInForest = false; // Always spawn outside forest
+        // FORCE forest state to OFF when respawning (always spawn outside)
+        this.isInForest = false;
+        this.forestMusic.pause();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
+        this.updateForestVisibility();
         
         this.updateUI();
         return true;
