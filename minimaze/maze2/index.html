@@ -835,10 +835,6 @@ this.playerVelocityY = deltaY * sensitivity;
         this.timeElapsed++;
         this.updateTimer();
         
-        // Auto-save every minute
-        if (this.timeElapsed % 60 === 0) {
-            this.saveGameState();
-        }
     }, 1000);
 }
     
