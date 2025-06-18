@@ -540,9 +540,18 @@ z-index: 25;
         
         <div id="startScreen">
     <h2>🐸 Master Frog's Adventure</h2>
-    <p style="margin: 20px 0;">Save the World</p>
+    <div id="welcomeMessage" style="margin: 20px 0;">Save the World</div>
+    <div id="saveStateInfo" style="font-size: 12px; opacity: 0.8; margin: 10px 0; display: none;"></div>
     <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
-        <div id="gameOptions">
+    
+    <!-- Name input for new players -->
+    <div id="nameInput" style="display: none; margin: 20px 0;">
+        <p>What's your name, brave adventurer?</p>
+        <input type="text" id="playerNameField" placeholder="Enter your name" style="padding: 8px; margin: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        <button onclick="setPlayerName()" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Start Adventure!</button>
+    </div>
+    
+    <div id="gameOptions">
         <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">Continue</button>
         <button class="new-game-button" onclick="startNewGame()" id="newGameButton" style="display: none;">New Game</button>
     </div>
@@ -2639,6 +2648,67 @@ if (onLava) {
             this.exitForest();
         }
     }
+
+    initializeZoneEffects() {
+    const playerCenterX = this.playerX + 12;
+    const playerCenterY = this.playerY + 12;
+    
+    // Check if spawning in forest
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    let inForest = false;
+    
+    for (let zone of forestZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            inForest = true;
+            break;
+        }
+    }
+    
+    // Apply forest effects if spawning in forest
+    if (inForest && !this.isInForest) {
+        this.isInForest = true;
+        this.bgMusic.pause();
+        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+        document.getElementById('forestOverlay').classList.add('active');
+        document.getElementById('forestVisionMask').classList.add('active');
+        this.updateForestVisibility();
+    }
+    
+    // Check if spawning on water
+    const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+    let onWater = false;
+    
+    for (let zone of waterZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            onWater = true;
+            break;
+        }
+    }
+    
+    // Apply boat visual if spawning on water with boat
+    if (onWater && this.hasBoat && !this.isOnWater) {
+        this.isOnWater = true;
+        this.player.style.backgroundImage = '';
+        this.player.textContent = '⛵';
+    }
+}
+
     
     handleNPCInteraction(friendly) {
         const message = friendly.dataset.message;
@@ -2992,6 +3062,7 @@ function continueGame() {
     game = new MazeGame();
     game.loadGameState(); // This loads the saved state
     game.initLevel();
+    game.initializeZoneEffects(); // NEW: Fix zone effects on continue
     game.startGameTimer();
 }
 
