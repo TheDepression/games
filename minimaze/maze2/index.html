@@ -2822,16 +2822,18 @@ this.saveGameState(); // Auto-save after purchase
         this.showMessage('Thank you so much! Here is your reward!');
         friendly.dataset.message = 'You saved my baby! I am forever grateful!';
         this.updateUI();
-        this.saveGameState();
+        this.saveGameState(); // ONLY save when baby is delivered to mother
     } else if (!this.bullyDefeated) {
         this.showMessage(message);
     } else {
-        this.showMessage('You already helped me! Thank you so much!');
+        this.showMessage('You need to rescue my baby from the forest first!');
     }
 } else {
     this.showMessage(message);
 }
     }
+
+    
     rectsOverlap(rect1, rect2) {
         return rect1.left < rect2.right &&
                rect1.right > rect2.left &&
