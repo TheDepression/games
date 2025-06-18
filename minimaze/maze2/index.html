@@ -553,7 +553,12 @@ z-index: 25;
             <p id="levelCompleteText">Great job!</p>
             <button id="retryButton" onclick="restartGame()">Play Again</button>
         </div>
-        
+        <div id="pauseMenu" style="display: none;">
+            <h3>⏸️ Game Paused</h3>
+            <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
+            <button onclick="resumeGame()" style="background: #4CAF50; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Continue Game</button>
+            <button onclick="returnToTitle()" style="background: #ff6b35; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Return to Title</button>
+        </div>
         <!-- Forest overlay and vision mask -->
         <div id="forestOverlay" class="forest-overlay"></div>
         <div id="forestVisionMask" class="forest-vision-mask"></div>
