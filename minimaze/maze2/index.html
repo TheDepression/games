@@ -2804,9 +2804,12 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         
         this.initLevel(); // Regenerate world
         this.startGameTimer(); // Restart timer from death time
+        
+        // Auto-save the respawn state to prevent pause-exploit
+        this.saveGameState();
+        
         this.showMessage('🔄 Respawned at start - time penalty applied!');
-    this.saveGameState();
-}, 3000);
+    }, 3000);
 }
     
     showLevelComplete(title, text) {
@@ -3045,6 +3048,18 @@ function restartGame() {
 function resumeGame() {
     if (game) {
         game.isPaused = false;
+        
+        // Resume timer from where it left off
+        game.timerInterval = setInterval(() => {
+            game.timeElapsed++;
+            game.updateTimer();
+            
+            // Keep strategic auto-saves (every minute for collected items)
+            if (game.timeElapsed % 60 === 0) {
+                game.saveGameState();
+            }
+        }, 1000);
+        
         document.getElementById('pauseMenu').style.display = 'none';
         
         // Resume appropriate music
