@@ -1955,8 +1955,9 @@ heartPositions.forEach(pos => {
     }
 });
 
-// Baby collectible - Show if bully defeated but baby not yet delivered to mother
-if (this.bullyDefeated && !this.motherPaid) {
+// Baby collectible - Show if bully NOT defeated (to show what you're fighting for)
+// OR if bully defeated but baby not yet delivered to mother
+if (!this.bullyDefeated || (this.bullyDefeated && !this.motherPaid)) {
     const babyEl = document.createElement('div');
     babyEl.className = 'heart-pickup';
     babyEl.textContent = '👶🏻';
