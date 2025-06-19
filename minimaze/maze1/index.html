@@ -979,6 +979,7 @@ this.updatePlayerImage('s'); // Start facing south
         // Create exit
         this.createExit();
         this.updateForestVisibility();
+        this.createCaveEntrances();
     }
     
     createBackgroundZones() {
@@ -1988,7 +1989,47 @@ if (!this.bullyDefeated || (this.bullyDefeated && !this.motherPaid)) {
         exitEl.style.top = '260px';
         this.gameWorld.appendChild(exitEl);
     }
+    createCaveEntrances() {
+    // Cave A entrance
+    const caveAEl = document.createElement('div');
+    caveAEl.className = 'cave-entrance';
+    caveAEl.style.position = 'absolute';
+    caveAEl.style.left = '100px';
+    caveAEl.style.top = '1940px';
+    caveAEl.style.width = '22px';
+    caveAEl.style.height = '22px';
+    caveAEl.style.background = '#000';
+    caveAEl.style.border = '2px solid #333';
+    caveAEl.style.borderRadius = '4px';
+    caveAEl.style.zIndex = '80';
+    caveAEl.dataset.cave = 'A';
+    this.gameWorld.appendChild(caveAEl);
     
+    // Cave B entrance - blocked by breakable wall initially
+    const caveBWallEl = document.createElement('div');
+    caveBWallEl.className = 'breakable-wall';
+    caveBWallEl.style.left = '300px';
+    caveBWallEl.style.top = '2318px';
+    caveBWallEl.style.width = '22px';
+    caveBWallEl.style.height = '22px';
+    caveBWallEl.dataset.breakable = 'true';
+    this.gameWorld.appendChild(caveBWallEl);
+    
+    // Cave B entrance (hidden behind wall initially)
+    const caveBEl = document.createElement('div');
+    caveBEl.className = 'cave-entrance';
+    caveBEl.style.position = 'absolute';
+    caveBEl.style.left = '300px';
+    caveBEl.style.top = '2318px';
+    caveBEl.style.width = '22px';
+    caveBEl.style.height = '22px';
+    caveBEl.style.background = '#000';
+    caveBEl.style.border = '2px solid #333';
+    caveBEl.style.borderRadius = '4px';
+    caveBEl.style.zIndex = '70'; // Lower than wall
+    caveBEl.dataset.cave = 'B';
+    this.gameWorld.appendChild(caveBEl);
+}
     startGameLoop() {
         const gameLoop = () => {
             if (this.gameStarted) {
@@ -2852,7 +2893,7 @@ this.saveGameState(); // Auto-save after purchase
 } else {
     this.showMessage(message);
 }
-        else if (message === "😢 The bully stole my pencil and hid it in a cave! I'll give you my pyramid key if you return it!" && !this.hasPyramidKey) {
+        else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!" && !this.hasPyramidKey) {
     if (this.hasPencil) {
         this.hasPencil = false;
         this.hasPyramidKey = true;
@@ -2861,7 +2902,7 @@ this.saveGameState(); // Auto-save after purchase
         this.updateUI();
         this.saveGameState();
     } else {
-        this.showMessage('😢 Please find my pencil in the caves!');
+        this.showMessage('😢 Please find my pencil!');
     }
 } else {
     this.showMessage(message);
