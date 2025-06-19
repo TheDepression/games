@@ -3116,9 +3116,9 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         collectedHearts: this.collectedHearts || [],
         currentUrl: 'main',
         lastSaveTime: Date.now(),
-        isInForest: this.isInForest || false
+        isInForest: this.isInForest || false,
         hasFlashlight: this.hasFlashlight,
-hasPyramidKey: this.hasPyramidKey,
+hasPyramidKey: this.hasPyramidKey
     };
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     console.log('Game saved:', gameState); // For debugging
