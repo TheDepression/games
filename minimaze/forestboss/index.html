@@ -359,19 +359,30 @@
     <script>
         // Check URL access on page load
         window.addEventListener('DOMContentLoaded', function() {
-            const savedState = localStorage.getItem('mfGameState');
-            if (!savedState) {
-                alert('No game data found! Starting from main world.');
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
-                return;
-            }
-            
-            const gameState = JSON.parse(savedState);
-            if (gameState.currentUrl !== 'forestbully') {
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
-                return;
-            }
-        });
+    // First check if boss already defeated
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        if (gameState.bullyDefeated === true) {
+            // Boss already defeated - redirect immediately
+            window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+            return;
+        }
+    }
+    
+    // Then existing checks
+    if (!savedState) {
+        alert('No game data found! Starting from main world.');
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+        return;
+    }
+    
+    const gameState = JSON.parse(savedState);
+    if (gameState.currentUrl !== 'forestbully') {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+        return;
+    }
+});
 
         class ForestBullyFight {
             constructor() {
@@ -1010,7 +1021,7 @@
                     
                     setTimeout(() => {
                         this.saveGameState();
-                        window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
                     }, 3000);
                 }, 1000);
             }
@@ -1045,7 +1056,7 @@
             if (game) {
                 game.saveGameState();
             }
-            window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+            window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
         }
     </script>
 </body>
