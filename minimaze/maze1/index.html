@@ -1810,6 +1810,44 @@ this.gameWorld.appendChild(furnitureEl);
             speed: enemy.speed
         });
     });
+
+
+const sharkEnemies = [
+    {x: 180, y: 280, moveX: 160, moveY: 280, range: 140, axis: 'x', speed: 0.6},
+    {x: 600, y: 120, moveX: 580, moveY: 120, range: 200, axis: 'x', speed: 0.7},
+    {x: 1500, y: 250, moveX: 1480, moveY: 250, range: 160, axis: 'x', speed: 0.5},
+    {x: 1800, y: 450, moveX: 1800, moveY: 430, range: 120, axis: 'y', speed: 0.6}
+];
+
+sharkEnemies.forEach((shark, index) => {
+    const sharkEl = document.createElement('div');
+    sharkEl.className = 'enemy water-shark';
+    sharkEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/shark-min.png")';
+    sharkEl.style.backgroundSize = 'contain';
+    sharkEl.style.backgroundRepeat = 'no-repeat';
+    sharkEl.style.backgroundPosition = 'center';
+    sharkEl.style.width = '28px';
+    sharkEl.style.height = '28px';
+    sharkEl.textContent = ''; // No emoji, using image
+    sharkEl.style.left = shark.x + 'px';
+    sharkEl.style.top = shark.y + 'px';
+    this.gameWorld.appendChild(sharkEl);
+    
+    this.movingEnemies.push({
+        element: sharkEl,
+        startX: shark.moveX,
+        startY: shark.moveY,
+        currentX: shark.x,
+        currentY: shark.y,
+        range: shark.range,
+        axis: shark.axis,
+        direction: 1,
+        speed: shark.speed
+    });
+});
+
+
+        
     
     // Add forest bees
     this.createForestBees();
