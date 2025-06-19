@@ -2508,9 +2508,8 @@ if (this.gorilla) {
             };
             
             if (this.rectsOverlap(playerRect, fgEnemyRect)) {
-                this.hearts = 0;
-                this.takeDamage();
-            }
+    this.gameOver(); // Direct game over call
+}
         }
         
         // Check friendly NPCs
