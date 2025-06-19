@@ -2931,7 +2931,7 @@ this.saveGameState(); // Auto-save after purchase
             } else {
                 this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
             }
-        } else if (message === "🔦 Flashlight for sale! Light up dark caves for 600¥!" && !this.hasFlashlight {
+        } else if (message === "🔦 Flashlight for sale! Light up dark caves for 600¥!" && !this.hasFlashlight) {
             if (this.money >= 600) {
                 this.money -= 600;
                 this.hasFlashlight = true;
