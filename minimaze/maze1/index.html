@@ -3080,6 +3080,8 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         currentUrl: 'main',
         lastSaveTime: Date.now(),
         isInForest: this.isInForest || false
+        hasFlashlight: this.hasFlashlight,
+hasPyramidKey: this.hasPyramidKey,
     };
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     console.log('Game saved:', gameState); // For debugging
@@ -3104,6 +3106,8 @@ loadGameState() {
         this.collectedMoney = gameState.collectedMoney || [];
         this.collectedHearts = gameState.collectedHearts || [];
         this.isInForest = gameState.isInForest || false;
+        this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasPyramidKey = gameState.hasPyramidKey || false;
         
         // Set the timer to continue from saved time
         this.updateTimer();
@@ -3138,6 +3142,8 @@ loadGameState() {
         document.getElementById('forestOverlay').classList.remove('active');
         document.getElementById('forestVisionMask').classList.remove('active');
         this.updateForestVisibility();
+        this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasPyramidKey = gameState.hasPyramidKey || false;
         
         this.updateUI();
         return true;
