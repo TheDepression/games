@@ -2852,6 +2852,20 @@ this.saveGameState(); // Auto-save after purchase
 } else {
     this.showMessage(message);
 }
+        else if (message === "😢 The bully stole my pencil and hid it in a cave! I'll give you my pyramid key if you return it!" && !this.hasPyramidKey) {
+    if (this.hasPencil) {
+        this.hasPencil = false;
+        this.hasPyramidKey = true;
+        this.showMessage('🗝️ Thank you! Here\'s the pyramid key!');
+        friendly.dataset.message = 'Thank you for returning my pencil!';
+        this.updateUI();
+        this.saveGameState();
+    } else {
+        this.showMessage('😢 Please find my pencil in the caves!');
+    }
+} else {
+    this.showMessage(message);
+}
     }
 
     
