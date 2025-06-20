@@ -824,8 +824,18 @@ this.gameWorld.appendChild(superTestLight);
     if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
         const mask = document.getElementById('visionMask');
         const gameAreaRect = this.gameArea.getBoundingClientRect();
-        const playerScreenX = gameAreaRect.left + (this.playerX + 12); // Remove extra +12
+        const playerScreenX = gameAreaRect.left + (this.playerX + 12);
         const playerScreenY = gameAreaRect.top + (this.playerY + 12);
+        
+        // DEBUG: Add these lines
+        console.log('Updating vision mask:', {
+            playerX: this.playerX,
+            playerY: this.playerY,
+            playerScreenX,
+            playerScreenY,
+            hasTestLight: this.hasTestLight
+        });
+        
         mask.style.background = `radial-gradient(circle 80px at ${playerScreenX}px ${playerScreenY}px, transparent 80px, black 80px)`;
     }
 }
