@@ -732,64 +732,64 @@ this.gameWorld.appendChild(superTestLight);
             }
             
             checkCollisions() {
-                if (this.isInvulnerable) return;
-                
-                const playerRect = {
-                    left: this.playerX,
-                    top: this.playerY,
-                    right: this.playerX + 24,
-                    bottom: this.playerY + 24
-                };
-                
-                // Check item pickups
-                const items = this.gameWorld.querySelectorAll('.test-item, .hammer-item, .cave-entrance');
-                items.forEach(item => {
-                    const itemX = parseInt(item.style.left);
-                    const itemY = parseInt(item.style.top);
-                    const itemRect = {
-                        left: itemX,
-                        top: itemY,
-                        right: itemX + 30,
-                        bottom: itemY + 30
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, itemRect)) {
-                        const type = item.dataset.type;
-                        
-                        if (type === 'testlight' && !this.hasTestLight) {
-                            this.hasTestLight = true;
-                            this.showMessage('🔦 TestLight acquired! Basic cave vision!');
-                            this.updateLighting();
-                            this.updateUI();
-                            item.remove();
-                        } else if (type === 'supertestlight' && !this.hasSuperTestLight) {
-                            this.hasSuperTestLight = true;
-                            this.showMessage('💡 SuperTestLight acquired! Full cave vision!');
-                            this.updateLighting();
-                            this.updateUI();
-                            item.remove();
-                        } else if (type === 'hammer' && !this.hasHammer) {
-                            this.hasHammer = true;
-                            this.hammerCollected = true;
-                            this.showMessage('🔨 Hammer acquired! You can break walls!');
-                            this.updateUI();
-                            // Auto-save hammer acquisition
-                            const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                            gameState.hasHammer = true;
-                            localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                            item.remove();
-                        if (type === 'exit') {
-    clearInterval(this.timerInterval);
-    this.caveMusic.pause();
-    this.showMessage('🌅 Exiting cave...');
+    if (this.isInvulnerable) return;
     
-    setTimeout(() => {
-        this.exitCave();
-    }, 1500);
-}
-                    }
-                });
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    // Check item pickups
+    const items = this.gameWorld.querySelectorAll('.test-item, .hammer-item, .cave-entrance');
+    items.forEach(item => {
+        const itemX = parseInt(item.style.left);
+        const itemY = parseInt(item.style.top);
+        const itemRect = {
+            left: itemX,
+            top: itemY,
+            right: itemX + 30,
+            bottom: itemY + 30
+        };
+        
+        if (this.rectsOverlap(playerRect, itemRect)) {
+            const type = item.dataset.type;
+            
+            if (type === 'testlight' && !this.hasTestLight) {
+                this.hasTestLight = true;
+                this.showMessage('🔦 TestLight acquired! Basic cave vision!');
+                this.updateLighting();
+                this.updateUI();
+                item.remove();
+            } else if (type === 'supertestlight' && !this.hasSuperTestLight) {
+                this.hasSuperTestLight = true;
+                this.showMessage('💡 SuperTestLight acquired! Full cave vision!');
+                this.updateLighting();
+                this.updateUI();
+                item.remove();
+            } else if (type === 'hammer' && !this.hasHammer) {
+                this.hasHammer = true;
+                this.hammerCollected = true;
+                this.showMessage('🔨 Hammer acquired! You can break walls!');
+                this.updateUI();
+                // Auto-save hammer acquisition
+                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                gameState.hasHammer = true;
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                item.remove();
+            } else if (type === 'exit') {
+                clearInterval(this.timerInterval);
+                this.caveMusic.pause();
+                this.showMessage('🌅 Exiting cave...');
+                
+                setTimeout(() => {
+                    this.exitCave();
+                }, 1500);
             }
+        }
+    });
+}
             
             rectsOverlap(rect1, rect2) {
                 return rect1.left < rect2.right &&
