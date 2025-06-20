@@ -276,7 +276,7 @@
             <div>💰 <span id="money">0</span>¥</div>
             <div>Room: <span id="roomInfo">1,1</span></div>
         </div>
-        <div id="timer">0:00</div>
+        <div id="timer">0:00 | Room: <span id="roomInfo">1,1</span></div>
         
         <div id="gameArea">
             <div id="gameWorld">
@@ -584,7 +584,6 @@
             createRightRoom() {
                 // Right room walls
                 this.createWall(0, 0, 350, 20); // Top wall
-                this.createWall(0, 150, 20, 60); // Left wall gap for entrance
                 this.createWall(0, 0, 20, 150); // Left wall top
                 this.createWall(0, 210, 20, 147.5); // Left wall bottom
                 this.createWall(330, 0, 20, 357.5); // Right wall (closed)
@@ -695,21 +694,21 @@
                 
                 if (roomKey === '1,1') {
                     // Right exit gap (x > 330, y: 150-210, 60px gap)
-                    if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+                    if (playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220) {
                         this.transitionToRoom(2, 1, 'right');
                     }
                 } else if (roomKey === '2,1') {
                     // Left entrance back to room 1,1
-                    if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+                    if (playerCenterX < 25 && playerCenterY >= 140 && playerCenterY <= 220) {
                         this.transitionToRoom(1, 1, 'left');
                     }
                     // Bottom exit gap to room 2,2 (y > 337, x: 150-210, 60px gap)
-                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                    if (playerCenterY > 325 && playerCenterX >= 140 && playerCenterX <= 220) {
                         this.transitionToRoom(2, 2, 'down');
                     }
                 } else if (roomKey === '2,2') {
                     // Top entrance back to room 2,1
-                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                    if (playerCenterY < 25 && playerCenterX >= 140 && playerCenterX <= 220) {
                         this.transitionToRoom(2, 1, 'up');
                     }
                 }
@@ -750,7 +749,18 @@
                     this.showMessage(`Entered room ${newRoomX},${newRoomY}`);
                 }, 100);
             }
-            
+
+            pauseAndTransition(newRoomX, newRoomY, direction) {
+    if (this.isTransitioning) return;
+    
+    this.isTransitioning = true;
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    
+    setTimeout(() => {
+        this.transitionToRoom(newRoomX, newRoomY, direction);
+    }, 200);
+}
             checkCollisions() {
                 if (this.isInvulnerable) return;
                 
