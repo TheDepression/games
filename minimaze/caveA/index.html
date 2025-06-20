@@ -751,11 +751,11 @@ this.gameWorld.appendChild(flashlight);
                     const itemX = parseInt(item.style.left);
                     const itemY = parseInt(item.style.top);
                     const itemRect = {
-                        left: itemX,
-                        top: itemY,
-                        right: itemX + 30,
-                        bottom: itemY + 30
-                    };
+    left: itemX - 15,
+    top: itemY - 15,
+    right: itemX + 30 + 15,
+    bottom: itemY + 30 + 15
+};
                     
                     if (this.rectsOverlap(playerRect, itemRect)) {
                         const type = item.dataset.type;
