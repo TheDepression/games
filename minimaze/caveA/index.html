@@ -92,8 +92,8 @@
         
         .enemy {
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 72px;
+            height: 72px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -299,7 +299,7 @@
             <div>❤️ <span id="hearts">3</span></div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
-        <div id="timer">0:00 | Room: <span id="roomInfo">1,1</span></div>
+        <div id="timer">0:00<br>Room: <span id="roomInfo">1,1</span></div>
         <button id="pauseBtn" onclick="pauseGame()">⏸️ Pause</button>
         
         <div id="gameArea">
@@ -372,7 +372,7 @@
                 
                 // Player properties - spawn at bottom center
                 this.playerX = 163; // Center horizontally (350/2 - 12)
-                this.playerY = 290; // Near bottom (entrance area)
+                this.playerY = 290; // Near bottom but away from exit
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
                 this.isDragging = false;
@@ -392,7 +392,6 @@
                 this.isTransitioning = false;
                 
                 // Lighting system
-                this.hasFlashlight = false;
                 this.realHasFlashlight = false; // From main world
                 
                 // Cave items
@@ -426,10 +425,9 @@
             }
             
             checkFlashlightWarning() {
-                const hasAnyLight = this.realHasFlashlight || this.hasFlashlight;
                 const warningDiv = document.getElementById('warningMessage');
                 
-                if (hasAnyLight) {
+                if (this.realHasFlashlight) {
                     warningDiv.textContent = "🔦 Entering the cave with light...";
                 } else {
                     warningDiv.textContent = "⚠️ It's very dark in here! You need a flashlight to see properly.";
@@ -493,7 +491,7 @@
                 gameState.hasHammer = this.hasHammer;
                 gameState.currentUrl = 'main';
                 gameState.playerX = 100; // Near cave entrance in main world
-                gameState.playerY = 1940;
+                gameState.playerY = 1980; // Further from cave entrance
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
             
@@ -541,7 +539,7 @@
                 this.playerVelocityX = deltaX * sensitivity;
                 this.playerVelocityY = deltaY * sensitivity;
                 
-                const maxVelocity = 11;
+                const maxVelocity = 11; // Reduced from 14 to 11
                 this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
                 this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
                 
@@ -606,15 +604,6 @@
                 entrance.style.height = '15px';
                 entrance.dataset.type = 'exit';
                 this.gameWorld.appendChild(entrance);
-                
-                // Flashlight - close to spawn point
-                const flashlight = document.createElement('div');
-                flashlight.className = 'test-item';
-                flashlight.textContent = '🔦';
-                flashlight.style.left = '140px';
-                flashlight.style.top = '280px';
-                flashlight.dataset.type = 'flashlight';
-                this.gameWorld.appendChild(flashlight);
             }
             
             createRightRoom() {
@@ -622,8 +611,7 @@
                 this.createWall(0, 0, 350, 20); // Top wall
                 this.createWall(0, 0, 20, 150); // Left wall top
                 this.createWall(0, 210, 20, 147.5); // Left wall bottom (60px gap for entrance)
-                this.createWall(330, 0, 20, 150); // Right wall top
-                this.createWall(330, 210, 20, 147.5); // Right wall bottom
+                this.createWall(330, 0, 20, 357.5); // Right wall completely closed
                 this.createWall(0, 337.5, 150, 20); // Bottom wall left part
                 this.createWall(210, 337.5, 140, 20); // Bottom wall right part (60px gap)
             }
@@ -691,7 +679,10 @@
             createSnakeEnemies() {
                 const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
                 
-                if (roomKey === '2,1') {
+                if (roomKey === '1,1') {
+                    this.createSnake(80, 120, 'horizontal');
+                    this.createSnake(250, 200, 'vertical');
+                } else if (roomKey === '2,1') {
                     this.createSnake(100, 100, 'horizontal');
                     this.createSnake(250, 200, 'vertical');
                 } else if (roomKey === '2,2') {
@@ -742,7 +733,7 @@
                         }
                         
                         // Bounce off walls
-                        if (enemy.x <= 30 || enemy.x >= 300) {
+                        if (enemy.x <= 30 || enemy.x >= 250) {
                             enemy.moveDirection *= -1;
                         }
                         
@@ -757,7 +748,7 @@
                         }
                         
                         // Bounce off walls
-                        if (enemy.y <= 30 || enemy.y >= 320) {
+                        if (enemy.y <= 30 || enemy.y >= 250) {
                             enemy.moveDirection *= -1;
                         }
                         
@@ -850,8 +841,8 @@
                     if (playerCenterX < 25 && playerCenterY >= 140 && playerCenterY <= 220) {
                         this.pauseAndTransition(1, 1, 'left');
                     }
-                    // Bottom exit gap to room 2,2
-                    if (playerCenterY > 325 && playerCenterX >= 140 && playerCenterX <= 220) {
+                    // Bottom exit gap to room 2,2 - smaller detection zone
+                    if (playerCenterY > 335 && playerCenterX >= 150 && playerCenterX <= 200) {
                         this.pauseAndTransition(2, 2, 'down');
                     }
                     // Up exit gap to room 2,0
@@ -859,8 +850,8 @@
                         this.pauseAndTransition(2, 0, 'up');
                     }
                 } else if (roomKey === '2,2') {
-                    // Top entrance back to room 2,1
-                    if (playerCenterY < 25 && playerCenterX >= 140 && playerCenterX <= 220) {
+                    // Top entrance back to room 2,1 - smaller detection zone
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 200) {
                         this.pauseAndTransition(2, 1, 'up');
                     }
                 } else if (roomKey === '2,0') {
@@ -881,7 +872,6 @@
                     if (playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220) {
                         this.pauseAndTransition(2, 0, 'right');
                     }
-                    // Down (no room)
                 } else if (roomKey === '2,-1') {
                     // Down to 2,0
                     if (playerCenterY > 325 && playerCenterX >= 140 && playerCenterX <= 220) {
@@ -958,13 +948,7 @@
                     if (this.rectsOverlap(playerRect, itemRect)) {
                         const type = item.dataset.type;
                         
-                        if (type === 'flashlight' && !this.hasFlashlight) {
-                            this.hasFlashlight = true;
-                            this.showMessage('🔦 Flashlight acquired! Full cave vision!');
-                            this.updateLighting();
-                            this.updateUI();
-                            item.remove();
-                        } else if (type === 'hammer' && !this.hasHammer) {
+                        if (type === 'hammer' && !this.hasHammer) {
                             this.hasHammer = true;
                             this.hammerCollected = true;
                             this.showMessage('🔨 Hammer acquired! You can break walls!');
@@ -991,8 +975,8 @@
                     const enemyRect = {
                         left: enemy.x,
                         top: enemy.y,
-                        right: enemy.x + 24,
-                        bottom: enemy.y + 24
+                        right: enemy.x + 72, // Updated for larger snake size
+                        bottom: enemy.y + 72 // Updated for larger snake size
                     };
                     
                     if (this.rectsOverlap(playerRect, enemyRect)) {
@@ -1012,9 +996,7 @@
                 const darknessOverlay = document.getElementById('darknessOverlay');
                 const visionMask = document.getElementById('visionMask');
                 
-                const hasAnyLight = this.realHasFlashlight || this.hasFlashlight;
-                
-                if (hasAnyLight) {
+                if (this.realHasFlashlight) {
                     // No darkness - full visibility
                     darknessOverlay.classList.remove('active');
                     visionMask.classList.remove('active');
@@ -1035,7 +1017,7 @@
                 
                 // Update items display
                 let itemsText = '';
-                if (this.realHasFlashlight || this.hasFlashlight) itemsText += ' 🔦';
+                if (this.realHasFlashlight) itemsText += ' 🔦';
                 if (this.hasHammer) itemsText += ' 🔨';
                 
                 const ui = document.getElementById('ui');
@@ -1105,7 +1087,7 @@
                 gameState.hasHammer = this.hasHammer;
                 gameState.currentUrl = 'main';
                 gameState.playerX = 100; // Near cave entrance in main world
-                gameState.playerY = 1990;
+                gameState.playerY = 1980; // Further from cave entrance
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
                 window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
@@ -1129,10 +1111,8 @@
                 });
                 
                 this.timerInterval = setInterval(() => {
-                    if (!this.isPaused) {
-                        this.timeElapsed++;
-                        this.updateTimer();
-                    }
+                    this.timeElapsed++; // Timer always runs, no pause check
+                    this.updateTimer();
                 }, 1000);
             }
             
@@ -1141,7 +1121,7 @@
                 const seconds = this.timeElapsed % 60;
                 const timerEl = document.getElementById('timer');
                 const roomInfo = document.getElementById('roomInfo').textContent;
-                timerEl.innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')} | Room: <span id="roomInfo">${roomInfo}</span>`;
+                timerEl.innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')}<br>Room: ${roomInfo}`;
                 
                 // Change color as time progresses
                 if (this.timeElapsed >= 600) { // 10+ minutes = red
@@ -1191,4 +1171,3 @@
     </script>
 </body>
 </html>
-                            
