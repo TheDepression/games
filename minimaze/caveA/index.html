@@ -321,13 +321,13 @@
             const savedState = localStorage.getItem('mfGameState');
             if (!savedState) {
                 alert('No game data found! Starting from main world.');
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
                 return;
             }
             
             const gameState = JSON.parse(savedState);
             if (gameState.currentUrl !== 'caveA') {
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
                 return;
             }
         });
@@ -915,7 +915,7 @@
                 
                 setTimeout(() => {
                     this.saveGameState();
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
                 }, 3000);
             }
             
@@ -931,7 +931,7 @@
                 gameState.playerY = 1940;
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
             }
             
             startGameTimer() {
