@@ -316,6 +316,22 @@
     </audio>
 
     <script>
+        // Check URL access on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            if (!savedState) {
+                alert('No game data found! Starting from main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+            
+            const gameState = JSON.parse(savedState);
+            if (gameState.currentUrl !== 'caveA') {
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+        });
+
         class CaveGame {
             constructor() {
                 this.loadGameState();
@@ -437,11 +453,11 @@
                 const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                 gameState.hearts = this.hearts;
                 gameState.money = this.money;
-                gameState.timeElapsed = this.timeElapsed + 120; // +2 minute death penalty
+                gameState.timeElapsed = this.timeElapsed;
                 gameState.hasHammer = this.hasHammer;
                 gameState.currentUrl = 'main';
-                gameState.playerX = 420; // Spawn point in main world
-                gameState.playerY = 1760;
+                gameState.playerX = 100; // Near cave entrance in main world
+                gameState.playerY = 1940;
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
             
@@ -556,13 +572,13 @@
                 this.gameWorld.appendChild(testLight);
                 
                 // Super test flashlight - further away
-const superTestLight = document.createElement('div');
-superTestLight.className = 'test-item';
-superTestLight.textContent = '💡';
-superTestLight.style.left = '250px'; // Move further right
-superTestLight.style.top = '150px';  // Move up a bit
-superTestLight.dataset.type = 'supertestlight';
-this.gameWorld.appendChild(superTestLight);
+                const superTestLight = document.createElement('div');
+                superTestLight.className = 'test-item';
+                superTestLight.textContent = '💡';
+                superTestLight.style.left = '250px';
+                superTestLight.style.top = '150px';
+                superTestLight.dataset.type = 'supertestlight';
+                this.gameWorld.appendChild(superTestLight);
             }
             
             createRightRoom() {
@@ -671,35 +687,33 @@ this.gameWorld.appendChild(superTestLight);
             }
             
             checkRoomTransitions() {
-    const playerCenterX = this.playerX + 12;
-    const playerCenterY = this.playerY + 12;
-    // DEBUG: Add this line
-    console.log('Player position:', { playerCenterX, playerCenterY, roomX: this.currentRoomX, roomY: this.currentRoomY });
-    
-    // Check for specific room gaps
-    const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
-    
-    if (roomKey === '1,1') {
-        // Right exit gap (y: 150-210)
-        if (playerCenterX > 340 && playerCenterY >= 150 && playerCenterY <= 210) {
-            this.transitionToRoom(2, 1, 'right');
-        }
-    } else if (roomKey === '2,1') {
-        // Left entrance 
-        if (playerCenterX < 10 && playerCenterY >= 150 && playerCenterY <= 210) {
-            this.transitionToRoom(1, 1, 'left');
-        }
-        // Bottom exit gap (x: 150-210)
-        if (playerCenterY > 347 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 2, 'down');
-        }
-    } else if (roomKey === '2,2') {
-        // Top entrance
-        if (playerCenterY < 10 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 1, 'up');
-        }
-    }
-}
+                const playerCenterX = this.playerX + 12;
+                const playerCenterY = this.playerY + 12;
+                
+                // Check for specific room gaps based on current room
+                const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+                
+                if (roomKey === '1,1') {
+                    // Right exit gap (x > 330, y: 150-210, 60px gap)
+                    if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(2, 1, 'right');
+                    }
+                } else if (roomKey === '2,1') {
+                    // Left entrance back to room 1,1
+                    if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(1, 1, 'left');
+                    }
+                    // Bottom exit gap to room 2,2 (y > 337, x: 150-210, 60px gap)
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 2, 'down');
+                    }
+                } else if (roomKey === '2,2') {
+                    // Top entrance back to room 2,1
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 1, 'up');
+                    }
+                }
+            }
             
             transitionToRoom(newRoomX, newRoomY, direction) {
                 if (this.isTransitioning) return;
@@ -712,15 +726,19 @@ this.gameWorld.appendChild(superTestLight);
                 switch(direction) {
                     case 'right':
                         this.playerX = 30;
+                        this.playerY = 180; // Center of gap
                         break;
                     case 'left':
-                        this.playerX = 320;
+                        this.playerX = 305;
+                        this.playerY = 180; // Center of gap
                         break;
                     case 'down':
                         this.playerY = 30;
+                        this.playerX = 180; // Center of gap
                         break;
                     case 'up':
-                        this.playerY = 327;
+                        this.playerY = 315;
+                        this.playerX = 180; // Center of gap
                         break;
                 }
                 
@@ -734,65 +752,64 @@ this.gameWorld.appendChild(superTestLight);
             }
             
             checkCollisions() {
-    if (this.isInvulnerable) return;
-    
-    const playerRect = {
-        left: this.playerX,
-        top: this.playerY,
-        right: this.playerX + 24,
-        bottom: this.playerY + 24
-    };
-    
-    // Check item pickups
-    const items = this.gameWorld.querySelectorAll('.test-item, .hammer-item, .cave-entrance');
-    items.forEach(item => {
-        const itemX = parseInt(item.style.left);
-        const itemY = parseInt(item.style.top);
-        const itemRect = {
-            left: itemX,
-            top: itemY,
-            right: itemX + 30,
-            bottom: itemY + 30
-        };
-        
-        if (this.rectsOverlap(playerRect, itemRect)) {
-            const type = item.dataset.type;
-            / DEBUG: Add this line
-    console.log('Item collision detected:', type);
-            if (type === 'testlight' && !this.hasTestLight) {
-                this.hasTestLight = true;
-                this.showMessage('🔦 TestLight acquired! Basic cave vision!');
-                this.updateLighting();
-                this.updateUI();
-                item.remove();
-            } else if (type === 'supertestlight' && !this.hasSuperTestLight) {
-                this.hasSuperTestLight = true;
-                this.showMessage('💡 SuperTestLight acquired! Full cave vision!');
-                this.updateLighting();
-                this.updateUI();
-                item.remove();
-            } else if (type === 'hammer' && !this.hasHammer) {
-                this.hasHammer = true;
-                this.hammerCollected = true;
-                this.showMessage('🔨 Hammer acquired! You can break walls!');
-                this.updateUI();
-                // Auto-save hammer acquisition
-                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                gameState.hasHammer = true;
-                localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                item.remove();
-            } else if (type === 'exit') {
-                clearInterval(this.timerInterval);
-                this.caveMusic.pause();
-                this.showMessage('🌅 Exiting cave...');
+                if (this.isInvulnerable) return;
                 
-                setTimeout(() => {
-                    this.exitCave();
-                }, 1500);
+                const playerRect = {
+                    left: this.playerX,
+                    top: this.playerY,
+                    right: this.playerX + 24,
+                    bottom: this.playerY + 24
+                };
+                
+                // Check item pickups
+                const items = this.gameWorld.querySelectorAll('.test-item, .hammer-item, .cave-entrance');
+                items.forEach(item => {
+                    const itemX = parseInt(item.style.left);
+                    const itemY = parseInt(item.style.top);
+                    const itemRect = {
+                        left: itemX,
+                        top: itemY,
+                        right: itemX + 30,
+                        bottom: itemY + 30
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, itemRect)) {
+                        const type = item.dataset.type;
+                        
+                        if (type === 'testlight' && !this.hasTestLight) {
+                            this.hasTestLight = true;
+                            this.showMessage('🔦 TestLight acquired! Basic cave vision!');
+                            this.updateLighting();
+                            this.updateUI();
+                            item.remove();
+                        } else if (type === 'supertestlight' && !this.hasSuperTestLight) {
+                            this.hasSuperTestLight = true;
+                            this.showMessage('💡 SuperTestLight acquired! Full cave vision!');
+                            this.updateLighting();
+                            this.updateUI();
+                            item.remove();
+                        } else if (type === 'hammer' && !this.hasHammer) {
+                            this.hasHammer = true;
+                            this.hammerCollected = true;
+                            this.showMessage('🔨 Hammer acquired! You can break walls!');
+                            this.updateUI();
+                            // Auto-save hammer acquisition
+                            const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                            gameState.hasHammer = true;
+                            localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                            item.remove();
+                        } else if (type === 'exit') {
+                            clearInterval(this.timerInterval);
+                            this.caveMusic.pause();
+                            this.showMessage('🌅 Exiting cave...');
+                            
+                            setTimeout(() => {
+                                this.exitCave();
+                            }, 1500);
+                        }
+                    }
+                });
             }
-        }
-    });
-}
             
             rectsOverlap(rect1, rect2) {
                 return rect1.left < rect2.right &&
@@ -824,24 +841,14 @@ this.gameWorld.appendChild(superTestLight);
             }
             
             updateVisionMask() {
-    if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
-        const mask = document.getElementById('visionMask');
-        const gameAreaRect = this.gameArea.getBoundingClientRect();
-        const playerScreenX = gameAreaRect.left + (this.playerX + 12);
-        const playerScreenY = gameAreaRect.top + (this.playerY + 12);
-        
-        // DEBUG: Add these lines
-        console.log('Updating vision mask:', {
-            playerX: this.playerX,
-            playerY: this.playerY,
-            playerScreenX,
-            playerScreenY,
-            hasTestLight: this.hasTestLight
-        });
-        
-        mask.style.background = `radial-gradient(circle 80px at ${playerScreenX}px ${playerScreenY}px, transparent 80px, black 80px)`;
-    }
-}
+                if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
+                    const mask = document.getElementById('visionMask');
+                    const gameAreaRect = this.gameArea.getBoundingClientRect();
+                    const playerScreenX = gameAreaRect.left + (this.playerX + 12);
+                    const playerScreenY = gameAreaRect.top + (this.playerY + 12);
+                    mask.style.background = `radial-gradient(circle 80px at ${playerScreenX}px ${playerScreenY}px, transparent 80px, black 80px)`;
+                }
+            }
             
             updateUI() {
                 document.getElementById('hearts').textContent = this.hearts;
@@ -904,19 +911,15 @@ this.gameWorld.appendChild(superTestLight);
                 clearInterval(this.timerInterval);
                 this.gameStarted = false;
                 this.caveMusic.pause();
-                this.showMessage('💀 You died! Returning to main world with time penalty...');
+                this.showMessage('💀 You died! Returning to main world...');
                 
                 setTimeout(() => {
-                    this.saveGameState(); // Includes 2-minute penalty
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                    this.saveGameState();
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 }, 3000);
             }
             
             exitCave() {
-                clearInterval(this.timerInterval);
-                this.caveMusic.pause();
-                this.showMessage('🌅 Exiting cave...');
-                
                 // Save progress without death penalty
                 const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                 gameState.hearts = this.hearts;
@@ -924,19 +927,17 @@ this.gameWorld.appendChild(superTestLight);
                 gameState.timeElapsed = this.timeElapsed; // No penalty for normal exit
                 gameState.hasHammer = this.hasHammer;
                 gameState.currentUrl = 'main';
-                gameState.playerX = 420;
-                gameState.playerY = 1760;
+                gameState.playerX = 100; // Near cave entrance in main world
+                gameState.playerY = 1940;
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
-                setTimeout(() => {
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-                }, 2000);
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
             }
             
             startGameTimer() {
                 this.gameStarted = true;
                 this.updateTimer();
-                this.startGameLoop(); // Move game loop start here
+                this.startGameLoop();
                 
                 // Try to play music
                 this.caveMusic.play().catch(e => {
