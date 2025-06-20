@@ -2941,9 +2941,9 @@ this.saveGameState(); // Auto-save after purchase
             } else {
                 this.showMessage('🔦 Flashlight for sale! Light up dark caves for 600¥!');
             }
-        } else if (message === "🥾 Lava-proof shoes! Only 600¥!" && !this.hasLavaShoes) {
-    if (this.money >= 600) {
-        this.money -= 600;
+        } else if (message === "🥾 Lava-proof shoes! Only 900000000¥!" && !this.hasLavaShoes) {
+    if (this.money >= 900) {
+        this.money -= 900;
         this.hasLavaShoes = true;
         this.lavaProtectionTime = 0;
         this.lavaProtectionActive = false;
@@ -2953,7 +2953,7 @@ this.saveGameState(); // Auto-save after purchase
         // After each successful purchase, add:
 this.saveGameState(); // Auto-save after purchase
     } else {
-        this.showMessage('🥾 Lava-proof shoes! Only 600¥!');
+        this.showMessage('🥾 Lava-proof shoes! Only 900000000¥!');
     }
 } else if (message.includes("Thank god you are here, master frog") && !this.motherPaid) {
     if (this.hasBaby) {
