@@ -55,6 +55,7 @@
             background-size: 20px 20px;
             border: 1px solid rgba(100,100,100,0.3);
             opacity: 1;
+            z-index: 30; /* Below darkness but above floor */
         }
         
         .cave-entrance {
@@ -62,7 +63,7 @@
             background: #fff;
             border: 2px solid #ccc;
             border-radius: 4px;
-            z-index: 80;
+            z-index: 350; /* Above everything including darkness */
         }
         
         .test-item {
@@ -74,7 +75,7 @@
             align-items: center;
             justify-content: center;
             animation: glow 2s infinite;
-            z-index: 60;
+            z-index: 350; /* Above everything including darkness */
         }
         
         .hammer-item {
@@ -86,7 +87,7 @@
             align-items: center;
             justify-content: center;
             animation: glow 2s infinite;
-            z-index: 60;
+            z-index: 350; /* Above everything including darkness */
         }
         
         @keyframes glow {
@@ -101,7 +102,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            z-index: 100;
+            z-index: 400; /* Highest priority - always visible */
             transition: none;
         }
         
@@ -154,7 +155,7 @@
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 12px;
-            z-index: 400;
+            z-index: 450;
             display: none;
             border: 1px solid rgba(255,255,255,0.3);
             max-width: 280px;
@@ -170,7 +171,7 @@
             height: 100vh;
             background: #000;
             pointer-events: none;
-            z-index: 150;
+            z-index: 150; /* Below player and important items */
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -188,7 +189,7 @@
             height: 100vh;
             background: radial-gradient(circle 80px, transparent 80px, black 80px);
             pointer-events: none;
-            z-index: 200;
+            z-index: 200; /* Below player and important items */
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -246,7 +247,7 @@
         
         <div id="gameArea">
             <div id="gameWorld">
-                <div id="player">🧙‍♂️</div>
+                <div id="player"></div>
             </div>
         </div>
         
@@ -287,15 +288,18 @@
                 this.gameStarted = false;
                 this.isInvulnerable = false;
                 
-                // Player properties
-                this.playerX = 175; // Center of room
-                this.playerY = 300; // Near bottom (entrance)
+                // Player properties - spawn at bottom center
+                this.playerX = 163; // Center horizontally (350/2 - 12)
+                this.playerY = 315; // Near bottom (entrance area)
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
                 this.isDragging = false;
+                this.dragStartX = 0;
+                this.dragStartY = 0;
                 this.lastDragX = 0;
                 this.lastDragY = 0;
-                this.currentDirection = 'n';
+                this.currentDirection = 's';
+                this.lastMoveDirection = 's';
                 
                 // Room system
                 this.currentRoomX = 1;
@@ -324,11 +328,42 @@
                 this.controlArea = document.getElementById('controlArea');
                 this.caveMusic = document.getElementById('caveMusic');
                 
+                this.preloadPlayerImages();
                 this.bindEvents();
-                this.startGameLoop();
                 this.initRoom();
-                this.updatePlayerImage('n');
+                this.updatePlayerImage('s'); // Start facing south
                 this.showEntryDialog();
+            }
+            
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+            
+            updatePlayerImage(direction) {
+                this.currentDirection = direction;
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+                this.player.textContent = ''; // Remove emoji when image loads
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
             }
             
             loadGameState() {
@@ -371,26 +406,6 @@
                 document.getElementById('confirmDialog').style.display = 'flex';
             }
             
-            updatePlayerImage(direction) {
-                this.currentDirection = direction;
-                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
-                this.player.textContent = '';
-            }
-            
-            getDirectionFromMovement(deltaX, deltaY) {
-                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-                if (angle < 0) angle += 360;
-                
-                if (angle >= 337.5 || angle < 22.5) return 'e';
-                else if (angle >= 22.5 && angle < 67.5) return 'se';
-                else if (angle >= 67.5 && angle < 112.5) return 's';
-                else if (angle >= 112.5 && angle < 157.5) return 'sw';
-                else if (angle >= 157.5 && angle < 202.5) return 'w';
-                else if (angle >= 202.5 && angle < 247.5) return 'nw';
-                else if (angle >= 247.5 && angle < 292.5) return 'n';
-                else return 'ne';
-            }
-            
             bindEvents() {
                 this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
                 this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
@@ -408,6 +423,8 @@
                 
                 this.isDragging = true;
                 const point = e.touches ? e.touches[0] : e;
+                this.dragStartX = point.clientX;
+                this.dragStartY = point.clientY;
                 this.lastDragX = point.clientX;
                 this.lastDragY = point.clientY;
             }
@@ -420,18 +437,20 @@
                 const deltaX = point.clientX - this.lastDragX;
                 const deltaY = point.clientY - this.lastDragY;
                 
+                // Update player direction based on movement
                 if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
                     const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
                     if (newDirection !== this.currentDirection) {
                         this.updatePlayerImage(newDirection);
+                        this.lastMoveDirection = newDirection;
                     }
                 }
                 
-                const sensitivity = 0.6;
+                const sensitivity = 0.5;
                 this.playerVelocityX = deltaX * sensitivity;
                 this.playerVelocityY = deltaY * sensitivity;
                 
-                const maxVelocity = 12;
+                const maxVelocity = 14;
                 this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
                 this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
                 
@@ -449,6 +468,8 @@
                 this.generateCurrentRoom();
                 this.updateLighting();
                 this.updateUI();
+                this.updatePlayerPosition(); // Make sure player is positioned correctly
+                this.startGameLoop();
             }
             
             generateCurrentRoom() {
@@ -481,27 +502,27 @@
                 const entrance = document.createElement('div');
                 entrance.className = 'cave-entrance';
                 entrance.style.left = '160px';
-                entrance.style.top = '320px';
+                entrance.style.top = '330px';
                 entrance.style.width = '30px';
-                entrance.style.height = '20px';
+                entrance.style.height = '15px';
                 entrance.dataset.type = 'exit';
                 this.gameWorld.appendChild(entrance);
                 
-                // Test flashlight
+                // Test flashlight - close to spawn point
                 const testLight = document.createElement('div');
                 testLight.className = 'test-item';
                 testLight.textContent = '🔦';
-                testLight.style.left = '100px';
-                testLight.style.top = '200px';
+                testLight.style.left = '140px';
+                testLight.style.top = '280px';
                 testLight.dataset.type = 'testlight';
                 this.gameWorld.appendChild(testLight);
                 
-                // Super test flashlight
+                // Super test flashlight - further away
                 const superTestLight = document.createElement('div');
                 superTestLight.className = 'test-item';
                 superTestLight.textContent = '💡';
-                superTestLight.style.left = '250px';
-                superTestLight.style.top = '150px';
+                superTestLight.style.left = '200px';
+                superTestLight.style.top = '200px';
                 superTestLight.dataset.type = 'supertestlight';
                 this.gameWorld.appendChild(superTestLight);
             }
@@ -567,17 +588,19 @@
                     if (this.canMoveTo(newX, newY)) {
                         this.playerX = newX;
                         this.playerY = newY;
-                        
-                        const visualOffset = (32 - 24) / 2;
-                        this.player.style.left = (this.playerX - visualOffset) + 'px';
-                        this.player.style.top = (this.playerY - visualOffset) + 'px';
-                        
-                        this.updateVisionMask();
+                        this.updatePlayerPosition();
                     }
                     
                     this.playerVelocityX *= 0.9;
                     this.playerVelocityY *= 0.9;
                 }
+            }
+            
+            updatePlayerPosition() {
+                const visualOffset = (32 - 24) / 2;
+                this.player.style.left = (this.playerX - visualOffset) + 'px';
+                this.player.style.top = (this.playerY - visualOffset) + 'px';
+                this.updateVisionMask();
             }
             
             canMoveTo(x, y) {
@@ -678,13 +701,6 @@
                 }, 100);
             }
             
-            updatePlayerPosition() {
-                const visualOffset = (32 - 24) / 2;
-                this.player.style.left = (this.playerX - visualOffset) + 'px';
-                this.player.style.top = (this.playerY - visualOffset) + 'px';
-                this.updateVisionMask();
-            }
-            
             checkCollisions() {
                 if (this.isInvulnerable) return;
                 
@@ -772,8 +788,8 @@
                 if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
                     const mask = document.getElementById('visionMask');
                     const gameAreaRect = this.gameArea.getBoundingClientRect();
-                    const playerScreenX = gameAreaRect.left + (this.playerX);
-                    const playerScreenY = gameAreaRect.top + (this.playerY);
+                    const playerScreenX = gameAreaRect.left + (this.playerX + 12);
+                    const playerScreenY = gameAreaRect.top + (this.playerY + 12);
                     mask.style.background = `radial-gradient(circle 80px at ${playerScreenX}px ${playerScreenY}px, transparent 80px, black 80px)`;
                 }
             }
@@ -842,7 +858,7 @@
                 
                 setTimeout(() => {
                     this.saveGameState(); // Includes 2-minute penalty
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 }, 3000);
             }
             
@@ -862,13 +878,24 @@
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
                 setTimeout(() => {
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 }, 2000);
             }
             
             startGame() {
                 this.gameStarted = true;
-                this.caveMusic.play().catch(e => console.log('Cave music failed:', e));
+                // Try to play music with user interaction
+                this.caveMusic.play().catch(e => {
+                    console.log('Cave music autoplay blocked, will try again on first interaction');
+                    // Try again on first user interaction
+                    const tryMusic = () => {
+                        this.caveMusic.play().catch(e => console.log('Music failed:', e));
+                        document.removeEventListener('click', tryMusic);
+                        document.removeEventListener('touchstart', tryMusic);
+                    };
+                    document.addEventListener('click', tryMusic);
+                    document.addEventListener('touchstart', tryMusic);
+                });
             }
         }
 
@@ -879,6 +906,32 @@
             game = new CaveGame();
             game.startGame();
         }
-    </script>
-</body>
-</html>
+
+        /*
+        WEAPON IMPLEMENTATION IDEAS:
+        
+        1. **Auto-Attack System**: When player has weapon + enemy nearby, weapon auto-attacks
+           - No UI changes needed
+           - Visual: brief animation/flash when attacking
+           - Could work with existing collision system
+        
+        2. **Tap-to-Attack**: Double-tap control area while near enemy
+           - Doesn't interfere with movement
+           - Could show brief attack indicator
+        
+        3. **Direction-Based Attack**: Quick swipe in direction of enemy
+           - Uses existing swipe mechanics
+           - Short, sharp swipes = attack, longer swipes = movement
+        
+        4. **Time-Based Attack**: Hold position near enemy for 1 second
+           - Passive attacking system
+           - Shows charging indicator
+        
+        5. **Zone Attack**: Weapon creates damage zone around player
+           - Completely passive
+           - Enemies take damage when too close
+        
+        My recommendation: Auto-attack (#1) for simplicity and mobile-friendliness.
+        When player has weapon and gets within range of enemy, automatically attack
+        with visual feedback but no additional input required.
+        */
