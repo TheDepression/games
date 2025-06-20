@@ -1926,7 +1926,7 @@ sharkEnemies.forEach((shark, index) => {
 }
     createFriendlies() {
     const friendlies = [
-        {x: 2280, y: 860, message: "🔑 Need a key? Give me 500¥!", customEmoji: "👴🏻"},
+        {x: 2280, y: 840, message: "🔑 Need a key? Give me 500¥!", customEmoji: "👴🏻"},
         {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!", customEmoji: "👩‍⚕️"},
         {x: 60, y: 60, message: "🔦 Flashlight for sale! Light up dark caves for 600¥!", customEmoji: "🧙‍♀️"},
         {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 900000000¥!", customEmoji: "👷‍♂️"},
@@ -1936,7 +1936,7 @@ sharkEnemies.forEach((shark, index) => {
         {x: 500, y: 500, message: "No,... I am NOT Mario. Leave me alone!", type: "villager", customEmoji: "👨🏻"},
         {x: 2260, y: 960, message: "The castle to the far north is always making loud noises and flashing lights. What is happening in there?!", type: "historian", customEmoji: "👵🏻"},
         {x: 80, y: 670, message: "The rumor is that the bully has found a way to live forever. If that is true, we may all be doomed.", type: "elder", customEmoji: "🤴🏻"},
-        {x: 2280, y: 820, message: "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""}
+        {x: 2280, y: 7800, message: "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""}
     ];
     
     friendlies.forEach((friendly, index) => {
@@ -1973,13 +1973,14 @@ sharkEnemies.forEach((shark, index) => {
     createCollectibles() {
         // Money pickups with unique IDs
 const moneyPositions = [
-    {x: 2340, y: 820, id: 'money_1'}, {x: 2360, y: 820, id: 'money_2'}, {x: 190, y: 1730, id: 'money_3'},
+    {x: 150, y: 1730, id: 'money_1'}, {x: 170, y: 1730, id: 'money_2'}, {x: 190, y: 1730, id: 'money_3'},
     {x: 150, y: 1750, id: 'money_4'}, {x: 170, y: 1750, id: 'money_5'}, {x: 190, y: 1750, id: 'money_6'},
     {x: 150, y: 1770, id: 'money_7'}, {x: 170, y: 1770, id: 'money_8'}, {x: 190, y: 1770, id: 'money_9'},
-    {x: 650, y: 1120, id: 'money_10'}, {x: 1410, y: 890, id: 'money_11'}, {x: 530, y: 2220, id: 'money_12'},
-    {x: 1390, y: 80, id: 'money_13'}, {x: 2380, y: 30, id: 'money_14'}, {x: 1810, y: 1230, id: 'money_15'},
-    {x: 1830, y: 2070, id: 'money_16'}, {x: 1940, y: 2350, id: 'money_17'}, {x: 1490, y: 350, id: 'money_18'}, 
-    {x: 1640, y: 1770, id: 'money_19'}, {x: 30, y: 1520, id: 'money_20'}, {x: 2350, y: 1240, id: 'money_21'}
+    {x: 2340, y: 820, id: 'money_10'}, {x: 2360, y: 820, id: 'money_11'}, {x: 1150, y: 540, id: 'money_12'},
+    {x: 650, y: 1120, id: 'money_13'}, {x: 1410, y: 890, id: 'money_14'}, {x: 530, y: 2220, id: 'money_15'},
+    {x: 1390, y: 80, id: 'money_16'}, {x: 2380, y: 30, id: 'money_17'}, {x: 1810, y: 1230, id: 'money_18'},
+    {x: 1830, y: 2070, id: 'money_19'}, {x: 1940, y: 2350, id: 'money_20'}, {x: 1490, y: 350, id: 'money_21'}, 
+    {x: 1640, y: 1770, id: 'money_22'}, {x: 30, y: 1520, id: 'money_23'}, {x: 2350, y: 1240, id: 'money_24'}
 ];
 
 moneyPositions.forEach(pos => {
