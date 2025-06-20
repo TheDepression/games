@@ -415,6 +415,59 @@
                 else if (angle >= 247.5 && angle < 292.5) return 'n';
                 else return 'ne';
             }
+
+
+            createSnake(x, y, direction) {
+    const snake = document.createElement('div');
+    snake.className = 'enemy';
+    snake.style.position = 'absolute';
+    snake.style.width = '24px';
+    snake.style.height = '24px';
+    snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
+    snake.style.backgroundSize = 'contain';
+    snake.style.left = x + 'px';
+    snake.style.top = y + 'px';
+    snake.style.zIndex = '60';
+    this.gameWorld.appendChild(snake);
+    
+    // Add to enemies array
+    this.enemies.push({
+        element: snake,
+        x: x,
+        y: y,
+        direction: direction,
+        speed: 1,
+        moveDirection: 1, // 1 or -1 for back and forth
+        range: 80 // How far they move
+    });
+}
+
+            updateEnemies() {
+    this.enemies.forEach(enemy => {
+        if (enemy.direction === 'horizontal') {
+            enemy.x += enemy.speed * enemy.moveDirection;
+            
+            // Bounce off walls or range limit
+            if (enemy.x <= 30 || enemy.x >= 300 || 
+                Math.abs(enemy.x - parseInt(enemy.element.style.left)) > enemy.range) {
+                enemy.moveDirection *= -1;
+            }
+            
+            enemy.element.style.left = enemy.x + 'px';
+            
+        } else if (enemy.direction === 'vertical') {
+            enemy.y += enemy.speed * enemy.moveDirection;
+            
+            // Bounce off walls or range limit
+            if (enemy.y <= 30 || enemy.y >= 320 || 
+                Math.abs(enemy.y - parseInt(enemy.element.style.top)) > enemy.range) {
+                enemy.moveDirection *= -1;
+            }
+            
+            enemy.element.style.top = enemy.y + 'px';
+        }
+    });
+}
             
             loadGameState() {
                 const savedState = localStorage.getItem('mfGameState');
@@ -963,6 +1016,32 @@ this.gameWorld.appendChild(flashlight);
             game = new CaveGame();
             game.startGameTimer();
         }
+
+        createSnakeEnemies() {
+    const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+    
+    if (roomKey === '2,1') {
+        this.createSnake(100, 100, 'horizontal');
+    } else if (roomKey === '2,2') {
+        this.createSnake(180, 150, 'vertical');
+    }
+}
+
+createSnake(x, y, direction) {
+    const snake = document.createElement('div');
+    snake.className = 'enemy';
+    snake.style.position = 'absolute';
+    snake.style.width = '24px';
+    snake.style.height = '24px';
+    snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
+    snake.style.backgroundSize = 'contain';
+    snake.style.left = x + 'px';
+    snake.style.top = y + 'px';
+    snake.style.zIndex = '60';
+    snake.dataset.direction = direction;
+    snake.dataset.speed = '1';
+    this.gameWorld.appendChild(snake);
+}
     </script>
 </body>
 </html>
