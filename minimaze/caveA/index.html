@@ -662,16 +662,17 @@ this.gameWorld.appendChild(flashlight);
             }
             
             startGameLoop() {
-                const gameLoop = () => {
-                    if (this.gameStarted && !this.isTransitioning) {
-                        this.updatePlayer();
-                        this.checkCollisions();
-                        this.checkRoomTransitions();
-                    }
-                    requestAnimationFrame(gameLoop);
-                };
-                gameLoop();
-            }
+    const gameLoop = () => {
+        if (this.gameStarted && !this.isTransitioning) {
+            this.updatePlayer();
+            this.updateEnemies(); // Add this line
+            this.checkCollisions();
+            this.checkRoomTransitions();
+        }
+        requestAnimationFrame(gameLoop);
+    };
+    gameLoop();
+}
             
             updatePlayer() {
                 if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
