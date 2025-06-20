@@ -2768,10 +2768,12 @@ if (onLava) {
     if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
         this.lavaProtectionActive = false;
         this.lavaProtectionTime = 5; // Reset to full protection
+        if (this.wasOnLava) {  // Only show message if actually was on lava
         this.showMessage('🥾 Stepped off lava! Shoes recharged for next time');
     }
 }
-
+this.wasOnLava = false; // Reset the flag
+}
         // Check if on desert zones
         const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
         let onDesert = false;
