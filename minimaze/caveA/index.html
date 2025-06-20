@@ -806,67 +806,60 @@
             }
             
             checkRoomTransitions() {
-                const playerCenterX = this.playerX + 12;
-                const playerCenterY = this.playerY + 12;
-                
-                // Check for specific room gaps based on current room
-                const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
-                
-                if (roomKey === '1,1') {
-                    // Right exit gap (x > 330, y: 150-210, 60px gap)
-                    if (playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220) {
-                        this.pauseAndTransition(2, 1, 'right');
-                    }
-                } else if (roomKey === '2,1') {
-                    // Left entrance back to room 1,1
-                    if (playerCenterX < 25 && playerCenterY >= 140 && playerCenterY <= 220) {
-                        this.pauseAndTransition(1, 1, 'left');
-                    }
-                    // Bottom exit gap to room 2,2 - smaller detection zone
-                    if (playerCenterY > 335 && playerCenterX >= 150 && playerCenterX <= 200) {
-                        this.pauseAndTransition(2, 2, 'down');
-                    }
-                    // Up exit gap to room 2,0
-                    if (playerCenterY < 25 && playerCenterX >= 140 && playerCenterX <= 220) {
-                        this.pauseAndTransition(2, 0, 'up');
-                    }
-                } else if (roomKey === '2,2') {
-                    // Top entrance back to room 2,1 - smaller detection zone
-                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 200) {
-                        this.pauseAndTransition(2, 1, 'up');
-                    }
-                } else if (roomKey === '2,0') {
-                    // Down to 2,1
-                    if (playerCenterY > 325 && playerCenterX >= 140 && playerCenterX <= 220) {
-                        this.pauseAndTransition(2, 1, 'down');
-                    }
-                    // Up to 2,-1
-                    if (playerCenterY < 25 && playerCenterX >= 140 && playerCenterX <= 220) {
-                        this.pauseAndTransition(2, -1, 'up');
-                    }
-                    // Left to 1,0
-                    if (playerCenterX < 25 && playerCenterY >= 140 && playerCenterY <= 220) {
-                        this.pauseAndTransition(1, 0, 'left');
-                    }
-                } else if (roomKey === '1,0') {
-                    // Right to 2,0
-                    if (playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220) {
-                        this.pauseAndTransition(2, 0, 'right');
-                    }
-                } else if (roomKey === '2,-1') {
-                    // Down to 2,0
-                    if (playerCenterY > 325 && playerCenterX >= 140 && playerCenterX <= 220) {
-                        this.pauseAndTransition(2, 0, 'down');
-                    }
-                }
-            }
-            
-            pauseAndTransition(newRoomX, newRoomY, direction) {
-                if (this.isTransitioning) return;
-                
-                this.isTransitioning = true;
-                this.playerVelocityX = 0;
-                this.playerVelocityY = 0;
+    const playerCenterX = this.playerX + 12;
+    const playerCenterY = this.playerY + 12;
+    
+    // Check for specific room gaps based on current room
+    const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+    
+    if (roomKey === '1,1') {
+        // Right exit gap (x > 330, y: 150-210, 60px gap)
+        if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+            this.transitionToRoom(2, 1, 'right');
+        }
+    } else if (roomKey === '2,1') {
+        // Left entrance back to room 1,1
+        if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+            this.transitionToRoom(1, 1, 'left');
+        }
+        // Bottom exit gap to room 2,2
+        if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+            this.transitionToRoom(2, 2, 'down');
+        }
+        // Up exit gap to room 2,0
+        if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+            this.transitionToRoom(2, 0, 'up');
+        }
+    } else if (roomKey === '2,2') {
+        // Top entrance back to room 2,1
+        if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+            this.transitionToRoom(2, 1, 'up');
+        }
+    } else if (roomKey === '2,0') {
+        // Down to 2,1
+        if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+            this.transitionToRoom(2, 1, 'down');
+        }
+        // Up to 2,-1
+        if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+            this.transitionToRoom(2, -1, 'up');
+        }
+        // Left to 1,0
+        if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+            this.transitionToRoom(1, 0, 'left');
+        }
+    } else if (roomKey === '1,0') {
+        // Right to 2,0
+        if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+            this.transitionToRoom(2, 0, 'right');
+        }
+    } else if (roomKey === '2,-1') {
+        // Down to 2,0
+        if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+            this.transitionToRoom(2, 0, 'down');
+        }
+    }
+}
 
                 // SAFETY TIMEOUT - force completion after 1 second
     const safetyTimeout = setTimeout(() => {
@@ -882,35 +875,40 @@
             }
             
             transitionToRoom(newRoomX, newRoomY, direction) {
-                this.currentRoomX = newRoomX;
-                this.currentRoomY = newRoomY;
-                
-                // Position player on opposite side of new room
-                switch(direction) {
-                    case 'right':
-                        this.playerX = 30;
-                        this.playerY = 180; // Center of gap
-                        break;
-                    case 'left':
-                        this.playerX = 305;
-                        this.playerY = 180; // Center of gap
-                        break;
-                    case 'down':
-                        this.playerY = 30;
-                        this.playerX = 180; // Center of gap
-                        break;
-                    case 'up':
-                        this.playerY = 315;
-                        this.playerX = 180; // Center of gap
-                        break;
-                }
-                
-                // Generate new room
-                this.generateCurrentRoom();
-                this.updatePlayerPosition();
-                this.isTransitioning = false;
-                this.showMessage(`Room ${newRoomX},${newRoomY}`);
-            }
+    if (this.isTransitioning) return;
+    
+    this.isTransitioning = true;
+    this.currentRoomX = newRoomX;
+    this.currentRoomY = newRoomY;
+    
+    // Position player on opposite side of new room
+    switch(direction) {
+        case 'right':
+            this.playerX = 30;
+            this.playerY = 180; // Center of gap
+            break;
+        case 'left':
+            this.playerX = 305;
+            this.playerY = 180; // Center of gap
+            break;
+        case 'down':
+            this.playerY = 30;
+            this.playerX = 180; // Center of gap
+            break;
+        case 'up':
+            this.playerY = 315;
+            this.playerX = 180; // Center of gap
+            break;
+    }
+    
+    // Generate new room
+    setTimeout(() => {
+        this.generateCurrentRoom();
+        this.updatePlayerPosition();
+        this.isTransitioning = false;
+        this.showMessage(`Room ${newRoomX},${newRoomY}`);
+    }, 100);
+}
             
             checkCollisions() {
                 if (this.isInvulnerable) return;
