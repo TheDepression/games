@@ -1235,7 +1235,6 @@ this.gameWorld.appendChild(pyramidEl);
   {x: 140, y: 580, w: 10, h: 120},
   {x: 140, y: 700, w: 60, h: 10},
   {x: 0, y: 580, w: 140, h: 10},
-  {x: 0, y: 700, w: 140, h: 10},
   {x: 200, y: 1800, w: 300, h: 10},
   {x: 490, y: 1500, w: 10, h: 170},
   {x: 1650, y: 830, w: 120, h: 10},
@@ -1345,6 +1344,13 @@ this.gameWorld.appendChild(pyramidEl);
             ],
             red: [
   {x: 10, y: 880, w: 140, h: 20},
+                {x: 20, y: 580, w: 30, h: 120},
+                {x: 20, y: 600, w: 120, h: 30},
+                {x: 120, y: 580, w: 30, h: 120},
+                {x: 20, y: 620, w: 100, h: 30},
+                {x: 5, y: 700, w: 50, h: 10},
+                {x: 90, y: 700, w: 40, h: 10},
+                {x: 15, y: 585, w: 110, h: 10},
   {x: 150, y: 880, w: 20, h: 170},
   {x: 10, y: 1100, w: 140, h: 20}
             ],
@@ -1676,6 +1682,8 @@ wallEl.style.background = color;
   {x: 60, y: 1500, w: 10, h: 50},
   {x: 2340, y: 920, w: 50, h: 10},
   {x: 20, y: 1550, w: 40, h: 10},
+            {x: 60, y: 180, w: 100, h: 10},
+  {x: 60, y: 240, w: 100, h: 10},
   {x: 850, y: 250, w: 310, h: 10}
         ];
         
@@ -1724,7 +1732,7 @@ wallEl.style.background = color;
         // Add village furniture
 const furniturePositions = [
 {x: 30, y: 910, emoji: '🚽'},
-{x: 2380, y: 870, emoji: '🚽'},
+{x: 2380, y: 850, emoji: '🚽'},
 {x: 30, y: 1070, emoji: '🛌'},
 {x: 30, y: 1250, emoji: '🛌'},
 {x: 2340, y: 900, emoji: '🛌'},
@@ -1926,11 +1934,11 @@ sharkEnemies.forEach((shark, index) => {
         {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 600¥!", customEmoji: "👷‍♂️"},
         {x: 380, y: 1760, message: this.motherPaid ? "You saved my baby! I am forever grateful!" : "Thank god you are here, master frog! The bully took my baby and went into the dark forest! If you can rescue him, I will pay you 200¥. It's all I have! PLEASE!", type: "mother", customEmoji: "👩🏻"},
         {x: 120, y: 1200, message: "After the Bully raided our town, we do not have much money left. I put this in a safe. No one is going near it!", type: "guard", customEmoji: "💂🏻‍♂️"},
-        {x: 1900, y: 1200, message: "The forest is a dangerous place,.. You should walk slowly to avoid death...", type: "traveler", customEmoji: "🧓🏻"},
+        {x: 100, y: 1020, message: "The forest is a dangerous place,.. You should walk slowly to avoid death...", type: "traveler", customEmoji: "🧓🏻"},
         {x: 500, y: 500, message: "No,... I am NOT Mario. Leave me alone!", type: "villager", customEmoji: "👨🏻"},
-        {x: 2100, y: 400, message: "The castle has been abandoned for decades. Some say it's haunted!", type: "historian", customEmoji: "👵🏻"},
-        {x: 80, y: 700, message: "The rumor is that the bully has found a way to live forever. If that is true, we may all be doomed.", type: "elder", customEmoji: "🤴🏻"},
-        {x: 2000, y: 900, message: "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""}
+        {x: 2260, y: 960, message: "The castle to the far north is always making loud noises and flashing lights. What is happening in there?!", type: "historian", customEmoji: "👵🏻"},
+        {x: 80, y: 670, message: "The rumor is that the bully has found a way to live forever. If that is true, we may all be doomed.", type: "elder", customEmoji: "🤴🏻"},
+        {x: 2280, y: 820, message: "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""}
     ];
     
     friendlies.forEach((friendly, index) => {
@@ -1967,7 +1975,7 @@ sharkEnemies.forEach((shark, index) => {
     createCollectibles() {
         // Money pickups with unique IDs
 const moneyPositions = [
-    {x: 150, y: 1730, id: 'money_1'}, {x: 170, y: 1730, id: 'money_2'}, {x: 190, y: 1730, id: 'money_3'},
+    {x: 2340, y: 820, id: 'money_1'}, {x: 2360, y: 820, id: 'money_2'}, {x: 190, y: 1730, id: 'money_3'},
     {x: 150, y: 1750, id: 'money_4'}, {x: 170, y: 1750, id: 'money_5'}, {x: 190, y: 1750, id: 'money_6'},
     {x: 150, y: 1770, id: 'money_7'}, {x: 170, y: 1770, id: 'money_8'}, {x: 190, y: 1770, id: 'money_9'},
     {x: 650, y: 1120, id: 'money_10'}, {x: 1410, y: 890, id: 'money_11'}, {x: 530, y: 2220, id: 'money_12'},
