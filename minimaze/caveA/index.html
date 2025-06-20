@@ -301,7 +301,7 @@
             </div>
             <div class="control-hint">
                 <div>🔦 Very dark! Find a light source!</div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Test items: TestLight & SuperTestLight</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">FlashLight</div>
             </div>
         </div>
         
@@ -360,10 +360,9 @@
                 this.currentRoomY = 1;
                 this.isTransitioning = false;
                 
-                // Lighting system
-                this.hasTestLight = false;
-                this.hasSuperTestLight = false;
-                this.realHasFlashlight = false; // From main world
+                
+                this.hasFlashLight = false;
+                
                 
                 // Cave items
                 this.hasHammer = false;
@@ -390,7 +389,7 @@
             }
             
             checkFlashlightWarning() {
-                const hasAnyLight = this.realHasFlashlight || this.hasTestLight || this.hasSuperTestLight;
+                const hasAnyLight = this.hasFlashLight;
                 const warningDiv = document.getElementById('warningMessage');
                 
                 if (hasAnyLight) {
@@ -779,15 +778,9 @@ this.gameWorld.appendChild(flashlight);
                     if (this.rectsOverlap(playerRect, itemRect)) {
                         const type = item.dataset.type;
                         
-                        if (type === 'testlight' && !this.hasTestLight) {
-                            this.hasTestLight = true;
-                            this.showMessage('🔦 TestLight acquired! Basic cave vision!');
-                            this.updateLighting();
-                            this.updateUI();
-                            item.remove();
-                        } else if (type === 'supertestlight' && !this.hasSuperTestLight) {
-                            this.hasSuperTestLight = true;
-                            this.showMessage('💡 SuperTestLight acquired! Full cave vision!');
+                         else if (type === 'flashlight' && !this.hasFlashLight) {
+                            this.hasFlashLight = true;
+                            this.showMessage('💡 FlashLight acquired! Full cave vision!');
                             this.updateLighting();
                             this.updateUI();
                             item.remove();
@@ -825,17 +818,12 @@ this.gameWorld.appendChild(flashlight);
                 const darknessOverlay = document.getElementById('darknessOverlay');
                 const visionMask = document.getElementById('visionMask');
                 
-                const hasAnyLight = this.realHasFlashlight || this.hasTestLight || this.hasSuperTestLight;
+                const hasAnyLight = this.hasFlashLight;
                 
-                if (this.hasSuperTestLight) {
-                    // Super test light: no darkness at all
+                if (this.hasFlashLight) {
+                    // Flash light: no darkness at all
                     darknessOverlay.classList.remove('active');
                     visionMask.classList.remove('active');
-                } else if (hasAnyLight) {
-                    // Regular flashlight: circular vision
-                    darknessOverlay.classList.add('active');
-                    visionMask.classList.add('active');
-                    this.updateVisionMask();
                 } else {
                     // No light: maximum darkness (but still see player and entrance)
                     darknessOverlay.classList.add('active');
@@ -844,7 +832,7 @@ this.gameWorld.appendChild(flashlight);
             }
             
             updateVisionMask() {
-                if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
+                if (!this.hasFlashLight ) {
                     const mask = document.getElementById('visionMask');
                     const gameAreaRect = this.gameArea.getBoundingClientRect();
                     const playerScreenX = gameAreaRect.left + (this.playerX + 12);
@@ -859,9 +847,7 @@ this.gameWorld.appendChild(flashlight);
                 
                 // Update items display
                 let itemsText = '';
-                if (this.realHasFlashlight) itemsText += ' 🔦';
-                if (this.hasTestLight) itemsText += ' 🔦T';
-                if (this.hasSuperTestLight) itemsText += ' 💡S';
+                if (this.hasFlashLight) itemsText += ' 🔦F';
                 if (this.hasHammer) itemsText += ' 🔨';
                 
                 const ui = document.getElementById('ui');
