@@ -35,19 +35,18 @@
             height: 357.5px;
             position: relative;
             overflow: hidden;
-            background: #2d2421; /* Grayish brown cave floor */
+            background: #2d2421;
             touch-action: none;
         }
         
         #gameWorld {
             position: absolute;
-            width: 350px; /* Single room size */
+            width: 350px;
             height: 357.5px;
             transform-origin: 0 0;
-            transition: none; /* We'll handle room transitions manually */
+            transition: none;
         }
         
-        /* Cave-specific styles */
         .cave-wall {
             position: absolute;
             background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
@@ -55,7 +54,7 @@
             background-size: 20px 20px;
             border: 1px solid rgba(100,100,100,0.3);
             opacity: 1;
-            z-index: 30; /* Below darkness but above floor */
+            z-index: 30;
         }
         
         .cave-entrance {
@@ -63,19 +62,7 @@
             background: #fff;
             border: 2px solid #ccc;
             border-radius: 4px;
-            z-index: 250; /* Always visible above darkness */
-        }
-        
-        .test-item {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: glow 2s infinite;
-            z-index: 250; /* Always visible above darkness */
+            z-index: 250;
         }
         
         .hammer-item {
@@ -87,7 +74,7 @@
             align-items: center;
             justify-content: center;
             animation: glow 2s infinite;
-            z-index: 60; /* Hidden by darkness unless lit */
+            z-index: 60;
         }
         
         .enemy {
@@ -97,7 +84,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            z-index: 60; /* Hidden by darkness unless lit */
+            z-index: 60;
         }
         
         @keyframes glow {
@@ -112,7 +99,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            z-index: 300; /* Always visible above darkness */
+            z-index: 300;
             transition: none;
         }
         
@@ -200,7 +187,6 @@
             text-align: center;
         }
         
-        /* Darkness overlay system */
         .darkness-overlay {
             position: fixed;
             top: 0;
@@ -209,7 +195,7 @@
             height: 100vh;
             background: #000;
             pointer-events: none;
-            z-index: 150; /* Below player and important items */
+            z-index: 150;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -303,8 +289,8 @@
         <div id="pauseMenu" style="display: none;">
             <h3>⏸️ Game Paused</h3>
             <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
-            <button onclick="resumeGame()" style="background: #4CAF50; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Continue Game</button>
-            <button onclick="returnToTitle()" style="background: #ff6b35; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Return to Main World</button>
+            <button onclick="resumeGame()">Continue Game</button>
+            <button onclick="returnToTitle()">Return to Main World</button>
         </div>
         
         <div id="controlArea">
@@ -318,7 +304,6 @@
             </div>
         </div>
         
-        <!-- Darkness system -->
         <div id="darknessOverlay" class="darkness-overlay"></div>
     </div>
 
@@ -328,18 +313,17 @@
     </audio>
 
     <script>
-        // Check URL access on page load
         window.addEventListener('DOMContentLoaded', function() {
             const savedState = localStorage.getItem('mfGameState');
             if (!savedState) {
                 alert('No game data found! Starting from main world.');
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 return;
             }
             
             const gameState = JSON.parse(savedState);
             if (gameState.currentUrl !== 'caveA') {
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 return;
             }
         });
@@ -351,9 +335,8 @@
                 this.isInvulnerable = false;
                 this.isPaused = false;
                 
-                // Player properties - spawn at bottom center
-                this.playerX = 163; // Center horizontally (350/2 - 12)
-                this.playerY = 290; // Near bottom but away from exit
+                this.playerX = 163;
+                this.playerY = 290;
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
                 this.isDragging = false;
@@ -364,32 +347,24 @@
                 this.currentDirection = 's';
                 this.lastMoveDirection = 's';
                 
-                // Timer properties
                 this.timerInterval = null;
                 
-                // Room system
                 this.currentRoomX = 1;
                 this.currentRoomY = 1;
                 this.isTransitioning = false;
                 
-                // Lighting system
-                this.hasFlashlight = false; // From main world
-                
-                // Cave items
+                this.hasFlashlight = false;
                 this.hasHammer = false;
                 this.hammerCollected = false;
-                
-                // Enemies
                 this.enemies = [];
                 
-                // Room layout (true = room exists, false = void)
                 this.roomLayout = {
-                    '1,1': true,  // Starting room
-                    '2,1': true,  // Right room
-                    '2,2': true,  // right down
-                    '2,0': true,  // right up
-                    '1,0': true,  // right up left
-                    '2,-1': true  // right up up
+                    '1,1': true,
+                    '2,1': true,
+                    '2,2': true,
+                    '2,0': true,
+                    '1,0': true,
+                    '2,-1': true
                 };
                 
                 this.player = document.getElementById('player');
@@ -401,13 +376,12 @@
                 this.preloadPlayerImages();
                 this.bindEvents();
                 this.initRoom();
-                this.updatePlayerImage('s'); // Start facing south
+                this.updatePlayerImage('s');
                 this.checkFlashlightWarning();
             }
             
             checkFlashlightWarning() {
                 const warningDiv = document.getElementById('warningMessage');
-                
                 if (this.hasFlashlight) {
                     warningDiv.textContent = "🔦 Entering the cave with light...";
                 } else {
@@ -418,7 +392,6 @@
             preloadPlayerImages() {
                 const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
                 this.playerImages = {};
-                
                 directions.forEach(direction => {
                     const img = new Image();
                     img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
@@ -429,7 +402,7 @@
             updatePlayerImage(direction) {
                 this.currentDirection = direction;
                 this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
-                this.player.textContent = ''; // Remove emoji when image loads
+                this.player.textContent = '';
             }
             
             getDirectionFromMovement(deltaX, deltaY) {
@@ -453,13 +426,13 @@
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
-                    this.realHasFlashlight = gameState.hasFlashlight || false;
+                    this.hasFlashlight = gameState.hasFlashlight || false;
                     this.hasHammer = gameState.hasHammer || false;
                 } else {
                     this.hearts = 3;
                     this.money = 0;
                     this.timeElapsed = 0;
-                    this.realHasFlashlight = false;
+                    this.hasFlashlight = false;
                     this.hasHammer = false;
                 }
             }
@@ -471,8 +444,8 @@
                 gameState.timeElapsed = this.timeElapsed;
                 gameState.hasHammer = this.hasHammer;
                 gameState.currentUrl = 'main';
-                gameState.playerX = 100; // Near cave entrance in main world
-                gameState.playerY = 1980; // Further from cave entrance
+                gameState.playerX = 100;
+                gameState.playerY = 1980;
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
             
@@ -507,7 +480,6 @@
                 const deltaX = point.clientX - this.lastDragX;
                 const deltaY = point.clientY - this.lastDragY;
                 
-                // Update player direction based on movement
                 if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
                     const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
                     if (newDirection !== this.currentDirection) {
@@ -520,7 +492,7 @@
                 this.playerVelocityX = deltaX * sensitivity;
                 this.playerVelocityY = deltaY * sensitivity;
                 
-                const maxVelocity = 11; // Reduced from 14 to 11
+                const maxVelocity = 11;
                 this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
                 this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
                 
@@ -542,11 +514,10 @@
             }
             
             generateCurrentRoom() {
-                // Clear current room
-                const elements = this.gameWorld.querySelectorAll('.cave-wall, .test-item, .hammer-item, .cave-entrance, .enemy');
+                const elements = this.gameWorld.querySelectorAll('.cave-wall, .hammer-item, .cave-entrance, .enemy');
                 elements.forEach(el => el.remove());
                 
-                this.enemies = []; // Clear enemies array
+                this.enemies = [];
                 
                 const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
                 
@@ -569,14 +540,12 @@
             }
             
             createStartingRoom() {
-                // Room walls (leaving gaps for exits)
-                this.createWall(0, 0, 350, 20); // Top wall
-                this.createWall(0, 0, 20, 357.5); // Left wall
-                this.createWall(0, 337.5, 350, 20); // Bottom wall
-                this.createWall(330, 0, 20, 150); // Right wall top part
-                this.createWall(330, 210, 20, 147.5); // Right wall bottom part (60px gap in middle)
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(0, 337.5, 350, 20);
+                this.createWall(330, 0, 20, 150);
+                this.createWall(330, 210, 20, 147.5);
                 
-                // Cave entrance (white square) - visible even in darkness
                 const entrance = document.createElement('div');
                 entrance.className = 'cave-entrance';
                 entrance.style.left = '160px';
@@ -588,24 +557,21 @@
             }
             
             createRightRoom() {
-                // Right room walls
-                this.createWall(0, 0, 350, 20); // Top wall
-                this.createWall(0, 0, 20, 150); // Left wall top
-                this.createWall(0, 210, 20, 147.5); // Left wall bottom (60px gap for entrance)
-                this.createWall(330, 0, 20, 357.5); // Right wall completely closed
-                this.createWall(0, 337.5, 150, 20); // Bottom wall left part
-                this.createWall(210, 337.5, 140, 20); // Bottom wall right part (60px gap)
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 150);
+                this.createWall(0, 210, 20, 147.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
             }
             
             createRightDownRoom() {
-                // Bottom-right room walls
-                this.createWall(0, 0, 150, 20); // Top wall left part
-                this.createWall(210, 0, 140, 20); // Top wall right part (60px gap for entrance)
-                this.createWall(0, 0, 20, 357.5); // Left wall (closed)
-                this.createWall(330, 0, 20, 357.5); // Right wall (closed)
-                this.createWall(0, 337.5, 350, 20); // Bottom wall (closed)
+                this.createWall(0, 0, 150, 20);
+                this.createWall(210, 0, 140, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 350, 20);
                 
-                // Hammer item (the real prize!)
                 if (!this.hammerCollected) {
                     const hammer = document.createElement('div');
                     hammer.className = 'hammer-item';
@@ -618,33 +584,30 @@
             }
             
             createRightUpRoom() {
-                // Right-up room walls
-                this.createWall(0, 0, 150, 20); // Top wall left part
-                this.createWall(210, 0, 140, 20); // Top wall right part (60px gap)
-                this.createWall(0, 0, 20, 150); // Left wall top
-                this.createWall(0, 210, 20, 147.5); // Left wall bottom (60px gap for entrance)
-                this.createWall(330, 0, 20, 357.5); // Right wall (closed)
-                this.createWall(0, 337.5, 150, 20); // Bottom wall left part
-                this.createWall(210, 337.5, 140, 20); // Bottom wall right part (60px gap)
+                this.createWall(0, 0, 150, 20);
+                this.createWall(210, 0, 140, 20);
+                this.createWall(0, 0, 20, 150);
+                this.createWall(0, 210, 20, 147.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
             }
             
             createUpLeftRoom() {
-                // Up-left room walls
-                this.createWall(0, 0, 350, 20); // Top wall (closed)
-                this.createWall(0, 0, 20, 357.5); // Left wall (closed)
-                this.createWall(330, 0, 20, 150); // Right wall top
-                this.createWall(330, 210, 20, 147.5); // Right wall bottom (60px gap for entrance)
-                this.createWall(0, 337.5, 150, 20); // Bottom wall left part
-                this.createWall(210, 337.5, 140, 20); // Bottom wall right part (60px gap)
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(330, 0, 20, 150);
+                this.createWall(330, 210, 20, 147.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
             }
             
             createRightUpUpRoom() {
-                // Right-up-up room walls (dead end)
-                this.createWall(0, 0, 350, 20); // Top wall (closed)
-                this.createWall(0, 0, 20, 357.5); // Left wall (closed)
-                this.createWall(330, 0, 20, 357.5); // Right wall (closed)
-                this.createWall(0, 337.5, 150, 20); // Bottom wall left part
-                this.createWall(210, 337.5, 140, 20); // Bottom wall right part (60px gap for entrance)
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
             }
             
             createWall(x, y, width, height) {
@@ -687,7 +650,6 @@
                 snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
                 this.gameWorld.appendChild(snake);
                 
-                // Add to enemies array
                 this.enemies.push({
                     element: snake,
                     x: x,
@@ -696,8 +658,8 @@
                     startY: y,
                     direction: direction,
                     speed: 1,
-                    moveDirection: 1, // 1 or -1 for back and forth
-                    range: 80 // How far they move
+                    moveDirection: 1,
+                    range: 80
                 });
             }
             
@@ -708,12 +670,10 @@
                     if (enemy.direction === 'horizontal') {
                         enemy.x += enemy.speed * enemy.moveDirection;
                         
-                        // Bounce off range limit
                         if (enemy.x <= enemy.startX - enemy.range/2 || enemy.x >= enemy.startX + enemy.range/2) {
                             enemy.moveDirection *= -1;
                         }
                         
-                        // Bounce off walls
                         if (enemy.x <= 30 || enemy.x >= 250) {
                             enemy.moveDirection *= -1;
                         }
@@ -723,12 +683,10 @@
                     } else if (enemy.direction === 'vertical') {
                         enemy.y += enemy.speed * enemy.moveDirection;
                         
-                        // Bounce off range limit
                         if (enemy.y <= enemy.startY - enemy.range/2 || enemy.y >= enemy.startY + enemy.range/2) {
                             enemy.moveDirection *= -1;
                         }
                         
-                        // Bounce off walls
                         if (enemy.y <= 30 || enemy.y >= 250) {
                             enemy.moveDirection *= -1;
                         }
@@ -773,20 +731,17 @@
                 const visualOffset = (32 - 24) / 2;
                 this.player.style.left = (this.playerX - visualOffset) + 'px';
                 this.player.style.top = (this.playerY - visualOffset) + 'px';
-                this.updateVisionMask();
             }
             
             canMoveTo(x, y) {
                 const playerSize = 24;
                 const padding = 2;
                 
-                // Basic bounds checking
                 if (x < padding || x > 350 - playerSize - padding || 
                     y < padding || y > 357.5 - playerSize - padding) {
                     return false;
                 }
                 
-                // Wall collision
                 const walls = this.gameWorld.querySelectorAll('.cave-wall');
                 for (let wall of walls) {
                     const wallRect = {
@@ -806,96 +761,83 @@
             }
             
             checkRoomTransitions() {
-    const playerCenterX = this.playerX + 12;
-    const playerCenterY = this.playerY + 12;
-    
-    // Check for specific room gaps based on current room
-    const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
-    
-    if (roomKey === '1,1') {
-        // Right exit gap (x > 330, y: 150-210, 60px gap)
-        if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
-            this.transitionToRoom(2, 1, 'right');
-        }
-    } else if (roomKey === '2,1') {
-        // Left entrance back to room 1,1
-        if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
-            this.transitionToRoom(1, 1, 'left');
-        }
-        // Bottom exit gap to room 2,2
-        if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 2, 'down');
-        }
-        // Up exit gap to room 2,0
-        if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 0, 'up');
-        }
-    } else if (roomKey === '2,2') {
-        // Top entrance back to room 2,1
-        if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 1, 'up');
-        }
-    } else if (roomKey === '2,0') {
-        // Down to 2,1
-        if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 1, 'down');
-        }
-        // Up to 2,-1
-        if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, -1, 'up');
-        }
-        // Left to 1,0
-        if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
-            this.transitionToRoom(1, 0, 'left');
-        }
-    } else if (roomKey === '1,0') {
-        // Right to 2,0
-        if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
-            this.transitionToRoom(2, 0, 'right');
-        }
-    } else if (roomKey === '2,-1') {
-        // Down to 2,0
-        if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
-            this.transitionToRoom(2, 0, 'down');
-        }
-    }
+                const playerCenterX = this.playerX + 12;
+                const playerCenterY = this.playerY + 12;
+                
+                const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+                
+                if (roomKey === '1,1') {
+                    if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(2, 1, 'right');
+                    }
+                } else if (roomKey === '2,1') {
+                    if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(1, 1, 'left');
+                    }
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 2, 'down');
+                    }
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 0, 'up');
+                    }
+                } else if (roomKey === '2,2') {
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 1, 'up');
+                    }
+                } else if (roomKey === '2,0') {
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 1, 'down');
+                    }
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, -1, 'up');
+                    }
+                    if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(1, 0, 'left');
+                    }
+                } else if (roomKey === '1,0') {
+                    if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(2, 0, 'right');
+                    }
+                } else if (roomKey === '2,-1') {
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 0, 'down');
+                    }
+                }
             }
             
             transitionToRoom(newRoomX, newRoomY, direction) {
-    if (this.isTransitioning) return;
-    
-    this.isTransitioning = true;
-    this.currentRoomX = newRoomX;
-    this.currentRoomY = newRoomY;
-    
-    // Position player on opposite side of new room
-    switch(direction) {
-        case 'right':
-            this.playerX = 30;
-            this.playerY = 180; // Center of gap
-            break;
-        case 'left':
-            this.playerX = 305;
-            this.playerY = 180; // Center of gap
-            break;
-        case 'down':
-            this.playerY = 30;
-            this.playerX = 180; // Center of gap
-            break;
-        case 'up':
-            this.playerY = 315;
-            this.playerX = 180; // Center of gap
-            break;
-    }
-    
-    // Generate new room
-    setTimeout(() => {
-        this.generateCurrentRoom();
-        this.updatePlayerPosition();
-        this.isTransitioning = false;
-        this.showMessage(`Room ${newRoomX},${newRoomY}`);
-    }, 100);
-}
+                if (this.isTransitioning) return;
+                
+                this.isTransitioning = true;
+                this.currentRoomX = newRoomX;
+                this.currentRoomY = newRoomY;
+                
+                switch(direction) {
+                    case 'right':
+                        this.playerX = 30;
+                        this.playerY = 180;
+                        break;
+                    case 'left':
+                        this.playerX = 305;
+                        this.playerY = 180;
+                        break;
+                    case 'down':
+                        this.playerY = 30;
+                        this.playerX = 180;
+                        break;
+                    case 'up':
+                        this.playerY = 315;
+                        this.playerX = 180;
+                        break;
+                }
+                
+                setTimeout(() => {
+                    this.generateCurrentRoom();
+                    this.updatePlayerPosition();
+                    this.isTransitioning = false;
+                    this.showMessage(`Room ${newRoomX},${newRoomY}`);
+                }, 100);
+            }
             
             checkCollisions() {
                 if (this.isInvulnerable) return;
@@ -907,8 +849,7 @@
                     bottom: this.playerY + 24
                 };
                 
-                // Check item pickups
-                const items = this.gameWorld.querySelectorAll('.test-item, .hammer-item, .cave-entrance');
+                const items = this.gameWorld.querySelectorAll('.hammer-item, .cave-entrance');
                 items.forEach(item => {
                     const itemX = parseInt(item.style.left);
                     const itemY = parseInt(item.style.top);
@@ -927,7 +868,6 @@
                             this.hammerCollected = true;
                             this.showMessage('🔨 Hammer acquired! You can break walls!');
                             this.updateUI();
-                            // Auto-save hammer acquisition
                             const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                             gameState.hasHammer = true;
                             localStorage.setItem('mfGameState', JSON.stringify(gameState));
@@ -944,13 +884,12 @@
                     }
                 });
                 
-                // Check enemy collisions
                 this.enemies.forEach(enemy => {
                     const enemyRect = {
                         left: enemy.x,
                         top: enemy.y,
-                        right: enemy.x + 72, // Updated for larger snake size
-                        bottom: enemy.y + 72 // Updated for larger snake size
+                        right: enemy.x + 72,
+                        bottom: enemy.y + 72
                     };
                     
                     if (this.rectsOverlap(playerRect, enemyRect)) {
@@ -968,28 +907,18 @@
             
             updateLighting() {
                 const darknessOverlay = document.getElementById('darknessOverlay');
-                const visionMask = document.getElementById('visionMask');
                 
                 if (this.hasFlashlight) {
-                    // No darkness - full visibility
                     darknessOverlay.classList.remove('active');
-                    visionMask.classList.remove('active');
                 } else {
-                    // No light: maximum darkness (but still see player and entrance)
                     darknessOverlay.classList.add('active');
-                    visionMask.classList.remove('active');
                 }
-            }
-            
-            updateVisionMask() {
-                // Not needed since we're using full visibility when flashlight is acquired
             }
             
             updateUI() {
                 document.getElementById('hearts').textContent = this.hearts;
                 document.getElementById('money').textContent = this.money;
                 
-                // Update items display
                 let itemsText = '';
                 if (this.hasFlashlight) itemsText += ' 🔦';
                 if (this.hasHammer) itemsText += ' 🔨';
@@ -1048,33 +977,30 @@
                 
                 setTimeout(() => {
                     this.saveGameState();
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 }, 3000);
             }
             
             exitCave() {
-                // Save progress without death penalty
                 const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                 gameState.hearts = this.hearts;
                 gameState.money = this.money;
-                gameState.timeElapsed = this.timeElapsed; // No penalty for normal exit
+                gameState.timeElapsed = this.timeElapsed;
                 gameState.hasHammer = this.hasHammer;
                 gameState.currentUrl = 'main';
-                gameState.playerX = 100; // Near cave entrance in main world
-                gameState.playerY = 1980; // Further from cave entrance
+                gameState.playerX = 100;
+                gameState.playerY = 1980;
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
             }
             
             startGameTimer() {
-                // SAFETY: Reset any stuck transition state
-    this.isTransitioning = false;
+                this.isTransitioning = false; // Safety reset
                 this.gameStarted = true;
                 this.updateTimer();
                 this.startGameLoop();
                 
-                // Try to play music
                 this.caveMusic.play().catch(e => {
                     console.log('Cave music autoplay blocked, will try again on first interaction');
                     const tryMusic = () => {
@@ -1087,7 +1013,7 @@
                 });
                 
                 this.timerInterval = setInterval(() => {
-                    this.timeElapsed++; // Timer always runs, no pause check
+                    this.timeElapsed++;
                     this.updateTimer();
                 }, 1000);
             }
@@ -1099,13 +1025,12 @@
                 const roomInfo = document.getElementById('roomInfo').textContent;
                 timerEl.innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')}<br>Room: ${roomInfo}`;
                 
-                // Change color as time progresses
-                if (this.timeElapsed >= 600) { // 10+ minutes = red
+                if (this.timeElapsed >= 600) {
                     timerEl.style.background = 'rgba(255,0,0,0.8)';
-                } else if (this.timeElapsed >= 300) { // 5+ minutes = orange
+                } else if (this.timeElapsed >= 300) {
                     timerEl.style.background = 'rgba(255,165,0,0.8)';
                 } else {
-                    timerEl.style.background = 'rgba(0,128,0,0.8)'; // Under 5 minutes = green
+                    timerEl.style.background = 'rgba(0,128,0,0.8)';
                 }
             }
         }
@@ -1132,8 +1057,6 @@
             if (game) {
                 game.isPaused = false;
                 document.getElementById('pauseMenu').style.display = 'none';
-                
-                // Resume music
                 game.caveMusic.play().catch(e => console.log('Music resume failed:', e));
             }
         }
@@ -1141,9 +1064,10 @@
         function returnToTitle() {
             if (game) {
                 game.saveGameState();
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
             }
         }
     </script>
 </body>
 </html>
+                    
