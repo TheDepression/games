@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cave A - Master Frog's Adventure</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #1a1a1a;
+            border: 3px solid #444;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: #2d2421;
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 350px;
+            height: 357.5px;
+            transform-origin: 0 0;
+            transition: none;
+        }
+        
+        .cave-wall {
+            position: absolute;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+            background-repeat: repeat;
+            background-size: 20px 20px;
+            border: 1px solid rgba(100,100,100,0.3);
+            opacity: 1;
+            z-index: 30;
+        }
+        
+        .cave-entrance {
+            position: absolute;
+            background: #fff;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            z-index: 250;
+        }
+        
+        .hammer-item {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glow 2s infinite;
+            z-index: 60;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 60;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px gold); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 10px gold); }
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 300;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #333;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #555;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 250;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #666;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        #pauseBtn {
+            position: fixed;
+            top: 10px;
+            right: 80px;
+            z-index: 250;
+            background: rgba(100,0,100,0.8);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 450;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+        }
+        
+        .darkness-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            pointer-events: none;
+            z-index: 150;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .darkness-overlay.active {
+            opacity: 0.95;
+        }
+        
+        #startScreen, #pauseMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
+        h2, h3 {
+            margin: 10px 0;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .control-hint {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🐸 Cave A:</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+        </div>
+        <div id="timer">0:00<br>Room: <span id="roomInfo">1,1</span></div>
+        <button id="pauseBtn" onclick="pauseGame()">⏸️ Pause</button>
+        
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="startScreen">
+            <h2>🕳️ Cave A</h2>
+            <div id="warningMessage" style="margin: 20px 0;">⚠️ It's very dark in here! You need a flashlight to see properly.</div>
+            <p style="font-size: 12px; opacity: 0.8;">🔦 Find light sources to navigate safely!</p>
+            <p style="font-size: 12px; opacity: 0.8;">🔨 Search for the legendary hammer!</p>
+            <button class="start-button" onclick="startCave()">Enter Cave</button>
+        </div>
+        
+        <div id="pauseMenu" style="display: none;">
+            <h3>⏸️ Game Paused</h3>
+            <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
+            <button onclick="resumeGame()">Continue Game</button>
+            <button onclick="returnToTitle()">Return to Main World</button>
+        </div>
+        
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">🕳️ Cave A</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
+            </div>
+            <div class="control-hint">
+                <div>🔦 Very dark! Find a light source!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid the snakes! 🐍</div>
+            </div>
+        </div>
+        
+        <div id="darknessOverlay" class="darkness-overlay"></div>
+    </div>
+
+    <audio id="caveMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            if (!savedState) {
+                alert('No game data found! Starting from main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+            
+            const gameState = JSON.parse(savedState);
+            if (gameState.currentUrl !== 'caveA') {
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+        });
+
+        class CaveGame {
+            constructor() {
+                this.loadGameState();
+                this.gameStarted = false;
+                this.isInvulnerable = false;
+                this.isPaused = false;
+                
+                this.playerX = 163;
+                this.playerY = 290;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.dragStartX = 0;
+                this.dragStartY = 0;
+                this.lastDragX = 0;
+                this.lastDragY = 0;
+                this.currentDirection = 's';
+                this.lastMoveDirection = 's';
+                
+                this.timerInterval = null;
+                
+                this.currentRoomX = 1;
+                this.currentRoomY = 1;
+                this.isTransitioning = false;
+                
+                this.hasFlashlight = false;
+                this.hasHammer = false;
+                this.hammerCollected = false;
+                this.enemies = [];
+                
+                this.roomLayout = {
+                    '1,1': true,
+                    '2,1': true,
+                    '2,2': true,
+                    '2,0': true,
+                    '1,0': true,
+                    '2,-1': true
+                };
+                
+                this.player = document.getElementById('player');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.gameArea = document.getElementById('gameArea');
+                this.controlArea = document.getElementById('controlArea');
+                this.caveMusic = document.getElementById('caveMusic');
+                
+                this.preloadPlayerImages();
+                this.bindEvents();
+                this.initRoom();
+                this.updatePlayerImage('s');
+                this.checkFlashlightWarning();
+            }
+            
+            checkFlashlightWarning() {
+                const warningDiv = document.getElementById('warningMessage');
+                if (this.hasFlashlight) {
+                    warningDiv.textContent = "🔦 Entering the cave with light...";
+                } else {
+                    warningDiv.textContent = "⚠️ It's very dark in here! You need a flashlight to see properly.";
+                }
+            }
+            
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+            
+            updatePlayerImage(direction) {
+                this.currentDirection = direction;
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+                this.player.textContent = '';
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            loadGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    this.hearts = gameState.hearts || 3;
+                    this.money = gameState.money || 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
+                    this.hasFlashlight = gameState.hasFlashlight || false;
+                    this.hasHammer = gameState.hasHammer || false;
+                } else {
+                    this.hearts = 3;
+                    this.money = 0;
+                    this.timeElapsed = 0;
+                    this.hasFlashlight = false;
+                    this.hasHammer = false;
+                }
+            }
+            
+            saveGameState() {
+                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                gameState.hearts = this.hearts;
+                gameState.money = this.money;
+                gameState.timeElapsed = this.timeElapsed;
+                gameState.hasHammer = this.hasHammer;
+                gameState.currentUrl = 'main';
+                gameState.playerX = 100;
+                gameState.playerY = 1980;
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+            }
+            
+            bindEvents() {
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+            
+            handleStart(e) {
+                if (!this.gameStarted || this.isTransitioning || this.isPaused) return;
+                e.preventDefault();
+                
+                this.isDragging = true;
+                const point = e.touches ? e.touches[0] : e;
+                this.dragStartX = point.clientX;
+                this.dragStartY = point.clientY;
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging || !this.gameStarted || this.isTransitioning || this.isPaused) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+                
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.updatePlayerImage(newDirection);
+                        this.lastMoveDirection = newDirection;
+                    }
+                }
+                
+                const sensitivity = 0.5;
+                this.playerVelocityX = deltaX * sensitivity;
+                this.playerVelocityY = deltaY * sensitivity;
+                
+                const maxVelocity = 11;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+            
+            initRoom() {
+                this.generateCurrentRoom();
+                this.updateLighting();
+                this.updateUI();
+                this.updatePlayerPosition();
+            }
+            
+            generateCurrentRoom() {
+                const elements = this.gameWorld.querySelectorAll('.cave-wall, .hammer-item, .cave-entrance, .enemy');
+                elements.forEach(el => el.remove());
+                
+                this.enemies = [];
+                
+                const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+                
+                if (roomKey === '1,1') {
+                    this.createStartingRoom();
+                } else if (roomKey === '2,1') {
+                    this.createRightRoom();
+                } else if (roomKey === '2,2') {
+                    this.createRightDownRoom();
+                } else if (roomKey === '2,0') {
+                    this.createRightUpRoom();
+                } else if (roomKey === '1,0') {
+                    this.createUpLeftRoom();
+                } else if (roomKey === '2,-1') {
+                    this.createRightUpUpRoom();
+                }
+                
+                this.createSnakeEnemies();
+                this.updateRoomInfo();
+            }
+            
+            createStartingRoom() {
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(0, 337.5, 350, 20);
+                this.createWall(330, 0, 20, 150);
+                this.createWall(330, 210, 20, 147.5);
+                
+                const entrance = document.createElement('div');
+                entrance.className = 'cave-entrance';
+                entrance.style.left = '160px';
+                entrance.style.top = '340px';
+                entrance.style.width = '30px';
+                entrance.style.height = '15px';
+                entrance.dataset.type = 'exit';
+                this.gameWorld.appendChild(entrance);
+            }
+            
+            createRightRoom() {
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 150);
+                this.createWall(0, 210, 20, 147.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
+            }
+            
+            createRightDownRoom() {
+                this.createWall(0, 0, 150, 20);
+                this.createWall(210, 0, 140, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 350, 20);
+                
+                if (!this.hammerCollected) {
+                    const hammer = document.createElement('div');
+                    hammer.className = 'hammer-item';
+                    hammer.textContent = '🔨';
+                    hammer.style.left = '175px';
+                    hammer.style.top = '100px';
+                    hammer.dataset.type = 'hammer';
+                    this.gameWorld.appendChild(hammer);
+                }
+            }
+            
+            createRightUpRoom() {
+                this.createWall(0, 0, 150, 20);
+                this.createWall(210, 0, 140, 20);
+                this.createWall(0, 0, 20, 150);
+                this.createWall(0, 210, 20, 147.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
+            }
+            
+            createUpLeftRoom() {
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(330, 0, 20, 150);
+                this.createWall(330, 210, 20, 147.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
+            }
+            
+            createRightUpUpRoom() {
+                this.createWall(0, 0, 350, 20);
+                this.createWall(0, 0, 20, 357.5);
+                this.createWall(330, 0, 20, 357.5);
+                this.createWall(0, 337.5, 150, 20);
+                this.createWall(210, 337.5, 140, 20);
+            }
+            
+            createWall(x, y, width, height) {
+                const wall = document.createElement('div');
+                wall.className = 'cave-wall';
+                wall.style.left = x + 'px';
+                wall.style.top = y + 'px';
+                wall.style.width = width + 'px';
+                wall.style.height = height + 'px';
+                this.gameWorld.appendChild(wall);
+            }
+            
+            createSnakeEnemies() {
+                const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+                
+                if (roomKey === '1,1') {
+                    this.createSnake(80, 120, 'horizontal');
+                    this.createSnake(250, 200, 'vertical');
+                } else if (roomKey === '2,1') {
+                    this.createSnake(100, 100, 'horizontal');
+                    this.createSnake(250, 200, 'vertical');
+                } else if (roomKey === '2,2') {
+                    this.createSnake(180, 150, 'vertical');
+                } else if (roomKey === '2,0') {
+                    this.createSnake(80, 180, 'horizontal');
+                    this.createSnake(200, 80, 'horizontal');
+                } else if (roomKey === '1,0') {
+                    this.createSnake(150, 120, 'vertical');
+                    this.createSnake(100, 250, 'horizontal');
+                } else if (roomKey === '2,-1') {
+                    this.createSnake(175, 180, 'horizontal');
+                }
+            }
+            
+            createSnake(x, y, direction) {
+                const snake = document.createElement('div');
+                snake.className = 'enemy';
+                snake.style.left = x + 'px';
+                snake.style.top = y + 'px';
+                snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
+                this.gameWorld.appendChild(snake);
+                
+                this.enemies.push({
+                    element: snake,
+                    x: x,
+                    y: y,
+                    startX: x,
+                    startY: y,
+                    direction: direction,
+                    speed: 1,
+                    moveDirection: 1,
+                    range: 80
+                });
+            }
+            
+            updateEnemies() {
+                if (this.isPaused) return;
+                
+                this.enemies.forEach(enemy => {
+                    if (enemy.direction === 'horizontal') {
+                        enemy.x += enemy.speed * enemy.moveDirection;
+                        
+                        if (enemy.x <= enemy.startX - enemy.range/2 || enemy.x >= enemy.startX + enemy.range/2) {
+                            enemy.moveDirection *= -1;
+                        }
+                        
+                        if (enemy.x <= 30 || enemy.x >= 250) {
+                            enemy.moveDirection *= -1;
+                        }
+                        
+                        enemy.element.style.left = enemy.x + 'px';
+                        
+                    } else if (enemy.direction === 'vertical') {
+                        enemy.y += enemy.speed * enemy.moveDirection;
+                        
+                        if (enemy.y <= enemy.startY - enemy.range/2 || enemy.y >= enemy.startY + enemy.range/2) {
+                            enemy.moveDirection *= -1;
+                        }
+                        
+                        if (enemy.y <= 30 || enemy.y >= 250) {
+                            enemy.moveDirection *= -1;
+                        }
+                        
+                        enemy.element.style.top = enemy.y + 'px';
+                    }
+                });
+            }
+            
+            startGameLoop() {
+                const gameLoop = () => {
+                    if (this.gameStarted && !this.isTransitioning) {
+                        this.updatePlayer();
+                        this.updateEnemies();
+                        this.checkCollisions();
+                        this.checkRoomTransitions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+            
+            updatePlayer() {
+                if (this.isPaused) return;
+                
+                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                    const newX = this.playerX + this.playerVelocityX;
+                    const newY = this.playerY + this.playerVelocityY;
+                    
+                    if (this.canMoveTo(newX, newY)) {
+                        this.playerX = newX;
+                        this.playerY = newY;
+                        this.updatePlayerPosition();
+                    }
+                    
+                    this.playerVelocityX *= 0.9;
+                    this.playerVelocityY *= 0.9;
+                }
+            }
+            
+            updatePlayerPosition() {
+                const visualOffset = (32 - 24) / 2;
+                this.player.style.left = (this.playerX - visualOffset) + 'px';
+                this.player.style.top = (this.playerY - visualOffset) + 'px';
+            }
+            
+            canMoveTo(x, y) {
+                const playerSize = 24;
+                const padding = 2;
+                
+                if (x < padding || x > 350 - playerSize - padding || 
+                    y < padding || y > 357.5 - playerSize - padding) {
+                    return false;
+                }
+                
+                const walls = this.gameWorld.querySelectorAll('.cave-wall');
+                for (let wall of walls) {
+                    const wallRect = {
+                        left: parseInt(wall.style.left),
+                        top: parseInt(wall.style.top),
+                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+                    };
+                    
+                    if (x < wallRect.right && x + playerSize > wallRect.left &&
+                        y < wallRect.bottom && y + playerSize > wallRect.top) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            checkRoomTransitions() {
+                const playerCenterX = this.playerX + 12;
+                const playerCenterY = this.playerY + 12;
+                
+                const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+                
+                if (roomKey === '1,1') {
+                    if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(2, 1, 'right');
+                    }
+                } else if (roomKey === '2,1') {
+                    if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(1, 1, 'left');
+                    }
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 2, 'down');
+                    }
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 0, 'up');
+                    }
+                } else if (roomKey === '2,2') {
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 1, 'up');
+                    }
+                } else if (roomKey === '2,0') {
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 1, 'down');
+                    }
+                    if (playerCenterY < 15 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, -1, 'up');
+                    }
+                    if (playerCenterX < 15 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(1, 0, 'left');
+                    }
+                } else if (roomKey === '1,0') {
+                    if (playerCenterX > 335 && playerCenterY >= 150 && playerCenterY <= 210) {
+                        this.transitionToRoom(2, 0, 'right');
+                    }
+                } else if (roomKey === '2,-1') {
+                    if (playerCenterY > 342 && playerCenterX >= 150 && playerCenterX <= 210) {
+                        this.transitionToRoom(2, 0, 'down');
+                    }
+                }
+            }
+            
+            transitionToRoom(newRoomX, newRoomY, direction) {
+                if (this.isTransitioning) return;
+                
+                this.isTransitioning = true;
+                this.currentRoomX = newRoomX;
+                this.currentRoomY = newRoomY;
+                
+                switch(direction) {
+                    case 'right':
+                        this.playerX = 30;
+                        this.playerY = 180;
+                        break;
+                    case 'left':
+                        this.playerX = 305;
+                        this.playerY = 180;
+                        break;
+                    case 'down':
+                        this.playerY = 30;
+                        this.playerX = 180;
+                        break;
+                    case 'up':
+                        this.playerY = 315;
+                        this.playerX = 180;
+                        break;
+                }
+                
+                setTimeout(() => {
+                    this.generateCurrentRoom();
+                    this.updatePlayerPosition();
+                    this.isTransitioning = false;
+                    this.showMessage(`Room ${newRoomX},${newRoomY}`);
+                }, 100);
+            }
+            
+            checkCollisions() {
+                if (this.isInvulnerable) return;
+                
+                const playerRect = {
+                    left: this.playerX,
+                    top: this.playerY,
+                    right: this.playerX + 24,
+                    bottom: this.playerY + 24
+                };
+                
+                const items = this.gameWorld.querySelectorAll('.hammer-item, .cave-entrance');
+                items.forEach(item => {
+                    const itemX = parseInt(item.style.left);
+                    const itemY = parseInt(item.style.top);
+                    const itemRect = {
+                        left: itemX - 15,
+                        top: itemY - 15,
+                        right: itemX + 30 + 15,
+                        bottom: itemY + 30 + 15
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, itemRect)) {
+                        const type = item.dataset.type;
+                        
+                        if (type === 'hammer' && !this.hasHammer) {
+                            this.hasHammer = true;
+                            this.hammerCollected = true;
+                            this.showMessage('🔨 Hammer acquired! You can break walls!');
+                            this.updateUI();
+                            const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                            gameState.hasHammer = true;
+                            localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                            item.remove();
+                        } else if (type === 'exit') {
+                            clearInterval(this.timerInterval);
+                            this.caveMusic.pause();
+                            this.showMessage('🌅 Exiting cave...');
+                            
+                            setTimeout(() => {
+                                this.exitCave();
+                            }, 1500);
+                        }
+                    }
+                });
+                
+                this.enemies.forEach(enemy => {
+                    const enemyRect = {
+                        left: enemy.x,
+                        top: enemy.y,
+                        right: enemy.x + 72,
+                        bottom: enemy.y + 72
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, enemyRect)) {
+                        this.takeDamage();
+                    }
+                });
+            }
+            
+            rectsOverlap(rect1, rect2) {
+                return rect1.left < rect2.right &&
+                       rect1.right > rect2.left &&
+                       rect1.top < rect2.bottom &&
+                       rect1.bottom > rect2.top;
+            }
+            
+            updateLighting() {
+                const darknessOverlay = document.getElementById('darknessOverlay');
+                
+                if (this.hasFlashlight) {
+                    darknessOverlay.classList.remove('active');
+                } else {
+                    darknessOverlay.classList.add('active');
+                }
+            }
+            
+            updateUI() {
+                document.getElementById('hearts').textContent = this.hearts;
+                document.getElementById('money').textContent = this.money;
+                
+                let itemsText = '';
+                if (this.hasFlashlight) itemsText += ' 🔦';
+                if (this.hasHammer) itemsText += ' 🔨';
+                
+                const ui = document.getElementById('ui');
+                if (!document.getElementById('items')) {
+                    const itemsDiv = document.createElement('div');
+                    itemsDiv.id = 'items';
+                    itemsDiv.textContent = '+' + itemsText;
+                    ui.appendChild(itemsDiv);
+                } else {
+                    document.getElementById('items').textContent = '+' + itemsText;
+                }
+            }
+            
+            updateRoomInfo() {
+                document.getElementById('roomInfo').textContent = `${this.currentRoomX},${this.currentRoomY}`;
+            }
+            
+            showMessage(text) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.style.display = 'block';
+                
+                clearTimeout(this.messageTimeout);
+                this.messageTimeout = setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2500);
+            }
+            
+            takeDamage() {
+                if (this.isInvulnerable) return;
+                
+                this.hearts--;
+                this.showMessage('💔 Ouch!');
+                this.updateUI();
+                
+                this.isInvulnerable = true;
+                this.player.classList.add('invulnerable');
+                
+                setTimeout(() => {
+                    this.isInvulnerable = false;
+                    this.player.classList.remove('invulnerable');
+                }, 1000);
+                
+                if (this.hearts <= 0) {
+                    this.gameOver();
+                }
+            }
+            
+            gameOver() {
+                clearInterval(this.timerInterval);
+                this.gameStarted = false;
+                this.caveMusic.pause();
+                this.showMessage('💀 You died! Returning to main world...');
+                
+                setTimeout(() => {
+                    this.saveGameState();
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                }, 3000);
+            }
+            
+            exitCave() {
+                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                gameState.hearts = this.hearts;
+                gameState.money = this.money;
+                gameState.timeElapsed = this.timeElapsed;
+                gameState.hasHammer = this.hasHammer;
+                gameState.currentUrl = 'main';
+                gameState.playerX = 100;
+                gameState.playerY = 1980;
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+            }
+            
+            startGameTimer() {
+                this.isTransitioning = false; // Safety reset
+                this.gameStarted = true;
+                this.updateTimer();
+                this.startGameLoop();
+                
+                this.caveMusic.play().catch(e => {
+                    console.log('Cave music autoplay blocked, will try again on first interaction');
+                    const tryMusic = () => {
+                        this.caveMusic.play().catch(e => console.log('Music failed:', e));
+                        document.removeEventListener('click', tryMusic);
+                        document.removeEventListener('touchstart', tryMusic);
+                    };
+                    document.addEventListener('click', tryMusic);
+                    document.addEventListener('touchstart', tryMusic);
+                });
+                
+                this.timerInterval = setInterval(() => {
+                    this.timeElapsed++;
+                    this.updateTimer();
+                }, 1000);
+            }
+            
+            updateTimer() {
+                const minutes = Math.floor(this.timeElapsed / 60);
+                const seconds = this.timeElapsed % 60;
+                const timerEl = document.getElementById('timer');
+                const roomInfo = document.getElementById('roomInfo').textContent;
+                timerEl.innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')}<br>Room: ${roomInfo}`;
+                
+                if (this.timeElapsed >= 600) {
+                    timerEl.style.background = 'rgba(255,0,0,0.8)';
+                } else if (this.timeElapsed >= 300) {
+                    timerEl.style.background = 'rgba(255,165,0,0.8)';
+                } else {
+                    timerEl.style.background = 'rgba(0,128,0,0.8)';
+                }
+            }
+        }
+
+        let game;
+
+        function startCave() {
+            const startScreen = document.getElementById('startScreen');
+            startScreen.style.display = 'none';
+            
+            game = new CaveGame();
+            game.startGameTimer();
+        }
+
+        function pauseGame() {
+            if (game && game.gameStarted) {
+                game.isPaused = true;
+                game.caveMusic.pause();
+                document.getElementById('pauseMenu').style.display = 'flex';
+            }
+        }
+
+        function resumeGame() {
+            if (game) {
+                game.isPaused = false;
+                document.getElementById('pauseMenu').style.display = 'none';
+                game.caveMusic.play().catch(e => console.log('Music resume failed:', e));
+            }
+        }
+
+        function returnToTitle() {
+            if (game) {
+                game.saveGameState();
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+            }
+        }
+    </script>
+</body>
+</html>
+                    
