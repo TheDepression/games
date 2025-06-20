@@ -867,6 +867,14 @@
                 this.isTransitioning = true;
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
+
+                // SAFETY TIMEOUT - force completion after 1 second
+    const safetyTimeout = setTimeout(() => {
+        if (this.isTransitioning) {
+            console.log('Force completing stuck transition');
+            this.transitionToRoom(newRoomX, newRoomY, direction);
+        }
+    }, 1000);
                 
                 setTimeout(() => {
                     this.transitionToRoom(newRoomX, newRoomY, direction);
@@ -1075,6 +1083,8 @@
             }
             
             startGameTimer() {
+                // SAFETY: Reset any stuck transition state
+    this.isTransitioning = false;
                 this.gameStarted = true;
                 this.updateTimer();
                 this.startGameLoop();
