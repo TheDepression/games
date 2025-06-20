@@ -778,9 +778,15 @@ this.gameWorld.appendChild(superTestLight);
                             gameState.hasHammer = true;
                             localStorage.setItem('mfGameState', JSON.stringify(gameState));
                             item.remove();
-                        } else if (type === 'exit') {
-                            this.exitCave();
-                        }
+                        if (type === 'exit') {
+    clearInterval(this.timerInterval);
+    this.caveMusic.pause();
+    this.showMessage('🌅 Exiting cave...');
+    
+    setTimeout(() => {
+        this.exitCave();
+    }, 1500);
+}
                     }
                 });
             }
