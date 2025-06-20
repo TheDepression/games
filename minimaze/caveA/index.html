@@ -673,6 +673,8 @@ this.gameWorld.appendChild(superTestLight);
             checkRoomTransitions() {
     const playerCenterX = this.playerX + 12;
     const playerCenterY = this.playerY + 12;
+    // DEBUG: Add this line
+    console.log('Player position:', { playerCenterX, playerCenterY, roomX: this.currentRoomX, roomY: this.currentRoomY });
     
     // Check for specific room gaps
     const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
