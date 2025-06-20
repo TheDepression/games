@@ -562,23 +562,16 @@
                 entrance.dataset.type = 'exit';
                 this.gameWorld.appendChild(entrance);
                 
-                // Test flashlight - close to spawn point
-                const testLight = document.createElement('div');
-                testLight.className = 'test-item';
-                testLight.textContent = '🔦';
-                testLight.style.left = '140px';
-                testLight.style.top = '280px';
-                testLight.dataset.type = 'testlight';
-                this.gameWorld.appendChild(testLight);
-                
-                // Super test flashlight - further away
-                const superTestLight = document.createElement('div');
-                superTestLight.className = 'test-item';
-                superTestLight.textContent = '💡';
-                superTestLight.style.left = '250px';
-                superTestLight.style.top = '150px';
-                superTestLight.dataset.type = 'supertestlight';
-                this.gameWorld.appendChild(superTestLight);
+                // Remove the regular testLight creation entirely
+
+// Rename super test flashlight to just "flashlight"
+const flashlight = document.createElement('div');
+flashlight.className = 'test-item';
+flashlight.textContent = '🔦';
+flashlight.style.left = '140px';
+flashlight.style.top = '280px';
+flashlight.dataset.type = 'flashlight';
+this.gameWorld.appendChild(flashlight);
             }
             
             createRightRoom() {
