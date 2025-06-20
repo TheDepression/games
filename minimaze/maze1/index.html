@@ -2638,35 +2638,23 @@ caveEntrances.forEach(cave => {
     };
     
     if (this.rectsOverlap(playerRect, caveRect)) {
-        const caveType = cave.dataset.cave;
-        if (caveType === 'A') {
-            if (this.hasFlashlight) {
-                this.saveGameState();
-                // Update save state to indicate cave A
-                const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-                gameState.currentUrl = 'caveA';
-                localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                window.location.href = 'https://thedepression.github.io/games/minimaze/caves';
-            } else {
-                this.showMessage('🔦 It\'s too dark! You need a flashlight!');
-            }
-        } else if (caveType === 'B') {
-            if (this.hasFlashlight) {
-                this.saveGameState();
-                // Update save state to indicate cave B
-                const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-                gameState.currentUrl = 'caveB';
-                localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                window.location.href = 'https://thedepression.github.io/games/minimaze/caves';
-            } else {
-                this.showMessage('🔦 It\'s too dark! You need a flashlight!');
-            }
-        }
+    const caveType = cave.dataset.cave;
+    if (caveType === 'A') {
+        this.saveGameState();
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.currentUrl = 'caveA';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        window.location.href = 'https://thedepression.github.io/games/minimaze/cavea';
+    } else if (caveType === 'B') {
+        this.saveGameState();
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.currentUrl = 'caveB';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        window.location.href = 'https://thedepression.github.io/games/minimaze/caveb';
     }
+}
 });
        }
-
-
     
     checkZoneEffects() {
         const playerCenterX = this.playerX + 12;
