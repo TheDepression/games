@@ -2724,6 +2724,7 @@ if (onWater && this.hasBoat && !this.isOnWater) {
         // Lava damage and protection system
 if (onLava) {
     const now = Date.now();
+    this.wasOnLava = true;
     
     if (this.hasLavaShoes) {
         // If just entered lava zone, start protection (but only if not already active)
