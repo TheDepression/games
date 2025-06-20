@@ -372,6 +372,8 @@
                 this.initRoom();
                 this.updatePlayerImage('s'); // Start facing south
                 this.checkFlashlightWarning();
+                this.enemies = []; // Add this line
+}
             }
             
             checkFlashlightWarning() {
@@ -1025,22 +1027,6 @@ this.gameWorld.appendChild(flashlight);
     } else if (roomKey === '2,2') {
         this.createSnake(180, 150, 'vertical');
     }
-}
-
-createSnake(x, y, direction) {
-    const snake = document.createElement('div');
-    snake.className = 'enemy';
-    snake.style.position = 'absolute';
-    snake.style.width = '24px';
-    snake.style.height = '24px';
-    snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
-    snake.style.backgroundSize = 'contain';
-    snake.style.left = x + 'px';
-    snake.style.top = y + 'px';
-    snake.style.zIndex = '60';
-    snake.dataset.direction = direction;
-    snake.dataset.speed = '1';
-    this.gameWorld.appendChild(snake);
 }
     </script>
 </body>
