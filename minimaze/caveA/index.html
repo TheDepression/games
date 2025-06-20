@@ -370,7 +370,18 @@
                 this.bindEvents();
                 this.initRoom();
                 this.updatePlayerImage('s'); // Start facing south
-                this.showEntryDialog();
+                this.checkFlashlightWarning();
+            }
+            
+            checkFlashlightWarning() {
+                const hasAnyLight = this.realHasFlashlight || this.hasTestLight || this.hasSuperTestLight;
+                const warningDiv = document.getElementById('warningMessage');
+                
+                if (hasAnyLight) {
+                    warningDiv.textContent = "🔦 Entering the cave with light...";
+                } else {
+                    warningDiv.textContent = "⚠️ It's very dark in here! You need a flashlight to see properly.";
+                }
             }
             
             preloadPlayerImages() {
@@ -432,16 +443,6 @@
                 gameState.playerX = 420; // Spawn point in main world
                 gameState.playerY = 1760;
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
-            }
-            
-            showEntryDialog() {
-                const hasAnyLight = this.realHasFlashlight || this.hasTestLight || this.hasSuperTestLight;
-                const message = hasAnyLight ? 
-                    "🔦 Entering the cave with light..." : 
-                    "⚠️ It's very dark in here! You need a flashlight to see properly. Continue anyway?";
-                
-                document.getElementById('confirmText').textContent = message;
-                document.getElementById('confirmDialog').style.display = 'flex';
             }
             
             bindEvents() {
@@ -506,8 +507,7 @@
                 this.generateCurrentRoom();
                 this.updateLighting();
                 this.updateUI();
-                this.updatePlayerPosition(); // Make sure player is positioned correctly
-                this.startGameLoop();
+                this.updatePlayerPosition();
             }
             
             generateCurrentRoom() {
@@ -925,6 +925,7 @@
             startGameTimer() {
                 this.gameStarted = true;
                 this.updateTimer();
+                this.startGameLoop(); // Move game loop start here
                 
                 // Try to play music
                 this.caveMusic.play().catch(e => {
@@ -971,7 +972,7 @@
             startScreen.style.display = 'none';
             
             game = new CaveGame();
-            game.startGameTimer(); // Start timer and game
+            game.startGameTimer();
         }
     </script>
 </body>
