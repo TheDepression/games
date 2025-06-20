@@ -717,6 +717,7 @@ this.collectedHearts = [];
         this.hasFlashlight = false;
 this.hasPencil = false;
 this.hasPyramidKey = false;
+        this.caveBossDefeated = false;
         
         // Movement properties
         this.playerX = 400;
@@ -3115,7 +3116,8 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         lastSaveTime: Date.now(),
         isInForest: this.isInForest || false,
         hasFlashlight: this.hasFlashlight,
-hasPyramidKey: this.hasPyramidKey
+hasPyramidKey: this.hasPyramidKey,
+        caveBossDefeated: this.caveBossDefeated
     };
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     console.log('Game saved:', gameState); // For debugging
@@ -3142,6 +3144,7 @@ loadGameState() {
         this.isInForest = gameState.isInForest || false;
         this.hasFlashlight = gameState.hasFlashlight || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
+        this.caveBossDefeated = gameState.caveBossDefeated || false;
         
         // Set the timer to continue from saved time
         this.updateTimer();
@@ -3178,6 +3181,7 @@ this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.updateForestVisibility();
         this.hasFlashlight = gameState.hasFlashlight || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
+        this.caveBossDefeated = gameState.caveBossDefeated || false;
         
         this.updateUI();
         return true;
