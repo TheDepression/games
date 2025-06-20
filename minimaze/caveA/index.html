@@ -63,7 +63,7 @@
             background: #fff;
             border: 2px solid #ccc;
             border-radius: 4px;
-            z-index: 350; /* Above everything including darkness */
+            z-index: 250; /* Always visible above darkness */
         }
         
         .test-item {
@@ -75,7 +75,7 @@
             align-items: center;
             justify-content: center;
             animation: glow 2s infinite;
-            z-index: 350; /* Above everything including darkness */
+            z-index: 250; /* Always visible above darkness */
         }
         
         .hammer-item {
@@ -87,7 +87,7 @@
             align-items: center;
             justify-content: center;
             animation: glow 2s infinite;
-            z-index: 350; /* Above everything including darkness */
+            z-index: 60; /* Hidden by darkness unless lit */
         }
         
         @keyframes glow {
@@ -102,7 +102,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            z-index: 400; /* Highest priority - always visible */
+            z-index: 300; /* Always visible above darkness */
             transition: none;
         }
         
@@ -142,6 +142,20 @@
             border-radius: 8px;
             font-size: 12px;
             border: 1px solid #666;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
             pointer-events: none;
         }
         
@@ -198,17 +212,35 @@
             opacity: 1;
         }
         
-        #confirmDialog {
-            position: fixed;
+        #startScreen {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.95);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
+        h2, h3 {
+            margin: 10px 0;
         }
         
         button {
@@ -244,6 +276,7 @@
             <div>💰 <span id="money">0</span>¥</div>
             <div>Room: <span id="roomInfo">1,1</span></div>
         </div>
+        <div id="timer">0:00</div>
         
         <div id="gameArea">
             <div id="gameWorld">
@@ -253,11 +286,12 @@
         
         <div id="message"></div>
         
-        <div id="confirmDialog" style="display: none;">
-            <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
-                <p id="confirmText">Entering the dark cave...</p>
-                <button onclick="confirmAction()">OK</button>
-            </div>
+        <div id="startScreen">
+            <h2>🕳️ Cave A</h2>
+            <div id="warningMessage" style="margin: 20px 0;">⚠️ It's very dark in here! You need a flashlight to see properly.</div>
+            <p style="font-size: 12px; opacity: 0.8;">🔦 Find light sources to navigate safely!</p>
+            <p style="font-size: 12px; opacity: 0.8;">🔨 Search for the legendary hammer!</p>
+            <button class="start-button" onclick="startCave()">Enter Cave</button>
         </div>
         
         <div id="controlArea">
@@ -300,6 +334,10 @@
                 this.lastDragY = 0;
                 this.currentDirection = 's';
                 this.lastMoveDirection = 's';
+                
+                // Timer properties
+                this.timerInterval = null;
+                this.isPaused = false;
                 
                 // Room system
                 this.currentRoomX = 1;
@@ -852,6 +890,7 @@
             }
             
             gameOver() {
+                clearInterval(this.timerInterval);
                 this.gameStarted = false;
                 this.caveMusic.pause();
                 this.showMessage('💀 You died! Returning to main world with time penalty...');
@@ -863,6 +902,7 @@
             }
             
             exitCave() {
+                clearInterval(this.timerInterval);
                 this.caveMusic.pause();
                 this.showMessage('🌅 Exiting cave...');
                 
@@ -882,9 +922,11 @@
                 }, 2000);
             }
             
-            startGame() {
+            startGameTimer() {
                 this.gameStarted = true;
-                // Try to play music with user interaction
+                this.updateTimer();
+                
+                // Try to play music
                 this.caveMusic.play().catch(e => {
                     console.log('Cave music autoplay blocked, will try again on first interaction');
                     // Try again on first user interaction
@@ -896,42 +938,41 @@
                     document.addEventListener('click', tryMusic);
                     document.addEventListener('touchstart', tryMusic);
                 });
+                
+                this.timerInterval = setInterval(() => {
+                    if (!this.isPaused) {
+                        this.timeElapsed++;
+                        this.updateTimer();
+                    }
+                }, 1000);
+            }
+            
+            updateTimer() {
+                const minutes = Math.floor(this.timeElapsed / 60);
+                const seconds = this.timeElapsed % 60;
+                const timerEl = document.getElementById('timer');
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Change color as time progresses
+                if (this.timeElapsed >= 600) { // 10+ minutes = red
+                    timerEl.style.background = 'rgba(255,0,0,0.8)';
+                } else if (this.timeElapsed >= 300) { // 5+ minutes = orange
+                    timerEl.style.background = 'rgba(255,165,0,0.8)';
+                } else {
+                    timerEl.style.background = 'rgba(0,128,0,0.8)'; // Under 5 minutes = green
+                }
             }
         }
 
         let game;
 
-        function confirmAction() {
-            document.getElementById('confirmDialog').style.display = 'none';
+        function startCave() {
+            const startScreen = document.getElementById('startScreen');
+            startScreen.style.display = 'none';
+            
             game = new CaveGame();
-            game.startGame();
+            game.startGameTimer(); // Start timer and game
         }
-
-        /*
-        WEAPON IMPLEMENTATION IDEAS:
-        
-        1. **Auto-Attack System**: When player has weapon + enemy nearby, weapon auto-attacks
-           - No UI changes needed
-           - Visual: brief animation/flash when attacking
-           - Could work with existing collision system
-        
-        2. **Tap-to-Attack**: Double-tap control area while near enemy
-           - Doesn't interfere with movement
-           - Could show brief attack indicator
-        
-        3. **Direction-Based Attack**: Quick swipe in direction of enemy
-           - Uses existing swipe mechanics
-           - Short, sharp swipes = attack, longer swipes = movement
-        
-        4. **Time-Based Attack**: Hold position near enemy for 1 second
-           - Passive attacking system
-           - Shows charging indicator
-        
-        5. **Zone Attack**: Weapon creates damage zone around player
-           - Completely passive
-           - Enemies take damage when too close
-        
-        My recommendation: Auto-attack (#1) for simplicity and mobile-friendliness.
-        When player has weapon and gets within range of enemy, automatically attack
-        with visual feedback but no additional input required.
-        */
+</script>
+</body>
+</html>
