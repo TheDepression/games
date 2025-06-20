@@ -194,23 +194,6 @@
             opacity: 0.95;
         }
         
-        /* Flashlight vision mask */
-        .vision-mask {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle 80px, transparent 80px, black 80px);
-            pointer-events: none;
-            z-index: 200; /* Below player and important items */
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .vision-mask.active {
-            opacity: 1;
-        }
         
         #startScreen {
             position: absolute;
