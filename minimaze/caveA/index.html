@@ -418,7 +418,15 @@
                 else return 'ne';
             }
 
-
+createSnakeEnemies() {
+    const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
+    
+    if (roomKey === '2,1') {
+        this.createSnake(100, 100, 'horizontal');
+    } else if (roomKey === '2,2') {
+        this.createSnake(180, 150, 'vertical');
+    }
+}
             createSnake(x, y, direction) {
     const snake = document.createElement('div');
     snake.className = 'enemy';
@@ -1018,16 +1026,6 @@ this.gameWorld.appendChild(flashlight);
             game = new CaveGame();
             game.startGameTimer();
         }
-
-        createSnakeEnemies() {
-    const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
-    
-    if (roomKey === '2,1') {
-        this.createSnake(100, 100, 'horizontal');
-    } else if (roomKey === '2,2') {
-        this.createSnake(180, 150, 'vertical');
-    }
-}
     </script>
 </body>
 </html>
