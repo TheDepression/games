@@ -556,13 +556,13 @@
                 this.gameWorld.appendChild(testLight);
                 
                 // Super test flashlight - further away
-                const superTestLight = document.createElement('div');
-                superTestLight.className = 'test-item';
-                superTestLight.textContent = '💡';
-                superTestLight.style.left = '200px';
-                superTestLight.style.top = '200px';
-                superTestLight.dataset.type = 'supertestlight';
-                this.gameWorld.appendChild(superTestLight);
+const superTestLight = document.createElement('div');
+superTestLight.className = 'test-item';
+superTestLight.textContent = '💡';
+superTestLight.style.left = '250px'; // Move further right
+superTestLight.style.top = '150px';  // Move up a bit
+superTestLight.dataset.type = 'supertestlight';
+this.gameWorld.appendChild(superTestLight);
             }
             
             createRightRoom() {
@@ -815,14 +815,14 @@
             }
             
             updateVisionMask() {
-                if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
-                    const mask = document.getElementById('visionMask');
-                    const gameAreaRect = this.gameArea.getBoundingClientRect();
-                    const playerScreenX = gameAreaRect.left + (this.playerX + 12);
-                    const playerScreenY = gameAreaRect.top + (this.playerY + 12);
-                    mask.style.background = `radial-gradient(circle 80px at ${playerScreenX}px ${playerScreenY}px, transparent 80px, black 80px)`;
-                }
-            }
+    if (!this.hasSuperTestLight && (this.realHasFlashlight || this.hasTestLight)) {
+        const mask = document.getElementById('visionMask');
+        const gameAreaRect = this.gameArea.getBoundingClientRect();
+        const playerScreenX = gameAreaRect.left + (this.playerX + 12); // Remove extra +12
+        const playerScreenY = gameAreaRect.top + (this.playerY + 12);
+        mask.style.background = `radial-gradient(circle 80px at ${playerScreenX}px ${playerScreenY}px, transparent 80px, black 80px)`;
+    }
+}
             
             updateUI() {
                 document.getElementById('hearts').textContent = this.hearts;
