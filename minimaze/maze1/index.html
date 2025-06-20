@@ -2962,17 +2962,23 @@ this.saveGameState(); // Auto-save after purchase
     } else {
         this.showMessage('You need to rescue my baby from the forest first!');
     }
-} else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!" && !this.hasPyramidKey) {
+// ... other NPC interactions ...
+} else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!") {
     if (this.hasPencil) {
+        // STAGE 2: Exchange
         this.hasPencil = false;
         this.hasPyramidKey = true;
-        this.showMessage('🗝️ Thank you! Here\'s the pyramid key!');
-        friendly.dataset.message = 'Thank you for returning my pencil!';
+        this.showMessage('🗝️ Thank you so much! Here\'s the pyramid key!');
+        friendly.dataset.message = "I'll never forget your kindness!";
         this.updateUI();
         this.saveGameState();
     } else {
-        this.showMessage('😢 Please find my pencil!');
+        // STAGE 1: Show original message
+        this.showMessage(message);
     }
+} else if (message === "I'll never forget your kindness!") {
+    // STAGE 3: Post-mission message
+    this.showMessage(message);
 } else {
     this.showMessage(message);
 }
