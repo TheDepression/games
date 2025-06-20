@@ -757,7 +757,8 @@ this.gameWorld.appendChild(superTestLight);
         
         if (this.rectsOverlap(playerRect, itemRect)) {
             const type = item.dataset.type;
-            
+            / DEBUG: Add this line
+    console.log('Item collision detected:', type);
             if (type === 'testlight' && !this.hasTestLight) {
                 this.hasTestLight = true;
                 this.showMessage('🔦 TestLight acquired! Basic cave vision!');
