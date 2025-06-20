@@ -577,7 +577,7 @@ createSnakeEnemies() {
                 // Clear current room
                 const elements = this.gameWorld.querySelectorAll('.cave-wall, .test-item, .hammer-item, .cave-entrance');
                 elements.forEach(el => el.remove());
-                
+                this.enemies = []; // Clear enemies array
                 const roomKey = `${this.currentRoomX},${this.currentRoomY}`;
                 
                 if (roomKey === '1,1') {
@@ -589,6 +589,7 @@ createSnakeEnemies() {
                 }
                 
                 this.updateRoomInfo();
+                 this.createSnakeEnemies(); // Add this at the end
             }
             
             createStartingRoom() {
