@@ -853,6 +853,19 @@ this.gameWorld.appendChild(flashlight);
                         }
                     }
                 });
+                // Check enemy collisions
+this.enemies.forEach(enemy => {
+    const enemyRect = {
+        left: enemy.x,
+        top: enemy.y,
+        right: enemy.x + 24,
+        bottom: enemy.y + 24
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage();
+    }
+});
             }
             
             rectsOverlap(rect1, rect2) {
