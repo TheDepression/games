@@ -859,15 +859,7 @@
             this.transitionToRoom(2, 0, 'down');
         }
     }
-}
 
-                // SAFETY TIMEOUT - force completion after 1 second
-    const safetyTimeout = setTimeout(() => {
-        if (this.isTransitioning) {
-            console.log('Force completing stuck transition');
-            this.transitionToRoom(newRoomX, newRoomY, direction);
-        }
-    }, 1000);
                 
                 setTimeout(() => {
                     this.transitionToRoom(newRoomX, newRoomY, direction);
