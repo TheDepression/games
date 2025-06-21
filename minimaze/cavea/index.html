@@ -568,7 +568,7 @@
                     entrance.className = 'cave-entrance';
                     entrance.style.position = 'absolute';
                     entrance.style.left = '160px';
-                    entrance.style.top = '340px';
+                    entrance.style.top = '330px';
                     entrance.style.width = '30px';
                     entrance.style.height = '15px';
                     entrance.style.background = '#fff';
@@ -607,29 +607,29 @@
                 
                 // Bottom wall  
                 if (!exits.includes('s')) {
-                    this.createWall(0, 337.5, 350, 20);
+                    this.createWall(0, 340, 340, 20);
                 } else {
                     // Wall with opening in middle
-                    this.createWall(0, 337.5, 140, 20);
-                    this.createWall(210, 337.5, 140, 20);
+                    this.createWall(0, 340, 140, 20);
+                    this.createWall(210, 340, 140, 20);
                 }
                 
                 // Left wall
                 if (!exits.includes('w')) {
-                    this.createWall(0, 0, 20, 357.5);
+                    this.createWall(-5, 0, 20, 360);
                 } else {
                     // Wall with opening in middle (77.5px gap)
-                    this.createWall(0, 0, 20, 140);
-                    this.createWall(0, 217.5, 20, 140);
+                    this.createWall(-5, 0, 20, 135);
+                    this.createWall(-5, 210, 20, 130);
                 }
                 
                 // Right wall
                 if (!exits.includes('e')) {
-                    this.createWall(330, 0, 20, 357.5);
+                    this.createWall(340, 0, 20, 350);
                 } else {
                     // Wall with opening in middle (60px gap: 150-210)
-                    this.createWall(330, 0, 20, 140);
-                    this.createWall(330, 217.5, 20, 140);
+                    this.createWall(340, 0, 20, 135);
+                    this.createWall(340, 210, 20, 130);
                 }
             }
             
