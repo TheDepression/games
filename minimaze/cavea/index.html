@@ -663,7 +663,12 @@
                     range: 80
                 });
             }
-            
+
+            positionPlayer() {
+    // Center the 32x32 sprite around playerX, playerY
+    this.player.style.left = (this.playerX - 16) + 'px';
+    this.player.style.top = (this.playerY - 16) + 'px';
+}
             
             updateDarkness() {
                 const darknessOverlay = document.getElementById('darknessOverlay');
@@ -724,24 +729,25 @@
             }
             
             canMoveTo(x, y) {
-    const playerSize = 24; // Player hit box size
-    const padding = 4; // Increased padding for tighter bounds
+    const playerSize = 24; // Collision hit box size
+    const padding = 2; // Reduced padding for precise movement
 
-    // Basic bounds checking (room boundaries)
-    if (x < padding || x > 350 - playerSize - padding || 
-        y < padding || y > 357.5 - playerSize - padding) {
+    // Center the hit box around (x, y)
+    const playerRect = {
+        left: x - playerSize / 2, // Center the hit box
+        top: y - playerSize / 2,
+        right: x + playerSize / 2,
+        bottom: y + playerSize / 2
+    };
+
+    // Room boundary checks
+    if (playerRect.left < padding || playerRect.right > 350 - padding ||
+        playerRect.top < padding || playerRect.bottom > 357.5 - padding) {
         return false;
     }
 
     // Wall collision
     const walls = this.gameWorld.querySelectorAll('.cave-wall');
-    const playerRect = {
-        left: x,
-        top: y,
-        right: x + playerSize,
-        bottom: y + playerSize
-    };
-
     for (let wall of walls) {
         const wallRect = {
             left: parseFloat(wall.style.left),
@@ -750,8 +756,10 @@
             bottom: parseFloat(wall.style.top) + parseFloat(wall.style.height)
         };
 
-        if (playerRect.right > wallRect.left && playerRect.left < wallRect.right &&
-            playerRect.bottom > wallRect.top && playerRect.top < wallRect.bottom) {
+        if (playerRect.right > wallRect.left &&
+            playerRect.left < wallRect.right &&
+            playerRect.bottom > wallRect.top &&
+            playerRect.top < wallRect.bottom) {
             return false;
         }
     }
@@ -856,30 +864,30 @@
             checkRoomTransitions() {
     if (this.isTransitioning) return;
 
-    const playerCenterX = this.playerX + 12; // Center of 24x24 hit box
-    const playerCenterY = this.playerY + 12;
+    const playerCenterX = this.playerX; // Centered hit box
+    const playerCenterY = this.playerY;
 
     let targetRoomX = this.currentRoomX;
     let targetRoomY = this.currentRoomY;
     let direction = null;
 
     // North (up) - top edge, within horizontal gap (140-210px)
-    if (playerCenterY < 10 && playerCenterX >= 140 && playerCenterX <= 210) {
+    if (playerCenterY < 20 && playerCenterX >= 140 && playerCenterX <= 210) {
         targetRoomY = this.currentRoomY + 1;
         direction = 'n';
     }
     // South (down) - bottom edge, within horizontal gap (140-210px)
-    else if (playerCenterY > 347 && playerCenterX >= 140 && playerCenterX <= 210) {
+    else if (playerCenterY > 337.5 && playerCenterX >= 140 && playerCenterX <= 210) {
         targetRoomY = this.currentRoomY - 1;
         direction = 's';
     }
     // East (right) - right edge, within vertical gap (140-217.5px)
-    else if (playerCenterX > 340 && playerCenterY >= 140 && playerCenterY <= 217.5) {
+    else if (playerCenterX > 330 && playerCenterY >= 140 && playerCenterY <= 217.5) {
         targetRoomX = this.currentRoomX + 1;
         direction = 'e';
     }
     // West (left) - left edge, within vertical gap (140-217.5px)
-    else if (playerCenterX < 10 && playerCenterY >= 140 && playerCenterY <= 217.5) {
+    else if (playerCenterX < 20 && playerCenterY >= 140 && playerCenterY <= 217.5) {
         targetRoomX = this.currentRoomX - 1;
         direction = 'w';
     }
