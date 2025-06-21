@@ -322,7 +322,7 @@
                 
                 // Player state
                 this.playerX = 175; // Center of room
-                this.playerY = 300; // Near bottom (entrance)
+                this.playerY = 280; // Moved up 20px from 300 - safer distance from exit
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
                 this.isDragging = false;
@@ -411,14 +411,13 @@
                 const deltaX = point.clientX - this.lastDragX;
                 const deltaY = point.clientY - this.lastDragY;
                 
-                // Update direction based on movement
-                if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
-                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                        this.currentDirection = deltaX > 0 ? 'e' : 'w';
-                    } else {
-                        this.currentDirection = deltaY > 0 ? 's' : 'n';
+                // Update direction based on movement with diagonal support
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.currentDirection = newDirection;
+                        this.updatePlayerImage(newDirection);
                     }
-                    this.updatePlayerImage(this.currentDirection);
                 }
                 
                 const sensitivity = 0.6;
@@ -441,6 +440,20 @@
             
             updatePlayerImage(direction) {
                 this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
             }
             
             createAllRooms() {
@@ -484,7 +497,7 @@
                     const exitLight = document.createElement('div');
                     exitLight.className = 'exit-light';
                     exitLight.style.left = '160px';
-                    exitLight.style.top = '335px';
+                    exitLight.style.top = '330px'; // Move up slightly so it's visible
                     exitLight.dataset.type = 'exit';
                     room.appendChild(exitLight);
                 }
@@ -697,16 +710,16 @@
             
             canMoveTo(x, y) {
                 const size = 24;
-                const padding = 2;
+                const padding = 4;
                 
-                // Room bounds
-                if (x < 30 || x > 320 || y < 30 || y > 327) {
+                // Room bounds - more generous boundaries
+                if (x < 25 || x > 310 || y < 25 || y > 320) {
                     return false;
                 }
                 
-                // Check walls in current room
+                // Check walls in current room - only check actual wall elements
                 const currentRoom = this.rooms.get(`${this.currentRoomX},${this.currentRoomY}`);
-                if (!currentRoom) return false;
+                if (!currentRoom) return true;
                 
                 const walls = currentRoom.element.querySelectorAll('.wall');
                 for (let wall of walls) {
@@ -717,8 +730,9 @@
                         bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
                     };
                     
-                    if (x < wallRect.right && x + size > wallRect.left &&
-                        y < wallRect.bottom && y + size > wallRect.top) {
+                    // Add some padding to make movement feel less restrictive
+                    if (x + padding < wallRect.right && x + size - padding > wallRect.left &&
+                        y + padding < wallRect.bottom && y + size - padding > wallRect.top) {
                         return false;
                     }
                 }
@@ -734,24 +748,31 @@
                     if (snake.roomX === this.currentRoomX && snake.roomY === this.currentRoomY) {
                         snake.changeTime++;
                         
-                        // Change direction randomly
-                        if (snake.changeTime > 120) { // Every 2 seconds at 60fps
+                        // Change direction randomly every 2 seconds
+                        if (snake.changeTime > 120) {
                             snake.direction = Math.random() * Math.PI * 2;
                             snake.changeTime = 0;
                         }
                         
                         // Move snake
-                        const newX = snake.x + Math.cos(snake.direction) * snake.speed;
-                        const newY = snake.y + Math.sin(snake.direction) * snake.speed;
+                        const moveX = Math.cos(snake.direction) * snake.speed;
+                        const moveY = Math.sin(snake.direction) * snake.speed;
                         
-                        // Bounce off walls
-                        if (newX < 50 || newX > 280 || newY < 50 || newY > 280) {
-                            snake.direction += Math.PI; // Reverse direction
-                        } else {
-                            snake.x = newX;
-                            snake.y = newY;
+                        let newX = snake.x + moveX;
+                        let newY = snake.y + moveY;
+                        
+                        // Bounce off room boundaries
+                        if (newX < 40 || newX > 270) {
+                            snake.direction = Math.PI - snake.direction; // Reverse X direction
+                            newX = snake.x - moveX; // Move back
+                        }
+                        if (newY < 40 || newY > 280) {
+                            snake.direction = -snake.direction; // Reverse Y direction  
+                            newY = snake.y - moveY; // Move back
                         }
                         
+                        snake.x = newX;
+                        snake.y = newY;
                         snake.element.style.left = snake.x + 'px';
                         snake.element.style.top = snake.y + 'px';
                     }
@@ -828,28 +849,32 @@
                 
                 const exits = currentRoom.exits;
                 
-                // Check each direction for transitions
+                // Check each direction for transitions (more generous hit areas)
                 // North transition
-                if (exits.includes('n') && this.playerY < 25 && 
-                    this.playerX > 130 && this.playerX < 220 && this.currentDirection === 'n') {
+                if (exits.includes('n') && this.playerY < 30 && 
+                    this.playerX > 120 && this.playerX < 230 && 
+                    (this.currentDirection === 'n' || this.currentDirection === 'ne' || this.currentDirection === 'nw')) {
                     this.transitionToRoom(this.currentRoomX, this.currentRoomY + 1, 'n');
                 }
                 
                 // South transition  
-                if (exits.includes('s') && this.playerY > 330 && 
-                    this.playerX > 130 && this.playerX < 220 && this.currentDirection === 's') {
+                if (exits.includes('s') && this.playerY > 325 && 
+                    this.playerX > 120 && this.playerX < 230 && 
+                    (this.currentDirection === 's' || this.currentDirection === 'se' || this.currentDirection === 'sw')) {
                     this.transitionToRoom(this.currentRoomX, this.currentRoomY - 1, 's');
                 }
                 
                 // East transition
-                if (exits.includes('e') && this.playerX > 325 && 
-                    this.playerY > 130 && this.playerY < 220 && this.currentDirection === 'e') {
+                if (exits.includes('e') && this.playerX > 320 && 
+                    this.playerY > 120 && this.playerY < 230 && 
+                    (this.currentDirection === 'e' || this.currentDirection === 'ne' || this.currentDirection === 'se')) {
                     this.transitionToRoom(this.currentRoomX + 1, this.currentRoomY, 'e');
                 }
                 
                 // West transition
-                if (exits.includes('w') && this.playerX < 25 && 
-                    this.playerY > 130 && this.playerY < 220 && this.currentDirection === 'w') {
+                if (exits.includes('w') && this.playerX < 30 && 
+                    this.playerY > 120 && this.playerY < 230 && 
+                    (this.currentDirection === 'w' || this.currentDirection === 'nw' || this.currentDirection === 'sw')) {
                     this.transitionToRoom(this.currentRoomX - 1, this.currentRoomY, 'w');
                 }
             }
@@ -958,8 +983,8 @@
                     gameState.money = this.money;
                     gameState.timeElapsed = this.timeElapsed;
                     gameState.hasHammer = this.hasHammer;
-                    gameState.playerX = 120; // Near cave entrance
-                    gameState.playerY = 1980; // Near cave entrance  
+                    gameState.playerX = 120; // Safe distance from cave entrance
+                    gameState.playerY = 1980; // Safe distance from cave entrance  
                     gameState.currentUrl = 'main';
                     localStorage.setItem('mfGameState', JSON.stringify(gameState));
                     
