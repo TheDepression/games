@@ -204,7 +204,7 @@
             height: 100vh;
             background: #000;
             pointer-events: none;
-            z-index: 200;
+            z-index: 199; /* Below player (300) and cave entrance (300) */
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -469,6 +469,7 @@
                 
                 this.positionPlayer();
                 this.updateDarkness();
+                console.log('Has flashlight:', this.hasFlashlight); // Debug line
                 this.updateUI();
             }
             
@@ -729,10 +730,14 @@
             
             updateDarkness() {
                 const darknessOverlay = document.getElementById('darknessOverlay');
+                
+                // If player has flashlight from main world, no darkness
                 if (this.hasFlashlight) {
                     darknessOverlay.classList.remove('active');
+                    console.log('Flashlight detected - removing darkness');
                 } else {
                     darknessOverlay.classList.add('active');
+                    console.log('No flashlight - adding darkness');
                 }
             }
             
