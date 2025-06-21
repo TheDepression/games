@@ -725,26 +725,42 @@
             
             canMoveTo(x, y) {
                 const playerSize = 24;
-                const padding = 3; // Slightly more generous
                 
-                // Basic bounds checking - match your original but fix the edges
-                if (x < padding || x > 350 - playerSize - padding || 
-                    y < padding || y > 357.5 - playerSize - padding) {
+                // Basic bounds checking - fix the edge positioning
+                // Allow closer to right and bottom walls, further from left wall
+                if (x < 5 || x > 330 - playerSize || 
+                    y < 3 || y > 357.5 - playerSize) {
                     return false;
                 }
                 
-                // Wall collision - match your original approach exactly
+                // Wall collision - adjust for positioning issues
                 const walls = this.gameWorld.querySelectorAll('.cave-wall');
                 for (let wall of walls) {
-                    const wallRect = {
-                        left: parseInt(wall.style.left),
-                        top: parseInt(wall.style.top),
-                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-                    };
+                    const wallLeft = parseInt(wall.style.left);
+                    const wallTop = parseInt(wall.style.top);
+                    const wallWidth = parseInt(wall.style.width);
+                    const wallHeight = parseInt(wall.style.height);
                     
-                    if (x < wallRect.right && x + playerSize > wallRect.left &&
-                        y < wallRect.bottom && y + playerSize > wallRect.top) {
+                    const wallRight = wallLeft + wallWidth;
+                    const wallBottom = wallTop + wallHeight;
+                    
+                    // Adjust collision detection based on direction
+                    let playerLeft = x;
+                    let playerTop = y;
+                    let playerRight = x + playerSize;
+                    let playerBottom = y + playerSize;
+                    
+                    // Add different padding for different directions to fix positioning
+                    const leftPadding = 8; // Less restrictive on left walls
+                    const rightPadding = 2; // More restrictive on right walls  
+                    const topPadding = 2;
+                    const bottomPadding = 2;
+                    
+                    // Check collision with adjusted padding
+                    if (playerRight - rightPadding > wallLeft && 
+                        playerLeft + leftPadding < wallRight &&
+                        playerBottom - bottomPadding > wallTop && 
+                        playerTop + topPadding < wallBottom) {
                         return false;
                     }
                 }
@@ -814,16 +830,16 @@
                     }
                 });
                 
-                // Check cave entrance collision - match your original
+                // Check cave entrance collision - tighter detection near white square
                 const items = this.gameWorld.querySelectorAll('.cave-entrance');
                 items.forEach(item => {
                     const itemX = parseInt(item.style.left);
                     const itemY = parseInt(item.style.top);
                     const itemRect = {
-                        left: itemX - 15,
-                        top: itemY - 15,
-                        right: itemX + 30 + 15,
-                        bottom: itemY + 30 + 15
+                        left: itemX - 5,
+                        top: itemY - 5, // Only 5px above the white square
+                        right: itemX + 30 + 5,
+                        bottom: itemY + 15 + 5
                     };
                     
                     if (this.rectsOverlap(playerRect, itemRect)) {
