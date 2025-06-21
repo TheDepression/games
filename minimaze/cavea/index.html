@@ -480,13 +480,22 @@
                 this.createWall(330, 0, 20, 150); // Right wall top part
                 this.createWall(330, 210, 20, 147.5); // Right wall bottom part (60px gap in middle)
                 
+                // Add some interior walls like your original
+                this.createWall(100, 100, 60, 20); // Horizontal wall
+                this.createWall(200, 200, 20, 60); // Vertical wall
+                
                 // Cave entrance (white square) - EXACTLY like your original
                 const entrance = document.createElement('div');
                 entrance.className = 'cave-entrance';
+                entrance.style.position = 'absolute';
                 entrance.style.left = '160px';
                 entrance.style.top = '340px';
                 entrance.style.width = '30px';
                 entrance.style.height = '15px';
+                entrance.style.background = '#fff';
+                entrance.style.border = '2px solid #ccc';
+                entrance.style.borderRadius = '4px';
+                entrance.style.zIndex = '250';
                 entrance.dataset.type = 'exit';
                 this.gameWorld.appendChild(entrance);
                 
@@ -716,15 +725,15 @@
             
             canMoveTo(x, y) {
                 const playerSize = 24;
-                const padding = 2;
+                const padding = 3; // Slightly more generous
                 
-                // Basic bounds checking - match your original
+                // Basic bounds checking - match your original but fix the edges
                 if (x < padding || x > 350 - playerSize - padding || 
                     y < padding || y > 357.5 - playerSize - padding) {
                     return false;
                 }
                 
-                // Wall collision - match your original approach
+                // Wall collision - match your original approach exactly
                 const walls = this.gameWorld.querySelectorAll('.cave-wall');
                 for (let wall of walls) {
                     const wallRect = {
@@ -791,97 +800,58 @@
                     bottom: this.playerY + 24
                 };
                 
-                // Check snake collisions (only in current room) - FIXED
-                this.snakes.forEach(snake => {
-                    if (snake.roomX === this.currentRoomX && snake.roomY === this.currentRoomY) {
-                        const snakeRect = {
-                            left: snake.x,
-                            top: snake.y,
-                            right: snake.x + 40,
-                            bottom: snake.y + 40
-                        };
-                        
-                        if (this.rectsOverlap(playerRect, snakeRect)) {
-                            this.takeDamage();
-                            return; // Exit early to prevent multiple hits
-                        }
+                // Check snake collisions - match your original exactly
+                this.snakes.forEach(enemy => {
+                    const enemyRect = {
+                        left: enemy.x,
+                        top: enemy.y,
+                        right: enemy.x + 24,
+                        bottom: enemy.y + 24
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, enemyRect)) {
+                        this.takeDamage();
                     }
                 });
                 
-                // Check item pickups in current room
-                const currentRoom = this.rooms.get(`${this.currentRoomX},${this.currentRoomY}`);
-                if (currentRoom) {
-                    const items = currentRoom.element.querySelectorAll('.hammer, .exit-light');
-                    items.forEach(item => {
-                        const itemLeft = parseInt(item.style.left);
-                        const itemTop = parseInt(item.style.top);
-                        const itemWidth = parseInt(item.style.width) || 30;
-                        const itemHeight = parseInt(item.style.height) || 30;
-                        
-                        const itemRect = {
-                            left: itemLeft,
-                            top: itemTop,
-                            right: itemLeft + itemWidth,
-                            bottom: itemTop + itemHeight
-                        };
-                        
-                        if (this.rectsOverlap(playerRect, itemRect)) {
-                            const type = item.dataset.type;
+                // Check cave entrance collision - match your original
+                const items = this.gameWorld.querySelectorAll('.cave-entrance');
+                items.forEach(item => {
+                    const itemX = parseInt(item.style.left);
+                    const itemY = parseInt(item.style.top);
+                    const itemRect = {
+                        left: itemX - 15,
+                        top: itemY - 15,
+                        right: itemX + 30 + 15,
+                        bottom: itemY + 30 + 15
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, itemRect)) {
+                        const type = item.dataset.type;
+                        if (type === 'exit') {
+                            clearInterval(this.timerInterval);
+                            this.caveMusic.pause();
+                            this.showMessage('🌅 Exiting cave...');
                             
-                            if (type === 'hammer' && !this.hasHammer) {
-                                this.hasHammer = true;
-                                this.showMessage('🔨 Legendary Hammer acquired!');
-                                this.updateUI();
-                                item.remove();
-                                
-                                // Save hammer to main world state
-                                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                                gameState.hasHammer = true;
-                                localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                                
-                            } else if (type === 'exit') {
+                            setTimeout(() => {
                                 this.exitCave();
-                            }
+                            }, 1500);
                         }
-                    });
-                }
+                    }
+                });
             }
             
             checkRoomTransitions() {
                 if (this.isTransitioning) return;
                 
-                const currentRoom = this.rooms.get(`${this.currentRoomX},${this.currentRoomY}`);
-                if (!currentRoom) return;
+                const playerCenterX = this.playerX + 12;
+                const playerCenterY = this.playerY + 12;
                 
-                const exits = currentRoom.exits;
-                
-                // Check each direction for transitions (more generous hit areas)
-                // North transition
-                if (exits.includes('n') && this.playerY < 30 && 
-                    this.playerX > 120 && this.playerX < 230 && 
-                    (this.currentDirection === 'n' || this.currentDirection === 'ne' || this.currentDirection === 'nw')) {
-                    this.transitionToRoom(this.currentRoomX, this.currentRoomY + 1, 'n');
-                }
-                
-                // South transition  
-                if (exits.includes('s') && this.playerY > 325 && 
-                    this.playerX > 120 && this.playerX < 230 && 
-                    (this.currentDirection === 's' || this.currentDirection === 'se' || this.currentDirection === 'sw')) {
-                    this.transitionToRoom(this.currentRoomX, this.currentRoomY - 1, 's');
-                }
-                
-                // East transition
-                if (exits.includes('e') && this.playerX > 320 && 
-                    this.playerY > 120 && this.playerY < 230 && 
-                    (this.currentDirection === 'e' || this.currentDirection === 'ne' || this.currentDirection === 'se')) {
-                    this.transitionToRoom(this.currentRoomX + 1, this.currentRoomY, 'e');
-                }
-                
-                // West transition
-                if (exits.includes('w') && this.playerX < 30 && 
-                    this.playerY > 120 && this.playerY < 230 && 
-                    (this.currentDirection === 'w' || this.currentDirection === 'nw' || this.currentDirection === 'sw')) {
-                    this.transitionToRoom(this.currentRoomX - 1, this.currentRoomY, 'w');
+                // Check for room transition through right opening (like your original)
+                // Right exit gap (x > 330, y: 150-210, 60px gap)
+                if (playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220) {
+                    this.showMessage('🚪 Would transition to next room!');
+                    // For now just show message - we can add actual room later
                 }
             }
             
