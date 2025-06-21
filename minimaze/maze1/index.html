@@ -2656,7 +2656,7 @@ caveEntrances.forEach(cave => {
     } else if (caveType === 'B') {
         this.saveGameState();
         const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-        gameState.currentUrl = 'caveB';
+        gameState.currentUrl = 'caveb';
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         window.location.href = 'https://thedepression.github.io/games/minimaze/caveb';
     }
