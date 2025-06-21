@@ -902,43 +902,43 @@
             }
             
             transitionToRoom(newRoomX, newRoomY, direction) {
-                this.isTransitioning = true;
-                this.playerVelocityX = 0;
-                this.playerVelocityY = 0;
-                
-                // Position player on opposite side of new room
-                switch(direction) {
-                    case 'n': // Going north, enter from south
-                        this.playerX = 175; // Center horizontally
-                        this.playerY = 320; // Near bottom
-                        break;
-                    case 's': // Going south, enter from north
-                        this.playerX = 175;
-                        this.playerY = 35; // Near top
-                        break;
-                    case 'e': // Going east, enter from west
-                        this.playerX = 35; // Near left edge
-                        this.playerY = 178; // Center vertically
-                        break;
-                    case 'w': // Going west, enter from east
-                        this.playerX = 320; // Near right edge
-                        this.playerY = 178; // Center vertically
-                        break;
-                }
-                
-                // Update room
-                this.currentRoomX = newRoomX;
-                this.currentRoomY = newRoomY;
-                
-                // Create new room and show transition message
-                this.showMessage(`Entering room ${newRoomX},${newRoomY}`);
-                this.createRoom(newRoomX, newRoomY);
-                
-                // End transition
-                setTimeout(() => {
-                    this.isTransitioning = false;
-                }, 800);
-            }
+    this.isTransitioning = true;
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+
+    // Position player on opposite side of new room
+    switch(direction) {
+        case 'n': // Enter from south
+            this.playerX = 175; // Center
+            this.playerY = 337.5 - 30; // 30px from bottom
+            break;
+        case 's': // Enter from north
+            this.playerX = 175;
+            this.playerY = 30; // 30px from top
+            break;
+        case 'e': // Enter from west
+            this.playerX = 30; // 30px from left
+            this.playerY = 178.75; // Center vertically
+            break;
+        case 'w': // Enter from east
+            this.playerX = 350 - 30; // 30px from right
+            this.playerY = 178.75; // Center vertically
+            break;
+    }
+
+    // Update room
+    this.currentRoomX = newRoomX;
+    this.currentRoomY = newRoomY;
+
+    // Create new room and show transition message
+    this.showMessage(`Entering room ${newRoomX},${newRoomY}`);
+    this.createRoom(newRoomX, newRoomY);
+
+    // End transition
+    setTimeout(() => {
+        this.isTransitioning = false;
+    }, 800);
+}
             
             rectsOverlap(rect1, rect2) {
                 return rect1.left < rect2.right &&
