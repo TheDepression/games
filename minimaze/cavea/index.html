@@ -204,7 +204,7 @@
             height: 100vh;
             background: #000;
             pointer-events: none;
-            z-index: 199; /* Below player (300) and cave entrance (300) */
+            z-index: 200;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -469,126 +469,61 @@
                 
                 this.positionPlayer();
                 this.updateDarkness();
-                console.log('Has flashlight:', this.hasFlashlight); // Debug line
                 this.updateUI();
             }
             
-            createAllRooms() {
-                // Clear existing rooms
-                this.gameWorld.innerHTML = '<div id="player"></div>';
-                this.player = document.getElementById('player');
-                this.rooms.clear();
-                this.snakes = [];
+            createStartingRoom() {
+                // Room walls (leaving gaps for exits) - MATCH YOUR ORIGINAL DIMENSIONS
+                this.createWall(0, 0, 350, 20); // Top wall
+                this.createWall(0, 0, 20, 357.5); // Left wall
+                this.createWall(0, 337.5, 350, 20); // Bottom wall
+                this.createWall(330, 0, 20, 150); // Right wall top part
+                this.createWall(330, 210, 20, 147.5); // Right wall bottom part (60px gap in middle)
                 
-                // Create multiple rooms like we had today
-                const roomConfigs = [
-                    { x: 1, y: 1, exits: ['e'], entrance: true },      // Starting room - exit east
-                    { x: 2, y: 1, exits: ['w', 'e', 'n'] },            // Right room - west to 1,1, east to 3,1, north to 2,0
-                    { x: 3, y: 1, exits: ['w'] },                      // Far right - west to 2,1
-                    { x: 2, y: 0, exits: ['s', 'w'] },                 // Upper middle - south to 2,1, west to 1,0
-                    { x: 1, y: 0, exits: ['e'] },                      // Upper left - east to 2,0
-                    { x: 0, y: -1, exits: ['s'], hammer: true }        // Hammer room (accessible later)
-                ];
+                // Add some interior walls like your original
+                this.createWall(100, 100, 60, 20); // Horizontal wall
+                this.createWall(200, 200, 20, 60); // Vertical wall
                 
-                roomConfigs.forEach(config => {
-                    this.createRoom(config.x, config.y, config.exits, config.entrance, config.hammer);
+                // Cave entrance (white square) - EXACTLY like your original
+                const entrance = document.createElement('div');
+                entrance.className = 'cave-entrance';
+                entrance.style.position = 'absolute';
+                entrance.style.left = '160px';
+                entrance.style.top = '340px';
+                entrance.style.width = '30px';
+                entrance.style.height = '15px';
+                entrance.style.background = '#fff';
+                entrance.style.border = '2px solid #ccc';
+                entrance.style.borderRadius = '4px';
+                entrance.style.zIndex = '250';
+                entrance.dataset.type = 'exit';
+                this.gameWorld.appendChild(entrance);
+                
+                // Add a few snakes to the starting room - using your approach
+                this.createSnake(150, 100, 'horizontal');
+                this.createSnake(250, 200, 'vertical');
+            }
+            
+            createSnake(x, y, direction) {
+                const snake = document.createElement('div');
+                snake.className = 'enemy';
+                snake.style.left = x + 'px';
+                snake.style.top = y + 'px';
+                snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
+                this.gameWorld.appendChild(snake);
+                
+                // Add to enemies array - match your original structure
+                this.snakes.push({
+                    element: snake,
+                    x: x,
+                    y: y,
+                    startX: x,
+                    startY: y,
+                    direction: direction,
+                    speed: 1,
+                    moveDirection: 1, // 1 or -1 for back and forth
+                    range: 80 // How far they move
                 });
-                
-                this.positionPlayer();
-                this.updateDarkness();
-                this.updateUI();
-            }
-            
-            createRoom(x, y, exits, isEntrance = false, hasHammer = false) {
-                const room = document.createElement('div');
-                room.className = 'room';
-                room.id = `room_${x}_${y}`;
-                room.style.left = (x * 350) + 'px';
-                room.style.top = (-y * 357.5) + 'px'; // Negative Y for upward rooms
-                
-                // Create walls with openings
-                this.createWalls(room, exits);
-                
-                // Add entrance light if this is starting room
-                if (isEntrance) {
-                    const entrance = document.createElement('div');
-                    entrance.className = 'cave-entrance';
-                    entrance.style.position = 'absolute';
-                    entrance.style.left = '160px';
-                    entrance.style.top = '340px';
-                    entrance.style.width = '30px';
-                    entrance.style.height = '15px';
-                    entrance.style.background = '#fff';
-                    entrance.style.border = '2px solid #ccc';
-                    entrance.style.borderRadius = '4px';
-                    entrance.style.zIndex = '250';
-                    entrance.dataset.type = 'exit';
-                    room.appendChild(entrance);
-                }
-                
-                // Add hammer if this is the hammer room
-                if (hasHammer && !this.hasHammer) {
-                    const hammer = document.createElement('div');
-                    hammer.className = 'hammer';
-                    hammer.textContent = '🔨';
-                    hammer.style.left = '175px';
-                    hammer.style.top = '178px';
-                    hammer.dataset.type = 'hammer';
-                    room.appendChild(hammer);
-                }
-                
-                // Add some walls as obstacles
-                this.addRoomWalls(room, x, y);
-                
-                // Add snakes
-                this.addSnakes(room, x, y);
-                
-                this.gameWorld.appendChild(room);
-                this.rooms.set(`${x},${y}`, { element: room, exits: exits });
-            }
-            
-            createWalls(room, exits) {
-                // Top wall
-                if (!exits.includes('n')) {
-                    this.addWall(room, 0, 0, 350, 20);
-                } else {
-                    this.addWall(room, 0, 0, 140, 20);
-                    this.addWall(room, 210, 0, 140, 20);
-                }
-                
-                // Bottom wall
-                if (!exits.includes('s')) {
-                    this.addWall(room, 0, 337.5, 350, 20);
-                } else {
-                    this.addWall(room, 0, 337.5, 140, 20);
-                    this.addWall(room, 210, 337.5, 140, 20);
-                }
-                
-                // Left wall
-                if (!exits.includes('w')) {
-                    this.addWall(room, 0, 0, 20, 357.5);
-                } else {
-                    this.addWall(room, 0, 0, 20, 140);
-                    this.addWall(room, 0, 217.5, 20, 140);
-                }
-                
-                // Right wall
-                if (!exits.includes('e')) {
-                    this.addWall(room, 330, 0, 20, 357.5);
-                } else {
-                    this.addWall(room, 330, 0, 20, 140);
-                    this.addWall(room, 330, 217.5, 20, 140);
-                }
-            }
-            
-            addWall(room, x, y, width, height) {
-                const wall = document.createElement('div');
-                wall.className = 'cave-wall';
-                wall.style.left = x + 'px';
-                wall.style.top = y + 'px';
-                wall.style.width = width + 'px';
-                wall.style.height = height + 'px';
-                room.appendChild(wall);
             }
             
             createWalls(room, exits) {
@@ -640,52 +575,54 @@
             }
             
             addRoomWalls(room, roomX, roomY) {
-                // Add interior obstacle walls
+                // Add some obstacle walls in each room - FIXED positioning
                 const wallConfigs = {
-                    '1,1': [{ x: 100, y: 100, w: 60, h: 20 }, { x: 200, y: 200, w: 20, h: 60 }],
-                    '2,1': [{ x: 80, y: 80, w: 80, h: 20 }, { x: 250, y: 150, w: 20, h: 80 }],
-                    '3,1': [{ x: 60, y: 120, w: 20, h: 100 }],
-                    '2,0': [{ x: 150, y: 100, w: 20, h: 80 }],
-                    '1,0': [{ x: 100, y: 80, w: 80, h: 20 }]
+                    '1,1': [ // Starting room - just a few walls
+                        { x: 100, y: 100, w: 60, h: 20 },
+                        { x: 200, y: 200, w: 20, h: 60 }
+                    ],
+                    '2,1': [ // Middle room - more walls
+                        { x: 80, y: 80, w: 80, h: 20 },
+                        { x: 250, y: 150, w: 20, h: 80 },
+                        { x: 120, y: 250, w: 60, h: 20 }
+                    ],
+                    '3,1': [ // Right room
+                        { x: 60, y: 120, w: 20, h: 100 },
+                        { x: 200, y: 80, w: 80, h: 20 }
+                    ],
+                    '2,0': [ // Upper middle
+                        { x: 150, y: 100, w: 20, h: 80 },
+                        { x: 80, y: 200, w: 100, h: 20 }
+                    ],
+                    '1,0': [ // Upper left
+                        { x: 100, y: 80, w: 80, h: 20 },
+                        { x: 200, y: 180, w: 20, h: 80 }
+                    ],
+                    '0,0': [ // Left upper
+                        { x: 120, y: 120, w: 60, h: 20 },
+                        { x: 220, y: 200, w: 20, h: 60 }
+                    ],
+                    '0,-1': [ // Hammer room - minimal walls to make hammer accessible
+                        { x: 100, y: 100, w: 40, h: 20 },
+                        { x: 250, y: 150, w: 20, h: 40 }
+                    ]
                 };
                 
                 const walls = wallConfigs[`${roomX},${roomY}`] || [];
                 walls.forEach(wall => {
-                    this.addWall(room, wall.x, wall.y, wall.w, wall.h);
-                });
-            }
-            
-            addSnakes(room, roomX, roomY) {
-                const snakeConfigs = {
-                    '1,1': [{ x: 150, y: 120, dir: 'horizontal' }],
-                    '2,1': [{ x: 120, y: 120, dir: 'horizontal' }, { x: 280, y: 280, dir: 'vertical' }],
-                    '3,1': [{ x: 150, y: 150, dir: 'vertical' }],
-                    '2,0': [{ x: 100, y: 150, dir: 'horizontal' }],
-                    '1,0': [{ x: 150, y: 200, dir: 'vertical' }]
-                };
-                
-                const snakePositions = snakeConfigs[`${roomX},${roomY}`] || [];
-                snakePositions.forEach(pos => {
-                    const snake = document.createElement('div');
-                    snake.className = 'enemy';
-                    snake.style.left = pos.x + 'px';
-                    snake.style.top = pos.y + 'px';
-                    snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
-                    room.appendChild(snake);
-                    
-                    this.snakes.push({
-                        element: snake,
-                        x: pos.x,
-                        y: pos.y,
-                        startX: pos.x,
-                        startY: pos.y,
-                        roomX: roomX,
-                        roomY: roomY,
-                        direction: pos.dir,
-                        speed: 1,
-                        moveDirection: 1,
-                        range: 80
-                    });
+                    // Create wall element with proper positioning
+                    const wallEl = document.createElement('div');
+                    wallEl.className = 'wall obstacle-wall'; // Add class to distinguish from border walls
+                    wallEl.style.position = 'absolute';
+                    wallEl.style.left = wall.x + 'px';
+                    wallEl.style.top = wall.y + 'px';
+                    wallEl.style.width = wall.w + 'px';
+                    wallEl.style.height = wall.h + 'px';
+                    wallEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png")';
+                    wallEl.style.backgroundRepeat = 'repeat';
+                    wallEl.style.backgroundSize = '20px 20px';
+                    wallEl.style.border = '1px solid rgba(100,100,100,0.3)';
+                    room.appendChild(wallEl);
                 });
             }
             
@@ -730,14 +667,10 @@
             
             updateDarkness() {
                 const darknessOverlay = document.getElementById('darknessOverlay');
-                
-                // If player has flashlight from main world, no darkness
                 if (this.hasFlashlight) {
                     darknessOverlay.classList.remove('active');
-                    console.log('Flashlight detected - removing darkness');
                 } else {
                     darknessOverlay.classList.add('active');
-                    console.log('No flashlight - adding darkness');
                 }
             }
             
@@ -792,15 +725,15 @@
             
             canMoveTo(x, y) {
                 const playerSize = 24;
-                const padding = 2;
+                const padding = 3; // Slightly more generous
                 
-                // Simple bounds checking
+                // Basic bounds checking - match your original but fix the edges
                 if (x < padding || x > 350 - playerSize - padding || 
                     y < padding || y > 357.5 - playerSize - padding) {
                     return false;
                 }
                 
-                // Simple wall collision - just use basic overlap
+                // Wall collision - match your original approach exactly
                 const walls = this.gameWorld.querySelectorAll('.cave-wall');
                 for (let wall of walls) {
                     const wallRect = {
@@ -881,16 +814,16 @@
                     }
                 });
                 
-                // Check cave entrance collision - tighter detection near white square
+                // Check cave entrance collision - match your original
                 const items = this.gameWorld.querySelectorAll('.cave-entrance');
                 items.forEach(item => {
                     const itemX = parseInt(item.style.left);
                     const itemY = parseInt(item.style.top);
                     const itemRect = {
-                        left: itemX - 5,
-                        top: itemY - 5, // Only 5px above the white square
-                        right: itemX + 30 + 5,
-                        bottom: itemY + 15 + 5
+                        left: itemX - 15,
+                        top: itemY - 15,
+                        right: itemX + 30 + 15,
+                        bottom: itemY + 30 + 15
                     };
                     
                     if (this.rectsOverlap(playerRect, itemRect)) {
@@ -911,65 +844,15 @@
             checkRoomTransitions() {
                 if (this.isTransitioning) return;
                 
-                const currentRoom = this.rooms.get(`${this.currentRoomX},${this.currentRoomY}`);
-                if (!currentRoom) return;
-                
-                const exits = currentRoom.exits;
                 const playerCenterX = this.playerX + 12;
                 const playerCenterY = this.playerY + 12;
                 
-                // Check transitions with direction requirements
-                if (exits.includes('e') && playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220 && 
-                    (this.currentDirection === 'e' || this.currentDirection === 'ne' || this.currentDirection === 'se')) {
-                    this.transitionToRoom(this.currentRoomX + 1, this.currentRoomY, 'e');
+                // Check for room transition through right opening (like your original)
+                // Right exit gap (x > 330, y: 150-210, 60px gap)
+                if (playerCenterX > 325 && playerCenterY >= 140 && playerCenterY <= 220) {
+                    this.showMessage('🚪 Would transition to next room!');
+                    // For now just show message - we can add actual room later
                 }
-                
-                if (exits.includes('w') && playerCenterX < 25 && playerCenterY >= 140 && playerCenterY <= 220 && 
-                    (this.currentDirection === 'w' || this.currentDirection === 'nw' || this.currentDirection === 'sw')) {
-                    this.transitionToRoom(this.currentRoomX - 1, this.currentRoomY, 'w');
-                }
-                
-                if (exits.includes('n') && playerCenterY < 25 && playerCenterX >= 140 && playerCenterX <= 220 && 
-                    (this.currentDirection === 'n' || this.currentDirection === 'ne' || this.currentDirection === 'nw')) {
-                    this.transitionToRoom(this.currentRoomX, this.currentRoomY + 1, 'n');
-                }
-                
-                if (exits.includes('s') && playerCenterY > 325 && playerCenterX >= 140 && playerCenterX <= 220 && 
-                    (this.currentDirection === 's' || this.currentDirection === 'se' || this.currentDirection === 'sw')) {
-                    this.transitionToRoom(this.currentRoomX, this.currentRoomY - 1, 's');
-                }
-            }
-            
-            transitionToRoom(newRoomX, newRoomY, direction) {
-                if (!this.rooms.has(`${newRoomX},${newRoomY}`)) return;
-                
-                this.isTransitioning = true;
-                this.playerVelocityX = 0;
-                this.playerVelocityY = 0;
-                
-                // Calculate world position for smooth transition
-                const worldOffsetX = -newRoomX * 350;
-                const worldOffsetY = newRoomY * 357.5;
-                
-                // Position player on opposite side of new room
-                switch(direction) {
-                    case 'n': this.playerY = 320; break;
-                    case 's': this.playerY = 35; break;
-                    case 'e': this.playerX = 35; break;
-                    case 'w': this.playerX = 320; break;
-                }
-                
-                // Animate world position
-                this.gameWorld.style.transform = `translate(${worldOffsetX}px, ${worldOffsetY}px)`;
-                
-                setTimeout(() => {
-                    this.currentRoomX = newRoomX;
-                    this.currentRoomY = newRoomY;
-                    this.positionPlayer();
-                    this.updateRoomInfo();
-                    this.showMessage(`Room ${newRoomX},${newRoomY}`);
-                    this.isTransitioning = false;
-                }, 800);
             }
             
             transitionToRoom(newRoomX, newRoomY, direction) {
