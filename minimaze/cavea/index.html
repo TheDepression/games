@@ -799,8 +799,8 @@
                 const playerRect = {
                     left: this.playerX,
                     top: this.playerY,
-                    right: this.playerX + 24,
-                    bottom: this.playerY + 24
+                    right: this.playerX + 4,
+                    bottom: this.playerY + 4
                 };
                 
                 // Check snake collisions
@@ -808,8 +808,8 @@
                     const enemyRect = {
                         left: enemy.x,
                         top: enemy.y,
-                        right: enemy.x + 24,
-                        bottom: enemy.y + 24
+                        right: enemy.x + 4,
+                        bottom: enemy.y + 4
                     };
                     
                     if (this.rectsOverlap(playerRect, enemyRect)) {
@@ -823,10 +823,10 @@
                     const itemX = parseInt(item.style.left);
                     const itemY = parseInt(item.style.top);
                     const itemRect = {
-                        left: itemX - 15,
-                        top: itemY - 15,
-                        right: itemX + 30 + 15,
-                        bottom: itemY + 30 + 15
+                        left: itemX - 5,
+                        top: itemY - 5,
+                        right: itemX + 5 + 5,
+                        bottom: itemY + 5 + 5
                     };
                     
                     if (this.rectsOverlap(playerRect, itemRect)) {
@@ -853,8 +853,8 @@
             checkRoomTransitions() {
                 if (this.isTransitioning) return;
                 
-                const playerCenterX = this.playerX + 12;
-                const playerCenterY = this.playerY + 12;
+                const playerCenterX = this.playerX + 22;
+                const playerCenterY = this.playerY + 22;
                 
                 // Check each direction for room transitions
                 let targetRoomX = this.currentRoomX;
