@@ -910,35 +910,32 @@
     this.playerVelocityX = 0;
     this.playerVelocityY = 0;
 
-    // Position player on opposite side of new room
+    // Position player in the new room, centered in the exit gap
     switch(direction) {
         case 'n': // Enter from south
-            this.playerX = 175; // Center
-            this.playerY = 337.5 - 30; // 30px from bottom
+            this.playerX = 175; // Center of 140-210px gap
+            this.playerY = 337.5 - 24; // 24px from bottom
             break;
         case 's': // Enter from north
             this.playerX = 175;
-            this.playerY = 30; // 30px from top
+            this.playerY = 24; // 24px from top
             break;
         case 'e': // Enter from west
-            this.playerX = 30; // 30px from left
-            this.playerY = 178.75; // Center vertically
+            this.playerX = 24; // 24px from left
+            this.playerY = 178.75; // Center of 140-217.5px gap
             break;
         case 'w': // Enter from east
-            this.playerX = 350 - 30; // 30px from right
-            this.playerY = 178.75; // Center vertically
+            this.playerX = 350 - 24; // 24px from right
+            this.playerY = 178.75; // Center of 140-217.5px gap
             break;
     }
 
-    // Update room
     this.currentRoomX = newRoomX;
     this.currentRoomY = newRoomY;
 
-    // Create new room and show transition message
     this.showMessage(`Entering room ${newRoomX},${newRoomY}`);
     this.createRoom(newRoomX, newRoomY);
 
-    // End transition
     setTimeout(() => {
         this.isTransitioning = false;
     }, 800);
