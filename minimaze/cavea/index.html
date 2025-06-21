@@ -496,8 +496,15 @@
                 if (isEntrance) {
                     const exitLight = document.createElement('div');
                     exitLight.className = 'exit-light';
+                    exitLight.style.position = 'absolute';
                     exitLight.style.left = '160px';
-                    exitLight.style.top = '330px'; // Move up slightly so it's visible
+                    exitLight.style.top = '320px'; // Position above bottom wall
+                    exitLight.style.width = '30px';
+                    exitLight.style.height = '20px';
+                    exitLight.style.background = '#fff';
+                    exitLight.style.border = '2px solid #ccc';
+                    exitLight.style.borderRadius = '4px';
+                    exitLight.style.zIndex = '300'; // Always visible above darkness
                     exitLight.dataset.type = 'exit';
                     room.appendChild(exitLight);
                 }
@@ -572,7 +579,7 @@
             }
             
             addRoomWalls(room, roomX, roomY) {
-                // Add some obstacle walls in each room
+                // Add some obstacle walls in each room - FIXED positioning
                 const wallConfigs = {
                     '1,1': [ // Starting room - just a few walls
                         { x: 100, y: 100, w: 60, h: 20 },
@@ -607,7 +614,19 @@
                 
                 const walls = wallConfigs[`${roomX},${roomY}`] || [];
                 walls.forEach(wall => {
-                    this.addWall(room, wall.x, wall.y, wall.w, wall.h);
+                    // Create wall element with proper positioning
+                    const wallEl = document.createElement('div');
+                    wallEl.className = 'wall obstacle-wall'; // Add class to distinguish from border walls
+                    wallEl.style.position = 'absolute';
+                    wallEl.style.left = wall.x + 'px';
+                    wallEl.style.top = wall.y + 'px';
+                    wallEl.style.width = wall.w + 'px';
+                    wallEl.style.height = wall.h + 'px';
+                    wallEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png")';
+                    wallEl.style.backgroundRepeat = 'repeat';
+                    wallEl.style.backgroundSize = '20px 20px';
+                    wallEl.style.border = '1px solid rgba(100,100,100,0.3)';
+                    room.appendChild(wallEl);
                 });
             }
             
@@ -710,29 +729,40 @@
             
             canMoveTo(x, y) {
                 const size = 24;
-                const padding = 4;
+                const padding = 3;
                 
-                // Room bounds - more generous boundaries
-                if (x < 25 || x > 310 || y < 25 || y > 320) {
+                // Room bounds - allow closer to edges for doorway access
+                if (x < 15 || x > 320 || y < 15 || y > 330) {
                     return false;
                 }
                 
-                // Check walls in current room - only check actual wall elements
+                // Check walls in current room - be more specific about wall types
                 const currentRoom = this.rooms.get(`${this.currentRoomX},${this.currentRoomY}`);
                 if (!currentRoom) return true;
                 
+                // Only check actual walls with precise collision
                 const walls = currentRoom.element.querySelectorAll('.wall');
                 for (let wall of walls) {
-                    const wallRect = {
-                        left: parseInt(wall.style.left),
-                        top: parseInt(wall.style.top),
-                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-                    };
+                    const wallLeft = parseInt(wall.style.left);
+                    const wallTop = parseInt(wall.style.top); 
+                    const wallWidth = parseInt(wall.style.width);
+                    const wallHeight = parseInt(wall.style.height);
                     
-                    // Add some padding to make movement feel less restrictive
-                    if (x + padding < wallRect.right && x + size - padding > wallRect.left &&
-                        y + padding < wallRect.bottom && y + size - padding > wallRect.top) {
+                    // Player rectangle
+                    const playerLeft = x;
+                    const playerTop = y;
+                    const playerRight = x + size;
+                    const playerBottom = y + size;
+                    
+                    // Wall rectangle
+                    const wallRight = wallLeft + wallWidth;
+                    const wallBottom = wallTop + wallHeight;
+                    
+                    // Check for overlap with small padding
+                    if (playerLeft + padding < wallRight && 
+                        playerRight - padding > wallLeft &&
+                        playerTop + padding < wallBottom && 
+                        playerBottom - padding > wallTop) {
                         return false;
                     }
                 }
@@ -748,33 +778,36 @@
                     if (snake.roomX === this.currentRoomX && snake.roomY === this.currentRoomY) {
                         snake.changeTime++;
                         
-                        // Change direction randomly every 2 seconds
-                        if (snake.changeTime > 120) {
+                        // Change direction randomly every 3 seconds (180 frames at 60fps)
+                        if (snake.changeTime > 180) {
                             snake.direction = Math.random() * Math.PI * 2;
                             snake.changeTime = 0;
                         }
                         
-                        // Move snake
+                        // Calculate movement
                         const moveX = Math.cos(snake.direction) * snake.speed;
                         const moveY = Math.sin(snake.direction) * snake.speed;
                         
                         let newX = snake.x + moveX;
                         let newY = snake.y + moveY;
                         
-                        // Bounce off room boundaries
+                        // Bounce off room boundaries (account for snake size)
                         if (newX < 40 || newX > 270) {
-                            snake.direction = Math.PI - snake.direction; // Reverse X direction
-                            newX = snake.x - moveX; // Move back
+                            snake.direction = Math.PI - snake.direction; // Flip X direction
+                            newX = Math.max(40, Math.min(270, newX)); // Clamp to bounds
                         }
                         if (newY < 40 || newY > 280) {
-                            snake.direction = -snake.direction; // Reverse Y direction  
-                            newY = snake.y - moveY; // Move back
+                            snake.direction = -snake.direction; // Flip Y direction
+                            newY = Math.max(40, Math.min(280, newY)); // Clamp to bounds
                         }
                         
+                        // Update snake position
                         snake.x = newX;
                         snake.y = newY;
-                        snake.element.style.left = snake.x + 'px';
-                        snake.element.style.top = snake.y + 'px';
+                        
+                        // Apply position to element
+                        snake.element.style.left = Math.round(snake.x) + 'px';
+                        snake.element.style.top = Math.round(snake.y) + 'px';
                     }
                 });
             }
@@ -789,7 +822,7 @@
                     bottom: this.playerY + 24
                 };
                 
-                // Check snake collisions (only in current room)
+                // Check snake collisions (only in current room) - FIXED
                 this.snakes.forEach(snake => {
                     if (snake.roomX === this.currentRoomX && snake.roomY === this.currentRoomY) {
                         const snakeRect = {
@@ -801,6 +834,7 @@
                         
                         if (this.rectsOverlap(playerRect, snakeRect)) {
                             this.takeDamage();
+                            return; // Exit early to prevent multiple hits
                         }
                     }
                 });
@@ -810,13 +844,16 @@
                 if (currentRoom) {
                     const items = currentRoom.element.querySelectorAll('.hammer, .exit-light');
                     items.forEach(item => {
-                        const itemX = parseInt(item.style.left);
-                        const itemY = parseInt(item.style.top);
+                        const itemLeft = parseInt(item.style.left);
+                        const itemTop = parseInt(item.style.top);
+                        const itemWidth = parseInt(item.style.width) || 30;
+                        const itemHeight = parseInt(item.style.height) || 30;
+                        
                         const itemRect = {
-                            left: itemX - 10,
-                            top: itemY - 10,
-                            right: itemX + 40,
-                            bottom: itemY + 40
+                            left: itemLeft,
+                            top: itemTop,
+                            right: itemLeft + itemWidth,
+                            bottom: itemTop + itemHeight
                         };
                         
                         if (this.rectsOverlap(playerRect, itemRect)) {
