@@ -326,6 +326,27 @@ preloadPlayerImages() {
             constructor() {
                 // Load game state from main world
                 this.loadGameState();
+                // Check if returning from boss fight
+const savedState = localStorage.getItem('mfGameState');
+if (savedState) {
+    const gameState = JSON.parse(savedState);
+    if (gameState.currentUrl === 'caveb-boss-return') {
+        // Returning from boss fight - use saved room coordinates
+        this.currentRoomX = gameState.currentRoomX || 0;
+        this.currentRoomY = gameState.currentRoomY || 0;
+        
+        // Reset URL to normal caveb for future entries
+        gameState.currentUrl = 'caveb';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    } else {
+        // Normal entry from outside - always start at 0,0
+        this.currentRoomX = 0;
+        this.currentRoomY = 0;
+    }
+} else {
+    this.currentRoomX = 0;
+    this.currentRoomY = 0;
+}
                 
                 // Game state
                 this.gameStarted = false;
