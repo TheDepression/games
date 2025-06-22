@@ -550,7 +550,7 @@
         ],
         snakes: [] // No snakes in boss room
     }
-};}
+};
                 
                 const layout = roomLayouts[`${roomX},${roomY}`];
                 if (!layout) return;
@@ -586,18 +586,7 @@
                     entrance.style.zIndex = '250';
                     entrance.dataset.type = 'exit';
                     this.gameWorld.appendChild(entrance);
-                } else if (layout.exits.includes('hammer')) {
-                    // Hammer in treasure room
-                    const hammer = document.createElement('div');
-                    hammer.className = 'hammer';
-                    hammer.style.position = 'absolute';
-                    hammer.style.left = '160px';
-                    hammer.style.top = '170px';
-                    hammer.textContent = '🔨';
-                    hammer.dataset.type = 'hammer';
-                    this.gameWorld.appendChild(hammer);
-                }
-
+                    
 } else if (layout.exits.includes('boss')) {
     // Boss in boss room (using same PNG as forest boss)
     const boss = document.createElement('div');
@@ -638,7 +627,7 @@
                 this.updateUI();
                 this.updateRoomInfo();
             
-            
+        
             createBorderWalls(exits) {
     // Top wall (north)
     if (!exits.includes('n')) {
