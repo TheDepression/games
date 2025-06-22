@@ -966,26 +966,14 @@ items.forEach(item => {
             setTimeout(() => {
                 this.exitCave();
             }, 1500);
-        } else if (type === 'boss') {
-            this.playerVelocityX = 0;
-            this.playerVelocityY = 0;
-            this.isDragging = false;
-            
-            this.showMessage('🗣️ "Face me in battle, brave warrior!"');
-            
-            setTimeout(() => {
-                // Save current state before boss fight
-                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                gameState.hearts = this.hearts;
-                gameState.money = this.money;
-                gameState.timeElapsed = this.timeElapsed;
-                gameState.hasHammer = this.hasHammer;
-                gameState.currentUrl = 'caveboss';
-                localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                
-                window.location.href = 'https://thedepression.github.io/games/minimaze/caveboss';
-            }, 2000);
-        } else if (type === 'pencil' && !this.pencilCollected) {
+       } else if (type === 'boss') {
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    
+    // Show boss encounter overlay instead of message
+    document.getElementById('bossEncounterOverlay').style.display = 'flex';
+} else if (type === 'pencil' && !this.pencilCollected) {
     this.pencilCollected = true;
     this.hasPencil = true;
     item.remove();
@@ -1255,6 +1243,25 @@ if (!gameState.hasHammer) {
                 game.exitCave();
             }
         }
+
+function acceptBossFight() {
+    if (game) {
+        // Hide overlay
+        document.getElementById('bossEncounterOverlay').style.display = 'none';
+        
+        // Save current state before boss fight
+        const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+        gameState.hearts = game.hearts;
+        gameState.money = game.money;
+        gameState.timeElapsed = game.timeElapsed;
+        gameState.hasHammer = game.hasHammer;
+        gameState.currentUrl = 'caveboss';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/caveboss';
+    }
+}
+        
     </script>
 </body>
 </html>
