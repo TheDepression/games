@@ -688,25 +688,27 @@ preloadPlayerImages() {
             }
             
             createSnake(x, y, direction) {
-                const snake = document.createElement('div');
-                snake.className = 'enemy';
-                snake.style.left = x + 'px';
-                snake.style.top = y + 'px';
-                snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
-                this.gameWorld.appendChild(snake);
-                
-                this.snakes.push({
-                    element: snake,
-                    x: x,
-                    y: y,
-                    startX: x,
-                    startY: y,
-                    direction: direction,
-                    speed: 1,
-                    moveDirection: 1,
-                    range: 80
-                });
-            }
+    const snake = document.createElement('div');
+    snake.className = 'enemy';
+    snake.style.left = x + 'px';
+    snake.style.top = y + 'px';
+    snake.style.width = '60px';  // Larger width
+    snake.style.height = '35px'; // Larger height
+    snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
+    this.gameWorld.appendChild(snake);
+    
+    this.snakes.push({
+        element: snake,
+        x: x,
+        y: y,
+        startX: x,
+        startY: y,
+        direction: direction,
+        speed: 1,
+        moveDirection: 1,
+        range: 100
+    });
+}
 
             positionPlayer() {
     // Center the 32x32 sprite around playerX, playerY
@@ -859,18 +861,18 @@ preloadPlayerImages() {
                 };
                 
                 // Check snake collisions
-                this.snakes.forEach(enemy => {
-                    const enemyRect = {
-                        left: enemy.x,
-                        top: enemy.y,
-                        right: enemy.x + 4,
-                        bottom: enemy.y + 4
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, enemyRect)) {
-                        this.takeDamage();
-                    }
-                });
+this.snakes.forEach(enemy => {
+    const enemyRect = {
+        left: enemy.x,
+        top: enemy.y,
+        right: enemy.x + 60,  // Use full snake width
+        bottom: enemy.y + 35  // Use full snake height
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage();
+    }
+});
                 
                 // Check cave entrance collision
 const items = this.gameWorld.querySelectorAll('.cave-entrance, [data-type="boss"], [data-type="pencil"]');
