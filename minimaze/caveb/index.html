@@ -850,12 +850,6 @@
                             setTimeout(() => {
                                 this.exitCave();
                             }, 1500);
-                        } else if (type === 'hammer' && !this.hammerCollected) {
-                            this.hammerCollected = true;
-                            this.hasHammer = true;
-                            item.remove();
-                            this.showMessage('🔨 Legendary Hammer acquired!');
-                            this.updateUI();
                         }
                     }
                 });
