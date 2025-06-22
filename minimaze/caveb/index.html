@@ -683,7 +683,7 @@ preloadPlayerImages() {
     boss.style.zIndex = '250';
     boss.dataset.type = 'boss';
     this.gameWorld.appendChild(boss);
-    
+                }
     // Pencil behind boss - only if not collected AND pyramid key not collected
     if (!this.pencilCollected && !this.hasPyramidKey) {
         const pencil = document.createElement('div');
@@ -702,7 +702,7 @@ preloadPlayerImages() {
         pencil.dataset.type = 'pencil';
         this.gameWorld.appendChild(pencil);
     }
-}
+
                 this.positionPlayer();
                 this.updateDarkness();
                 this.updateUI();
