@@ -311,6 +311,18 @@
 
     <script>
         class ZeldaCave {
+
+preloadPlayerImages() {
+    const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+    this.playerImages = {};
+    
+    directions.forEach(direction => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+        this.playerImages[direction] = img;
+    });
+}
+            
             constructor() {
                 // Load game state from main world
                 this.loadGameState();
@@ -330,6 +342,8 @@
                 this.lastDragX = 0;
                 this.lastDragY = 0;
                 this.currentDirection = 'n'; // Start facing north (into cave)
+                this.currentDirection = 'n'; // Start facing north (into cave)
+this.preloadPlayerImages(); // <-- ADD THIS LINE
                 
                 // Room system - thinking in X,Y coordinates (starting at 0,0)
                 this.currentRoomX = 0;
