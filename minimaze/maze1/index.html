@@ -3123,6 +3123,7 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         lastSaveTime: Date.now(),
         isInForest: this.isInForest || false,
         hasFlashlight: this.hasFlashlight,
+hasPencil: this.hasPencil,
 hasPyramidKey: this.hasPyramidKey,
         caveBossDefeated: this.caveBossDefeated
     };
@@ -3150,6 +3151,7 @@ loadGameState() {
         this.collectedHearts = gameState.collectedHearts || [];
         this.isInForest = gameState.isInForest || false;
         this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasPencil = gameState.hasPencil || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
         
@@ -3187,6 +3189,7 @@ this.hasPyramidKey = gameState.hasPyramidKey || false;
         document.getElementById('forestVisionMask').classList.remove('active');
         this.updateForestVisibility();
         this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasPencil = gameState.hasPencil || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
         
