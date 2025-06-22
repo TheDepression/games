@@ -364,6 +364,7 @@
                     this.timeElapsed = gameState.timeElapsed || 0;
                     this.hasFlashlight = gameState.hasFlashlight || false;
                     this.hasHammer = gameState.hasHammer || false;
+                    this.hasPencil = gameState.hasPencil || false;
                 } else {
                     this.hearts = 3;
                     this.money = 0;
@@ -1106,8 +1107,9 @@ items.forEach(item => {
                 document.getElementById('money').textContent = this.money;
                 
                 let items = [];
-                if (this.hasFlashlight) items.push('🔦');
-                if (this.hasHammer) items.push('🔨');
+if (this.hasFlashlight) items.push('🔦');
+if (this.hasHammer) items.push('🔨');
+if (this.hasPencil) items.push('✏️');
                 
                 document.getElementById('itemsList').textContent = items.length > 0 ? items.join(' ') : 'None';
             }
