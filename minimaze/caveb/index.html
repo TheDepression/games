@@ -255,6 +255,43 @@
         .start-button:hover {
             background: #ff5722;
         }
+
+        #bossEncounterOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 600;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.boss-encounter-image {
+    width: 120px;
+    height: 120px;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 20px;
+}
+
+.boss-encounter-text {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #666;
+}
     </style>
 </head>
 <body>
@@ -300,6 +337,14 @@
                 <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Avoid the giant snakes! 🐍</div>
             </div>
         </div>
+
+<div id="bossEncounterOverlay">
+    <div class="boss-encounter-image"></div>
+    <div class="boss-encounter-text">
+        "Face me in battle, brave warrior!"
+    </div>
+    <button onclick="acceptBossFight()" style="background: #ff4444; font-size: 16px; padding: 12px 24px;">Fight!</button>
+</div>
         
         <div id="darknessOverlay" class="darkness-overlay"></div>
     </div>
@@ -399,6 +444,7 @@ if (savedState) {
                     this.hasFlashlight = gameState.hasFlashlight || false;
                     this.hasHammer = gameState.hasHammer || false;
                     this.hasPencil = gameState.hasPencil || false;
+                    this.caveBossDefeated = gameState.caveBossDefeated || false;
                 } else {
                     this.hearts = 3;
                     this.money = 0;
@@ -407,6 +453,8 @@ if (savedState) {
                     this.hasHammer = false;
                     this.caveBossDefeated = gameState.caveBossDefeated || false;
                 }
+
+        
             }
             
             updateStartMessage() {
