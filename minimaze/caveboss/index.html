@@ -528,6 +528,8 @@
                     timeElapsed: this.timeElapsed,
                     playerX: 175, // Return to cave entrance
                     playerY: 280,
+                    currentRoomX: 0, // Boss room coordinates  
+        currentRoomY: 3,
                     hasKey: this.hasKey,
                     hasBoat: this.hasBoat,
                     hasHammer: this.hasHammer,
@@ -1140,15 +1142,42 @@
             }
 
             gameOver() {
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                this.bgMusic.pause();
-                this.showMessage('💀 Game Over!');
-                
-                setTimeout(() => {
-                    this.showLevelComplete('💀 Game Over', 'The cave boss was too strong!');
-                }, 2000);
-            }
+    clearInterval(this.timerInterval);
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    this.showMessage('💀 Game Over!');
+    
+    setTimeout(() => {
+        // Save state to return to cave entrance
+        const gameState = {
+            hearts: 3, // Reset to full health
+            money: this.money,
+            timeElapsed: this.timeElapsed,
+            playerX: 175, // Cave entrance
+            playerY: 280,
+            currentRoomX: 0, // Entrance room
+            currentRoomY: 0, // Entrance room
+            hasKey: this.hasKey,
+            hasBoat: this.hasBoat,
+            hasHammer: this.hasHammer,
+            hasLavaShoes: this.hasLavaShoes,
+            hasBaby: this.hasBaby,
+            bullyDefeated: this.bullyDefeated,
+            motherPaid: this.motherPaid,
+            collectedMoney: this.collectedMoney,
+            collectedHearts: this.collectedHearts,
+            currentUrl: 'caveb', // Return to Cave B
+            lastSaveTime: Date.now(),
+            isInForest: this.isInForest,
+            hasFlashlight: this.hasFlashlight,
+            hasPencil: this.hasPencil,
+            caveBossDefeated: false // Boss NOT defeated if you died
+        };
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/caveb';
+    }, 3000);
+}
 
             showLevelComplete(title, text) {
                 document.getElementById('levelCompleteTitle').textContent = title;
