@@ -584,7 +584,7 @@ preloadPlayerImages() {
                 }
                 
                 // Add special items
-                if (layout.exits.includes('s') && roomX === 0 && roomY === 0) {
+                if (roomX === 0 && roomY === 0) {
                     // Cave entrance in starting room
                     const entrance = document.createElement('div');
                     entrance.className = 'cave-entrance';
