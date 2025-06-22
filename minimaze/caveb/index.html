@@ -369,109 +369,89 @@ preloadPlayerImages() {
 }
             
             constructor() {
-                // Load game state from main world
-                this.loadGameState();
-                // Check if returning from boss fight
-const savedState = localStorage.getItem('mfGameState');
-if (savedState) {
+    // Load game state from main world
+    this.loadGameState();
+    
     // Check if returning from boss fight
-const savedState = localStorage.getItem('mfGameState');
-if (savedState) {
-    const gameState = JSON.parse(savedState);
-    if (gameState.returningFromBoss === true) {  // Check the new field
-        // Returning from boss fight - use saved room coordinates
-        this.currentRoomX = gameState.currentRoomX || 0;
-        this.currentRoomY = gameState.currentRoomY || 0;
-        
-        // Reset flag for future entries
-        gameState.returningFromBoss = false;
-        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        if (gameState.returningFromBoss === true) {
+            // Returning from boss fight - use saved room coordinates
+            this.currentRoomX = gameState.currentRoomX;
+            this.currentRoomY = gameState.currentRoomY;
+            
+            // Reset flag for future entries
+            gameState.returningFromBoss = false;
+            localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        } else {
+            // Normal entry from outside - always start at 0,0
+            this.currentRoomX = 0;
+            this.currentRoomY = 0;
+        }
     } else {
-        // Normal entry from outside - always start at 0,0
         this.currentRoomX = 0;
         this.currentRoomY = 0;
     }
-} else {
-    this.currentRoomX = 0;
-    this.currentRoomY = 0;
-}
-        
-        // Reset URL to normal caveb for future entries
-        gameState.currentUrl = 'caveb';
-        localStorage.setItem('mfGameState', JSON.stringify(gameState));
-    } else {
-        // Normal entry from outside - always start at 0,0
-        this.currentRoomX = 0;
-        this.currentRoomY = 0;
-    }
-} else {
-    this.currentRoomX = 0;
-    this.currentRoomY = 0;
-}
-                
-                // Game state
-                this.gameStarted = false;
-                this.isPaused = false;
-                this.isTransitioning = false;
-                this.isInvulnerable = false;
-                
-                // Player state
-                this.playerX = 175; // Center of room
-                this.playerY = 280; // Moved up 20px from 300 - safer distance from exit
-                this.playerVelocityX = 0;
-                this.playerVelocityY = 0;
-                this.isDragging = false;
-                this.lastDragX = 0;
-                this.lastDragY = 0;
-                this.currentDirection = 'n'; // Start facing north (into cave)
-                this.preloadPlayerImages(); // <-- ADD THIS LINE
-                
-                // Room system - thinking in X,Y coordinates (starting at 0,0)
-                this.currentRoomX = 0;
-                this.currentRoomY = 0;
-                
-                // Cave items
-                this.pencilCollected = false;
-                this.snakes = [];
-                
-                // Timer
-                this.timerInterval = null;
-                
-                // Elements
-                this.player = document.getElementById('player');
-                this.gameWorld = document.getElementById('gameWorld');
-                this.gameArea = document.getElementById('gameArea');
-                this.controlArea = document.getElementById('controlArea');
-                this.caveMusic = document.getElementById('caveMusic');
-                
-                this.setupControls();
-                this.createRoom(0, 0); // Start in room 0,0
-                this.updatePlayerImage('n');
-                this.updateStartMessage();
-            }
+    
+    // Game state
+    this.gameStarted = false;
+    this.isPaused = false;
+    this.isTransitioning = false;
+    this.isInvulnerable = false;
+    
+    // Player state
+    this.playerX = 175;
+    this.playerY = 280;
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    this.lastDragX = 0;
+    this.lastDragY = 0;
+    this.currentDirection = 'n';
+    this.preloadPlayerImages();
+    
+    // Cave items
+    this.pencilCollected = false;
+    this.snakes = [];
+    
+    // Timer
+    this.timerInterval = null;
+    
+    // Elements
+    this.player = document.getElementById('player');
+    this.gameWorld = document.getElementById('gameWorld');
+    this.gameArea = document.getElementById('gameArea');
+    this.controlArea = document.getElementById('controlArea');
+    this.caveMusic = document.getElementById('caveMusic');
+    
+    this.setupControls();
+    this.createRoom(this.currentRoomX, this.currentRoomY); // Use the coordinates set above
+    this.updatePlayerImage('n');
+    this.updateStartMessage();
+} 
             
             loadGameState() {
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    this.hearts = gameState.hearts || 3;
-                    this.money = gameState.money || 0;
-                    this.timeElapsed = gameState.timeElapsed || 0;
-                    this.hasFlashlight = gameState.hasFlashlight || false;
-                    this.hasHammer = gameState.hasHammer || false;
-                    this.hasPencil = gameState.hasPencil || false;
-                    this.caveBossDefeated = gameState.caveBossDefeated || false;
-                } else {
-                    this.hearts = 3;
-                    this.money = 0;
-                    this.timeElapsed = 0;
-                    this.hasFlashlight = false;
-                    this.hasHammer = false;
-                    this.caveBossDefeated = gameState.caveBossDefeated || false;
-                }
-
-        
-            }
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        this.hearts = gameState.hearts || 3;
+        this.money = gameState.money || 0;
+        this.timeElapsed = gameState.timeElapsed || 0;
+        this.hasFlashlight = gameState.hasFlashlight || false;
+        this.hasHammer = gameState.hasHammer || false;
+        this.hasPencil = gameState.hasPencil || false;
+        this.caveBossDefeated = gameState.caveBossDefeated || false; // MOVED INSIDE IF BLOCK
+    } else {
+        this.hearts = 3;
+        this.money = 0;
+        this.timeElapsed = 0;
+        this.hasFlashlight = false;
+        this.hasHammer = false;
+        this.hasPencil = false;
+        this.caveBossDefeated = false;
+    }
+}
             
             updateStartMessage() {
                 const warningDiv = document.getElementById('warningMessage');
