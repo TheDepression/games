@@ -685,23 +685,23 @@ if (roomX === 0 && roomY === 3 && !this.caveBossDefeated) {
     this.gameWorld.appendChild(boss);
 }
 
-// Pencil in boss room - available before AND after boss defeat (if conditions met)
-if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) {
-    const pencil = document.createElement('div');
-    pencil.style.position = 'absolute';
-    pencil.style.left = '320px';
-    pencil.style.top = '30px';
-    pencil.style.width = '24px';
-    pencil.style.height = '24px';
-    pencil.style.fontSize = '20px';
-    pencil.style.display = 'flex';
-    pencil.style.alignItems = 'center';
-    pencil.style.justifyContent = 'center';
-    pencil.style.animation = 'glow 2s infinite';
-    pencil.style.zIndex = '250';
-    pencil.textContent = '✏️';
-    pencil.dataset.type = 'pencil';
-    this.gameWorld.appendChild(pencil);
+// Pencil (only if not collected and no pyramid key)
+    if (!this.pencilCollected && !this.hasPyramidKey) {
+        const pencil = document.createElement('div');
+        pencil.style.position = 'absolute';
+        pencil.style.left = '320px';
+        pencil.style.top = '30px';
+        pencil.style.width = '24px';
+        pencil.style.height = '24px';
+        pencil.style.fontSize = '20px';
+        pencil.style.display = 'flex';
+        pencil.style.alignItems = 'center';
+        pencil.style.justifyContent = 'center';
+        pencil.style.animation = 'glow 2s infinite';
+        pencil.style.zIndex = '250';
+        pencil.textContent = '✏️';
+        pencil.dataset.type = 'pencil';
+        this.gameWorld.appendChild(pencil);
 }
 
                 this.positionPlayer();
