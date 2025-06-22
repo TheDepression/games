@@ -311,6 +311,18 @@
 
     <script>
         class ZeldaCave {
+
+preloadPlayerImages() {
+    const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+    this.playerImages = {};
+    
+    directions.forEach(direction => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+        this.playerImages[direction] = img;
+    });
+}
+            
             constructor() {
                 // Load game state from main world
                 this.loadGameState();
