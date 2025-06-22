@@ -668,8 +668,8 @@ preloadPlayerImages() {
                     entrance.dataset.type = 'exit';
                     this.gameWorld.appendChild(entrance);
                     
-} else if (layout.exits.includes('boss') && !this.caveBossDefeated) {
-    // Boss in boss room - only if not defeated
+// Boss in boss room - only if not defeated
+if (roomX === 0 && roomY === 3 && !this.caveBossDefeated) {
     const boss = document.createElement('div');
     boss.style.position = 'absolute';
     boss.style.left = '170px';
@@ -683,25 +683,26 @@ preloadPlayerImages() {
     boss.style.zIndex = '250';
     boss.dataset.type = 'boss';
     this.gameWorld.appendChild(boss);
-                }
-    // Pencil behind boss - only if not collected AND pyramid key not collected
-    if (!this.pencilCollected && !this.hasPyramidKey) {
-        const pencil = document.createElement('div');
-        pencil.style.position = 'absolute';
-        pencil.style.left = '320px';
-        pencil.style.top = '30px';
-        pencil.style.width = '24px';
-        pencil.style.height = '24px';
-        pencil.style.fontSize = '20px';
-        pencil.style.display = 'flex';
-        pencil.style.alignItems = 'center';
-        pencil.style.justifyContent = 'center';
-        pencil.style.animation = 'glow 2s infinite';
-        pencil.style.zIndex = '250';
-        pencil.textContent = '✏️';
-        pencil.dataset.type = 'pencil';
-        this.gameWorld.appendChild(pencil);
-    }
+}
+
+// Pencil in boss room - available before AND after boss defeat (if conditions met)
+if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) {
+    const pencil = document.createElement('div');
+    pencil.style.position = 'absolute';
+    pencil.style.left = '320px';
+    pencil.style.top = '30px';
+    pencil.style.width = '24px';
+    pencil.style.height = '24px';
+    pencil.style.fontSize = '20px';
+    pencil.style.display = 'flex';
+    pencil.style.alignItems = 'center';
+    pencil.style.justifyContent = 'center';
+    pencil.style.animation = 'glow 2s infinite';
+    pencil.style.zIndex = '250';
+    pencil.textContent = '✏️';
+    pencil.dataset.type = 'pencil';
+    this.gameWorld.appendChild(pencil);
+}
 
                 this.positionPlayer();
                 this.updateDarkness();
