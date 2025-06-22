@@ -384,6 +384,7 @@ preloadPlayerImages() {
                     this.timeElapsed = 0;
                     this.hasFlashlight = false;
                     this.hasHammer = false;
+                    this.caveBossDefeated = gameState.caveBossDefeated || false;
                 }
             }
             
@@ -600,8 +601,8 @@ preloadPlayerImages() {
                     entrance.dataset.type = 'exit';
                     this.gameWorld.appendChild(entrance);
                     
-} else if (layout.exits.includes('boss')) {
-    // Boss in boss room (using same PNG as forest boss)
+} else if (layout.exits.includes('boss') && !this.caveBossDefeated) {
+    // Boss in boss room (using same PNG as forest boss) - only if not defeated
     const boss = document.createElement('div');
     boss.style.position = 'absolute';
     boss.style.left = '170px';
@@ -916,12 +917,13 @@ items.forEach(item => {
                 window.location.href = 'https://thedepression.github.io/games/minimaze/caveboss';
             }, 2000);
         } else if (type === 'pencil' && !this.pencilCollected) {
-            this.pencilCollected = true;
-            this.hasPencil = true;
-            item.remove();
-            this.showMessage('✏️ Ancient Pencil acquired!');
-            this.updateUI();
-        }
+    this.pencilCollected = true;
+    this.hasPencil = true;
+    item.remove();
+    this.showMessage('✏️ Ancient Pencil acquired! Return to main world to save it!');
+    this.updateUI();
+    // DON'T auto-save pencil collection - only save when exiting cave
+}
     }
 });
             }
@@ -1054,26 +1056,28 @@ items.forEach(item => {
             }
             
             exitCave() {
-                this.gameStarted = false;
-                clearInterval(this.timerInterval);
-                this.caveMusic.pause();
-                
-                this.showMessage('🌅 Exiting cave...');
-                
-                setTimeout(() => {
-                    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                    gameState.hearts = this.hearts;
-                    gameState.money = this.money;
-                    gameState.timeElapsed = this.timeElapsed;
-                    gameState.hasHammer = this.hasHammer;
-                    gameState.playerX = 300;
-                    gameState.playerY = 2280;
-                    gameState.currentUrl = 'main';
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                    
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-                }, 2000);
-            }
+    this.gameStarted = false;
+    clearInterval(this.timerInterval);
+    this.caveMusic.pause();
+    
+    this.showMessage('🌅 Exiting cave...');
+    
+    setTimeout(() => {
+        const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+        gameState.hearts = this.hearts;
+        gameState.money = this.money;
+        gameState.timeElapsed = this.timeElapsed;
+        gameState.hasHammer = this.hasHammer;
+        gameState.hasPencil = this.hasPencil; // Save pencil state when exiting
+        gameState.caveBossDefeated = this.caveBossDefeated; // Save boss defeat state
+        gameState.playerX = 300;
+        gameState.playerY = 2280;
+        gameState.currentUrl = 'main';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+    }, 2000);
+}
             
             startTimer() {
                 this.updateTimer();
