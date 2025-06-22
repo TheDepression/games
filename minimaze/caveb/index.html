@@ -668,8 +668,8 @@ preloadPlayerImages() {
                     entrance.dataset.type = 'exit';
                     this.gameWorld.appendChild(entrance);
                     
-// Boss in boss room - only if not defeated
-if (roomX === 0 && roomY === 3 && !this.caveBossDefeated) {
+} else if (roomX === 0 && roomY === 3 && !this.caveBossDefeated) {
+    // Boss (only if not defeated)
     const boss = document.createElement('div');
     boss.style.position = 'absolute';
     boss.style.left = '170px';
@@ -685,31 +685,30 @@ if (roomX === 0 && roomY === 3 && !this.caveBossDefeated) {
     this.gameWorld.appendChild(boss);
 }
 
-// Pencil (only if not collected and no pyramid key)
-    // Pencil (only if not collected and no pyramid key)
+// Pencil - completely separate check
 if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) {
-        const pencil = document.createElement('div');
-        pencil.style.position = 'absolute';
-        pencil.style.left = '320px';
-        pencil.style.top = '30px';
-        pencil.style.width = '24px';
-        pencil.style.height = '24px';
-        pencil.style.fontSize = '20px';
-        pencil.style.display = 'flex';
-        pencil.style.alignItems = 'center';
-        pencil.style.justifyContent = 'center';
-        pencil.style.animation = 'glow 2s infinite';
-        pencil.style.zIndex = '250';
-        pencil.textContent = '✏️';
-        pencil.dataset.type = 'pencil';
-        this.gameWorld.appendChild(pencil);
+    const pencil = document.createElement('div');
+    pencil.style.position = 'absolute';
+    pencil.style.left = '320px';
+    pencil.style.top = '30px';
+    pencil.style.width = '24px';
+    pencil.style.height = '24px';
+    pencil.style.fontSize = '20px';
+    pencil.style.display = 'flex';
+    pencil.style.alignItems = 'center';
+    pencil.style.justifyContent = 'center';
+    pencil.style.animation = 'glow 2s infinite';
+    pencil.style.zIndex = '250';
+    pencil.textContent = '✏️';
+    pencil.dataset.type = 'pencil';
+    this.gameWorld.appendChild(pencil);
 }
 
                 this.positionPlayer();
                 this.updateDarkness();
                 this.updateUI();
                 this.updateRoomInfo();
-                }}
+                }
         
             createBorderWalls(exits) {
     // Top wall (north)
