@@ -644,25 +644,27 @@
             }
             
             createSnake(x, y, direction) {
-                const snake = document.createElement('div');
-                snake.className = 'enemy';
-                snake.style.left = x + 'px';
-                snake.style.top = y + 'px';
-                snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
-                this.gameWorld.appendChild(snake);
-                
-                this.snakes.push({
-                    element: snake,
-                    x: x,
-                    y: y,
-                    startX: x,
-                    startY: y,
-                    direction: direction,
-                    speed: 1,
-                    moveDirection: 1,
-                    range: 80
-                });
-            }
+    const snake = document.createElement('div');
+    snake.className = 'enemy';
+    snake.style.left = x + 'px';
+    snake.style.top = y + 'px';
+    snake.style.width = '60px';  // Larger width
+    snake.style.height = '35px'; // Larger height
+    snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
+    this.gameWorld.appendChild(snake);
+    
+    this.snakes.push({
+        element: snake,
+        x: x,
+        y: y,
+        startX: x,
+        startY: y,
+        direction: direction,
+        speed: 1,
+        moveDirection: 1,
+        range: 100
+    });
+}
 
             positionPlayer() {
     // Center the 32x32 sprite around playerX, playerY
@@ -819,8 +821,8 @@
                     const enemyRect = {
                         left: enemy.x,
                         top: enemy.y,
-                        right: enemy.x + 4,
-                        bottom: enemy.y + 4
+                        right: enemy.x + 60,
+                        bottom: enemy.y + 35
                     };
                     
                     if (this.rectsOverlap(playerRect, enemyRect)) {
@@ -836,8 +838,8 @@
                     const itemRect = {
                         left: itemX - 5,
                         top: itemY - 5,
-                        right: itemX + 5 + 5,
-                        bottom: itemY + 5 + 5
+                        right: itemX + 30,
+                        bottom: itemY + 30
                     };
                     
                     if (this.rectsOverlap(playerRect, itemRect)) {
