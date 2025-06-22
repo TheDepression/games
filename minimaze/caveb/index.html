@@ -558,8 +558,8 @@ preloadPlayerImages() {
     '0,3': { // Boss room
         exits: ['s', 'boss'], // south back, has boss
         walls: [
-            { x: 80, y: 80, w: 60, h: 20 },
-            { x: 260, y: 120, w: 20, h: 60 }
+            { x: 220, y: 80, w: 120, h: 50 },
+            { x: 160, y: 10, w: 20, h: 100 }
         ],
         snakes: [] // No snakes in boss room
     }
@@ -880,10 +880,10 @@ items.forEach(item => {
     const itemX = parseInt(item.style.left);
     const itemY = parseInt(item.style.top);
     const itemRect = {
-        left: itemX - 5,
-        top: itemY - 5,
-        right: itemX + 5 + 5,
-        bottom: itemY + 5 + 5
+        left: itemX - 10,
+        top: itemY - 10,
+        right: itemX + 50 + 10,
+        bottom: itemY + 10 + 15
     };
     
     if (this.rectsOverlap(playerRect, itemRect)) {
