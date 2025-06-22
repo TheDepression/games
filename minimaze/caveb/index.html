@@ -464,84 +464,92 @@
                 
                 // Define room layouts - your exact network
                 const roomLayouts = {
-                    '0,0': { // Starting room
-                        exits: ['e', 's'], // east and south (cave entrance)
-                        walls: [
-                            { x: 100, y: 100, w: 60, h: 20 },
-                            { x: 200, y: 200, w: 20, h: 60 }
-                        ],
-                        snakes: [
-                            { x: 150, y: 100, dir: 'horizontal' },
-                            { x: 250, y: 200, dir: 'vertical' }
-                        ]
-                    },
-                    '1,0': { // Right of start
-                        exits: ['w', 'e', 'n'], // west, east, north
-                        walls: [
-                            { x: 80, y: 80, w: 80, h: 20 },
-                            { x: 250, y: 150, w: 20, h: 80 },
-                            { x: 120, y: 250, w: 60, h: 20 }
-                        ],
-                        snakes: [
-                            { x: 120, y: 120, dir: 'horizontal' },
-                            { x: 280, y: 280, dir: 'vertical' }
-                        ]
-                    },
-                    '2,0': { // Far right
-                        exits: ['w'], // only west
-                        walls: [
-                            { x: 60, y: 120, w: 20, h: 100 },
-                            { x: 200, y: 80, w: 80, h: 20 }
-                        ],
-                        snakes: [
-                            { x: 150, y: 150, dir: 'horizontal' },
-                            { x: 100, y: 250, dir: 'vertical' }
-                        ]
-                    },
-                    '1,1': { // Up from middle
-                        exits: ['s', 'w', 'n'], // south, west, north
-                        walls: [
-                            { x: 150, y: 100, w: 20, h: 80 },
-                            { x: 80, y: 200, w: 100, h: 20 }
-                        ],
-                        snakes: [
-                            { x: 100, y: 150, dir: 'vertical' },
-                            { x: 250, y: 120, dir: 'horizontal' }
-                        ]
-                    },
-                    '0,1': { // Left from upper
-                        exits: ['e', 'n'], // east, north
-                        walls: [
-                            { x: 100, y: 80, w: 80, h: 20 },
-                            { x: 200, y: 180, w: 20, h: 80 }
-                        ],
-                        snakes: [
-                            { x: 150, y: 200, dir: 'horizontal' },
-                            { x: 250, y: 100, dir: 'vertical' }
-                        ]
-                    },
-                    '0,2': { // Up from left
-                        exits: ['s'], // only south
-                        walls: [
-                            { x: 120, y: 120, w: 60, h: 20 },
-                            { x: 220, y: 200, w: 20, h: 60 }
-                        ],
-                        snakes: [
-                            { x: 180, y: 150, dir: 'vertical' },
-                            { x: 80, y: 250, dir: 'horizontal' }
-                        ]
-                    },
-                    '1,2': { // Hammer room - up from middle upper
-                        exits: ['s', 'hammer'], // south, has hammer
-                        walls: [
-                            { x: 100, y: 100, w: 40, h: 20 },
-                            { x: 250, y: 150, w: 20, h: 40 }
-                        ],
-                        snakes: [
-                            { x: 120, y: 250, dir: 'horizontal' } // Only one snake
-                        ]
-                    }
-                };
+    '0,0': { // Starting room
+        exits: ['w'], // only west
+        walls: [
+            { x: 100, y: 100, w: 60, h: 20 },
+            { x: 200, y: 200, w: 20, h: 60 }
+        ],
+        snakes: [
+            { x: 150, y: 150, dir: 'horizontal' },
+            { x: 250, y: 250, dir: 'vertical' }
+        ]
+    },
+    '-1,0': { // First west
+        exits: ['e', 'w'], // east back to start, west forward
+        walls: [
+            { x: 80, y: 80, w: 80, h: 20 },
+            { x: 250, y: 150, w: 20, h: 80 }
+        ],
+        snakes: [
+            { x: 120, y: 200, dir: 'horizontal' },
+            { x: 280, y: 120, dir: 'vertical' }
+        ]
+    },
+    '-2,0': { // Second west
+        exits: ['e', 'n'], // east back, north forward
+        walls: [
+            { x: 60, y: 120, w: 20, h: 100 },
+            { x: 200, y: 80, w: 80, h: 20 }
+        ],
+        snakes: [
+            { x: 150, y: 180, dir: 'horizontal' },
+            { x: 100, y: 280, dir: 'vertical' }
+        ]
+    },
+    '-2,1': { // First north
+        exits: ['s', 'n'], // south back, north forward
+        walls: [
+            { x: 150, y: 100, w: 20, h: 80 },
+            { x: 80, y: 200, w: 100, h: 20 }
+        ],
+        snakes: [
+            { x: 100, y: 150, dir: 'vertical' },
+            { x: 250, y: 250, dir: 'horizontal' }
+        ]
+    },
+    '-2,2': { // Second north
+        exits: ['s', 'e'], // south back, east forward
+        walls: [
+            { x: 100, y: 80, w: 80, h: 20 },
+            { x: 200, y: 180, w: 20, h: 80 }
+        ],
+        snakes: [
+            { x: 150, y: 200, dir: 'horizontal' },
+            { x: 250, y: 100, dir: 'vertical' }
+        ]
+    },
+    '-1,2': { // First east
+        exits: ['w', 'e'], // west back, east forward
+        walls: [
+            { x: 120, y: 120, w: 60, h: 20 },
+            { x: 220, y: 200, w: 20, h: 60 }
+        ],
+        snakes: [
+            { x: 180, y: 180, dir: 'vertical' },
+            { x: 80, y: 150, dir: 'horizontal' }
+        ]
+    },
+    '0,2': { // Second east
+        exits: ['w', 'n'], // west back, north to boss
+        walls: [
+            { x: 100, y: 100, w: 40, h: 20 },
+            { x: 250, y: 150, w: 20, h: 40 }
+        ],
+        snakes: [
+            { x: 120, y: 250, dir: 'horizontal' },
+            { x: 200, y: 200, dir: 'vertical' }
+        ]
+    },
+    '0,3': { // Boss room
+        exits: ['s', 'boss'], // south back, has boss
+        walls: [
+            { x: 80, y: 80, w: 60, h: 20 },
+            { x: 260, y: 120, w: 20, h: 60 }
+        ],
+        snakes: [] // No snakes in boss room
+    }
+};
                 
                 const layout = roomLayouts[`${roomX},${roomY}`];
                 if (!layout) return;
@@ -588,6 +596,41 @@
                     hammer.dataset.type = 'hammer';
                     this.gameWorld.appendChild(hammer);
                 }
+
+} else if (layout.exits.includes('boss')) {
+    // Boss in boss room (using same PNG as forest boss)
+    const boss = document.createElement('div');
+    boss.style.position = 'absolute';
+    boss.style.left = '150px';
+    boss.style.top = '150px';
+    boss.style.width = '50px';
+    boss.style.height = '50px';
+    boss.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png")';
+    boss.style.backgroundSize = 'contain';
+    boss.style.backgroundRepeat = 'no-repeat';
+    boss.style.backgroundPosition = 'center';
+    boss.style.zIndex = '250';
+    boss.dataset.type = 'boss';
+    this.gameWorld.appendChild(boss);
+    
+    // Pencil behind boss
+    const pencil = document.createElement('div');
+    pencil.style.position = 'absolute';
+    pencil.style.left = '210px';
+    pencil.style.top = '170px';
+    pencil.style.width = '24px';
+    pencil.style.height = '24px';
+    pencil.style.fontSize = '20px';
+    pencil.style.display = 'flex';
+    pencil.style.alignItems = 'center';
+    pencil.style.justifyContent = 'center';
+    pencil.style.animation = 'glow 2s infinite';
+    pencil.style.zIndex = '250';
+    pencil.textContent = '✏️';
+    pencil.dataset.type = 'pencil';
+    this.gameWorld.appendChild(pencil);
+}
+
                 
                 this.positionPlayer();
                 this.updateDarkness();
@@ -829,30 +872,55 @@
                 });
                 
                 // Check cave entrance collision
-                const items = this.gameWorld.querySelectorAll('.cave-entrance, .hammer');
-                items.forEach(item => {
-                    const itemX = parseInt(item.style.left);
-                    const itemY = parseInt(item.style.top);
-                    const itemRect = {
-                        left: itemX - 5,
-                        top: itemY - 5,
-                        right: itemX + 5 + 5,
-                        bottom: itemY + 5 + 5
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, itemRect)) {
-                        const type = item.dataset.type;
-                        if (type === 'exit') {
-                            clearInterval(this.timerInterval);
-                            this.caveMusic.pause();
-                            this.showMessage('🌅 Exiting cave...');
-                            
-                            setTimeout(() => {
-                                this.exitCave();
-                            }, 1500);
-                        }
-                    }
-                });
+const items = this.gameWorld.querySelectorAll('.cave-entrance, [data-type="boss"], [data-type="pencil"]');
+items.forEach(item => {
+    const itemX = parseInt(item.style.left);
+    const itemY = parseInt(item.style.top);
+    const itemRect = {
+        left: itemX - 5,
+        top: itemY - 5,
+        right: itemX + 5 + 5,
+        bottom: itemY + 5 + 5
+    };
+    
+    if (this.rectsOverlap(playerRect, itemRect)) {
+        const type = item.dataset.type;
+        if (type === 'exit') {
+            clearInterval(this.timerInterval);
+            this.caveMusic.pause();
+            this.showMessage('🌅 Exiting cave...');
+            
+            setTimeout(() => {
+                this.exitCave();
+            }, 1500);
+        } else if (type === 'boss') {
+            this.playerVelocityX = 0;
+            this.playerVelocityY = 0;
+            this.isDragging = false;
+            
+            this.showMessage('🗣️ "Face me in battle, brave warrior!"');
+            
+            setTimeout(() => {
+                // Save current state before boss fight
+                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                gameState.hearts = this.hearts;
+                gameState.money = this.money;
+                gameState.timeElapsed = this.timeElapsed;
+                gameState.hasHammer = this.hasHammer;
+                gameState.currentUrl = 'caveboss';
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                
+                window.location.href = 'https://thedepression.github.io/games/minimaze/caveboss';
+            }, 2000);
+        } else if (type === 'pencil' && !this.pencilCollected) {
+            this.pencilCollected = true;
+            this.hasPencil = true;
+            item.remove();
+            this.showMessage('✏️ Ancient Pencil acquired!');
+            this.updateUI();
+        }
+    }
+});
             }
             
             checkRoomTransitions() {
