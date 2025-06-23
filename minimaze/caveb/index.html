@@ -1141,9 +1141,19 @@ items.forEach(item => {
         gameState.hearts = this.hearts;
         gameState.money = this.money;
         gameState.timeElapsed = this.timeElapsed;
+        // SAVE ALL ITEMS:
         gameState.hasHammer = this.hasHammer;
-        gameState.hasPencil = this.hasPencil; // Save pencil state when exiting
-        gameState.caveBossDefeated = this.caveBossDefeated; // Save boss defeat state
+        gameState.hasPencil = this.hasPencil;
+        gameState.caveBossDefeated = this.caveBossDefeated;
+        gameState.hasFlashlight = this.hasFlashlight;
+        gameState.hasBoat = this.hasBoat;
+        gameState.hasKey = this.hasKey;
+        gameState.hasLavaShoes = this.hasLavaShoes;
+        gameState.hasPyramidKey = this.hasPyramidKey;
+        gameState.bullyDefeated = this.bullyDefeated;
+        gameState.motherPaid = this.motherPaid;
+        gameState.collectedMoney = this.collectedMoney;
+        gameState.collectedHearts = this.collectedHearts;
         gameState.playerX = 300;
         gameState.playerY = 2280;
         gameState.currentUrl = 'main';
@@ -1183,16 +1193,21 @@ items.forEach(item => {
             }
             
             updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('money').textContent = this.money;
-                
-                let items = [];
-if (this.hasFlashlight) items.push('🔦');
-if (this.hasHammer) items.push('🔨');
-if (this.hasPencil) items.push('✏️');
-                
-                document.getElementById('itemsList').textContent = items.length > 0 ? items.join(' ') : 'None';
-            }
+    document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money;
+    
+    let items = [];
+    if (this.hasFlashlight) items.push('🔦');
+    if (this.hasHammer) items.push('🔨');
+    if (this.hasPencil) items.push('✏️');
+    // ADD ALL OTHER ITEMS:
+    if (this.hasBoat) items.push('⛵');
+    if (this.hasKey) items.push('🔑');
+    if (this.hasLavaShoes) items.push('🥾');
+    if (this.hasPyramidKey) items.push('🗝️');
+    
+    document.getElementById('itemsList').textContent = items.length > 0 ? items.join(' ') : 'None';
+}
             
             showMessage(text) {
                 const message = document.getElementById('message');
