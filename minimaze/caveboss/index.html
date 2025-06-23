@@ -480,7 +480,7 @@
                     this.playerImages[direction] = img;
                 });
             }
-
+        }
             loadGameState() {
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
@@ -546,7 +546,7 @@
                     isInForest: this.isInForest,
                     hasFlashlight: this.hasFlashlight,
                     hasPencil: this.hasPencil,
-                    caveBossDefeated: this.caveBossDefeated
+                    caveBossDefeated: this.caveBossDefeated,
                     hasPyramidKey: this.hasPyramidKey
                 };
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
