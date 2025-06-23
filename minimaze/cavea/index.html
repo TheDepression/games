@@ -626,7 +626,7 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
 // ADD MONEY/HEARTS HERE (after existing special items):
     
     // Example: Add money to specific rooms
-    if (roomX === 0 && roomY === 2) {
+    if (roomX === 0 && roomY === 2 && !this.collectedMoney.includes('cavea_money_1')) {
         // Add money to room 0,2
         const moneyEl = document.createElement('div');
         moneyEl.className = 'money-pickup';
@@ -647,7 +647,7 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
     }
 
     // Example: Add heart to specific room
-    if (roomX === 2 && roomY === 0) {
+    if (roomX === 2 && roomY === 0 && !this.collectedHearts.includes('cavea_heart_1')) {
         // Add heart to room 2,0
         const heartEl = document.createElement('div');
         heartEl.className = 'heart-pickup';
@@ -663,7 +663,7 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
         heartEl.style.justifyContent = 'center';
         heartEl.style.animation = 'heartbeat 1s infinite';
         heartEl.style.zIndex = '60';
-        heartEl.dataset.id = 'cave_heart_1'; // Unique ID
+        heartEl.dataset.id = 'cavea_heart_1'; // Unique ID
         this.gameWorld.appendChild(heartEl);
     }
 
