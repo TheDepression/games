@@ -1150,6 +1150,10 @@ hearts.forEach(heart => {
         gameState.playerX = 120;
         gameState.playerY = 1980;
         gameState.currentUrl = 'main';
+/ ADD YOUR CAVE COLLECTION FLAGS HERE:
+        gameState.caveaMoneyCollected = this.caveaMoneyCollected;
+        gameState.caveaHeartCollected = this.caveaHeartCollected;
+        
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
         window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
