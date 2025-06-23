@@ -718,6 +718,10 @@ this.collectedHearts = [];
 this.hasPencil = false;
 this.hasPyramidKey = false;
         this.caveBossDefeated = false;
+        this.caveaMoneyCollected = false;
+this.caveaHeartCollected = false;
+        this.cavebMoneyCollected = false;
+this.cavebHeartCollected = false;
         
         // Movement properties
         this.playerX = 400;
@@ -3140,6 +3144,10 @@ if (this.hasBaby) itemsText += ' 👶🏻';
 hasPencil: this.hasPencil,
 hasPyramidKey: this.hasPyramidKey,
         caveBossDefeated: this.caveBossDefeated
+        caveaMoneyCollected: this.caveaMoneyCollected,
+caveaHeartCollected: this.caveaHeartCollected,
+        cavebMoneyCollected: this.cavebMoneyCollected,
+cavebHeartCollected: this.cavebHeartCollected
     };
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     console.log('Game saved:', gameState); // For debugging
@@ -3168,7 +3176,10 @@ loadGameState() {
 this.hasPencil = gameState.hasPencil || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
-        
+        this.caveaMoneyCollected = gameState.caveaMoneyCollected || false;
+this.caveaHeartCollected = gameState.caveaHeartCollected || false;
+        this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
+this.cavebHeartCollected = gameState.cavebHeartCollected || false;
         // Set the timer to continue from saved time
         this.updateTimer();
         
