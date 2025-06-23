@@ -900,43 +900,49 @@ cavebHeartCollected: this.cavebHeartCollected
             }
 
             updateWallRiding() {
-                const rideSpeed = this.bossSpeed * 1.2; // Faster when wall riding
-                
-                if (this.wallRideAxis === 'vertical') {
-                    // Riding up/down the right wall
-                    this.bossY += this.wallRideDirection * rideSpeed;
-                    this.wallRideDistance += rideSpeed;
-                    
-                    // Bounce off top/bottom
-                    if (this.bossY <= 20) {
-                        this.bossY = 20;
-                        this.wallRideDirection = 1;
-                    } else if (this.bossY >= 257.5) {
-                        this.bossY = 257.5;
-                        this.wallRideDirection = -1;
-                    }
-                    
-                } else if (this.wallRideAxis === 'horizontal') {
-                    // Riding left/right along the bottom wall
-                    this.bossX += this.wallRideDirection * rideSpeed;
-                    this.wallRideDistance += rideSpeed;
-                    
-                    // Bounce off left/right
-                    if (this.bossX <= 20) {
-                        this.bossX = 20;
-                        this.wallRideDirection = 1;
-                    } else if (this.bossX >= 250) {
-                        this.bossX = 250;
-                        this.wallRideDirection = -1;
-                    }
-                }
-                
-                // Stop wall riding after distance
-                if (this.wallRideDistance >= this.targetWallRideDistance) {
-                    this.bossState = 'moving';
-                    this.setBossRandomDirection();
-                }
-            }
+    const rideSpeed = this.bossSpeed * 1.2;
+    
+    if (this.wallRideAxis === 'vertical') {
+        // FORCE boss to stay on right wall
+        this.bossX = 250; // Lock X position to right wall
+        
+        // Only move up/down
+        this.bossY += this.wallRideDirection * rideSpeed;
+        this.wallRideDistance += rideSpeed;
+        
+        // Bounce off top/bottom
+        if (this.bossY <= 20) {
+            this.bossY = 20;
+            this.wallRideDirection = 1;
+        } else if (this.bossY >= 257.5) {
+            this.bossY = 257.5;
+            this.wallRideDirection = -1;
+        }
+        
+    } else if (this.wallRideAxis === 'horizontal') {
+        // FORCE boss to stay on bottom wall
+        this.bossY = 257.5; // Lock Y position to bottom wall
+        
+        // Only move left/right
+        this.bossX += this.wallRideDirection * rideSpeed;
+        this.wallRideDistance += rideSpeed;
+        
+        // Bounce off left/right
+        if (this.bossX <= 20) {
+            this.bossX = 20;
+            this.wallRideDirection = 1;
+        } else if (this.bossX >= 250) {
+            this.bossX = 250;
+            this.wallRideDirection = -1;
+        }
+    }
+    
+    // Stop wall riding after distance
+    if (this.wallRideDistance >= this.targetWallRideDistance) {
+        this.bossState = 'moving';
+        this.setBossRandomDirection();
+    }
+}
 
             shootProjectiles() {
                 this.isShooting = true;
