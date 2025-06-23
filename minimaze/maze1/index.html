@@ -2908,93 +2908,103 @@ if (inForest) {
 
     
     handleNPCInteraction(friendly) {
-        const message = friendly.dataset.message;
-        
-        if (message === "🔑 Need a key? Give me 500¥!" && !this.hasKey) {
-            if (this.money >= 500) {
-                this.money -= 500;
-                this.hasKey = true;
-                this.showMessage('Thank you! Here\'s your key! 🔑');
-                friendly.dataset.message = 'Thank you for your business!';
-                this.updateUI();
-                // After each successful purchase, add:
-this.saveGameState(); // Auto-save after purchase
-            } else {
-                this.showMessage('🔑 Need a key? Give me 500¥!');
-            }
-        } else if (message === "⛵ Want a boat? 500¥ and you can sail!" && !this.hasBoat) {
-            if (this.money >= 500) {
-                this.money -= 500;
-                this.hasBoat = true;
-                this.showMessage('⛵ Boat purchased! Now you can sail!');
-                friendly.dataset.message = 'Enjoy your boat!';
-                this.updateUI();
-                // After each successful purchase, add:
-this.saveGameState(); // Auto-save after purchase
-            } else {
-                this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
-            }
-        } else if (message === "🔦 Flashlight for sale! Light up dark caves for 600¥!" && !this.hasFlashlight) {
-            if (this.money >= 600) {
-                this.money -= 600;
-                this.hasFlashlight = true;
-                this.showMessage('🔦 Flashlight purchased! Now you can explore dark caves!');
-                friendly.dataset.message = 'That flashlight will help you in southern caves... But be careful. I heard the Bully was in that area!';
-                this.updateUI();
-                // After each successful purchase, add:
-this.saveGameState(); // Auto-save after purchase
-            } else {
-                this.showMessage('🔦 Flashlight for sale! Light up dark caves for 600¥!');
-            }
-        } else if (message === "🥾 Lava-proof shoes! Only 900000000¥!" && !this.hasLavaShoes) {
-    if (this.money >= 900) {
-        this.money -= 900;
-        this.hasLavaShoes = true;
-        this.lavaProtectionTime = 0;
-        this.lavaProtectionActive = false;
-        this.showMessage('🥾 Lava shoes purchased! 5 seconds protection per entry!');
-        friendly.dataset.message = 'Those shoes will protect you!';
-        this.updateUI();
-        // After each successful purchase, add:
-this.saveGameState(); // Auto-save after purchase
-    } else {
-        this.showMessage('🥾 Lava-proof shoes! Only 900000000¥!');
-    }
-} else if (message.includes("Thank god you are here, master frog") && !this.motherPaid) {
-    if (this.hasBaby) {
-        this.money += 200;
-        this.hasBaby = false;
-        this.motherPaid = true;
-        this.showMessage('Thank you so much! Here is your reward!');
-        friendly.dataset.message = 'You saved my baby! I am forever grateful!';
-        this.updateUI();
-        this.saveGameState(); // ONLY save when baby is delivered to mother
-    } else if (!this.bullyDefeated) {
+    const message = friendly.dataset.message;
+    
+    if (message === "🔑 Need a key? Give me 500¥!" && !this.hasKey) {
+        if (this.money >= 500) {
+            this.money -= 500;
+            this.hasKey = true;
+            this.showMessage('Thank you! Here\'s your key! 🔑');
+            friendly.dataset.message = 'Thank you for your business!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('🔑 Need a key? Give me 500¥!');
+        }
+    } else if (message === "⛵ Want a boat? 500¥ and you can sail!" && !this.hasBoat) {
+        if (this.money >= 500) {
+            this.money -= 500;
+            this.hasBoat = true;
+            this.showMessage('⛵ Boat purchased! Now you can sail!');
+            friendly.dataset.message = 'Enjoy your boat!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
+        }
+    } else if (message === "🔦 Flashlight for sale! Light up dark caves for 600¥!" && !this.hasFlashlight) {
+        if (this.money >= 600) {
+            this.money -= 600;
+            this.hasFlashlight = true;
+            this.showMessage('🔦 Flashlight purchased! Now you can explore dark caves!');
+            friendly.dataset.message = 'That flashlight will help you in southern caves... But be careful. I heard the Bully was in that area!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('🔦 Flashlight for sale! Light up dark caves for 600¥!');
+        }
+    } else if (message === "🥾 Lava-proof shoes! Only 900000000¥!" && !this.hasLavaShoes) {
+        if (this.money >= 900) {
+            this.money -= 900;
+            this.hasLavaShoes = true;
+            this.lavaProtectionTime = 0;
+            this.lavaProtectionActive = false;
+            this.showMessage('🥾 Lava shoes purchased! 5 seconds protection per entry!');
+            friendly.dataset.message = 'Those shoes will protect you!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('🥾 Lava-proof shoes! Only 900000000¥!');
+        }
+    } else if (message.includes("Thank god you are here, master frog") && !this.motherPaid) {
+        if (this.hasBaby) {
+            this.money += 200;
+            this.hasBaby = false;
+            this.motherPaid = true;
+            this.showMessage('Thank you so much! Here is your reward!');
+            friendly.dataset.message = 'You saved my baby! I am forever grateful!';
+            this.updateUI();
+            this.saveGameState(); // ONLY save when baby is delivered to mother
+        } else if (!this.bullyDefeated) {
+            this.showMessage(message);
+        } else {
+            this.showMessage('You need to rescue my baby from the forest first!');
+        }
+    } else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!") {
+        if (this.hasPencil) {
+            // STAGE 2: Exchange with enhanced save
+            this.hasPencil = false;
+            this.hasPyramidKey = true;
+            this.showMessage('🗝️ Thank you so much! Here\'s the pyramid key!');
+            friendly.dataset.message = "I'll never forget your kindness!";
+            this.updateUI();
+            
+            // ENHANCED SAVE WITH BACKUP
+            this.saveGameState();
+            localStorage.setItem('mfGameState_backup', localStorage.getItem('mfGameState'));
+            
+            // VERIFICATION
+            setTimeout(() => {
+                const check = JSON.parse(localStorage.getItem('mfGameState'));
+                if (check.hasPyramidKey) {
+                    this.showMessage('✅ Pyramid key saved securely!');
+                } else {
+                    this.showMessage('❌ Save failed! Check console.');
+                    console.error('SAVE FAILURE - Main:', check.hasPyramidKey);
+                    console.log('Backup exists:', localStorage.getItem('mfGameState_backup') !== null);
+                }
+            }, 100);
+        } else {
+            // STAGE 1: Show original message
+            this.showMessage(message);
+        }
+    } else if (message === "I'll never forget your kindness!") {
+        // STAGE 3: Post-mission message
         this.showMessage(message);
     } else {
-        this.showMessage('You need to rescue my baby from the forest first!');
-    }
-// ... other NPC interactions ...
-} else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!") {
-    if (this.hasPencil) {
-        // STAGE 2: Exchange
-        this.hasPencil = false;
-        this.hasPyramidKey = true;
-        this.showMessage('🗝️ Thank you so much! Here\'s the pyramid key!');
-        friendly.dataset.message = "I'll never forget your kindness!";
-        this.updateUI();
-        this.saveGameState();
-    } else {
-        // STAGE 1: Show original message
         this.showMessage(message);
     }
-} else if (message === "I'll never forget your kindness!") {
-    // STAGE 3: Post-mission message
-    this.showMessage(message);
-} else {
-    this.showMessage(message);
 }
-    }
 
     
     rectsOverlap(rect1, rect2) {
