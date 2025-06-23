@@ -518,6 +518,7 @@
                     this.hasFlashlight = false;
                     this.hasPencil = false;
                     this.caveBossDefeated = false;
+                    this.hasPyramidKey = gameState.hasPyramidKey || false;
                 }
             }
 
@@ -546,6 +547,7 @@
                     hasFlashlight: this.hasFlashlight,
                     hasPencil: this.hasPencil,
                     caveBossDefeated: this.caveBossDefeated
+                    hasPyramidKey: this.hasPyramidKey
                 };
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
