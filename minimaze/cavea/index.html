@@ -895,6 +895,51 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
                         }
                     }
                 });
+
+
+// Check money pickup
+const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
+moneyItems.forEach(money => {
+    const moneyX = parseInt(money.style.left);
+    const moneyY = parseInt(money.style.top);
+    const moneyRect = {
+        left: moneyX, top: moneyY,
+        right: moneyX + 22, bottom: moneyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, moneyRect)) {
+        this.money += 100;
+        this.collectedMoney.push(money.dataset.id);
+        this.showMessage('💰 +100¥ collected!');
+        this.updateUI();
+        this.saveGameState(); // Auto-save
+        money.remove();
+    }
+});
+
+// Check heart pickup  
+const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
+hearts.forEach(heart => {
+    if (heart.dataset.type !== 'baby' && this.hearts < 3) {
+        const heartX = parseInt(heart.style.left);
+        const heartY = parseInt(heart.style.top);
+        const heartRect = {
+            left: heartX, top: heartY,
+            right: heartX + 22, bottom: heartY + 22
+        };
+        
+        if (this.rectsOverlap(playerRect, heartRect)) {
+            this.hearts++;
+            this.collectedHearts.push(heart.dataset.id);
+            this.showMessage('❤️ Health restored!');
+            this.updateUI();
+            this.saveGameState(); // Auto-save
+            heart.remove();
+        }
+    }
+});
+
+                
             }
             
             checkRoomTransitions() {
