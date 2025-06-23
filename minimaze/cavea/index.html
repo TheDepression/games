@@ -622,6 +622,52 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
                     hammer.dataset.type = 'hammer';
                     this.gameWorld.appendChild(hammer);
                 }
+
+// ADD MONEY/HEARTS HERE (after existing special items):
+    
+    // Example: Add money to specific rooms
+    if (roomX === 0 && roomY === 2) {
+        // Add money to room 0,2
+        const moneyEl = document.createElement('div');
+        moneyEl.className = 'money-pickup';
+        moneyEl.textContent = '💰';
+        moneyEl.style.position = 'absolute';
+        moneyEl.style.left = '200px';
+        moneyEl.style.top = '150px';
+        moneyEl.style.width = '22px';
+        moneyEl.style.height = '22px';
+        moneyEl.style.fontSize = '18px';
+        moneyEl.style.display = 'flex';
+        moneyEl.style.alignItems = 'center';
+        moneyEl.style.justifyContent = 'center';
+        moneyEl.style.animation = 'glow 2s infinite';
+        moneyEl.style.zIndex = '60';
+        moneyEl.dataset.id = 'cave_money_1'; // Unique ID
+        this.gameWorld.appendChild(moneyEl);
+    }
+
+    // Example: Add heart to specific room
+    if (roomX === 2 && roomY === 0) {
+        // Add heart to room 2,0
+        const heartEl = document.createElement('div');
+        heartEl.className = 'heart-pickup';
+        heartEl.textContent = '❤️';
+        heartEl.style.position = 'absolute';
+        heartEl.style.left = '250px';
+        heartEl.style.top = '200px';
+        heartEl.style.width = '22px';
+        heartEl.style.height = '22px';
+        heartEl.style.fontSize = '18px';
+        heartEl.style.display = 'flex';
+        heartEl.style.alignItems = 'center';
+        heartEl.style.justifyContent = 'center';
+        heartEl.style.animation = 'heartbeat 1s infinite';
+        heartEl.style.zIndex = '60';
+        heartEl.dataset.id = 'cave_heart_1'; // Unique ID
+        this.gameWorld.appendChild(heartEl);
+    }
+
+
                 
                 this.positionPlayer();
                 this.updateDarkness();
