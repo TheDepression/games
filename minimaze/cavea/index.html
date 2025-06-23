@@ -255,6 +255,11 @@
         .start-button:hover {
             background: #ff5722;
         }
+
+        @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
     </style>
 </head>
 <body>
@@ -350,10 +355,6 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
                 // Cave items
                 this.hammerCollected = false;
                 this.snakes = [];
-                
-                // In cave constructor, add:
-this.caveaMoneyCollected = false;
-this.caveaHeartCollected = false;
                 
                 // Timer
                 this.timerInterval = null;
