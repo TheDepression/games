@@ -706,7 +706,7 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
 }
 
 // Pencil - completely separate check
-if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) {
+if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey && !this.hasPencil) {
     const pencil = document.createElement('div');
     pencil.style.position = 'absolute';
     pencil.style.left = '320px';
