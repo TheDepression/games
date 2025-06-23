@@ -413,8 +413,8 @@ preloadPlayerImages() {
     this.pencilCollected = false;
     this.snakes = [];
     // In cave constructor, add:
-this.caveaMoneyCollected = false;
-this.caveaHeartCollected = false;
+this.cavebMoneyCollected = false;
+this.cavebHeartCollected = false;
     // Timer
     this.timerInterval = null;
     
@@ -443,6 +443,9 @@ this.caveaHeartCollected = false;
         this.hasPencil = gameState.hasPencil || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
         this.hasPyramidKey = gameState.hasPyramidKey || false;
+        // In loadGameState():
+this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
+this.cavebHeartCollected = gameState.cavebHeartCollected || false;
         // ADD ALL MISSING ITEMS:
         this.hasBoat = gameState.hasBoat || false;
         this.hasKey = gameState.hasKey || false;
@@ -724,7 +727,7 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
 // ADD MONEY/HEARTS HERE (after existing special items):
     
     // Example: Add money to specific rooms
-    if (roomX === -1 && roomY === 2 && !this.collectedMoney.includes('caveb_money_1')) {
+    if (roomX === -1 && roomY === 2 && !this.cavebMoneyCollected) {
         // Add money to room -1,2
         const moneyEl = document.createElement('div');
         moneyEl.className = 'money-pickup';
@@ -740,12 +743,11 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
         moneyEl.style.justifyContent = 'center';
         moneyEl.style.animation = 'glow 2s infinite';
         moneyEl.style.zIndex = '60';
-        moneyEl.dataset.id = 'caveb_money_1'; // Unique ID
         this.gameWorld.appendChild(moneyEl);
     }
 
     // Example: Add heart to specific room
-    if (roomX === -2 && roomY === 0 && !this.collectedHearts.includes('caveb_heart_1')) {
+   if (roomX === -2 && roomY === 0 && !this.cavebHeartCollected) {
         // Add heart to room -2,0
         const heartEl = document.createElement('div');
         heartEl.className = 'heart-pickup';
@@ -761,7 +763,6 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
         heartEl.style.justifyContent = 'center';
         heartEl.style.animation = 'heartbeat 1s infinite';
         heartEl.style.zIndex = '60';
-        heartEl.dataset.id = 'caveb_heart_1'; // Unique ID
         this.gameWorld.appendChild(heartEl);
     }
 
@@ -1063,7 +1064,7 @@ moneyItems.forEach(money => {
     
     if (this.rectsOverlap(playerRect, moneyRect)) {
         this.money += 100;
-        this.collectedMoney.push(money.dataset.id);
+        this.cavebMoneyCollected = true; // Boolean flag instead of array
         this.showMessage('💰 +100¥ collected!');
         this.updateUI();
         money.remove();
@@ -1083,7 +1084,7 @@ hearts.forEach(heart => {
         
         if (this.rectsOverlap(playerRect, heartRect)) {
             this.hearts++;
-            this.collectedHearts.push(heart.dataset.id);
+            this.cavebHeartCollected = true; // Boolean flag instead of array
             this.showMessage('❤️ Health restored!');
             this.updateUI();
             heart.remove();
@@ -1252,6 +1253,10 @@ hearts.forEach(heart => {
         gameState.playerX = 300;
         gameState.playerY = 2280;
         gameState.currentUrl = 'main';
+ // ADD YOUR CAVE COLLECTION FLAGS HERE:
+        gameState.cavebMoneyCollected = this.cavebMoneyCollected;
+        gameState.cavebHeartCollected = this.cavebHeartCollected;
+        
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
         window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
