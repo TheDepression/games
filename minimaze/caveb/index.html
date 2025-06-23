@@ -722,7 +722,7 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
 // ADD MONEY/HEARTS HERE (after existing special items):
     
     // Example: Add money to specific rooms
-    if (roomX === -1 && roomY === 2) {
+    if (roomX === -1 && roomY === 2 && !this.collectedMoney.includes('caveb_money_1')) {
         // Add money to room -1,2
         const moneyEl = document.createElement('div');
         moneyEl.className = 'money-pickup';
@@ -738,12 +738,12 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
         moneyEl.style.justifyContent = 'center';
         moneyEl.style.animation = 'glow 2s infinite';
         moneyEl.style.zIndex = '60';
-        moneyEl.dataset.id = 'cave_money_1'; // Unique ID
+        moneyEl.dataset.id = 'caveb_money_1'; // Unique ID
         this.gameWorld.appendChild(moneyEl);
     }
 
     // Example: Add heart to specific room
-    if (roomX === -2 && roomY === 0) {
+    if (roomX === -2 && roomY === 0 && !this.collectedHearts.includes('caveb_heart_1')) {
         // Add heart to room -2,0
         const heartEl = document.createElement('div');
         heartEl.className = 'heart-pickup';
@@ -759,7 +759,7 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
         heartEl.style.justifyContent = 'center';
         heartEl.style.animation = 'heartbeat 1s infinite';
         heartEl.style.zIndex = '60';
-        heartEl.dataset.id = 'cave_heart_1'; // Unique ID
+        heartEl.dataset.id = 'caveb_heart_1'; // Unique ID
         this.gameWorld.appendChild(heartEl);
     }
 
