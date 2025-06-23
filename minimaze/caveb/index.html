@@ -623,6 +623,7 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         exits: ['s', 'e'], // south back, east forward
         walls: [
             { x: 70, y: 80, w: 200, h: 10 },
+            { x: 260, y: 80, w: 10, h: 140 },
             { x: 70, y: 80, w: 10, h: 180 },
             { x: 130, y: 170, w: 10, h: 180 },
             { x: 130, y: 160, w: 70, h: 10 },
@@ -637,7 +638,7 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
             { x: 200, y: 240, dir: 'horizontal' },
             { x: 140, y: 110, dir: 'vertical' },
             { x: 140, y: 60, dir: 'vertical' },
-            { x: 30, y: 150, dir: 'vertical' }
+            { x: 60, y: 220, dir: 'vertical' }
         ]
     },
     '-1,2': { // First east money
@@ -645,13 +646,13 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         walls: [
             { x: 10, y: 90, w: 50, h: 10 },
             { x: 60, y: 90, w: 10, h: 190 },
-            { x: 130, y: 10, w: 10, h: 230 },
+            { x: 130, y: 10, w: 10, h: 160 },
+            { x: 130, y: 200, w: 10, h: 30 },
             { x: 230, y: 60, w: 10, h: 300 },
             { x: 280, y: 110, w: 70, h: 10 }
         ],
         snakes: [
             { x: 80, y: 170, dir: 'vertical' },
-            { x: 110, y: 80, dir: 'vertical' },
             { x: 170, y: 80, dir: 'horizontal' },
             { x: 140, y: 260, dir: 'horizontal' }
         ]
@@ -659,15 +660,15 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
     '0,2': { // Second east
         exits: ['w', 'n'], // west back, north to boss
         walls: [
-            { x: 10, y: 90, w: 250, h: 50 },
-            { x: 10, y: 170, w: 50, h: 190 },
+            { x: 10, y: 90, w: 220, h: 50 },
+            { x: 10, y: 2200, w: 50, h: 140 },
             { x: 230, y: 110, w: 50, h: 180 }
         ],
         snakes: [
             { x: 130, y: 240, dir: 'horizontal' },
             { x: 210, y: 320, dir: 'horizontal' },
             { x: 280, y: 50, dir: 'vertical' },
-            { x: 330, y: 160, dir: 'vertical' },
+            { x: 320, y: 160, dir: 'vertical' },
             { x: 190, y: 130, dir: 'vertical' }
         ]
     },
