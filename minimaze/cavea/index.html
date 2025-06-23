@@ -370,22 +370,44 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
             }
             
             loadGameState() {
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    this.hearts = gameState.hearts || 3;
-                    this.money = gameState.money || 0;
-                    this.timeElapsed = gameState.timeElapsed || 0;
-                    this.hasFlashlight = gameState.hasFlashlight || false;
-                    this.hasHammer = gameState.hasHammer || false;
-                } else {
-                    this.hearts = 3;
-                    this.money = 0;
-                    this.timeElapsed = 0;
-                    this.hasFlashlight = false;
-                    this.hasHammer = false;
-                }
-            }
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        this.hearts = gameState.hearts || 3;
+        this.money = gameState.money || 0;
+        this.timeElapsed = gameState.timeElapsed || 0;
+        this.hasFlashlight = gameState.hasFlashlight || false;
+        this.hasHammer = gameState.hasHammer || false;
+        // ADD ALL MISSING ITEMS:
+        this.hasBoat = gameState.hasBoat || false;
+        this.hasKey = gameState.hasKey || false;
+        this.hasLavaShoes = gameState.hasLavaShoes || false;
+        this.hasPencil = gameState.hasPencil || false;
+        this.hasPyramidKey = gameState.hasPyramidKey || false;
+        this.caveBossDefeated = gameState.caveBossDefeated || false;
+        this.bullyDefeated = gameState.bullyDefeated || false;
+        this.motherPaid = gameState.motherPaid || false;
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.collectedHearts = gameState.collectedHearts || [];
+    } else {
+        // Set defaults for ALL items
+        this.hearts = 3;
+        this.money = 0;
+        this.timeElapsed = 0;
+        this.hasFlashlight = false;
+        this.hasHammer = false;
+        this.hasBoat = false;
+        this.hasKey = false;
+        this.hasLavaShoes = false;
+        this.hasPencil = false;
+        this.hasPyramidKey = false;
+        this.caveBossDefeated = false;
+        this.bullyDefeated = false;
+        this.motherPaid = false;
+        this.collectedMoney = [];
+        this.collectedHearts = [];
+    }
+}
             
             updateStartMessage() {
                 const warningDiv = document.getElementById('warningMessage');
