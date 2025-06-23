@@ -512,78 +512,109 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
                     '0,0': { // Starting room
                         exits: ['e', 's'], // east and south (cave entrance)
                         walls: [
-                            { x: 100, y: 100, w: 60, h: 20 },
-                            { x: 200, y: 200, w: 20, h: 60 }
+                            { x: 90, y: 240, w: 250, h: 10 },
+                            { x: 160, y: 10, w: 10, h: 160 },
+                            { x: 90, y: 80, w: 10, h: 170 },
+                            { x: 240, y: 90, w: 10, h: 150 }
                         ],
                         snakes: [
-                            { x: 150, y: 100, dir: 'horizontal' },
-                            { x: 250, y: 200, dir: 'vertical' }
+                            { x: 100, y: 270, dir: 'horizontal' },
+                            { x: 200, y: 270, dir: 'horizontal' },
+                            { x: 70, y: 120, dir: 'horizontal' },
+                            { x: 190, y: 200, dir: 'horizontal' },
+                            { x: 220, y: 40, dir: 'horizontal' }
                         ]
                     },
                     '1,0': { // Right of start
                         exits: ['w', 'e', 'n'], // west, east, north
                         walls: [
-                            { x: 80, y: 80, w: 80, h: 20 },
-                            { x: 250, y: 150, w: 20, h: 80 },
-                            { x: 120, y: 250, w: 60, h: 20 }
+                            { x: 10, y: 170, w: 70, h: 10 },
+                            { x: 80, y: 120, w: 10, h: 140 },
+                            { x: 100, y: 10, w: 10, h: 60 },
+                            { x: 100, y: 70, w: 140, h: 10 },
+                            { x: 250, y: 130, w: 90, h: 10 },
+                            { x: 250, y: 130, w: 10, h: 140 }
                         ],
                         snakes: [
-                            { x: 120, y: 120, dir: 'horizontal' },
-                            { x: 280, y: 280, dir: 'vertical' }
+                            { x: 130, y: 300, dir: 'horizontal' },
+                            { x: 210, y: 300, dir: 'horizontal' },
+                            { x: 170, y: 90, dir: 'horizontal' },
+                            { x: 170, y: 210, dir: 'vertical' }
                         ]
                     },
                     '2,0': { // Far right
                         exits: ['w'], // only west
                         walls: [
-                            { x: 60, y: 120, w: 20, h: 100 },
-                            { x: 200, y: 80, w: 80, h: 20 }
+                            { x: 10, y: 240, w: 40, h: 10 },
+                            { x: 60, y: 120, w: 10, h: 120 },
+                            { x: 280, y: 300, w: 70, h: 10 }
                         ],
                         snakes: [
-                            { x: 150, y: 150, dir: 'horizontal' },
-                            { x: 100, y: 250, dir: 'vertical' }
+                            { x: 130, y: 90, dir: 'horizontal' },
+                            { x: 220, y: 90, dir: 'horizontal' },
+                            { x: 80, y: 300, dir: 'horizontal' },
+                            { x: 240, y: 200, dir: 'horizontal' },
+                            { x: 160, y: 120, dir: 'vertical' },
+                            { x: 90, y: 190, dir: 'vertical' },
+                            { x: 220, y: 240, dir: 'vertical' }
                         ]
                     },
                     '1,1': { // Up from middle
                         exits: ['s', 'w', 'n'], // south, west, north
                         walls: [
-                            { x: 150, y: 100, w: 20, h: 80 },
-                            { x: 80, y: 200, w: 100, h: 20 }
+                            { x: 70, y: 70, w: 10, h: 200 },
+                            { x: 120, y: 270, w: 10, h: 90 },
+                            { x: 120, y: 290, w: 170, h: 10 },
+                            { x: 290, y: 80, w: 10, h: 210 },
+                            { x: 230, y: 10, w: 10, h: 210 },
+                            { x: 130, y: 130, w: 90, h: 10 },
+                            { x: 140, y: 10, w: 10, h: 40 }
                         ],
                         snakes: [
-                            { x: 100, y: 150, dir: 'vertical' },
-                            { x: 250, y: 120, dir: 'horizontal' }
+                            { x: 90, y: 220, dir: 'vertical' },
+                            { x: 80, y: 70, dir: 'vertical' },
+                            { x: 250, y: 230, dir: 'vertical' },
+                            { x: 190, y: 110, dir: 'horizontal' },
+                            { x: 260, y: 230, dir: 'horizontal' }
                         ]
                     },
                     '0,1': { // Left from upper
                         exits: ['e', 'n'], // east, north
                         walls: [
-                            { x: 100, y: 80, w: 80, h: 20 },
-                            { x: 200, y: 180, w: 20, h: 80 }
+                            { x: 110, y: 70, w: 150, h: 10 },
+                            { x: 170, y: 150, w: 10, h: 200 },
+                            { x: 30, y: 10, w: 50, h: 340 },
+                            { x: 100, y: 70, w: 10, h: 180 },
+                            { x: 250, y: 10, w: 50, h: 240 }
                         ],
                         snakes: [
-                            { x: 150, y: 200, dir: 'horizontal' },
-                            { x: 250, y: 100, dir: 'vertical' }
+                            { x: 120, y: 140, dir: 'horizontal' },
+                            { x: 120, y: 190, dir: 'horizontal' },
+                            { x: 120, y: 240, dir: 'horizontal' }
                         ]
                     },
                     '0,2': { // Up from left
                         exits: ['s'], // only south
                         walls: [
-                            { x: 120, y: 120, w: 60, h: 20 },
-                            { x: 220, y: 200, w: 20, h: 60 }
+                            { x: 150, y: 120, w: 10, h: 80 },
+                            { x: 150, y: 120, w: 70, h: 10 },
+                            { x: 220, y: 120, w: 10, h: 80 }
                         ],
                         snakes: [
-                            { x: 180, y: 150, dir: 'vertical' },
-                            { x: 80, y: 250, dir: 'horizontal' }
+                            { x: 40, y: 40, dir: 'horizontal' },
+                            { x: 290, y: 40, dir: 'horizontal' }
                         ]
                     },
                     '1,2': { // Hammer room - up from middle upper
                         exits: ['s', 'hammer'], // south, has hammer
                         walls: [
-                            { x: 100, y: 100, w: 40, h: 20 },
-                            { x: 250, y: 150, w: 20, h: 40 }
+                            { x: 150, y: 120, w: 10, h: 80 },
+                            { x: 150, y: 120, w: 70, h: 10 },
+                            { x: 220, y: 120, w: 10, h: 80 }
                         ],
                         snakes: [
-                            { x: 120, y: 250, dir: 'horizontal' } // Only one snake
+                            { x: 40, y: 40, dir: 'horizontal' },
+                            { x: 290, y: 40, dir: 'horizontal' }
                         ]
                     }
                 };
@@ -643,8 +674,8 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
         moneyEl.className = 'money-pickup';
         moneyEl.textContent = '💰';
         moneyEl.style.position = 'absolute';
-        moneyEl.style.left = '200px';
-        moneyEl.style.top = '150px';
+        moneyEl.style.left = '180px';
+        moneyEl.style.top = '160px';
         moneyEl.style.width = '35px';
         moneyEl.style.height = '35px';
         moneyEl.style.fontSize = '25px';
@@ -663,8 +694,8 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
         heartEl.className = 'heart-pickup';
         heartEl.textContent = '❤️';
         heartEl.style.position = 'absolute';
-        heartEl.style.left = '250px';
-        heartEl.style.top = '200px';
+        heartEl.style.left = '300px';
+        heartEl.style.top = '320px';
         heartEl.style.width = '35px';
         heartEl.style.height = '35px';
         heartEl.style.fontSize = '25px';
