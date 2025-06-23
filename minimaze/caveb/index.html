@@ -442,8 +442,17 @@ preloadPlayerImages() {
         this.hasHammer = gameState.hasHammer || false;
         this.hasPencil = gameState.hasPencil || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
-        this.hasPyramidKey = gameState.hasPyramidKey || false; // ADD THIS LINE
+        this.hasPyramidKey = gameState.hasPyramidKey || false;
+        // ADD ALL MISSING ITEMS:
+        this.hasBoat = gameState.hasBoat || false;
+        this.hasKey = gameState.hasKey || false;
+        this.hasLavaShoes = gameState.hasLavaShoes || false;
+        this.bullyDefeated = gameState.bullyDefeated || false;
+        this.motherPaid = gameState.motherPaid || false;
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.collectedHearts = gameState.collectedHearts || [];
     } else {
+        // Set defaults for ALL items
         this.hearts = 3;
         this.money = 0;
         this.timeElapsed = 0;
@@ -451,7 +460,14 @@ preloadPlayerImages() {
         this.hasHammer = false;
         this.hasPencil = false;
         this.caveBossDefeated = false;
-        this.hasPyramidKey = false; // ADD THIS LINE
+        this.hasPyramidKey = false;
+        this.hasBoat = false;
+        this.hasKey = false;
+        this.hasLavaShoes = false;
+        this.bullyDefeated = false;
+        this.motherPaid = false;
+        this.collectedMoney = [];
+        this.collectedHearts = [];
     }
 }
             
