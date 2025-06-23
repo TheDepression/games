@@ -501,6 +501,10 @@
                     this.hasPencil = gameState.hasPencil || false;
                     this.caveBossDefeated = gameState.caveBossDefeated || false;
                      this.hasPyramidKey = gameState.hasPyramidKey || false; // FIXED: Added this line
+                    this.caveaMoneyCollected = gameState.caveaMoneyCollected || false;
+this.caveaHeartCollected = gameState.caveaHeartCollected || false;
+                    this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
+this.cavebHeartCollected = gameState.cavebHeartCollected || false;
                 } else {
                     this.hearts = 3;
                     this.money = 0;
@@ -547,7 +551,11 @@
                     hasFlashlight: this.hasFlashlight,
                     hasPencil: this.hasPencil,
                     caveBossDefeated: this.caveBossDefeated,
-                    hasPyramidKey: this.hasPyramidKey
+                    hasPyramidKey: this.hasPyramidKey,
+                    caveaMoneyCollected: this.caveaMoneyCollected,
+caveaHeartCollected: this.caveaHeartCollected,
+                    cavebMoneyCollected: this.cavebMoneyCollected,
+cavebHeartCollected: this.cavebHeartCollected
                 };
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
