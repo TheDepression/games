@@ -1064,7 +1064,6 @@ moneyItems.forEach(money => {
         this.collectedMoney.push(money.dataset.id);
         this.showMessage('💰 +100¥ collected!');
         this.updateUI();
-        this.saveGameState(); // Auto-save
         money.remove();
     }
 });
@@ -1085,7 +1084,6 @@ hearts.forEach(heart => {
             this.collectedHearts.push(heart.dataset.id);
             this.showMessage('❤️ Health restored!');
             this.updateUI();
-            this.saveGameState(); // Auto-save
             heart.remove();
         }
     }
