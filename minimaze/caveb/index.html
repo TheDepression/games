@@ -444,6 +444,9 @@ preloadPlayerImages() {
         // In loadGameState():
 this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
 this.cavebHeartCollected = gameState.cavebHeartCollected || false;
+        this.caveaMoneyCollected = gameState.caveaMoneyCollected || false;
+this.caveaHeartCollected = gameState.caveaHeartCollected || false;
+
         // ADD ALL MISSING ITEMS:
         this.hasBoat = gameState.hasBoat || false;
         this.hasKey = gameState.hasKey || false;
@@ -733,9 +736,9 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
         moneyEl.style.position = 'absolute';
         moneyEl.style.left = '200px';
         moneyEl.style.top = '150px';
-        moneyEl.style.width = '22px';
-        moneyEl.style.height = '22px';
-        moneyEl.style.fontSize = '18px';
+        moneyEl.style.width = '35px';
+        moneyEl.style.height = '35px';
+        moneyEl.style.fontSize = '25px';
         moneyEl.style.display = 'flex';
         moneyEl.style.alignItems = 'center';
         moneyEl.style.justifyContent = 'center';
@@ -753,9 +756,9 @@ if (roomX === 0 && roomY === 3 && !this.pencilCollected && !this.hasPyramidKey) 
         heartEl.style.position = 'absolute';
         heartEl.style.left = '250px';
         heartEl.style.top = '200px';
-        heartEl.style.width = '22px';
-        heartEl.style.height = '22px';
-        heartEl.style.fontSize = '18px';
+        heartEl.style.width = '35px';
+        heartEl.style.height = '35px';
+        heartEl.style.fontSize = '25px';
         heartEl.style.display = 'flex';
         heartEl.style.alignItems = 'center';
         heartEl.style.justifyContent = 'center';
@@ -1057,13 +1060,13 @@ moneyItems.forEach(money => {
     const moneyY = parseInt(money.style.top);
     const moneyRect = {
         left: moneyX, top: moneyY,
-        right: moneyX + 22, bottom: moneyY + 22
+        right: moneyX + 32, bottom: moneyY + 32
     };
     
     if (this.rectsOverlap(playerRect, moneyRect)) {
-        this.money += 100;
+        this.money += 300;
         this.cavebMoneyCollected = true; // Boolean flag instead of array
-        this.showMessage('💰 +100¥ collected!');
+        this.showMessage('💰 +300¥ collected!');
         this.updateUI();
         money.remove();
     }
@@ -1077,7 +1080,7 @@ hearts.forEach(heart => {
         const heartY = parseInt(heart.style.top);
         const heartRect = {
             left: heartX, top: heartY,
-            right: heartX + 22, bottom: heartY + 22
+            right: heartX + 32, bottom: heartY + 32
         };
         
         if (this.rectsOverlap(playerRect, heartRect)) {
@@ -1254,6 +1257,9 @@ hearts.forEach(heart => {
  // ADD YOUR CAVE COLLECTION FLAGS HERE:
         gameState.cavebMoneyCollected = this.cavebMoneyCollected;
         gameState.cavebHeartCollected = this.cavebHeartCollected;
+        gameState.caveaMoneyCollected = this.caveaMoneyCollected;
+        gameState.caveaHeartCollected = this.caveaHeartCollected;
+        
         
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
