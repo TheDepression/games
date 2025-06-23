@@ -427,7 +427,7 @@
                 this.bossY = 150;
                 this.bossVelocityX = 0;
                 this.bossVelocityY = 0;
-                this.bossSpeed = 2.0; // Slightly faster than forest boss
+                this.bossSpeed = 1.8; // Slightly faster than forest boss
                 this.trackingStrength = 0.7; // Higher tracking
                 this.lastDirectionChange = Date.now();
                 this.isShooting = false;
@@ -437,6 +437,7 @@
                 this.wallRideAxis = 'vertical'; // 'vertical' or 'horizontal'
                 this.wallRideDistance = 0;
                 this.targetWallRideDistance = 0;
+                this.headingToCorner = false;
                 
                 // Game elements
                 this.projectiles = [];
@@ -937,11 +938,56 @@ cavebHeartCollected: this.cavebHeartCollected
         }
     }
     
-    // Stop wall riding after distance
-    if (this.wallRideDistance >= this.targetWallRideDistance) {
-        this.bossState = 'moving';
-        this.setBossRandomDirection();
+    // When reaching target distance, move to nearest corner before switching walls
+if (this.wallRideDistance >= this.targetWallRideDistance) {
+    this.wallRideDistance = 0;
+    
+    if (this.wallRideAxis === 'vertical') {
+        // Currently on right wall, decide which corner to go to
+        if (this.playerY < 178.75) { // Player in top half
+            // Go to top-right corner, then switch to horizontal
+            this.wallRideDirection = -1; // Go up
+            this.targetWallRideDistance = Math.abs(this.bossY - 20); // Distance to top
+        } else { // Player in bottom half
+            // Go to bottom-right corner, then switch to horizontal
+            this.wallRideDirection = 1; // Go down
+            this.targetWallRideDistance = Math.abs(257.5 - this.bossY); // Distance to bottom
+        }
+    } else {
+        // Currently on bottom wall, decide which corner to go to
+        if (this.playerX < 175) { // Player in left half
+            // Go to bottom-left corner, then switch to vertical
+            this.wallRideDirection = -1; // Go left
+            this.targetWallRideDistance = Math.abs(this.bossX - 20); // Distance to left
+        } else { // Player in right half
+            // Go to bottom-right corner, then switch to vertical
+            this.wallRideDirection = 1; // Go right
+            this.targetWallRideDistance = Math.abs(250 - this.bossX); // Distance to right
+        }
     }
+    
+    // Mark that we're heading to a corner
+    this.headingToCorner = true;
+}
+
+// Check if we've reached the corner and should switch walls
+if (this.headingToCorner) {
+    if (this.wallRideAxis === 'vertical' && (this.bossY <= 20 || this.bossY >= 257.5)) {
+        // Reached top or bottom corner, switch to horizontal
+        this.wallRideAxis = 'horizontal';
+        this.bossY = this.bossY <= 20 ? 20 : 257.5; // Snap to corner
+        this.wallRideDirection = this.playerX < this.bossX ? -1 : 1; // Move toward player
+        this.headingToCorner = false;
+        this.targetWallRideDistance = 100 + Math.random() * 150;
+    } else if (this.wallRideAxis === 'horizontal' && (this.bossX <= 20 || this.bossX >= 250)) {
+        // Reached left or right corner, switch to vertical
+        this.wallRideAxis = 'vertical';
+        this.bossX = this.bossX <= 20 ? 20 : 250; // Snap to corner
+        this.wallRideDirection = this.playerY < this.bossY ? -1 : 1; // Move toward player
+        this.headingToCorner = false;
+        this.targetWallRideDistance = 100 + Math.random() * 150;
+    }
+}
 }
 
             shootProjectiles() {
