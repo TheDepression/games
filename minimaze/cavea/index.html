@@ -1090,15 +1090,21 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
             }
             
             updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('money').textContent = this.money;
-                
-                let items = [];
-                if (this.hasFlashlight) items.push('🔦');
-                if (this.hasHammer) items.push('🔨');
-                
-                document.getElementById('itemsList').textContent = items.length > 0 ? items.join(' ') : 'None';
-            }
+    document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money;
+    
+    let items = [];
+    if (this.hasFlashlight) items.push('🔦');
+    if (this.hasHammer) items.push('🔨');
+    // ADD ALL OTHER ITEMS:
+    if (this.hasBoat) items.push('⛵');
+    if (this.hasKey) items.push('🔑');
+    if (this.hasLavaShoes) items.push('🥾');
+    if (this.hasPencil) items.push('✏️');
+    if (this.hasPyramidKey) items.push('🗝️');
+    
+    document.getElementById('itemsList').textContent = items.length > 0 ? items.join(' ') : 'None';
+}
             
             showMessage(text) {
                 const message = document.getElementById('message');
