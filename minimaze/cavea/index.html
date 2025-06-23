@@ -634,7 +634,7 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
 // ADD MONEY/HEARTS HERE (after existing special items):
     
     // Example: Add money to specific rooms
-    if (roomX === 0 && roomY === 2 && !this.collectedMoney.includes('cavea_money_1')) {
+    if (roomX === 0 && roomY === 2 && !this.caveaMoneyCollected) {
         // Add money to room 0,2
         const moneyEl = document.createElement('div');
         moneyEl.className = 'money-pickup';
@@ -650,12 +650,11 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         moneyEl.style.justifyContent = 'center';
         moneyEl.style.animation = 'glow 2s infinite';
         moneyEl.style.zIndex = '60';
-        moneyEl.dataset.id = 'cave_money_1'; // Unique ID
         this.gameWorld.appendChild(moneyEl);
     }
 
     // Example: Add heart to specific room
-    if (roomX === 2 && roomY === 0 && !this.collectedHearts.includes('cavea_heart_1')) {
+    if (roomX === 2 && roomY === 0 && !this.caveaHeartCollected) {
         // Add heart to room 2,0
         const heartEl = document.createElement('div');
         heartEl.className = 'heart-pickup';
@@ -671,7 +670,6 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         heartEl.style.justifyContent = 'center';
         heartEl.style.animation = 'heartbeat 1s infinite';
         heartEl.style.zIndex = '60';
-        heartEl.dataset.id = 'cavea_heart_1'; // Unique ID
         this.gameWorld.appendChild(heartEl);
     }
 
@@ -963,7 +961,7 @@ moneyItems.forEach(money => {
     
     if (this.rectsOverlap(playerRect, moneyRect)) {
         this.money += 100;
-        this.collectedMoney.push(money.dataset.id);
+        this.caveaMoneyCollected = true; // Boolean flag instead of array
         this.showMessage('💰 +100¥ collected!');
         this.updateUI();
         money.remove();
@@ -983,7 +981,7 @@ hearts.forEach(heart => {
         
         if (this.rectsOverlap(playerRect, heartRect)) {
             this.hearts++;
-            this.collectedHearts.push(heart.dataset.id);
+            this.caveaHeartCollected = true; // Boolean flag instead of array
             this.showMessage('❤️ Health restored!');
             this.updateUI();
             heart.remove();
