@@ -1386,6 +1386,8 @@ function acceptBossFight() {
         gameState.timeElapsed = game.timeElapsed;
         gameState.hasHammer = game.hasHammer;
         gameState.currentUrl = 'caveboss';
+        gameState.cavebMoneyCollected = game.cavebMoneyCollected;
+gameState.cavebHeartCollected = game.cavebHeartCollected;
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
         window.location.href = 'https://thedepression.github.io/games/minimaze/caveboss';
