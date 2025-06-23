@@ -384,6 +384,8 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
         // In loadGameState():
 this.caveaMoneyCollected = gameState.caveaMoneyCollected || false;
 this.caveaHeartCollected = gameState.caveaHeartCollected || false;
+        this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
+this.cavebHeartCollected = gameState.cavebHeartCollected || false;
 
         // ADD ALL MISSING ITEMS:
         this.hasBoat = gameState.hasBoat || false;
@@ -598,7 +600,7 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
                 });
                 
                 // Add snakes (except for starting room)
-                if (!(roomX === 0 && roomY === 0)) {
+                if (!(roomX === -1 && roomY === 0)) {
                     layout.snakes.forEach(snake => {
                         this.createSnake(snake.x, snake.y, snake.dir);
                     });
@@ -643,9 +645,9 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         moneyEl.style.position = 'absolute';
         moneyEl.style.left = '200px';
         moneyEl.style.top = '150px';
-        moneyEl.style.width = '22px';
-        moneyEl.style.height = '22px';
-        moneyEl.style.fontSize = '18px';
+        moneyEl.style.width = '35px';
+        moneyEl.style.height = '35px';
+        moneyEl.style.fontSize = '25px';
         moneyEl.style.display = 'flex';
         moneyEl.style.alignItems = 'center';
         moneyEl.style.justifyContent = 'center';
@@ -663,9 +665,9 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         heartEl.style.position = 'absolute';
         heartEl.style.left = '250px';
         heartEl.style.top = '200px';
-        heartEl.style.width = '22px';
-        heartEl.style.height = '22px';
-        heartEl.style.fontSize = '18px';
+        heartEl.style.width = '35px';
+        heartEl.style.height = '35px';
+        heartEl.style.fontSize = '25px';
         heartEl.style.display = 'flex';
         heartEl.style.alignItems = 'center';
         heartEl.style.justifyContent = 'center';
@@ -957,13 +959,13 @@ moneyItems.forEach(money => {
     const moneyY = parseInt(money.style.top);
     const moneyRect = {
         left: moneyX, top: moneyY,
-        right: moneyX + 22, bottom: moneyY + 22
+        right: moneyX + 35, bottom: moneyY + 35
     };
     
     if (this.rectsOverlap(playerRect, moneyRect)) {
-        this.money += 100;
+        this.money += 300;
         this.caveaMoneyCollected = true; // Boolean flag instead of array
-        this.showMessage('💰 +100¥ collected!');
+        this.showMessage('💎 SUPER MONEY! +300¥ collected!');
         this.updateUI();
         money.remove();
     }
@@ -972,18 +974,18 @@ moneyItems.forEach(money => {
 // Check heart pickup  
 const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
 hearts.forEach(heart => {
-    if (heart.dataset.type !== 'baby' && this.hearts < 3) {
+    if (heart.dataset.type !== 'baby') {
         const heartX = parseInt(heart.style.left);
         const heartY = parseInt(heart.style.top);
         const heartRect = {
             left: heartX, top: heartY,
-            right: heartX + 22, bottom: heartY + 22
+            right: heartX + 35, bottom: heartY + 35
         };
         
         if (this.rectsOverlap(playerRect, heartRect)) {
-            this.hearts++;
+            this.hearts = 5; 
             this.caveaHeartCollected = true; // Boolean flag instead of array
-            this.showMessage('❤️ Health restored!');
+            this.showMessage('💖 SUPER HEART! Maximum power!');
             this.updateUI();
             heart.remove();
         }
@@ -1151,6 +1153,8 @@ hearts.forEach(heart => {
         gameState.currentUrl = 'main';
         gameState.caveaMoneyCollected = this.caveaMoneyCollected;
         gameState.caveaHeartCollected = this.caveaHeartCollected;
+        gameState.cavebMoneyCollected = this.cavebMoneyCollected;
+        gameState.cavebHeartCollected = this.cavebHeartCollected;
         
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
