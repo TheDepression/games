@@ -1027,26 +1027,38 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
             }
             
             exitCave() {
-                this.gameStarted = false;
-                clearInterval(this.timerInterval);
-                this.caveMusic.pause();
-                
-                this.showMessage('🌅 Exiting cave...');
-                
-                setTimeout(() => {
-                    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                    gameState.hearts = this.hearts;
-                    gameState.money = this.money;
-                    gameState.timeElapsed = this.timeElapsed;
-                    gameState.hasHammer = this.hasHammer;
-                    gameState.playerX = 120;
-                    gameState.playerY = 1980;
-                    gameState.currentUrl = 'main';
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                    
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-                }, 2000);
-            }
+    this.gameStarted = false;
+    clearInterval(this.timerInterval);
+    this.caveMusic.pause();
+    
+    this.showMessage('🌅 Exiting cave...');
+    
+    setTimeout(() => {
+        const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+        gameState.hearts = this.hearts;
+        gameState.money = this.money;
+        gameState.timeElapsed = this.timeElapsed;
+        // SAVE ALL ITEMS, NOT JUST HAMMER:
+        gameState.hasHammer = this.hasHammer;
+        gameState.hasFlashlight = this.hasFlashlight;
+        gameState.hasBoat = this.hasBoat;
+        gameState.hasKey = this.hasKey;
+        gameState.hasLavaShoes = this.hasLavaShoes;
+        gameState.hasPencil = this.hasPencil;
+        gameState.hasPyramidKey = this.hasPyramidKey;
+        gameState.caveBossDefeated = this.caveBossDefeated;
+        gameState.bullyDefeated = this.bullyDefeated;
+        gameState.motherPaid = this.motherPaid;
+        gameState.collectedMoney = this.collectedMoney;
+        gameState.collectedHearts = this.collectedHearts;
+        gameState.playerX = 120;
+        gameState.playerY = 1980;
+        gameState.currentUrl = 'main';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+    }, 2000);
+}
             
             startTimer() {
                 this.updateTimer();
