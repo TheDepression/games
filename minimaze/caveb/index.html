@@ -1108,24 +1108,25 @@ items.forEach(item => {
             }
             
             gameOver() {
-                this.gameStarted = false;
-                this.isPaused = true;
-                clearInterval(this.timerInterval);
-                this.caveMusic.pause();
-                
-                this.showMessage('💀 You died in the cave!');
-                
-                setTimeout(() => {
-                    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
-                    gameState.hearts = 3;
-                    gameState.playerX = 420;
-                    gameState.playerY = 1760;
-                    gameState.currentUrl = 'main';
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                    
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-                }, 3000);
-            }
+    this.gameStarted = false;
+    this.isPaused = true;
+    clearInterval(this.timerInterval);
+    this.caveMusic.pause();
+    
+    this.showMessage('💀 You died in the cave!');
+    
+    setTimeout(() => {
+        const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+        gameState.hearts = 3;
+        gameState.timeElapsed = this.timeElapsed; // ✅ PRESERVE CURRENT TIME
+        gameState.playerX = 300;  // ✅ SPAWN NEAR CAVE B ENTRANCE  
+        gameState.playerY = 2280; // ✅ SAME AS MANUAL EXIT
+        gameState.currentUrl = 'main';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+    }, 3000);
+}
             
             exitCave() {
     this.gameStarted = false;
