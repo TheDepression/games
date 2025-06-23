@@ -1060,13 +1060,13 @@ moneyItems.forEach(money => {
     const moneyY = parseInt(money.style.top);
     const moneyRect = {
         left: moneyX, top: moneyY,
-        right: moneyX + 32, bottom: moneyY + 32
+        right: moneyX + 35, bottom: moneyY + 35
     };
     
     if (this.rectsOverlap(playerRect, moneyRect)) {
         this.money += 300;
         this.cavebMoneyCollected = true; // Boolean flag instead of array
-        this.showMessage('💰 +300¥ collected!');
+        this.showMessage('💎 SUPER MONEY! +300¥ collected!');
         this.updateUI();
         money.remove();
     }
@@ -1075,18 +1075,18 @@ moneyItems.forEach(money => {
 // Check heart pickup  
 const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
 hearts.forEach(heart => {
-    if (heart.dataset.type !== 'baby' && this.hearts < 3) {
+    if (heart.dataset.type !== 'baby') {
         const heartX = parseInt(heart.style.left);
         const heartY = parseInt(heart.style.top);
         const heartRect = {
             left: heartX, top: heartY,
-            right: heartX + 32, bottom: heartY + 32
+            right: heartX + 35, bottom: heartY + 35
         };
         
         if (this.rectsOverlap(playerRect, heartRect)) {
-            this.hearts++;
+            this.hearts = 5;
             this.cavebHeartCollected = true; // Boolean flag instead of array
-            this.showMessage('❤️ Health restored!');
+            this.showMessage('💖 SUPER HEART! 5 hearts!');
             this.updateUI();
             heart.remove();
         }
