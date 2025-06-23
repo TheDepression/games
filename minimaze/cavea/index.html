@@ -613,8 +613,8 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
                     entrance.style.zIndex = '250';
                     entrance.dataset.type = 'exit';
                     this.gameWorld.appendChild(entrance);
-                } else if (layout.exits.includes('hammer')) {
-                    // Hammer in treasure room
+                } else if (layout.exits.includes('hammer') && !this.hasHammer) { // <-- ADD THE CHECK
+    // Hammer in treasure room - only if player doesn't have it
                     const hammer = document.createElement('div');
                     hammer.className = 'hammer';
                     hammer.style.position = 'absolute';
