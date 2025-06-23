@@ -351,6 +351,10 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
                 this.hammerCollected = false;
                 this.snakes = [];
                 
+                // In cave constructor, add:
+this.caveaMoneyCollected = false;
+this.caveaHeartCollected = false;
+                
                 // Timer
                 this.timerInterval = null;
                 
@@ -376,6 +380,10 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
         this.timeElapsed = gameState.timeElapsed || 0;
         this.hasFlashlight = gameState.hasFlashlight || false;
         this.hasHammer = gameState.hasHammer || false;
+        // In loadGameState():
+this.caveaMoneyCollected = gameState.caveaMoneyCollected || false;
+this.caveaHeartCollected = gameState.caveaHeartCollected || false;
+
         // ADD ALL MISSING ITEMS:
         this.hasBoat = gameState.hasBoat || false;
         this.hasKey = gameState.hasKey || false;
