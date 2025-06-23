@@ -1936,7 +1936,7 @@ sharkEnemies.forEach((shark, index) => {
         {x: 500, y: 500, message: "No,... I am NOT Mario. Leave me alone!", type: "villager", customEmoji: "👨🏻"},
         {x: 2250, y: 960, message: "The castle to the far north is always making loud noises and flashing lights. What is happening in there?!", type: "historian", customEmoji: "👵🏻"},
         {x: 80, y: 670, message: "The rumor is that the bully has found a way to live forever. If that is true, we may all be doomed.", type: "elder", customEmoji: "🤴🏻"},
-        {x: 2270, y: 800, message: "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""},
+        {x: 2270, y: 800, message: this.hasPyramidKey ? "I'll never forget your kindness!" : "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""},
         {x: 900, y: 2340, message: "There is a secret third entrance to the forest..", type: "cowboy", customEmoji: "🤠"},
         {x: 2360, y: 2360, message: "Hello fellow frog. I will share a secret with you. Relax under the pink square and wait. You will be rewarded!", type: "frog", customEmoji: "🐸"},
         {x: 60, y: 1660, message: "I heard there is a gorilla running around town. Watch out!", type: "woman", customEmoji: "👩🏼‍💼"},
@@ -2975,7 +2975,7 @@ if (inForest) {
             // STAGE 2: Exchange with enhanced save
             this.hasPencil = false;
             this.hasPyramidKey = true;
-            this.showMessage('🗝️ Thank you so much! Here\'s the pyramid key!');
+            this.showMessage('🗝️ Thank you so much! Here's the pyramid key!');
             friendly.dataset.message = "I'll never forget your kindness!";
             this.updateUI();
             
@@ -2987,7 +2987,7 @@ if (inForest) {
             setTimeout(() => {
                 const check = JSON.parse(localStorage.getItem('mfGameState'));
                 if (check.hasPyramidKey) {
-                    this.showMessage('✅ Pyramid key saved securely!');
+                    this.showMessage('✏️ Oh! My lovely pencil! Thank You! 🗝️');
                 } else {
                     this.showMessage('❌ Save failed! Check console.');
                     console.error('SAVE FAILURE - Main:', check.hasPyramidKey);
