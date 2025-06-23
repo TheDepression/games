@@ -1141,14 +1141,15 @@ cavebHeartCollected: this.cavebHeartCollected
                 
                 // Show defeat overlay
                 this.showMessage('💥 Cave Boss Defeated!');
-                
+                this.hearts = 7;
                 setTimeout(() => {
                     document.getElementById('defeat-overlay').style.display = 'flex';
                     
                     setTimeout(() => {
+                        
                         this.saveGameState();
                         window.location.href = 'https://thedepression.github.io/games/minimaze/caveb';
-                    }, 3000);
+                    }, 3500);
                 }, 1000);
             }
 
