@@ -777,6 +777,17 @@
                         this.playerX = newX;
                         this.playerY = newY;
                         this.positionPlayer();
+
+                        // ADD THIS CAMERA FOLLOWING CODE:
+    const gameAreaWidth = this.gameArea.offsetWidth;
+    const gameAreaHeight = this.gameArea.offsetHeight;
+    const scrollX = this.playerX - gameAreaWidth / 2 + 16;
+    const scrollY = this.playerY - gameAreaHeight / 2 + 16;
+    this.gameArea.scrollTo({
+        left: scrollX,
+        top: scrollY,
+        behavior: 'auto'
+    });
                     }
                     
                     this.playerVelocityX *= 0.88;
