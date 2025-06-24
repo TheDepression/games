@@ -567,20 +567,22 @@
                 this.gameWorld.style.height = floor.height + 'px';
                 this.gameWorld.style.transform = `scale(${floor.scale})`;
                 
-                // Set player spawn positions
-                if (floorNumber === 1) {
-                    this.playerX = 70;
-                    this.playerY = 320;
-                } else if (floorNumber === 2) {
-                    this.playerX = 70;
-                    this.playerY = 270;
-                } else if (floorNumber === 3) {
-                    this.playerX = 70;
-                    this.playerY = 220;
-                } else if (floorNumber === 4) {
-                    this.playerX = 70;
-                    this.playerY = 150;
-                }
+                // Set player spawn positions (only if not transitioning)
+if (!this.isTransitioning) {
+    if (floorNumber === 1) {
+        this.playerX = 70;
+        this.playerY = 320;
+    } else if (floorNumber === 2) {
+        this.playerX = 70;
+        this.playerY = 270;
+    } else if (floorNumber === 3) {
+        this.playerX = 70;
+        this.playerY = 220;
+    } else if (floorNumber === 4) {
+        this.playerX = 70;
+        this.playerY = 150;
+    }
+}
                 
                 this.createWalls(floorNumber, floor);
                 this.createEnemies(floorNumber, floor);
