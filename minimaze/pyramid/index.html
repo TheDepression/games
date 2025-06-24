@@ -1119,8 +1119,12 @@
                         const type = element.dataset.type;
                         
                         if (type === 'exit') {
-                            this.exitPyramid();
-                        } else if (type === 'button') {
+    if (this.currentFloor === 1) {
+        this.exitPyramid();
+    } else {
+        this.goDownstairs();
+    }
+} else if (type === 'button') {
                             this.activateStairs();
                         } else if (type === 'stairs') {
                             if (this.currentFloor === 1 && this.stairsVisible) {
