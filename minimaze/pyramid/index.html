@@ -1169,7 +1169,7 @@ if (!this.isTransitioning) {
             }
             
             goUpstairs() {
-                if (this.currentFloor >= 4) return; // Already at top
+               if (this.currentFloor >= 4 || this.isTransitioning) return; // Prevent spam
                 this.isTransitioning = true;  // ADD THIS LINE
                 this.currentFloor++;
                 this.stairsVisible = false;
@@ -1188,7 +1188,7 @@ if (!this.isTransitioning) {
             }
             
             goDownstairs() {
-                if (this.currentFloor <= 1) {
+                if (this.currentFloor <= 1 || this.isTransitioning) {
                     this.exitPyramid();
                     return;
                 }
