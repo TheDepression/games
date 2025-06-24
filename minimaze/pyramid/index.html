@@ -1170,7 +1170,7 @@ if (!this.isTransitioning) {
             
             goUpstairs() {
                 if (this.currentFloor >= 4) return; // Already at top
-                
+                this.isTransitioning = true;  // ADD THIS LINE
                 this.currentFloor++;
                 this.stairsVisible = false;
                 
@@ -1183,6 +1183,7 @@ if (!this.isTransitioning) {
                 
                 setTimeout(() => {
                     this.createFloor(this.currentFloor);
+                    this.isTransitioning = false;  // ADD THIS LINE
                 }, 1000);
             }
             
@@ -1191,7 +1192,7 @@ if (!this.isTransitioning) {
                     this.exitPyramid();
                     return;
                 }
-                
+                this.isTransitioning = true;  // ADD THIS LINE
                 this.currentFloor--;
                 this.showMessage(`🔻 Descending to Floor ${this.currentFloor}!`);
                 
@@ -1206,6 +1207,7 @@ if (!this.isTransitioning) {
                         this.playerY = 300;
                     }
                     this.positionPlayer();
+                    this.isTransitioning = false;  // ADD THIS LINE
                 }, 1000);
             }
             
