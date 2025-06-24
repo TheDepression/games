@@ -573,7 +573,7 @@ if (!this.isTransitioning) {
         this.playerX = 70;
         this.playerY = 320;
     } else if (floorNumber === 2) {
-        this.playerX = 30;
+        this.playerX = 70;
         this.playerY = 270;
     } else if (floorNumber === 3) {
         this.playerX = 70;
@@ -1184,7 +1184,21 @@ if (!this.isTransitioning) {
                 setTimeout(() => {
                     this.createFloor(this.currentFloor);
                     this.isTransitioning = false;  // ADD THIS LINE
-                }, 1000);
+                // Position player near door (left side) when coming up stairs
+    if (this.currentFloor === 2) {
+        this.playerX = 70;   // Near door on left
+        this.playerY = 280;  // Center vertically
+    } else if (this.currentFloor === 3) {
+        this.playerX = 70;
+        this.playerY = 230;
+    } else if (this.currentFloor === 4) {
+        this.playerX = 70;
+        this.playerY = 180;
+    }
+    
+    this.positionPlayer();
+    this.isTransitioning = false;
+}, 1000);
             }
             
             goDownstairs() {
