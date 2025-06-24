@@ -1147,11 +1147,11 @@
             const gameState = JSON.parse(savedState);
             
             // Check if player has pyramid key - REQUIRED for pyramid access
-            // if (!gameState.hasPyramidKey) {
-            //     alert('You need the ancient pyramid key to enter! Complete the pencil quest first.');
-            //     window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-            //     return;
-            // }
+             if (!gameState.hasPyramidKey) {
+                 alert('You need the ancient pyramid key to enter! Complete the pencil quest first.');
+                 window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                 return;
+             }
         });
 
         function startPyramid() {
