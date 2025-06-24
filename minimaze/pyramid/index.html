@@ -1,4 +1,58 @@
-<!DOCTYPE html>
+            checkCollisions() {
+                if (this.isInvulnerable) return;
+                
+                const playerRect = {
+                    left: this.playerX - 12,
+                    top: this.playerY - 12,
+                    right: this.playerX + 12,
+                    bottom: this.playerY + 12
+                };
+                
+                // Check enemy collisions
+                this.enemies.forEach(enemy => {
+                    const enemyRect = {
+                        left: enemy.currentX,
+                        top: enemy.currentY,
+                        right: enemy.currentX + (enemy.width || 42),
+                        bottom: enemy.currentY + (enemy.height || 32)
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, enemyRect)) {
+                        if (enemy.type === 'tracking') {
+                            this.takeDamage('💀 Enemy attack!');
+                        } else {
+                            this.takeDamage('💔 Potato fly attack!');
+                        }
+                    }
+                });
+                
+                // Check interactive elements
+                const elements = this.gameWorld.querySelectorAll('[data-type]');
+                elements.forEach(element => {
+                    const elemX = parseInt(element.style.left);
+                    const elemY = parseInt(element.style.top);
+                    const elemRect = {
+                        left: elemX + 10,  // Smaller collision box
+                        top: elemY + 10,
+                        right: elemX + 30,
+                        bottom: elemY + 30
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, elemRect)) {
+                        const type = element.dataset.type;
+                        
+                        if (type === 'exit') {
+                            this.exitPyramid();
+                        } else if (type === 'button') {
+                            this.activateStairs();
+                        } else if (type === 'stairs') {
+                            if (this.currentFloor === 1 && this.stairsVisible) {
+                                this.goUpstairs();
+                            } else if (this.currentFloor > 1) {
+                                this.goUpstairs();
+                            }
+                        } else if (type === 'boss') {
+                            this.encounterBoss();<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -53,12 +107,26 @@
             z-index: 30;
         }
         
-        .oneway-wall {
+        .electric-wall {
             position: absolute;
-            background: #daa520;
-            border: 1px solid rgba(184, 134, 11, 0.8);
+            background: linear-gradient(45deg, #ff4500 0%, #ffa500 50%, #ffff00 100%);
+            border: 2px solid #ff6600;
             opacity: 0.9;
             z-index: 30;
+            animation: electricPulse 1s infinite;
+            box-shadow: 0 0 10px #ff6600;
+        }
+        
+        @keyframes electricPulse {
+            0%, 100% { box-shadow: 0 0 10px #ff6600; }
+            50% { box-shadow: 0 0 20px #ff6600, 0 0 30px #ff4500; }
+        }
+        
+        .sand-zone {
+            position: absolute;
+            background: linear-gradient(135deg, #f4a460 0%, #daa520 50%, #cd853f 100%);
+            opacity: 0.7;
+            z-index: 5;
         }
         
         .enemy {
@@ -401,6 +469,15 @@
                     img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
                     this.playerImages[direction] = img;
                 });
+                
+                // Preload enemy images
+                this.enemyImages = {};
+                const enemyTypes = ['potatofly-min', 'psycho-min', 'yamato-min'];
+                enemyTypes.forEach(type => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${type}.png`;
+                    this.enemyImages[type] = img;
+                });
             }
             
             loadGameState() {
@@ -539,7 +616,7 @@
                 // Set player spawn positions - moved away from door
                 if (floorNumber === 1) {
                     this.playerX = 70;  // Moved 20px right from door
-                    this.playerY = 320; // Moved 30px up from center
+                    this.playerY = 370; // Moved 30px up from center
                 } else if (floorNumber === 2) {
                     this.playerX = 70;
                     this.playerY = 270; // Moved 30px up
@@ -564,18 +641,26 @@
                 const { width, height } = floor;
                 
                 // Create border walls
-                this.createWall(0, 0, width, 20); // Top
-                this.createWall(0, height - 20, width, 20); // Bottom
-                this.createWall(0, 0, 20, height); // Left
-                this.createWall(width - 20, 0, 20, height); // Right
+                if (floorNumber === 2) {
+                    // Electric walls for Floor 2
+                    this.createElectricWall(0, 0, width, 20); // Top
+                    this.createElectricWall(0, height - 20, width, 20); // Bottom
+                    this.createElectricWall(0, 0, 20, height); // Left
+                    this.createElectricWall(width - 20, 0, 20, height); // Right
+                } else {
+                    // Regular walls for other floors
+                    this.createWall(0, 0, width, 20); // Top
+                    this.createWall(0, height - 20, width, 20); // Bottom
+                    this.createWall(0, 0, 20, height); // Left
+                    this.createWall(width - 20, 0, 20, height); // Right
+                }
                 
                 if (floorNumber === 1) {
                     // Floor 1: One-way walls maze
                     this.createOneWayWallsFloor1();
                 } else if (floorNumber === 2) {
-                    // Floor 2: Placeholder - mostly empty
-                    this.createWall(200, 200, 200, 20);
-                    this.createWall(300, 100, 20, 200);
+                    // Floor 2: Electric walls + sand zones
+                    this.createFloor2Layout();
                 } else if (floorNumber === 3) {
                     // Floor 3: Placeholder - mostly empty  
                     this.createWall(150, 150, 200, 20);
@@ -590,7 +675,7 @@
                 
                 const oneWayWalls = [
                     // Outer maze structure
-                    { x: 100, y: 100, w: 500, h: 20, dir: 'solid' },
+                    { x: 100, y: 100, w: 600, h: 20, dir: 'solid' },
                     { x: 100, y: 680, w: 600, h: 20, dir: 'solid' },
                     { x: 100, y: 100, w: 20, h: 580, dir: 'solid' },
                     { x: 680, y: 100, w: 20, h: 580, dir: 'solid' },
@@ -633,6 +718,45 @@
                 this.gameWorld.appendChild(wall);
             }
             
+            createFloor2Layout() {
+                // Create sand zones with different flow directions
+                this.createSandZone(50, 50, 200, 150, 'up');      // Upper left - flows up
+                this.createSandZone(350, 50, 200, 150, 'right');  // Upper right - flows right
+                this.createSandZone(50, 350, 200, 200, 'left');   // Lower left - flows left
+                this.createSandZone(350, 350, 200, 200, 'down');  // Lower right - flows down
+                this.createSandZone(200, 200, 200, 100, 'up');    // Center - flows up
+                
+                // Electric walls throughout the floor
+                this.createElectricWall(100, 150, 150, 20);
+                this.createElectricWall(200, 80, 20, 100);
+                this.createElectricWall(300, 250, 100, 20);
+                this.createElectricWall(400, 180, 20, 120);
+                this.createElectricWall(150, 400, 200, 20);
+                this.createElectricWall(450, 320, 20, 150);
+                this.createElectricWall(250, 300, 100, 20);
+            }
+            
+            createSandZone(x, y, width, height, direction) {
+                const zone = document.createElement('div');
+                zone.className = 'sand-zone';
+                zone.style.left = x + 'px';
+                zone.style.top = y + 'px';
+                zone.style.width = width + 'px';
+                zone.style.height = height + 'px';
+                zone.dataset.flowDirection = direction;
+                this.gameWorld.appendChild(zone);
+            }
+            
+            createElectricWall(x, y, width, height) {
+                const wall = document.createElement('div');
+                wall.className = 'electric-wall';
+                wall.style.left = x + 'px';
+                wall.style.top = y + 'px';
+                wall.style.width = width + 'px';
+                wall.style.height = height + 'px';
+                this.gameWorld.appendChild(wall);
+            }
+            
             createOneWayWall(x, y, width, height, direction) {
                 const wall = document.createElement('div');
                 wall.className = 'oneway-wall';
@@ -653,8 +777,9 @@
                         this.createPotatoFly(x, y);
                     }
                 } else if (floorNumber === 2) {
-                    // Floor 2: Different enemy (placeholder)
-                    this.createPotatoFly(300, 300);
+                    // Floor 2: Psycho and Yamato with player tracking
+                    this.createTrackingEnemy(150, 120, 'psycho-min', 35, 70);
+                    this.createTrackingEnemy(450, 400, 'yamato-min', 50, 70);
                 } else if (floorNumber === 3) {
                     // Floor 3: Different enemy (placeholder)
                     this.createPotatoFly(250, 250);
@@ -662,23 +787,24 @@
                 // Floor 4 has boss instead of regular enemies
             }
             
-            createPotatoFly(x, y) {
+            createTrackingEnemy(x, y, type, width, height) {
                 const enemy = document.createElement('div');
                 enemy.className = 'enemy';
                 enemy.style.left = x + 'px';
                 enemy.style.top = y + 'px';
-                enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/potatofly-min.png")';
+                enemy.style.width = width + 'px';
+                enemy.style.height = height + 'px';
+                enemy.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${type}.png")`;
                 this.gameWorld.appendChild(enemy);
                 
                 this.enemies.push({
                     element: enemy,
-                    centerX: x,
-                    centerY: y,
+                    type: 'tracking',
                     currentX: x,
                     currentY: y,
-                    angle: Math.random() * Math.PI * 2,
-                    radius: 80,
-                    speed: 0.02
+                    width: width,
+                    height: height,
+                    speed: 0.8 // Slower than potato flies
                 });
             }
             
@@ -766,6 +892,27 @@
                 gameLoop();
             }
             
+            createPotatoFly(x, y) {
+                const enemy = document.createElement('div');
+                enemy.className = 'enemy';
+                enemy.style.left = x + 'px';
+                enemy.style.top = y + 'px';
+                enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/potatofly-min.png")';
+                this.gameWorld.appendChild(enemy);
+                
+                this.enemies.push({
+                    element: enemy,
+                    type: 'circular',
+                    centerX: x,
+                    centerY: y,
+                    currentX: x,
+                    currentY: y,
+                    angle: Math.random() * Math.PI * 2,
+                    radius: 80,
+                    speed: 0.02
+                });
+            }
+            
             updatePlayer() {
                 if (this.isPaused) return;
                 
@@ -777,22 +924,69 @@
                         this.playerX = newX;
                         this.playerY = newY;
                         this.positionPlayer();
-
-                        // ADD THIS CAMERA FOLLOWING CODE:
-    const gameAreaWidth = this.gameArea.offsetWidth;
-    const gameAreaHeight = this.gameArea.offsetHeight;
-    const scrollX = this.playerX - gameAreaWidth / 2 + 16;
-    const scrollY = this.playerY - gameAreaHeight / 2 + 16;
-    this.gameArea.scrollTo({
-        left: scrollX,
-        top: scrollY,
-        behavior: 'auto'
-    });
+                        
+                        // Camera following
+                        const gameAreaWidth = this.gameArea.offsetWidth;
+                        const gameAreaHeight = this.gameArea.offsetHeight;
+                        const scrollX = this.playerX - gameAreaWidth / 2 + 16;
+                        const scrollY = this.playerY - gameAreaHeight / 2 + 16;
+                        this.gameArea.scrollTo({
+                            left: scrollX,
+                            top: scrollY,
+                            behavior: 'auto'
+                        });
                     }
                     
                     this.playerVelocityX *= 0.88;
                     this.playerVelocityY *= 0.88;
                 }
+                
+                // Check sand zone effects on Floor 2
+                if (this.currentFloor === 2) {
+                    this.checkSandZoneEffects();
+                }
+            }
+            
+            checkSandZoneEffects() {
+                const playerCenterX = this.playerX;
+                const playerCenterY = this.playerY;
+                
+                const sandZones = this.gameWorld.querySelectorAll('.sand-zone');
+                sandZones.forEach(zone => {
+                    const zoneRect = {
+                        left: parseInt(zone.style.left),
+                        top: parseInt(zone.style.top),
+                        right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+                    };
+                    
+                    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                        
+                        const direction = zone.dataset.flowDirection;
+                        const pushForce = 1.5;
+                        
+                        switch(direction) {
+                            case 'up':
+                                this.playerVelocityY -= pushForce;
+                                break;
+                            case 'down':
+                                this.playerVelocityY += pushForce;
+                                break;
+                            case 'left':
+                                this.playerVelocityX -= pushForce;
+                                break;
+                            case 'right':
+                                this.playerVelocityX += pushForce;
+                                break;
+                        }
+                        
+                        // Limit velocity
+                        const maxVelocity = 15;
+                        this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                        this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                    }
+                });
             }
             
             canMoveTo(x, y) {
@@ -821,7 +1015,23 @@
                     }
                 }
                 
-                // Check one-way walls
+                // Check electric walls (Floor 2) - damage but don't block
+                const electricWalls = this.gameWorld.querySelectorAll('.electric-wall');
+                for (let wall of electricWalls) {
+                    const wallRect = {
+                        left: parseFloat(wall.style.left),
+                        top: parseFloat(wall.style.top),
+                        right: parseFloat(wall.style.left) + parseFloat(wall.style.width),
+                        bottom: parseFloat(wall.style.top) + parseFloat(wall.style.height)
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, wallRect)) {
+                        this.takeDamage('⚡ Electric shock!');
+                        return false; // Still block movement
+                    }
+                }
+                
+                // Check one-way walls (Floor 1)
                 const oneWayWalls = this.gameWorld.querySelectorAll('.oneway-wall');
                 for (let wall of oneWayWalls) {
                     const wallRect = {
@@ -856,66 +1066,111 @@
                 if (this.isPaused) return;
                 
                 this.enemies.forEach(enemy => {
-                    // Circular movement for potato flies
-                    enemy.angle += enemy.speed;
-                    enemy.currentX = enemy.centerX + Math.cos(enemy.angle) * enemy.radius;
-                    enemy.currentY = enemy.centerY + Math.sin(enemy.angle) * enemy.radius;
-                    
-                    enemy.element.style.left = enemy.currentX + 'px';
-                    enemy.element.style.top = enemy.currentY + 'px';
+                    if (enemy.type === 'circular') {
+                        // Circular movement for potato flies
+                        enemy.angle += enemy.speed;
+                        enemy.currentX = enemy.centerX + Math.cos(enemy.angle) * enemy.radius;
+                        enemy.currentY = enemy.centerY + Math.sin(enemy.angle) * enemy.radius;
+                        
+                        enemy.element.style.left = enemy.currentX + 'px';
+                        enemy.element.style.top = enemy.currentY + 'px';
+                    } else if (enemy.type === 'tracking') {
+                        // Player tracking movement
+                        const deltaX = this.playerX - enemy.currentX;
+                        const deltaY = this.playerY - enemy.currentY;
+                        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        
+                        if (distance > 5) {
+                            const moveX = (deltaX / distance) * enemy.speed;
+                            const moveY = (deltaY / distance) * enemy.speed;
+                            
+                            // Check if enemy can move (doesn't pass through walls)
+                            if (this.canEnemyMoveTo(enemy.currentX + moveX, enemy.currentY + moveY, enemy.width, enemy.height)) {
+                                enemy.currentX += moveX;
+                                enemy.currentY += moveY;
+                            }
+                        }
+                        
+                        enemy.element.style.left = enemy.currentX + 'px';
+                        enemy.element.style.top = enemy.currentY + 'px';
+                    }
                 });
             }
             
-            checkCollisions() {
-                if (this.isInvulnerable) return;
-                
-                const playerRect = {
-                    left: this.playerX - 12,
-                    top: this.playerY - 12,
-                    right: this.playerX + 12,
-                    bottom: this.playerY + 12
+            canEnemyMoveTo(x, y, width, height) {
+                const enemyRect = {
+                    left: x,
+                    top: y,
+                    right: x + width,
+                    bottom: y + height
                 };
                 
-                // Check enemy collisions
-                this.enemies.forEach(enemy => {
-                    const enemyRect = {
-                        left: enemy.currentX,
-                        top: enemy.currentY,
-                        right: enemy.currentX + 42,
-                        bottom: enemy.currentY + 32
+                // Check against all walls
+                const walls = this.gameWorld.querySelectorAll('.pyramid-wall, .electric-wall, .oneway-wall');
+                for (let wall of walls) {
+                    const wallRect = {
+                        left: parseFloat(wall.style.left),
+                        top: parseFloat(wall.style.top),
+                        right: parseFloat(wall.style.left) + parseFloat(wall.style.width),
+                        bottom: parseFloat(wall.style.top) + parseFloat(wall.style.height)
                     };
                     
-                    if (this.rectsOverlap(playerRect, enemyRect)) {
-                        this.takeDamage();
+                    if (this.rectsOverlap(enemyRect, wallRect)) {
+                        return false;
                     }
-                });
+                }
                 
-                // Check interactive elements
-                const elements = this.gameWorld.querySelectorAll('[data-type]');
-                elements.forEach(element => {
-                    const elemX = parseInt(element.style.left);
-                    const elemY = parseInt(element.style.top);
-                    const elemRect = {
-                        left: elemX - 10,
-                        top: elemY - 10,
-                        right: elemX + 10,
-                        bottom: elemY + 10
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, elemRect)) {
-                        const type = element.dataset.type;
-                        
-                        if (type === 'exit') {
-                            this.exitPyramid();
-                        } else if (type === 'button') {
-                            this.activateStairs();
-                        } else if (type === 'stairs' && this.stairsVisible) {
-                            this.goUpstairs();
+                return true;
+            }
+            
                         } else if (type === 'boss') {
                             this.encounterBoss();
                         }
                     }
                 });
+            }
+            
+            goDownstairs() {
+                if (this.currentFloor <= 1) {
+                    this.exitPyramid();
+                    return;
+                }
+                
+                this.currentFloor--;
+                this.showMessage(`🔻 Descending to Floor ${this.currentFloor}!`);
+                
+                // Position player near stairs when going down
+                setTimeout(() => {
+                    this.createFloor(this.currentFloor);
+                    if (this.currentFloor === 1) {
+                        this.playerX = 650;
+                        this.playerY = 150;
+                    } else {
+                        this.playerX = 520; // Near stairs position
+                        this.playerY = 300;
+                    }
+                    this.positionPlayer();
+                }, 1000);
+            }
+            
+            takeDamage(message = '💔 Ouch!') {
+                if (this.isInvulnerable) return;
+                
+                this.hearts--;
+                this.showMessage(message);
+                this.updateUI();
+                
+                this.isInvulnerable = true;
+                this.player.classList.add('invulnerable');
+                
+                setTimeout(() => {
+                    this.isInvulnerable = false;
+                    this.player.classList.remove('invulnerable');
+                }, 1500);
+                
+                if (this.hearts <= 0) {
+                    this.gameOver();
+                }
             }
             
             activateStairs() {
@@ -1107,7 +1362,7 @@
             updateFloorHint(floorNumber) {
                 const hints = {
                     1: 'Floor 1: Beware the one-way walls!',
-                    2: 'Floor 2: Navigate the chamber...',
+                    2: 'Floor 2: Sandy currents drag you! Avoid electric walls!',
                     3: 'Floor 3: Almost to the top...',
                     4: 'Floor 4: Face the final guardian!'
                 };
@@ -1158,11 +1413,11 @@
             const gameState = JSON.parse(savedState);
             
             // Check if player has pyramid key - REQUIRED for pyramid access
-             if (!gameState.hasPyramidKey) {
-                 alert('You need the ancient pyramid key to enter! Complete the pencil quest first.');
-                 window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-                 return;
-             }
+            // if (!gameState.hasPyramidKey) {
+            //     alert('You need the ancient pyramid key to enter! Complete the pencil quest first.');
+            //     window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+            //     return;
+            // }
         });
 
         function startPyramid() {
