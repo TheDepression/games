@@ -1146,13 +1146,18 @@ this.gameWorld.appendChild(exitElement);
                     };
                     
                     if (this.rectsOverlap(playerRect, elemRect)) {
-                        const type = element.dataset.type;
-                        
-                        if (type === 'outside') {
-    this.exitPyramid();
-} else if (type === 'exit') {
-    this.goDownstairs();
-} else if (type === 'button') {
+    const type = element.dataset.type;
+    console.log(`COLLISION: type=${type}, floor=${this.currentFloor}, transitioning=${this.isTransitioning}, element=`, element);
+    console.log(`Player position: ${this.playerX}, ${this.playerY}`);
+    console.log(`Element position: ${elemX}, ${elemY}`);
+    
+    if (type === 'outside') {
+        console.log('Calling exitPyramid()');
+        this.exitPyramid();
+    } else if (type === 'exit') {
+        console.log('Calling goDownstairs()');
+        this.goDownstairs();
+    } else if (type === 'button') {
                             this.activateStairs();
                         } else if (type === 'stairs') {
                             if (this.currentFloor === 1 && this.stairsVisible) {
