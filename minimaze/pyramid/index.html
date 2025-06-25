@@ -787,14 +787,20 @@ if (!this.isTransitioning) {
             createFloorElements(floorNumber, floor) {
                 const { width, height } = floor;
                 
-                // Always create exit door - moved left from edge
-                const door = document.createElement('div');
-                door.className = 'door';
-                door.textContent = '🚪';
-                door.style.left = '10px';  // Moved from 30px to 10px
-                door.style.top = (height/2 - 20) + 'px';
-                door.dataset.type = 'exit';
-                this.gameWorld.appendChild(door);
+                // Create exit element - different for each floor
+const exitElement = document.createElement('div');
+if (floorNumber === 1) {
+    exitElement.className = 'door';
+    exitElement.textContent = '⬜'; // White square for outside light
+    exitElement.dataset.type = 'outside';
+} else {
+    exitElement.className = 'door';
+    exitElement.textContent = '🚪';
+    exitElement.dataset.type = 'exit';
+}
+exitElement.style.left = '10px';
+exitElement.style.top = (height/2 - 20) + 'px';
+this.gameWorld.appendChild(exitElement);
                 
                 if (floorNumber === 1) {
                     // Button to activate stairs
@@ -1142,12 +1148,10 @@ if (!this.isTransitioning) {
                     if (this.rectsOverlap(playerRect, elemRect)) {
                         const type = element.dataset.type;
                         
-                        if (type === 'exit') {
-    if (this.currentFloor === 1) {
-        this.exitPyramid();
-    } else {
-        this.goDownstairs();
-    }
+                        if (type === 'outside') {
+    this.exitPyramid();
+} else if (type === 'exit') {
+    this.goDownstairs();
 } else if (type === 'button') {
                             this.activateStairs();
                         } else if (type === 'stairs') {
