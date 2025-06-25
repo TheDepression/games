@@ -1233,19 +1233,22 @@ if (!this.isTransitioning) {
                 this.showMessage(`🔻 Descending to Floor ${this.currentFloor}!`);
                 
                 // Position player near stairs when going down
-                setTimeout(() => {
-                    this.createFloor(this.currentFloor);
-                    if (this.currentFloor === 1) {
-                        this.playerX = 650;
-                        this.playerY = 150;
-                    } else {
-                        this.playerX = 520; // Near stairs position
-                        this.playerY = 300;
-                    }
-                    this.positionPlayer();
-                    this.isTransitioning = false;  // ADD THIS LINE
-                }, 1000);
-            }
+    setTimeout(() => {
+        this.createFloor(this.currentFloor);
+        if (this.currentFloor === 1) {
+            this.playerX = 650;  // Near stairs on floor 1
+            this.playerY = 150;
+        } else if (this.currentFloor === 2) {
+            this.playerX = 520;  // Near stairs position  
+            this.playerY = 270;
+        } else if (this.currentFloor === 3) {
+            this.playerX = 420;
+            this.playerY = 220;
+        }
+        this.positionPlayer();
+        this.isTransitioning = false;
+    }, 1000);
+}
             
             encounterBoss() {
                 this.playerVelocityX = 0;
