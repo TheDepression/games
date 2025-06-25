@@ -1234,10 +1234,12 @@ this.gameWorld.appendChild(exitElement);
             }
             
             goDownstairs() {
-                if (this.currentFloor <= 1 || this.isTransitioning) {
-                    this.exitPyramid();
-                    return;
-                }
+    if (this.isTransitioning) return; // Block multiple calls first!
+    
+    if (this.currentFloor <= 1) {
+        this.exitPyramid();
+        return;
+    }
                 this.isTransitioning = true;  // ADD THIS LINE
                 this.currentFloor--;
                 this.showMessage(`🔻 Descending to Floor ${this.currentFloor}!`);
