@@ -1805,6 +1805,14 @@ showMessage(text, isPersistent = false) {
         }, 2500);
     }
 }
+            // Add this function to hide persistent messages:
+hideNPCMessage() {
+    if (this.currentNPCMessage) {
+        const message = document.getElementById('message');
+        message.style.display = 'none';
+        this.currentNPCMessage = null;
+    }
+}
         }
 
         let game;
@@ -1838,14 +1846,7 @@ showMessage(text, isPersistent = false) {
             }
         }
 
-        // Add this function to hide persistent messages:
-hideNPCMessage() {
-    if (this.currentNPCMessage) {
-        const message = document.getElementById('message');
-        message.style.display = 'none';
-        this.currentNPCMessage = null;
-    }
-}
+    
     </script>
 </body>
 </html>
