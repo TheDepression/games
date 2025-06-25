@@ -838,6 +838,20 @@ if (!this.isTransitioning) {
                 this.player.style.left = (this.playerX - 16) + 'px';
                 this.player.style.top = (this.playerY - 16) + 'px';
             }
+
+
+            centerCameraOnPlayer() {
+    const gameAreaWidth = this.gameArea.offsetWidth;
+    const gameAreaHeight = this.gameArea.offsetHeight;
+    const scrollX = this.playerX - gameAreaWidth / 2 + 16;
+    const scrollY = this.playerY - gameAreaHeight / 2 + 16;
+    this.gameArea.scrollTo({
+        left: scrollX,
+        top: scrollY,
+        behavior: 'auto'
+    });
+}
+
             
             startGame() {
                 this.gameStarted = true;
@@ -903,8 +917,12 @@ if (!this.isTransitioning) {
             }
             
             checkSandZoneEffects() {
-                const playerCenterX = this.playerX;
-                const playerCenterY = this.playerY;
+    // Only check sand effects every few frames for performance
+    if (!this.lastSandCheck || Date.now() - this.lastSandCheck > 100) {
+        this.lastSandCheck = Date.now();
+        
+        const playerCenterX = this.playerX;
+        const playerCenterY = this.playerY;
                 
                 const sandZones = this.gameWorld.querySelectorAll('.sand-zone');
                 sandZones.forEach(zone => {
@@ -943,7 +961,7 @@ if (!this.isTransitioning) {
                     }
                 });
             }
-            
+            }
             canMoveTo(x, y) {
                 const playerSize = 24;
                 const padding = 2;
@@ -1022,14 +1040,17 @@ if (!this.isTransitioning) {
                 
                 this.enemies.forEach(enemy => {
                     if (enemy.type === 'circular') {
-                        // Circular movement for potato flies
-                        enemy.angle += enemy.speed;
-                        enemy.currentX = enemy.centerX + Math.cos(enemy.angle) * enemy.radius;
-                        enemy.currentY = enemy.centerY + Math.sin(enemy.angle) * enemy.radius;
-                        
-                        enemy.element.style.left = enemy.currentX + 'px';
-                        enemy.element.style.top = enemy.currentY + 'px';
-                    } else if (enemy.type === 'tracking') {
+    // Optimized circular movement - update less frequently
+    if (!enemy.lastUpdate || Date.now() - enemy.lastUpdate > 50) { // Update every 50ms instead of every frame
+        enemy.angle += enemy.speed * 2.1; // Compensate for less frequent updates
+        enemy.currentX = enemy.centerX + Math.cos(enemy.angle) * enemy.radius;
+        enemy.currentY = enemy.centerY + Math.sin(enemy.angle) * enemy.radius;
+        enemy.lastUpdate = Date.now();
+    }
+    
+    enemy.element.style.left = enemy.currentX + 'px';
+    enemy.element.style.top = enemy.currentY + 'px';
+} else if (enemy.type === 'tracking') {
                         // Player tracking movement
                         const deltaX = this.playerX - enemy.currentX;
                         const deltaY = this.playerY - enemy.currentY;
