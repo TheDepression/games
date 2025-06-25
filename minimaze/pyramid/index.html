@@ -688,38 +688,13 @@
             }
             
             createFloor3Layout() {
-                // Create yellow maze walls throughout floor 3
+                // Create minimal yellow maze walls for floor 3
                 const yellowWalls = [
-                    // Outer perimeter (inside border)
-                    {x: 40, y: 40, w: 420, h: 20},
-                    {x: 40, y: 460, w: 420, h: 20},
-                    {x: 40, y: 40, w: 20, h: 420},
-                    {x: 460, y: 40, w: 20, h: 420},
-                    
-                    // Main maze structure
-                    {x: 100, y: 100, w: 20, h: 120},
-                    {x: 120, y: 200, w: 100, h: 20},
-                    {x: 200, y: 100, w: 20, h: 100},
-                    {x: 280, y: 80, w: 20, h: 140},
-                    {x: 160, y: 280, w: 120, h: 20},
-                    {x: 340, y: 120, w: 100, h: 20},
-                    {x: 380, y: 200, w: 20, h: 80},
-                    {x: 300, y: 320, w: 80, h: 20},
-                    {x: 120, y: 360, w: 160, h: 20},
-                    {x: 60, y: 240, w: 80, h: 20},
-                    
-                    // More maze complexity
-                    {x: 220, y: 240, w: 20, h: 80},
-                    {x: 340, y: 280, w: 20, h: 100},
-                    {x: 80, y: 320, w: 40, h: 20},
-                    {x: 400, y: 300, w: 20, h: 80},
-                    {x: 160, y: 140, w: 40, h: 20},
-                    {x: 320, y: 200, w: 20, h: 40},
-                    
-                    // Near stairs area - making it difficult
-                    {x: 350, y: 180, w: 50, h: 20},
-                    {x: 360, y: 240, w: 20, h: 40},
-                    {x: 380, y: 160, w: 20, h: 20},
+                    // Just a few strategic walls
+                    {x: 150, y: 150, w: 200, h: 20},
+                    {x: 250, y: 50, w: 20, h: 200},
+                    {x: 100, y: 350, w: 150, h: 20},
+                    {x: 350, y: 300, w: 20, h: 100},
                 ];
                 
                 yellowWalls.forEach(wall => {
@@ -1340,12 +1315,22 @@
                 this.enemies.forEach(enemy => {
                     if (!enemy.alive) return;
                     
-                    const enemyRect = {
-                        left: enemy.currentX,
-                        top: enemy.currentY,
-                        right: enemy.currentX + (enemy.width || 42),
-                        bottom: enemy.currentY + (enemy.height || 32)
-                    };
+                    let enemyRect;
+                    if (enemy.type === 'zombie') {
+                        enemyRect = {
+                            left: enemy.currentX,
+                            top: enemy.currentY,
+                            right: enemy.currentX + 24,
+                            bottom: enemy.currentY + 24
+                        };
+                    } else {
+                        enemyRect = {
+                            left: enemy.currentX,
+                            top: enemy.currentY,
+                            right: enemy.currentX + (enemy.width || 42),
+                            bottom: enemy.currentY + (enemy.height || 32)
+                        };
+                    }
                     
                     if (this.rectsOverlap(playerRect, enemyRect)) {
                         if (enemy.type === 'tracking') {
