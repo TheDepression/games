@@ -1470,8 +1470,8 @@ handleWeaponGiver(element) {
                 };
                 
                 const offset = directionOffsets[this.currentDirection];
-                attackEl.style.left = (this.playerX + offset.x) + 'px';
-                attackEl.style.top = (this.playerY + offset.y) + 'px';
+                attackEl.style.left = (this.playerX + offset.x - 20) + 'px';
+attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                 
                 this.gameWorld.appendChild(attackEl);
                 
