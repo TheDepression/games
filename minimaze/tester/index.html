@@ -589,6 +589,597 @@
                 }
             }
             
+          <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Frog Combat Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2a2a2a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #2a2a2a;
+            border: 3px solid #555;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #f7faed 0%, #f7f7e1 50%, #ebf7e1 100%);
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 1000px;
+            height: 1000px;
+            transform-origin: 0 0;
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 100;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            font-size: 20px;
+        }
+        
+        .bully-enemy {
+            width: 40px;
+            height: 40px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .chaser-enemy {
+            width: 28px;
+            height: 28px;
+            font-size: 22px;
+            background: radial-gradient(circle, rgba(255,0,0,0.3), transparent);
+            border-radius: 50%;
+        }
+        
+        .hp-bar {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 4px;
+            background: #333;
+            border: 1px solid #000;
+            border-radius: 2px;
+        }
+        
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            border-radius: 1px;
+            transition: width 0.3s;
+        }
+        
+        .attack-slash {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 200;
+            animation: slashEffect 0.3s ease-out;
+        }
+        
+        @keyframes slashEffect {
+            0% { 
+                transform: scale(0.5) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .damage-text {
+            position: absolute;
+            color: #ff4444;
+            font-weight: bold;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 300;
+            animation: damageFloat 1s ease-out;
+        }
+        
+        @keyframes damageFloat {
+            0% {
+                transform: translateY(0px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 192.5px;
+            background: #444;
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-top: 2px solid #665;
+            touch-action: none;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 250;
+        }
+        
+        #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+        }
+        
+        .retry-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .retry-button:hover {
+            background: #45a049;
+        }
+        
+        .wall {
+            position: absolute;
+            background: #8b4513;
+            border: 1px solid #654321;
+        }
+        
+        .instructions {
+            text-align: center;
+            color: #ccc;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .defeated {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            ❤️ <span id="hearts">3</span><br>
+            🗡️ Weapon Ready<br>
+            Double-tap to attack!
+        </div>
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+            </div>
+        </div>
+        <div id="controlArea">
+            <div class="instructions">
+                <div>🗡️ Combat Test Arena</div>
+                <div>Swipe to move • Double-tap to attack</div>
+                <div>Survive and defeat all enemies!</div>
+            </div>
+        </div>
+        <div id="gameOverScreen">
+            <h2 id="gameOverTitle">Game Over!</h2>
+            <p id="gameOverText">You died!</p>
+            <button class="retry-button" onclick="restartGame()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        class CombatTest {
+            constructor() {
+                this.player = document.getElementById('player');
+                this.gameArea = document.getElementById('gameArea');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.controlArea = document.getElementById('controlArea');
+                
+                // Player stats
+                this.playerX = 500; // Center of 1000px world
+                this.playerY = 500;
+                this.hearts = 3;
+                this.isInvulnerable = false;
+                this.currentDirection = 's';
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.lastTap = 0;
+                this.tapDelay = 300; // ms for double tap
+                
+                this.enemies = [];
+                this.attackCooldown = false;
+                this.attackRange = 45;
+                this.attackDamage = 25;
+                this.gameRunning = true;
+                
+                this.preloadImages();
+                this.createWalls();
+                this.createEnemies();
+                this.bindEvents();
+                this.startGameLoop();
+                
+                this.updatePlayerImage('s');
+                this.updatePlayerPosition();
+                this.updateUI();
+            }
+            
+            preloadImages() {
+                // Preload player images
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+                
+                // Preload enemy image
+                this.bullyImage = new Image();
+                this.bullyImage.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png';
+            }
+            
+            updatePlayerImage(direction) {
+                this.currentDirection = direction;
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            createWalls() {
+                // Create walls throughout the 1000x1000 world
+                const walls = [
+                    // Border walls
+                    {x: 0, y: 0, w: 1000, h: 20},     // top
+                    {x: 0, y: 980, w: 1000, h: 20},   // bottom
+                    {x: 0, y: 0, w: 20, h: 1000},     // left
+                    {x: 980, y: 0, w: 20, h: 1000},   // right
+                    // Interior walls for testing
+                    {x: 200, y: 100, w: 20, h: 200},
+                    {x: 400, y: 300, w: 200, h: 20},
+                    {x: 700, y: 150, w: 20, h: 300},
+                    {x: 150, y: 600, w: 300, h: 20},
+                    {x: 600, y: 700, w: 20, h: 200},
+                    {x: 750, y: 500, w: 150, h: 20}
+                ];
+                
+                walls.forEach(wall => {
+                    const wallEl = document.createElement('div');
+                    wallEl.className = 'wall';
+                    wallEl.style.left = wall.x + 'px';
+                    wallEl.style.top = wall.y + 'px';
+                    wallEl.style.width = wall.w + 'px';
+                    wallEl.style.height = wall.h + 'px';
+                    this.gameWorld.appendChild(wallEl);
+                });
+            }
+            
+            createEnemies() {
+                const enemyTypes = [
+                    // Regular patrol enemies
+                    {x: 150, y: 150, emoji: '🐍', maxHp: 50, damage: 10, speed: 0.5, type: 'patrol'},
+                    {x: 350, y: 180, emoji: '🦂', maxHp: 75, damage: 15, speed: 0.3, type: 'patrol'},
+                    {x: 600, y: 350, emoji: '👾', maxHp: 100, damage: 20, speed: 0.4, type: 'patrol'},
+                    {x: 800, y: 750, emoji: '🧌', maxHp: 125, damage: 25, speed: 0.2, type: 'patrol'},
+                    // Chaser enemy - tracks player
+                    {x: 300, y: 800, emoji: '😈', maxHp: 150, damage: 30, speed: 1.2, type: 'chaser'},
+                    // Bully PNG enemy - tougher patrol
+                    {x: 750, y: 250, type: 'bully', maxHp: 200, damage: 35, speed: 0.6}
+                ];
+                
+                enemyTypes.forEach((enemyData, index) => {
+                    const enemy = document.createElement('div');
+                    enemy.className = 'enemy';
+                    
+                    if (enemyData.type === 'bully') {
+                        enemy.classList.add('bully-enemy');
+                        enemy.textContent = '';
+                    } else if (enemyData.type === 'chaser') {
+                        enemy.classList.add('chaser-enemy');
+                        enemy.textContent = enemyData.emoji;
+                    } else {
+                        enemy.textContent = enemyData.emoji;
+                    }
+                    
+                    enemy.style.left = enemyData.x + 'px';
+                    enemy.style.top = enemyData.y + 'px';
+                    
+                    // Create HP bar
+                    const hpBar = document.createElement('div');
+                    hpBar.className = 'hp-bar';
+                    const hpFill = document.createElement('div');
+                    hpFill.className = 'hp-fill';
+                    hpFill.style.width = '100%';
+                    hpBar.appendChild(hpFill);
+                    enemy.appendChild(hpBar);
+                    
+                    this.gameWorld.appendChild(enemy);
+                    
+                    // Store enemy data
+                    this.enemies.push({
+                        element: enemy,
+                        hpFill: hpFill,
+                        x: enemyData.x,
+                        y: enemyData.y,
+                        maxHp: enemyData.maxHp,
+                        currentHp: enemyData.maxHp,
+                        damage: enemyData.damage,
+                        speed: enemyData.speed,
+                        type: enemyData.type,
+                        direction: 1,
+                        moveTimer: 0,
+                        alive: true,
+                        startX: enemyData.x,
+                        range: 100,
+                        lastDamageTime: 0
+                    });
+                });
+            }
+            
+            bindEvents() {
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+            
+            handleStart(e) {
+                e.preventDefault();
+                
+                const now = Date.now();
+                if (now - this.lastTap < this.tapDelay && !this.attackCooldown) {
+                    // Double tap detected - attack!
+                    this.attack();
+                    this.lastTap = 0;
+                } else {
+                    this.lastTap = now;
+                    // Regular movement
+                    this.isDragging = true;
+                    const point = e.touches ? e.touches[0] : e;
+                    this.dragStartX = point.clientX;
+                    this.dragStartY = point.clientY;
+                    this.lastDragX = point.clientX;
+                    this.lastDragY = point.clientY;
+                }
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+                
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.updatePlayerImage(newDirection);
+                    }
+                }
+                
+                this.playerVelocityX = deltaX * 0.5;
+                this.playerVelocityY = deltaY * 0.5;
+                
+                const maxVelocity = 8;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+            
+            attack() {
+                this.attackCooldown = true;
+                
+                // Create visual attack effect
+                const attackEl = document.createElement('div');
+                attackEl.className = 'attack-slash';
+                
+                // Position attack in front of player based on direction
+                const directionOffsets = {
+                    'n': {x: 0, y: -25},
+                    'ne': {x: 20, y: -20},
+                    'e': {x: 25, y: 0},
+                    'se': {x: 20, y: 20},
+                    's': {x: 0, y: 25},
+                    'sw': {x: -20, y: 20},
+                    'w': {x: -25, y: 0},
+                    'nw': {x: -20, y: -20}
+                };
+                
+                const offset = directionOffsets[this.currentDirection];
+                attackEl.style.left = (this.playerX + offset.x) + 'px';
+                attackEl.style.top = (this.playerY + offset.y) + 'px';
+                
+                this.gameWorld.appendChild(attackEl);
+                
+                // Remove attack effect after animation
+                setTimeout(() => {
+                    if (attackEl.parentNode) {
+                        attackEl.remove();
+                    }
+                }, 300);
+                
+                // Check for enemy hits
+                this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
+                
+                // Attack cooldown
+                setTimeout(() => {
+                    this.attackCooldown = false;
+                }, 500);
+            }
+            
+            checkAttackHits(attackX, attackY) {
+                this.enemies.forEach(enemy => {
+                    if (!enemy.alive) return;
+                    
+                    const distance = Math.sqrt(
+                        Math.pow(attackX - enemy.x, 2) + 
+                        Math.pow(attackY - enemy.y, 2)
+                    );
+                    
+                    if (distance <= this.attackRange) {
+                        // Hit enemy!
+                        enemy.currentHp -= this.attackDamage;
+                        
+                        // Show damage number
+                        const damageText = document.createElement('div');
+                        damageText.className = 'damage-text';
+                        damageText.textContent = `-${this.attackDamage}`;
+                        damageText.style.left = enemy.x + 'px';
+                        damageText.style.top = enemy.y + 'px';
+                        this.gameWorld.appendChild(damageText);
+                        
+                        setTimeout(() => {
+                            if (damageText.parentNode) {
+                                damageText.remove();
+                            }
+                        }, 1000);
+                        
+                        // Update HP bar
+                        const hpPercent = Math.max(0, enemy.currentHp / enemy.maxHp * 100);
+                        enemy.hpFill.style.width = hpPercent + '%';
+                        
+                        // Check if defeated
+                        if (enemy.currentHp <= 0) {
+                            enemy.alive = false;
+                            enemy.element.classList.add('defeated');
+                            
+                            // Check if all enemies defeated
+                            const aliveEnemies = this.enemies.filter(e => e.alive);
+                            if (aliveEnemies.length === 0) {
+                                this.gameWon();
+                            }
+                        }
+                    }
+                });
+            }
+            
+            startGameLoop() {
+                const gameLoop = () => {
+                    if (this.gameRunning) {
+                        this.updatePlayer();
+                        this.updateEnemies();
+                        this.checkCollisions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+            
+            updatePlayer() {
+                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                    const newX = this.playerX + this.playerVelocityX;
+                    const newY = this.playerY + this.playerVelocityY;
+                    
+                    if (this.canMoveTo(newX, newY)) {
+                        this.playerX = newX;
+                        this.playerY = newY;
+                        this.updatePlayerPosition();
+                    }
+                    
+                    this.playerVelocityX *= 0.9;
+                    this.playerVelocityY *= 0.9;
+                }
+            }
+            
             updatePlayerPosition() {
                 this.player.style.left = this.playerX + 'px';
                 this.player.style.top = this.playerY + 'px';
@@ -636,6 +1227,139 @@
                 
                 return true;
             }
+            
+            updateEnemies() {
+                this.enemies.forEach(enemy => {
+                    if (!enemy.alive) return;
+                    
+                    if (enemy.type === 'chaser') {
+                        // Chaser AI - move towards player
+                        const deltaX = this.playerX - enemy.x;
+                        const deltaY = this.playerY - enemy.y;
+                        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        
+                        if (distance > 5) {
+                            const moveX = (deltaX / distance) * enemy.speed;
+                            const moveY = (deltaY / distance) * enemy.speed;
+                            
+                            if (this.canEnemyMoveTo(enemy.x + moveX, enemy.y + moveY)) {
+                                enemy.x += moveX;
+                                enemy.y += moveY;
+                                enemy.element.style.left = enemy.x + 'px';
+                                enemy.element.style.top = enemy.y + 'px';
+                            }
+                        }
+                    } else {
+                        // Patrol AI: move back and forth
+                        enemy.moveTimer++;
+                        if (enemy.moveTimer % 60 === 0) {
+                            enemy.direction *= -1;
+                        }
+                        
+                        const newX = enemy.x + (enemy.direction * enemy.speed);
+                        if (newX > enemy.startX - enemy.range && newX < enemy.startX + enemy.range) {
+                            if (this.canEnemyMoveTo(newX, enemy.y)) {
+                                enemy.x = newX;
+                                enemy.element.style.left = enemy.x + 'px';
+                            }
+                        } else {
+                            enemy.direction *= -1;
+                        }
+                    }
+                });
+            }
+            
+            canEnemyMoveTo(x, y) {
+                const enemySize = 24;
+                const walls = this.gameWorld.querySelectorAll('.wall');
+                
+                for (let wall of walls) {
+                    const wallRect = {
+                        left: parseInt(wall.style.left),
+                        top: parseInt(wall.style.top),
+                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+                    };
+                    
+                    if (x < wallRect.right && x + enemySize > wallRect.left &&
+                        y < wallRect.bottom && y + enemySize > wallRect.top) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            checkCollisions() {
+                if (this.isInvulnerable) return;
+                
+                this.enemies.forEach(enemy => {
+                    if (!enemy.alive) return;
+                    
+                    const distance = Math.sqrt(
+                        Math.pow(this.playerX - enemy.x, 2) + 
+                        Math.pow(this.playerY - enemy.y, 2)
+                    );
+                    
+                    if (distance < 30) {
+                        const now = Date.now();
+                        if (now - enemy.lastDamageTime > 1000) { // 1 second damage cooldown per enemy
+                            this.takeDamage(enemy.damage);
+                            enemy.lastDamageTime = now;
+                        }
+                    }
+                });
+            }
+            
+            takeDamage(damage) {
+                this.hearts--;
+                this.updateUI();
+                
+                // Show damage effect
+                this.isInvulnerable = true;
+                this.player.style.opacity = '0.5';
+                
+                setTimeout(() => {
+                    this.isInvulnerable = false;
+                    this.player.style.opacity = '1';
+                }, 1000);
+                
+                if (this.hearts <= 0) {
+                    this.gameOver();
+                }
+            }
+            
+            updateUI() {
+                document.getElementById('hearts').textContent = this.hearts;
+            }
+            
+            gameOver() {
+                this.gameRunning = false;
+                document.getElementById('gameOverTitle').textContent = '💀 Game Over!';
+                document.getElementById('gameOverText').textContent = 'You were defeated by the enemies!';
+                document.getElementById('gameOverScreen').style.display = 'flex';
+            }
+            
+            gameWon() {
+                this.gameRunning = false;
+                document.getElementById('gameOverTitle').textContent = '🎉 Victory!';
+                document.getElementById('gameOverText').textContent = 'All enemies defeated!';
+                document.getElementById('gameOverScreen').style.display = 'flex';
+            }
+        }
+        
+        // Global functions
+        function restartGame() {
+            window.location.reload();
+        }
+        
+        // Start the test when page loads
+        window.addEventListener('load', () => {
+            new CombatTest();
+        });
+    </script>
+</body>
+</html>
             
             updateEnemies() {
                 this.enemies.forEach(enemy => {
