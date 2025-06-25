@@ -1204,9 +1204,9 @@ if (!this.isTransitioning) {
                 this.showMessage(`🔺 Ascending to Floor ${this.currentFloor}!`);
                 
                 setTimeout(() => {
-                    this.createFloor(this.currentFloor);
-                    this.isTransitioning = false;  // ADD THIS LINE
-                // Position player near door (left side) when coming up stairs
+    this.createFloor(this.currentFloor);
+    this.isTransitioning = false;
+    // Position player near door (left side) when coming up stairs
     if (this.currentFloor === 2) {
         this.playerX = 70;   // Near door on left
         this.playerY = 280;  // Center vertically
@@ -1219,6 +1219,7 @@ if (!this.isTransitioning) {
     }
     
     this.positionPlayer();
+    this.centerCameraOnPlayer(); // ADD THIS LINE
     this.isTransitioning = false;
 }, 1000);
             }
