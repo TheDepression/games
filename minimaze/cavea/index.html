@@ -1097,6 +1097,7 @@ hearts.forEach(heart => {
 
     this.showMessage(`Entering room ${newRoomX},${newRoomY}`);
     this.createRoom(newRoomX, newRoomY);
+    this.updatePlayerImage(this.currentDirection); // ADD THIS LINE
 
     setTimeout(() => {
         this.isTransitioning = false;
