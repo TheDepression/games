@@ -729,13 +729,15 @@ this.isNearNPC = false;
   {x: 660, y: 60, w: 20, h: 100, dir: 'solid' },
   {x: 400, y: 220, w: 20, h: 60, dir: 'solid' },
   {x: 400, y: 380, w: 20, h: 80, dir: 'solid' },
+                    {x: 700, y: 340, w: 20, h: 80, dir: 'solid' },
                     
                     {x: 0, y: 440, w: 140, h: 20, dir: 'down' },
   {x: 0, y: 260, w: 100, h: 20, dir: 'down' },
   {x: 520, y: 540, w: 280, h: 20, dir: 'down' },
-  {x: 640, y: 340, w: 160, h: 20, dir: 'down' },
+  {x: 690, y: 340, w: 100, h: 20, dir: 'down' },
   {x: 520, y: 700, w: 100, h: 20, dir: 'down' },
-                    
+
+                    {x: 640, y: 340, w: 50, h: 20, dir: 'up' },
                     {x: 0, y: 320, w: 140, h: 20, dir: 'up' },
                    {x: 100, y: 520, w: 100, h: 20, dir: 'up' },
   {x: 0, y: 660, w: 120, h: 20, dir: 'up' },
@@ -745,11 +747,12 @@ this.isNearNPC = false;
                     // More one-way sections
                 {x: 200, y: 280, w: 20, h: 240, dir: 'right' },
   {x: 520, y: 180, w: 20, h: 120, dir: 'right' },
-  {x: 640, y: 360, w: 20, h: 160, dir: 'right' },
+  {x: 640, y: 410, w: 20, h: 120, dir: 'right' },
   {x: 320, y: 640, w: 20, h: 60, dir: 'right' },
   {x: 180, y: 0, w: 20, h: 120, dir: 'right' },
                 
                     {x: 140, y: 320, w: 20, h: 120, dir: 'left' },
+                    {x: 640, y: 340, w: 70, h: 120, dir: 'left' },
   {x: 60, y: 320, w: 20, h: 120, dir: 'left' },
   {x: 480, y: 700, w: 20, h: 100, dir: 'left' },
   {x: 640, y: 720, w: 20, h: 80, dir: 'left' },
@@ -854,7 +857,7 @@ this.isNearNPC = false;
     this.createPotatoFly(700, 130);
     this.createPotatoFly(310, 450);
     this.createPotatoFly(520, 500);
-    this.createPotatoFly(720, 720);
+    this.createPotatoFly(690, 690);
     this.createPotatoFly(85, 100);
 } else if (floorNumber === 2) {
                     // Floor 2: Psycho and Yamato with player tracking
