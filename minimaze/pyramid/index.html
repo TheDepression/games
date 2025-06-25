@@ -1414,6 +1414,12 @@ friendlies.forEach(friendly => {
         }
     }
 });
+
+                // ADD THIS AFTER the friendlies.forEach loop:
+if (!nearAnyNPC && this.isNearNPC) {
+    this.hideNPCMessage();
+}
+this.isNearNPC = nearAnyNPC;
             }
             
             // Also update handleWeaponGiver to use persistent messages:
