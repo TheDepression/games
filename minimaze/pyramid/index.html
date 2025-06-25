@@ -1048,7 +1048,7 @@ this.gameWorld.appendChild(exitElement);
                     if (enemy.type === 'circular') {
     // Optimized circular movement - update less frequently
     if (!enemy.lastUpdate || Date.now() - enemy.lastUpdate > 50) { // Update every 50ms instead of every frame
-        enemy.angle += enemy.speed * 2.1; // Compensate for less frequent updates
+        enemy.angle += enemy.speed * 2.5; // Compensate for less frequent updates
         enemy.currentX = enemy.centerX + Math.cos(enemy.angle) * enemy.radius;
         enemy.currentY = enemy.centerY + Math.sin(enemy.angle) * enemy.radius;
         enemy.lastUpdate = Date.now();
