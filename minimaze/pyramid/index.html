@@ -1387,27 +1387,33 @@ this.isNearNPC = false;
                     }
                 });
                 
-                // Check friendly NPCs
-                const friendlies = this.gameWorld.querySelectorAll('.friendly:not([data-type="weaponGiver"])');
-                friendlies.forEach(friendly => {
-                    const friendlyX = parseInt(friendly.style.left);
-                    const friendlyY = parseInt(friendly.style.top);
-                    const friendlyRect = {
-                        left: friendlyX,
-                        top: friendlyY,
-                        right: friendlyX + 22,
-                        bottom: friendlyY + 22
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, friendlyRect)) {
-                        const now = Date.now();
-                        const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                        if (now - lastTime > 3000) {
-                            this.showMessage(friendly.dataset.message);
-                            this.lastInteractionTime[friendly.dataset.message] = now;
-                        }
-                    }
-                });
+                // Modify the friendly NPC collision check:
+// In checkCollisions(), replace the friendly NPC section:
+const friendlies = this.gameWorld.querySelectorAll('.friendly:not([data-type="weaponGiver"])');
+let nearAnyNPC = false;
+
+friendlies.forEach(friendly => {
+    const friendlyX = parseInt(friendly.style.left);
+    const friendlyY = parseInt(friendly.style.top);
+    const friendlyRect = {
+        left: friendlyX,
+        top: friendlyY,
+        right: friendlyX + 22,
+        bottom: friendlyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, friendlyRect)) {
+        nearAnyNPC = true;
+        const now = Date.now();
+        const messageKey = friendly.dataset.message;
+        const lastTime = this.lastInteractionTime[messageKey] || 0;
+        
+        if (now - lastTime > 100) { // Very short cooldown for persistent messages
+            this.showMessage(friendly.dataset.message, true); // Make it persistent
+            this.lastInteractionTime[messageKey] = now;
+        }
+    }
+});
             }
             
             handleWeaponGiver(element) {
@@ -1813,6 +1819,15 @@ showMessage(text, isPersistent = false) {
                 window.location.href = 'https://thedepression.github.io/games/minimaze/pyramidboss';
             }
         }
+
+        // Add this function to hide persistent messages:
+hideNPCMessage() {
+    if (this.currentNPCMessage) {
+        const message = document.getElementById('message');
+        message.style.display = 'none';
+        this.currentNPCMessage = null;
+    }
+}
     </script>
 </body>
 </html>
