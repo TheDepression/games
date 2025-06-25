@@ -589,6 +589,7 @@ if (!this.isTransitioning) {
                 this.createFloorElements(floorNumber, floor);
                 
                 this.positionPlayer();
+                this.centerCameraOnPlayer(); // Add this line
                 this.updateUI();
                 this.updateFloorHint(floorNumber);
             }
