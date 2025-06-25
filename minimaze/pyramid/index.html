@@ -713,32 +713,47 @@ this.isNearNPC = false;
                 // Create a complex maze with one-way walls
                 const oneWayWalls = [
                     // Outer maze structure
-                    { x: 100, y: 100, w: 500, h: 20, dir: 'solid' },
-                    { x: 100, y: 680, w: 600, h: 20, dir: 'solid' },
-                    { x: 100, y: 100, w: 20, h: 580, dir: 'solid' },
-                    { x: 680, y: 100, w: 20, h: 580, dir: 'solid' },
+                    {x: 0, y: 520, w: 100, h: 20},
+  {x: 100, y: 260, w: 100, h: 20},
+  {x: 200, y: 260, w: 100, h: 20},
+  {x: 300, y: 260, w: 20, h: 280},
+  {x: 500, y: 300, w: 20, h: 400},
+  {x: 120, y: 660, w: 140, h: 20},
+  {x: 320, y: 700, w: 180, h: 20},
+  {x: 520, y: 340, w: 120, h: 20},
+  {x: 640, y: 560, w: 20, h: 160},
+  {x: 120, y: 120, w: 220, h: 20},
+  {x: 180, y: 200, w: 20, h: 60},
+  {x: 500, y: 60, w: 20, h: 120},
+  {x: 520, y: 60, w: 140, h: 20},
+  {x: 660, y: 60, w: 20, h: 100},
+  {x: 400, y: 220, w: 20, h: 60},
+  {x: 400, y: 380, w: 20, h: 80},
                     
-                    // Inner maze with one-way passages
-                    { x: 200, y: 200, w: 20, h: 200, dir: 'right' },
-                    { x: 300, y: 150, w: 20, h: 150, dir: 'left' },
-                    { x: 400, y: 200, w: 20, h: 200, dir: 'right' },
-                    { x: 500, y: 150, w: 20, h: 150, dir: 'left' },
+                    {x: 0, y: 440, w: 140, h: 20, dir: 'down' }
+  {x: 0, y: 260, w: 100, h: 20, dir: 'down' }
+  {x: 520, y: 540, w: 280, h: 20, dir: 'down' }
+  {x: 640, y: 340, w: 160, h: 20, dir: 'down' }
+  {x: 520, y: 700, w: 100, h: 20, dir: 'down' }
                     
-                    { x: 150, y: 300, w: 200, h: 20, dir: 'up' },
-                    { x: 450, y: 350, w: 200, h: 20, dir: 'down' },
-                    { x: 250, y: 450, w: 150, h: 20, dir: 'up' },
-                    { x: 350, y: 500, w: 150, h: 20, dir: 'down' },
-                    
-                    // Some solid walls for challenge
-                    { x: 300, y: 300, w: 100, h: 20, dir: 'solid' },
-                    { x: 400, y: 400, w: 20, h: 100, dir: 'solid' },
-                    { x: 250, y: 550, w: 100, h: 20, dir: 'solid' },
+                    {x: 0, y: 320, w: 140, h: 20, dir: 'up' },
+                   {x: 100, y: 520, w: 100, h: 20, dir: 'up' },
+  {x: 0, y: 660, w: 120, h: 20, dir: 'up' },
+  {x: 260, y: 640, w: 100, h: 20, dir: 'up' },
+  {x: 680, y: 160, w: 120, h: 20, dir: 'up' },
                     
                     // More one-way sections
-                    { x: 150, y: 500, w: 20, h: 100, dir: 'right' },
-                    { x: 550, y: 250, w: 20, h: 200, dir: 'left' },
-                    { x: 200, y: 600, w: 200, h: 20, dir: 'up' },
-                    { x: 500, y: 550, w: 150, h: 20, dir: 'down' }
+                {x: 200, y: 280, w: 20, h: 240, dir: 'right' },
+  {x: 520, y: 180, w: 20, h: 120, dir: 'right' },
+  {x: 640, y: 360, w: 20, h: 160, dir: 'right' },
+  {x: 320, y: 640, w: 20, h: 60, dir: 'right' },
+  {x: 180, y: 0, w: 20, h: 120, dir: 'right' },
+                
+                    {x: 140, y: 320, w: 20, h: 120, dir: 'left' },
+  {x: 60, y: 320, w: 20, h: 120, dir: 'left' },
+  {x: 480, y: 700, w: 20, h: 100, dir: 'left' },
+  {x: 640, y: 720, w: 20, h: 80, dir: 'left' },
+  {x: 180, y: 120, w: 20, h: 80, dir: 'left' }
                 ];
                 
                 oneWayWalls.forEach(wall => {
