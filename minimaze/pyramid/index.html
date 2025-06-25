@@ -1760,16 +1760,27 @@ this.isNearNPC = false;
                 document.getElementById('itemsList').textContent = items.length > 0 ? items.join(' ') : 'None';
             }
             
-            showMessage(text) {
-                const message = document.getElementById('message');
-                message.textContent = text;
-                message.style.display = 'block';
-                
-                clearTimeout(this.messageTimeout);
-                this.messageTimeout = setTimeout(() => {
-                    message.style.display = 'none';
-                }, 2500);
+            // Modify the showMessage function to handle persistent NPC messages:
+showMessage(text, isPersistent = false) {
+    const message = document.getElementById('message');
+    message.textContent = text;
+    message.style.display = 'block';
+    
+    if (isPersistent) {
+        // Don't auto-hide persistent messages
+        this.currentNPCMessage = text;
+        clearTimeout(this.messageTimeout);
+    } else {
+        // Regular temporary messages
+        this.currentNPCMessage = null;
+        clearTimeout(this.messageTimeout);
+        this.messageTimeout = setTimeout(() => {
+            if (message.textContent === text) { // Only hide if this is still the current message
+                message.style.display = 'none';
             }
+        }, 2500);
+    }
+}
         }
 
         let game;
