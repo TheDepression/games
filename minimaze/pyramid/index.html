@@ -1416,19 +1416,31 @@ friendlies.forEach(friendly => {
 });
             }
             
-            handleWeaponGiver(element) {
-                if (!this.hasWeapon) {
-                    this.hasWeapon = true;
-                    this.showMessage('🔫 TNT Gun acquired! Double-tap to attack zombies!');
-                    // Don't change message immediately - let player read it first
-                    setTimeout(() => {
-                        element.dataset.message = 'Good luck with that TNT gun! Clear those zombies!';
-                    }, 3000); // 3 second delay
-                    this.updateUI();
-                } else {
-                    this.showMessage('Good luck with that TNT gun! Clear those zombies!');
-                }
-            }
+            // Also update handleWeaponGiver to use persistent messages:
+handleWeaponGiver(element) {
+    const now = Date.now();
+    const messageKey = 'weaponGiver';
+    const lastTime = this.lastInteractionTime[messageKey] || 0;
+    
+    if (!this.hasWeapon) {
+        if (now - lastTime > 3000) {
+            this.hasWeapon = true;
+            this.showMessage('🔫 TNT Gun acquired! I am too injured to go on.... take my TNT gun.... it\'s the only way to get past the zombies.', true);
+            this.lastInteractionTime[messageKey] = now;
+            
+            setTimeout(() => {
+                element.dataset.message = 'Good luck with that TNT gun! Clear those zombies!';
+            }, 3000);
+            
+            this.updateUI();
+        }
+    } else {
+        if (now - lastTime > 100) {
+            this.showMessage('Good luck with that TNT gun! Clear those zombies!', true);
+            this.lastInteractionTime[messageKey] = now;
+        }
+    }
+}
             
             attack() {
                 if (!this.hasWeapon) return;
