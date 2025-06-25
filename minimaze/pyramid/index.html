@@ -848,13 +848,15 @@ this.isNearNPC = false;
             
             createEnemies(floorNumber, floor) {
                 if (floorNumber === 1) {
-                    // Floor 1: Potato flies with circular movement
-                    for (let i = 0; i < 4; i++) {
-                        const x = 200 + (i * 150);
-                        const y = 300 + (i % 2) * 200;
-                        this.createPotatoFly(x, y);
-                    }
-                } else if (floorNumber === 2) {
+    // Floor 1: Potato flies with circular movement
+    this.createPotatoFly(350, 175);
+    this.createPotatoFly(100, 675);
+    this.createPotatoFly(700, 130);
+    this.createPotatoFly(310, 450);
+    this.createPotatoFly(520, 500);
+    this.createPotatoFly(720, 720);
+    this.createPotatoFly(85, 100);
+} else if (floorNumber === 2) {
                     // Floor 2: Psycho and Yamato with player tracking
                     this.createTrackingEnemy(150, 180, 'psycho-min', 35, 70);
                     this.createTrackingEnemy(450, 480, 'yamato-min', 50, 70);
