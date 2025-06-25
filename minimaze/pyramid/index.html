@@ -1228,6 +1228,7 @@ this.gameWorld.appendChild(exitElement);
     }
     
     this.positionPlayer();
+                    this.updatePlayerImage(this.currentDirection);
     this.centerCameraOnPlayer(); // ADD THIS LINE
     
 }, 1000);
@@ -1259,6 +1260,7 @@ this.gameWorld.appendChild(exitElement);
             this.playerY = 220;
         }
         this.positionPlayer();
+        this.updatePlayerImage(this.currentDirection);
         this.centerCameraOnPlayer(); // Add this too for consistency
     
     }, 1000);
