@@ -1010,9 +1010,11 @@
                     gameState.caveBossDefeated = this.caveBossDefeated;
                     
                     // Respawn in pyramid floor 4
-                    gameState.playerX = 70;
-                    gameState.playerY = 180;
-                    gameState.currentUrl = 'pyramid';
+gameState.playerX = 70;
+gameState.playerY = 150;  // Correct floor 4 spawn Y position
+gameState.currentUrl = 'pyramid';
+// Add floor info so pyramid knows to load floor 4
+gameState.pyramidFloor = 4;
                     
                     localStorage.setItem('mfGameState', JSON.stringify(gameState));
                     window.location.href = 'https://thedepression.github.io/games/minimaze/pyramid';
