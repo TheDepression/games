@@ -1429,7 +1429,7 @@ this.isNearNPC = false;
                 
                 // Modify the friendly NPC collision check:
 // In checkCollisions(), replace the friendly NPC section:
-const friendlies = this.gameWorld.querySelectorAll('.friendly:not([data-type="weaponGiver"])');
+const friendlies = this.gameWorld.querySelectorAll('.friendly');
 let nearAnyNPC = false;
 
 friendlies.forEach(friendly => {
