@@ -935,19 +935,21 @@ this.isNearNPC = false;
             
             createZombieEnemies() {
                 // Zombies around stairs area (420, 220)
-                this.createZombie(350, 200, 'horizontal');
-                this.createZombie(380, 240, 'horizontal');
-                this.createZombie(400, 180, 'horizontal');
-                this.createZombie(360, 260, 'horizontal');
-                this.createZombie(420, 160, 'vertical');
-                this.createZombie(440, 200, 'vertical');
-                this.createZombie(460, 240, 'vertical');
+                this.createZombie(360, 80, 'vertical');
+                this.createZombie(300, 410, 'vertical');
+                this.createZombie(100, 60, 'horizontal');
+                this.createZombie(120, 20, 'horizontal');
+                this.createZombie(160, 40, 'horizontal');
+                this.createZombie(180, 40, 'vertical')
+                this.createZombie(390, 260, 'horizontal');
+                this.createZombie(220, 170, 'horizontal');
+                this.createZombie(220, 360, 'horizontal');
                 
                 // Other areas
-                this.createZombie(150, 120, 'horizontal');
-                this.createZombie(200, 300, 'vertical');
-                this.createZombie(300, 350, 'horizontal');
-                this.createZombie(120, 250, 'vertical');
+                this.createZombie(200, 35, 'horizontal');
+                this.createZombie(220, 50, 'vertical');
+                this.createZombie(200, 60, 'horizontal');
+                this.createZombie(230, 80, 'horizontal');
             }
             
             createZombie(x, y, moveType) {
