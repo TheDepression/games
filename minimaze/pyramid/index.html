@@ -425,9 +425,12 @@ const savedState = localStorage.getItem('mfGameState');
 let startFloor = 1;
 if (savedState) {
     const gameState = JSON.parse(savedState);
-    if (gameState.currentUrl === 'pyramidboss') {
-        startFloor = 4; // Coming from boss fight
-    }
+    if (gameState.comingFromBoss === true) {
+    startFloor = 4; // Coming from boss fight
+    // Clear the flag so it doesn't persist
+    gameState.comingFromBoss = false;
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+}
 }
 
                 
