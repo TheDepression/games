@@ -1055,27 +1055,27 @@ this.isNearNPC = false;
                 // NPC 1: Gorilla owner
                 const npc1 = document.createElement('div');
                 npc1.className = 'friendly';
-                npc1.style.left = '120px';
-                npc1.style.top = '150px';
+                npc1.style.left = '470px';
+                npc1.style.top = '470px';
                 npc1.textContent = '🙍🏻‍♂️';
-                npc1.dataset.message = 'My pet gorilla went crazy and ran into the forest. He is attacking everyone now - I tried to bring a banana to him to help him calm down, but the bully came and took it from me... I chased him into this pyramid... but I cant go any further... too many zombies.';
+                npc1.dataset.message = 'Ever since the bully has been around, my pet gorilla became aggressive and then ran into the forest. I think the bully did something! I followed him in here but i cannot go further. too many zombies.';
                 this.gameWorld.appendChild(npc1);
                 
                 // NPC 2: Injured Officer (weapon giver)
                 const npc2 = document.createElement('div');
                 npc2.className = 'friendly';
-                npc2.style.left = '280px';
-                npc2.style.top = '120px';
+                npc2.style.left = '470px';
+                npc2.style.top = '30px';
                 npc2.textContent = '👮🏻‍♂️';
-                npc2.dataset.message = this.hasWeapon ? 'Good luck with that TNT gun! Clear those zombies!' : 'I am too injured to go on.... take my TNT gun.... it\'s the only way to get past the zombies.';
+                npc2.dataset.message = this.hasWeapon ? 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!' : 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!';
                 npc2.dataset.type = 'weaponGiver';
                 this.gameWorld.appendChild(npc2);
                 
                 // NPC 3: Scared person
                 const npc3 = document.createElement('div');
                 npc3.className = 'friendly';
-                npc3.style.left = '150px';
-                npc3.style.top = '400px';
+                npc3.style.left = '40px';
+                npc3.style.top = '460px';
                 npc3.textContent = '🤯';
                 npc3.dataset.message = 'I heard the bully was on the top floor.... but there are so many zombies in this room, it is impossible to get there. - How does he keep surviving?!';
                 this.gameWorld.appendChild(npc3);
@@ -1471,18 +1471,18 @@ handleWeaponGiver(element) {
     if (!this.hasWeapon) {
         if (now - lastTime > 3000) {
             this.hasWeapon = true;
-            this.showMessage('I cannot continue. Use my gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
+            this.showMessage('I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
             this.lastInteractionTime[messageKey] = now;
             
             setTimeout(() => {
-                element.dataset.message = 'I cannot continue. Use my gun🔫 to pass the zombies. Doudble-tap to shoot!';
+                element.dataset.message = 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!';
             }, 3000);
             
             this.updateUI();
         }
     } else {
         if (now - lastTime > 100) {
-            this.showMessage('I cannot continue. Use my gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
+            this.showMessage('I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
             this.lastInteractionTime[messageKey] = now;
         }
     }
