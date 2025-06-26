@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Pyramid Boss Battle</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2c1810;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #1a1a1a;
+            border: 3px solid #daa520;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(218, 165, 32, 0.5);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: #8b7355;
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 350px;
+            height: 357.5px;
+            transform-origin: 0 0;
+        }
+        
+        .electric-wall {
+            position: absolute;
+            background: linear-gradient(45deg, #ff4500 0%, #ffa500 50%, #ffff00 100%);
+            border: 2px solid #ff6600;
+            opacity: 0.9;
+            z-index: 30;
+            animation: electricPulse 1s infinite;
+            box-shadow: 0 0 10px #ff6600;
+        }
+        
+        @keyframes electricPulse {
+            0%, 100% { box-shadow: 0 0 10px #ff6600; }
+            50% { box-shadow: 0 0 20px #ff6600, 0 0 30px #ff4500; }
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 100;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .boss {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 200;
+            transition: none;
+        }
+        
+        .boss.damaged {
+            animation: bossHit 0.5s;
+        }
+        
+        @keyframes bossHit {
+            0%, 100% { filter: brightness(1); }
+            25%, 75% { filter: brightness(2) hue-rotate(0deg); }
+            50% { filter: brightness(3) hue-rotate(180deg) saturate(2); }
+        }
+        
+        .projectile {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+        }
+        
+        @keyframes slashEffect {
+            0% { 
+                transform: scale(0.5) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes damageFloat {
+            0% {
+                transform: translateY(0px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #654321;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #daa520;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #f4e4bc;
+            z-index: 250;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #daa520;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        .boss-health {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 250;
+            border: 1px solid #daa520;
+            pointer-events: none;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 400;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #defeatOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 600;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .boss-image {
+            width: 120px;
+            height: 120px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 20px;
+        }
+
+        .boss-text {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #daa520;
+        }
+        
+        button {
+            background: #daa520;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #b8860b;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🔺 Pyramid Boss:</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+            <div>🔫 TNT Gun Ready</div>
+        </div>
+        
+        <div id="timer">0:00</div>
+        
+        <div class="boss-health">
+            <div>😡 Pyramid Guardian</div>
+            <div>HP: <span id="bossHp">500</span>/500</div>
+        </div>
+        
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="startScreen">
+            <h2>⚔️ Final Battle</h2>
+            <div class="boss-image"></div>
+            <p style="margin: 20px 0;">"You dare challenge me in my pyramid?!"</p>
+            <p style="font-size: 12px; opacity: 0.8;">🔫 Double-tap to shoot your TNT gun!</p>
+            <button class="start-button" onclick="startBattle()">Face the Guardian!</button>
+        </div>
+        
+        <div id="defeatOverlay">
+            <div class="boss-image"></div>
+            <div class="boss-text">
+                "YOU ARE STARTING TO MAKE ME ANGRY, FROG!"
+            </div>
+            <button onclick="proceedToCutscene()">Continue</button>
+        </div>
+        
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">⚔️ Final Battle</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe to move, double-tap to shoot</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px;">
+                <div>Use your TNT gun to defeat the guardian!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Dodge his magical attacks!</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bossMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/efinalboss.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        class PyramidBoss {
+            constructor() {
+                this.loadGameState();
+                this.gameStarted = false;
+                this.isInvulnerable = false;
+                this.attackCooldown = false;
+                this.bossHp = 500;
+                this.maxBossHp = 500;
+                
+                // Player properties
+                this.playerX = 70;
+                this.playerY = 180;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.lastDragX = 0;
+                this.lastDragY = 0;
+                this.currentDirection = 'e';
+                this.attackRange = 45;
+                this.attackDamage = 50;
+                
+                // Boss properties
+                this.boss = null;
+                this.bossX = 200;
+                this.bossY = 150;
+                this.bossVelocityX = 0;
+                this.bossVelocityY = 0;
+                this.bossSpeed = 1.5;
+                this.trackingStrength = 0.6;
+                this.lastDirectionChange = Date.now();
+                this.isShooting = false;
+                this.lastShot = Date.now();
+                
+                // Game elements
+                this.projectiles = [];
+                this.bossDefeated = false;
+                
+                // Touch handling
+                this.lastTap = 0;
+                this.tapDelay = 300;
+                
+                this.player = document.getElementById('player');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.gameArea = document.getElementById('gameArea');
+                this.controlArea = document.getElementById('controlArea');
+                this.bossMusic = document.getElementById('bossMusic');
+                
+                this.preloadPlayerImages();
+                this.bindEvents();
+                this.initRoom();
+                this.updatePlayerImage('e');
+            }
+            
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+            
+            loadGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    this.hearts = gameState.hearts || 3;
+                    this.money = gameState.money || 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
+                    this.hasWeapon = gameState.hasWeapon || false;
+                    
+                    // Load all other items
+                    this.hasFlashlight = gameState.hasFlashlight || false;
+                    this.hasHammer = gameState.hasHammer || false;
+                    this.hasPencil = gameState.hasPencil || false;
+                    this.hasBoat = gameState.hasBoat || false;
+                    this.hasKey = gameState.hasKey || false;
+                    this.hasLavaShoes = gameState.hasLavaShoes || false;
+                    this.hasPyramidKey = gameState.hasPyramidKey || false;
+                    this.bullyDefeated = gameState.bullyDefeated || false;
+                    this.motherPaid = gameState.motherPaid || false;
+                    this.collectedMoney = gameState.collectedMoney || [];
+                    this.collectedHearts = gameState.collectedHearts || [];
+                    this.caveBossDefeated = gameState.caveBossDefeated || false;
+                } else {
+                    // Shouldn't happen, but set defaults
+                    this.hearts = 3;
+                    this.money = 0;
+                    this.timeElapsed = 0;
+                    this.hasWeapon = true; // Should have weapon to reach boss
+                }
+            }
+            
+            updatePlayerImage(direction) {
+                this.currentDirection = direction;
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            bindEvents() {
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+            
+            handleStart(e) {
+                if (!this.gameStarted) return;
+                e.preventDefault();
+                
+                const now = Date.now();
+                if (this.hasWeapon && now - this.lastTap < this.tapDelay && !this.attackCooldown) {
+                    // Double tap detected - attack!
+                    this.attack();
+                    this.lastTap = 0;
+                    return;
+                } else {
+                    this.lastTap = now;
+                }
+                
+                this.isDragging = true;
+                const point = e.touches ? e.touches[0] : e;
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging || !this.gameStarted) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+                
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.updatePlayerImage(newDirection);
+                    }
+                }
+                
+                const sensitivity = 0.6;
+                this.playerVelocityX = deltaX * sensitivity;
+                this.playerVelocityY = deltaY * sensitivity;
+                
+                const maxVelocity = 10;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+            
+            attack() {
+                if (!this.hasWeapon) return;
+                
+                this.attackCooldown = true;
+                
+                // Create visual attack effect
+                const attackEl = document.createElement('div');
+                attackEl.style.position = 'absolute';
+                attackEl.style.width = '40px';
+                attackEl.style.height = '40px';
+                attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+                attackEl.style.borderRadius = '50%';
+                attackEl.style.pointerEvents = 'none';
+                attackEl.style.zIndex = '400';
+                attackEl.style.animation = 'slashEffect 0.3s ease-out';
+                
+                const directionOffsets = {
+                    'n': {x: 0, y: -25},
+                    'ne': {x: 20, y: -20},
+                    'e': {x: 25, y: 0},
+                    'se': {x: 20, y: 20},
+                    's': {x: 0, y: 25},
+                    'sw': {x: -20, y: 20},
+                    'w': {x: -25, y: 0},
+                    'nw': {x: -20, y: -20}
+                };
+                
+                const offset = directionOffsets[this.currentDirection];
+                attackEl.style.left = (this.playerX + offset.x - 20) + 'px';
+                attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
+                
+                this.gameWorld.appendChild(attackEl);
+                
+                setTimeout(() => {
+                    if (attackEl.parentNode) {
+                        attackEl.remove();
+                    }
+                }, 300);
+                
+                this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
+                
+                setTimeout(() => {
+                    this.attackCooldown = false;
+                }, 500);
+            }
+            
+            checkAttackHits(attackX, attackY) {
+                if (this.bossDefeated) return;
+                
+                const distance = Math.sqrt(
+                    Math.pow(attackX - (this.bossX + 50), 2) + 
+                    Math.pow(attackY - (this.bossY + 50), 2)
+                );
+                
+                if (distance <= this.attackRange) {
+                    this.bossHp -= this.attackDamage;
+                    
+                    // Boss damage animation
+                    this.boss.classList.add('damaged');
+                    setTimeout(() => {
+                        this.boss.classList.remove('damaged');
+                    }, 500);
+                    
+                    // Show damage number
+                    const damageText = document.createElement('div');
+                    damageText.style.position = 'absolute';
+                    damageText.style.color = '#ff4444';
+                    damageText.style.fontWeight = 'bold';
+                    damageText.style.fontSize = '14px';
+                    damageText.style.pointerEvents = 'none';
+                    damageText.style.zIndex = '500';
+                    damageText.style.animation = 'damageFloat 1s ease-out';
+                    damageText.textContent = `-${this.attackDamage}`;
+                    damageText.style.left = (this.bossX + 50) + 'px';
+                    damageText.style.top = this.bossY + 'px';
+                    this.gameWorld.appendChild(damageText);
+                    
+                    setTimeout(() => {
+                        if (damageText.parentNode) {
+                            damageText.remove();
+                        }
+                    }, 1000);
+                    
+                    this.updateUI();
+                    
+                    if (this.bossHp <= 0) {
+                        this.defeatBoss();
+                    }
+                }
+            }
+            
+            initRoom() {
+                const elements = this.gameWorld.querySelectorAll('.electric-wall, .boss, .projectile');
+                elements.forEach(el => el.remove());
+                
+                this.createBorderWalls();
+                this.createBoss();
+                this.updateUI();
+            }
+            
+            createBorderWalls() {
+                // Electric walls around the border
+                this.createElectricWall(0, 0, 350, 20); // Top
+                this.createElectricWall(0, 337.5, 350, 20); // Bottom
+                this.createElectricWall(0, 0, 20, 357.5); // Left
+                this.createElectricWall(330, 0, 20, 357.5); // Right
+            }
+            
+            createElectricWall(x, y, width, height) {
+                const wall = document.createElement('div');
+                wall.className = 'electric-wall';
+                wall.style.left = x + 'px';
+                wall.style.top = y + 'px';
+                wall.style.width = width + 'px';
+                wall.style.height = height + 'px';
+                this.gameWorld.appendChild(wall);
+            }
+            
+            createBoss() {
+                const bossEl = document.createElement('div');
+                bossEl.className = 'boss';
+                bossEl.style.left = this.bossX + 'px';
+                bossEl.style.top = this.bossY + 'px';
+                this.gameWorld.appendChild(bossEl);
+                this.boss = bossEl;
+                
+                this.setBossRandomDirection();
+            }
+            
+            setBossRandomDirection() {
+                const angle = Math.random() * Math.PI * 2;
+                this.bossVelocityX = Math.cos(angle) * this.bossSpeed;
+                this.bossVelocityY = Math.sin(angle) * this.bossSpeed;
+                this.lastDirectionChange = Date.now();
+            }
+            
+            startGame() {
+                this.gameStarted = true;
+                this.bossMusic.play().catch(e => console.log('Music play failed:', e));
+                
+                this.timerInterval = setInterval(() => {
+                    this.timeElapsed++;
+                    this.updateTimer();
+                }, 1000);
+                
+                this.startGameLoop();
+            }
+            
+            startGameLoop() {
+                const gameLoop = () => {
+                    if (this.gameStarted) {
+                        this.updatePlayer();
+                        this.updateBoss();
+                        this.updateProjectiles();
+                        this.checkCollisions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+            
+            updatePlayer() {
+                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                    const newX = this.playerX + this.playerVelocityX;
+                    const newY = this.playerY + this.playerVelocityY;
+                    
+                    if (this.canMoveTo(newX, newY)) {
+                        this.playerX = newX;
+                        this.playerY = newY;
+                        this.positionPlayer();
+                    }
+                    
+                    this.playerVelocityX *= 0.88;
+                    this.playerVelocityY *= 0.88;
+                }
+            }
+            
+            positionPlayer() {
+                this.player.style.left = (this.playerX - 16) + 'px';
+                this.player.style.top = (this.playerY - 16) + 'px';
+            }
+            
+            canMoveTo(x, y) {
+                const playerSize = 24;
+                const playerRect = {
+                    left: x - playerSize / 2,
+                    top: y - playerSize / 2,
+                    right: x + playerSize / 2,
+                    bottom: y + playerSize / 2
+                };
+                
+                // Check electric walls
+                const electricWalls = this.gameWorld.querySelectorAll('.electric-wall');
+                for (let wall of electricWalls) {
+                    const wallRect = {
+                        left: parseFloat(wall.style.left),
+                        top: parseFloat(wall.style.top),
+                        right: parseFloat(wall.style.left) + parseFloat(wall.style.width),
+                        bottom: parseFloat(wall.style.top) + parseFloat(wall.style.height)
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, wallRect)) {
+                        this.takeDamage('⚡ Electric shock!');
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            updateBoss() {
+                if (!this.boss || this.isShooting || this.bossDefeated) return;
+                
+                const now = Date.now();
+                
+                // Tracking with direction changes
+                if (now - this.lastDirectionChange > 2500 + Math.random() * 1500) {
+                    const dx = this.playerX - (this.bossX + 50);
+                    const dy = this.playerY - (this.bossY + 50);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const randomX = Math.cos(angle) * this.bossSpeed;
+                    const randomY = Math.sin(angle) * this.bossSpeed;
+                    
+                    const trackX = (dx / distance) * this.bossSpeed;
+                    const trackY = (dy / distance) * this.bossSpeed;
+                    
+                    this.bossVelocityX = randomX * (1 - this.trackingStrength) + trackX * this.trackingStrength;
+                    this.bossVelocityY = randomY * (1 - this.trackingStrength) + trackY * this.trackingStrength;
+                    
+                    this.lastDirectionChange = now;
+                }
+                
+                // Move boss
+                let newX = this.bossX + this.bossVelocityX;
+                let newY = this.bossY + this.bossVelocityY;
+                
+                // Bounce off walls
+                if (newX < 30 || newX > 220) {
+                    this.bossVelocityX = -this.bossVelocityX;
+                    newX = this.bossX + this.bossVelocityX;
+                }
+                if (newY < 30 || newY > 227.5) {
+                    this.bossVelocityY = -this.bossVelocityY;
+                    newY = this.bossY + this.bossVelocityY;
+                }
+                
+                this.bossX = newX;
+                this.bossY = newY;
+                this.boss.style.left = this.bossX + 'px';
+                this.boss.style.top = this.bossY + 'px';
+                
+                // Shoot projectiles
+                if (now - this.lastShot > 4000 + Math.random() * 2000) {
+                    this.shootProjectiles();
+                }
+            }
+            
+            shootProjectiles() {
+                this.isShooting = true;
+                this.lastShot = Date.now();
+                
+                // Stop boss movement
+                const originalVelX = this.bossVelocityX;
+                const originalVelY = this.bossVelocityY;
+                this.bossVelocityX = 0;
+                this.bossVelocityY = 0;
+                
+                // Shoot 4 magical orbs in different directions
+                for (let i = 0; i < 4; i++) {
+                    setTimeout(() => {
+                        const angle = (i - 1.5) * 0.3;
+                        this.createProjectile(angle);
+                    }, i * 150);
+                }
+                
+                // Resume movement
+                setTimeout(() => {
+                    this.bossVelocityX = originalVelX;
+                    this.bossVelocityY = originalVelY;
+                    this.isShooting = false;
+                }, 800);
+            }
+            
+            createProjectile(angleOffset) {
+                const deltaX = this.playerX - (this.bossX + 50);
+                const deltaY = this.playerY - (this.bossY + 50);
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                let dirX = deltaX / distance;
+                let dirY = deltaY / distance;
+                
+                // Apply angle offset
+                const cos = Math.cos(angleOffset);
+                const sin = Math.sin(angleOffset);
+                const newDirX = dirX * cos - dirY * sin;
+                const newDirY = dirX * sin + dirY * cos;
+                
+                const projectileEl = document.createElement('div');
+                projectileEl.className = 'projectile';
+                projectileEl.textContent = '🔮';
+                projectileEl.style.left = (this.bossX + 50) + 'px';
+                projectileEl.style.top = (this.bossY + 50) + 'px';
+                this.gameWorld.appendChild(projectileEl);
+                
+                this.projectiles.push({
+                    element: projectileEl,
+                    x: this.bossX + 50,
+                    y: this.bossY + 50,
+                    velocityX: newDirX * 3,
+                    velocityY: newDirY * 3
+                });
+            }
+            
+            updateProjectiles() {
+                this.projectiles = this.projectiles.filter(projectile => {
+                    projectile.x += projectile.velocityX;
+                    projectile.y += projectile.velocityY;
+                    
+                    projectile.element.style.left = projectile.x + 'px';
+                    projectile.element.style.top = projectile.y + 'px';
+                    
+                    // Remove if out of bounds
+                    if (projectile.x < 0 || projectile.x > 350 || projectile.y < 0 || projectile.y > 357.5) {
+                        projectile.element.remove();
+                        return false;
+                    }
+                    
+                    return true;
+                });
+            }
+            
+            checkCollisions() {
+                if (this.isInvulnerable) return;
+                
+                const playerRect = {
+                    left: this.playerX - 12,
+                    top: this.playerY - 12,
+                    right: this.playerX + 12,
+                    bottom: this.playerY + 12
+                };
+                
+                // Check boss collision
+                if (!this.bossDefeated) {
+                    const bossRect = {
+                        left: this.bossX,
+                        top: this.bossY,
+                        right: this.bossX + 100,
+                        bottom: this.bossY + 100
+                    };
+                    if (this.rectsOverlap(playerRect, bossRect)) {
+                        this.takeDamage('💀 Guardian crush!');
+                        return;
+                    }
+                }
+                
+                // Check projectile collisions
+                this.projectiles.forEach((projectile, index) => {
+                    const projRect = {
+                        left: projectile.x,
+                        top: projectile.y,
+                        right: projectile.x + 24,
+                        bottom: projectile.y + 24
+                    };
+                    if (this.rectsOverlap(playerRect, projRect)) {
+                        this.takeDamage('🔮 Magic blast!');
+                        projectile.element.remove();
+                        this.projectiles.splice(index, 1);
+                    }
+                });
+            }
+            
+            rectsOverlap(rect1, rect2) {
+                return rect1.left < rect2.right &&
+                       rect1.right > rect2.left &&
+                       rect1.top < rect2.bottom &&
+                       rect1.bottom > rect2.top;
+            }
+            
+            takeDamage(message = '💔 Ouch!') {
+                if (this.isInvulnerable) return;
+                
+                this.hearts--;
+                this.showMessage(message);
+                this.updateUI();
+                
+                this.isInvulnerable = true;
+                this.player.classList.add('invulnerable');
+                
+                setTimeout(() => {
+                    this.isInvulnerable = false;
+                    this.player.classList.remove('invulnerable');
+                }, 1500);
+                
+                if (this.hearts <= 0) {
+                    this.gameOver();
+                }
+            }
+            
+            showMessage(text) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.style.display = 'block';
+                
+                clearTimeout(this.messageTimeout);
+                this.messageTimeout = setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2500);
+            }
+            
+            updateUI() {
+                document.getElementById('hearts').textContent = this.hearts;
+                document.getElementById('money').textContent = this.money;
+                document.getElementById('bossHp').textContent = this.bossHp;
+            }
+            
+            updateTimer() {
+                const minutes = Math.floor(this.timeElapsed / 60);
+                const seconds = this.timeElapsed % 60;
+                const timerEl = document.getElementById('timer');
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (this.timeElapsed >= 600) {
+                    timerEl.style.background = 'rgba(255,0,0,0.8)';
+                } else if (this.timeElapsed >= 300) {
+                    timerEl.style.background = 'rgba(255,165,0,0.8)';
+                } else {
+                    timerEl.style.background = 'rgba(0,128,0,0.8)';
+                }
+            }
+            
+            defeatBoss() {
+                this.bossDefeated = true;
+                clearInterval(this.timerInterval);
+                this.bossMusic.pause();
+                
+                // Remove boss and projectiles
+                if (this.boss) {
+                    this.boss.remove();
+                }
+                this.projectiles.forEach(proj => proj.element.remove());
+                this.projectiles = [];
+                
+                this.showMessage('💥 Guardian Defeated!');
+                
+                setTimeout(() => {
+                    document.getElementById('defeatOverlay').style.display = 'flex';
+                }, 1000);
+            }
+            
+            gameOver() {
+                this.gameStarted = false;
+                this.bossMusic.pause();
+                
+                this.showMessage('💀 Defeated by the Guardian!');
+                
+                setTimeout(() => {
+                    // Save state and respawn in pyramid
+                    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                    gameState.hearts = 3; // Reset hearts
+                    gameState.money = this.money; // Keep money
+                    gameState.timeElapsed = this.timeElapsed; // Keep accumulated time
+                    gameState.hasWeapon = this.hasWeapon; // Keep weapon
+                    
+                    // Keep all other items
+                    gameState.hasFlashlight = this.hasFlashlight;
+                    gameState.hasHammer = this.hasHammer;
+                    gameState.hasPencil = this.hasPencil;
+                    gameState.hasBoat = this.hasBoat;
+                    gameState.hasKey = this.hasKey;
+                    gameState.hasLavaShoes = this.hasLavaShoes;
+                    gameState.hasPyramidKey = this.hasPyramidKey;
+                    gameState.bullyDefeated = this.bullyDefeated;
+                    gameState.motherPaid = this.motherPaid;
+                    gameState.collectedMoney = this.collectedMoney;
+                    gameState.collectedHearts = this.collectedHearts;
+                    gameState.caveBossDefeated = this.caveBossDefeated;
+                    
+                    // Respawn in pyramid floor 4
+                    gameState.playerX = 70;
+                    gameState.playerY = 180;
+                    gameState.currentUrl = 'pyramid';
+                    
+                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/pyramid';
+                }, 3000);
+            }
+        }
+
+        let game;
+
+        // Check access on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            if (!savedState) {
+                alert('No game data found! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+            
+            const gameState = JSON.parse(savedState);
+            if (gameState.currentUrl !== 'pyramidboss') {
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+        });
+
+        function startBattle() {
+            document.getElementById('startScreen').style.display = 'none';
+            game = new PyramidBoss();
+            game.startGame();
+        }
+
+        function proceedToCutscene() {
+            if (game) {
+                // Save victory state
+                const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                gameState.hearts = game.hearts;
+                gameState.money = game.money;
+                gameState.timeElapsed = game.timeElapsed;
+                gameState.hasWeapon = game.hasWeapon;
+                gameState.pyramidBossDefeated = true; // New flag for pyramid boss
+                
+                // Keep all items
+                gameState.hasFlashlight = game.hasFlashlight;
+                gameState.hasHammer = game.hasHammer;
+                gameState.hasPencil = game.hasPencil;
+                gameState.hasBoat = game.hasBoat;
+                gameState.hasKey = game.hasKey;
+                gameState.hasLavaShoes = game.hasLavaShoes;
+                gameState.hasPyramidKey = game.hasPyramidKey;
+                gameState.bullyDefeated = game.bullyDefeated;
+                gameState.motherPaid = game.motherPaid;
+                gameState.collectedMoney = game.collectedMoney;
+                gameState.collectedHearts = game.collectedHearts;
+                gameState.caveBossDefeated = game.caveBossDefeated;
+                
+                gameState.currentUrl = 'cutscene1';
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+            }
+            
+            window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene1';
+        }
+    </script>
+</body>
+</html>
