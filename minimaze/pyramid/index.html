@@ -525,8 +525,7 @@ this.isNearNPC = false;
                     this.collectedHearts = gameState.collectedHearts || [];
                     this.caveBossDefeated = gameState.caveBossDefeated || false;
                     
-                    // DON'T load weapon state - it's temporary
-                    this.hasWeapon = false;
+                    this.hasWeapon = gameState.hasWeapon || false;
                 } else {
                     // Set defaults
                     this.hearts = 3;
@@ -1114,6 +1113,13 @@ this.isNearNPC = false;
                     boss.style.zIndex = '250';
                     boss.dataset.type = 'boss';
                     this.gameWorld.appendChild(boss);
+                    // Remove exit door quickly and silently
+    setTimeout(() => {
+        const exitDoor = this.gameWorld.querySelector('[data-type="exit"]');
+        if (exitDoor && this.currentFloor === 4) {
+            exitDoor.remove();
+        }
+    }, 200);
                 }
             }
             
