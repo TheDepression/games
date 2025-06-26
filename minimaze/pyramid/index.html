@@ -1468,6 +1468,46 @@ this.isNearNPC = false;
                         }
                     }
                 });
+
+
+                // Check super heart pickup
+const superHearts = this.gameWorld.querySelectorAll('[data-type="superheart"]');
+superHearts.forEach(heart => {
+    const heartX = parseInt(heart.style.left);
+    const heartY = parseInt(heart.style.top);
+    const heartRect = {
+        left: heartX, top: heartY,
+        right: heartX + 35, bottom: heartY + 35
+    };
+    
+    if (this.rectsOverlap(playerRect, heartRect)) {
+        this.hearts = 8; // Set to 8 hearts
+        this.showMessage('💖 SUPER HEART! Ultimate power!');
+        this.updateUI();
+        heart.remove();
+    }
+});
+
+// Check super money pickup
+const superMoney = this.gameWorld.querySelectorAll('[data-type="supermoney"]');
+superMoney.forEach(money => {
+    const moneyX = parseInt(money.style.left);
+    const moneyY = parseInt(money.style.top);
+    const moneyRect = {
+        left: moneyX, top: moneyY,
+        right: moneyX + 35, bottom: moneyY + 35
+    };
+    
+    if (this.rectsOverlap(playerRect, moneyRect)) {
+        this.money += 500;
+        this.showMessage('💎 SUPER Money! +500¥ collected!');
+        this.updateUI();
+        money.remove();
+    }
+});
+
+
+
                 
                 // Modify the friendly NPC collision check:
 // In checkCollisions(), replace the friendly NPC section:
