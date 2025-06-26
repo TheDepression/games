@@ -1464,18 +1464,18 @@ handleWeaponGiver(element) {
     if (!this.hasWeapon) {
         if (now - lastTime > 3000) {
             this.hasWeapon = true;
-            this.showMessage('🔫 TNT Gun acquired! I am too injured to go on.... take my TNT gun.... it\'s the only way to get past the zombies.', true);
+            this.showMessage('I cannot continue. Use my gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
             this.lastInteractionTime[messageKey] = now;
             
             setTimeout(() => {
-                element.dataset.message = 'Good luck with that TNT gun! Clear those zombies!';
+                element.dataset.message = 'I cannot continue. Use my gun🔫 to pass the zombies. Doudble-tap to shoot!';
             }, 3000);
             
             this.updateUI();
         }
     } else {
         if (now - lastTime > 100) {
-            this.showMessage('Good luck with that TNT gun! Clear those zombies!', true);
+            this.showMessage('I cannot continue. Use my gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
             this.lastInteractionTime[messageKey] = now;
         }
     }
