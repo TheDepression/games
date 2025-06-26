@@ -1063,6 +1063,16 @@ this.isNearNPC = false;
     superMoney.style.zIndex = '60';
     superMoney.dataset.type = 'supermoney';
     this.gameWorld.appendChild(superMoney);
+
+
+                    // Disappearing exit door for Floor 2 only
+    setTimeout(() => {
+        const exitDoor = this.gameWorld.querySelector('[data-type="exit"]');
+        if (exitDoor && this.currentFloor === 2) {
+            exitDoor.remove();
+            this.showMessage('🚪 The exit is GONE!');
+        }
+    }, 1000);
                     
                 } else if (floorNumber === 3) {
                     // Floor 3: NPCs + stairs
