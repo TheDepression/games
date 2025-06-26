@@ -580,12 +580,21 @@
             checkAttackHits(attackX, attackY) {
                 if (this.bossDefeated) return;
                 
-                const distance = Math.sqrt(
-                    Math.pow(attackX - (this.bossX + 50), 2) + 
-                    Math.pow(attackY - (this.bossY + 50), 2)
-                );
-                
-                if (distance <= this.attackRange) {
+                // Extended hitbox just for taking damage (20px larger on all sides)
+const extendedHitbox = {
+    left: this.bossX - 20,
+    top: this.bossY - 20,
+    right: this.bossX + 120, // 100px boss + 20px extension
+    bottom: this.bossY + 120
+};
+
+// Check if attack point is within extended hitbox
+const hitboxHit = attackX >= extendedHitbox.left && 
+                  attackX <= extendedHitbox.right &&
+                  attackY >= extendedHitbox.top && 
+                  attackY <= extendedHitbox.bottom;
+
+if (hitboxHit) {
                     this.bossHp -= this.attackDamage;
                     
                     // Boss damage animation
