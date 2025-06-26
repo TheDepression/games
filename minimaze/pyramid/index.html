@@ -1028,7 +1028,7 @@ this.isNearNPC = false;
                     const stairs = document.createElement('div');
                     stairs.className = 'stairs';
                     stairs.textContent = '🪜';
-                    stairs.style.left = '30px';
+                    stairs.style.left = '15px';
                     stairs.style.top = '30px';
                     stairs.dataset.type = 'stairs';
                     this.gameWorld.appendChild(stairs);
@@ -1064,7 +1064,7 @@ this.isNearNPC = false;
                 // NPC 2: Injured Officer (weapon giver)
                 const npc2 = document.createElement('div');
                 npc2.className = 'friendly';
-                npc2.style.left = '460px';
+                npc2.style.left = '440px';
                 npc2.style.top = '50px';
                 npc2.textContent = '👮🏻‍♂️';
                 npc2.dataset.message = this.hasWeapon ? 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!' : 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!';
