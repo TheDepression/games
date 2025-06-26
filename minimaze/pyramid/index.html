@@ -144,6 +144,12 @@
             0%, 100% { filter: brightness(1) drop-shadow(0 0 5px gold); }
             50% { filter: brightness(1.5) drop-shadow(0 0 10px gold); }
         }
+
+
+        @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
         
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -1011,6 +1017,24 @@ this.isNearNPC = false;
                     button.style.top = '670px';
                     button.dataset.type = 'button';
                     this.gameWorld.appendChild(button);
+
+                    // Super heart for Floor 1
+    const superHeart = document.createElement('div');
+    superHeart.className = 'heart-pickup';
+    superHeart.textContent = '💖';
+    superHeart.style.position = 'absolute';
+    superHeart.style.left = '140px';
+    superHeart.style.top = '220px';
+    superHeart.style.width = '35px';
+    superHeart.style.height = '35px';
+    superHeart.style.fontSize = '25px';
+    superHeart.style.display = 'flex';
+    superHeart.style.alignItems = 'center';
+    superHeart.style.justifyContent = 'center';
+    superHeart.style.animation = 'heartbeat 1s infinite';
+    superHeart.style.zIndex = '60';
+    superHeart.dataset.type = 'superheart';
+    this.gameWorld.appendChild(superHeart);
                     
                 } else if (floorNumber === 2) {
                     // Stairs for floor 2
@@ -1021,6 +1045,24 @@ this.isNearNPC = false;
                     stairs.style.top = '70px';
                     stairs.dataset.type = 'stairs';
                     this.gameWorld.appendChild(stairs);
+
+// Super money for Floor 2
+    const superMoney = document.createElement('div');
+    superMoney.className = 'money-pickup';
+    superMoney.textContent = '💰';
+    superMoney.style.position = 'absolute';
+    superMoney.style.left = '80px';
+    superMoney.style.top = '210px';
+    superMoney.style.width = '35px';
+    superMoney.style.height = '35px';
+    superMoney.style.fontSize = '25px';
+    superMoney.style.display = 'flex';
+    superMoney.style.alignItems = 'center';
+    superMoney.style.justifyContent = 'center';
+    superMoney.style.animation = 'glow 2s infinite';
+    superMoney.style.zIndex = '60';
+    superMoney.dataset.type = 'supermoney';
+    this.gameWorld.appendChild(superMoney);
                     
                 } else if (floorNumber === 3) {
                     // Floor 3: NPCs + stairs
