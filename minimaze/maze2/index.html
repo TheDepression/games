@@ -1110,44 +1110,77 @@
             }
 
             createColoredWalls() {
-                // Simplified but complete wall data - keeping essential structure
-                const wallData = {
-                    black: [
-                        // Border walls
-                        {x: 0, y: 0, w: 2400, h: 20},
-                        {x: 0, y: 0, w: 20, h: 2400},
-                        {x: 2400, y: 0, w: 20, h: 2400},
-                        {x: 0, y: 2400, w: 2400, h: 20},
-                        // Main structure walls (key ones from original)
-                        {x: 600, y: 360, w: 20, h: 920},
-                        {x: 600, y: 360, w: 380, h: 20},
-                        {x: 1060, y: 360, w: 520, h: 20},
-                        {x: 1580, y: 360, w: 20, h: 40},
-                        {x: 1580, y: 460, w: 20, h: 840},
-                        {x: 600, y: 1280, w: 780, h: 20},
-                        {x: 1500, y: 1280, w: 80, h: 20},
-                        // More essential walls for playability
-                        {x: 400, y: 1500, w: 100, h: 10},
-                        {x: 140, y: 580, w: 10, h: 120},
-                        {x: 2250, y: 840, w: 150, h: 10}
-                    ]
-                };
-                
-                Object.entries(wallData).forEach(([color, walls]) => {
-                    walls.forEach(wall => {
-                        const wallEl = document.createElement('div');
-                        wallEl.className = 'maze-wall';
-                        wallEl.style.background = color;
-                        wallEl.style.left = wall.x + 'px';
-                        wallEl.style.top = wall.y + 'px';
-                        wallEl.style.width = wall.w + 'px';
-                        wallEl.style.height = wall.h + 'px';
-                        this.gameWorld.appendChild(wallEl);
-                    });
-                });
-                
-                this.createBreakableWalls();
+    const wallData = {
+        black: [
+            // Border walls
+            {x: 0, y: 0, w: 2400, h: 20},
+            {x: 0, y: 0, w: 20, h: 2400},
+            {x: 2400, y: 0, w: 20, h: 2400},
+            {x: 0, y: 2400, w: 2400, h: 20},
+            // Main structure walls
+            {x: 600, y: 360, w: 20, h: 920},
+            {x: 600, y: 360, w: 380, h: 20}
+        ],
+        red: [
+            {x: 10, y: 880, w: 140, h: 20},
+            {x: 150, y: 880, w: 20, h: 170}
+        ],
+        green: [
+            {x: 1320, y: 1140, w: 160, h: 20},
+            {x: 680, y: 480, w: 30, h: 20}
+        ],
+        blue: [
+            {x: 1420, y: 10, w: 10, h: 110},
+            {x: 770, y: 70, w: 580, h: 10}
+        ],
+        purple: [
+            {x: 332, y: 471, w: 20, h: 20},
+            {x: 867, y: 1493, w: 20, h: 20}
+        ],
+        gray: [
+            {x: 10, y: 1230, w: 120, h: 20},
+            {x: 130, y: 1310, w: 20, h: 180}
+        ],
+        yellow: [
+            {x: 1840, y: 1140, w: 10, h: 240},
+            {x: 2080, y: 1360, w: 10, h: 140}
+        ],
+        hotpink: [
+            {x: 100, y: 200, w: 20, h: 20}
+        ],
+        tiled: [
+            {x: 1850, y: 2050, w: 10, h: 50},
+            {x: 1800, y: 2050, w: 50, h: 10}
+        ],
+        pathway: [
+            {x: 70, y: 710, w: 30, h: 70},
+            {x: 290, y: 790, w: 30, h: 950}
+        ]
+    };
+    
+    Object.entries(wallData).forEach(([color, walls]) => {
+        walls.forEach(wall => {
+            const wallEl = document.createElement('div');
+            
+            if (color === 'tiled') {
+                wallEl.className = 'tiled-wall';
+            } else if (color === 'pathway') {
+                wallEl.className = 'pathway';
+            } else {
+                wallEl.className = 'maze-wall';
+                wallEl.style.background = color;
             }
+            
+            wallEl.style.left = wall.x + 'px';
+            wallEl.style.top = wall.y + 'px';
+            wallEl.style.width = wall.w + 'px';
+            wallEl.style.height = wall.h + 'px';
+            this.gameWorld.appendChild(wallEl);
+        });
+    });
+    
+    this.createBreakableWalls();
+}
 
             createBreakableWalls() {
                 const breakableWalls = [
