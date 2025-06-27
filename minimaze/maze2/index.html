@@ -655,24 +655,42 @@
             }
 
             handleStart(e) {
-                if (!this.gameStarted) return;
-                e.preventDefault();
-                
-                // Double-tap for attack (exact from pyramid boss)
-                const now = Date.now();
-                if (this.hasWeapon && now - this.lastTap < this.tapDelay && !this.attackCooldown) {
-                    this.attack();
-                    this.lastTap = 0;
-                    return;
-                } else {
-                    this.lastTap = now;
-                }
-                
-                this.isDragging = true;
-                const point = e.touches ? e.touches[0] : e;
-                this.lastDragX = point.clientX;
-                this.lastDragY = point.clientY;
+    if (!this.gameStarted) return;
+    e.preventDefault();
+    
+    // Stricter double-tap for attack
+    const now = Date.now();
+    const point = e.touches ? e.touches[0] : e;
+    const currentX = point.clientX;
+    const currentY = point.clientY;
+    
+    if (this.hasWeapon && now - this.lastTap < 250 && !this.attackCooldown) { // Reduced from 300ms to 250ms
+        // Check if taps are in similar location (within 30px)
+        if (this.lastTapX && this.lastTapY) {
+            const tapDistance = Math.sqrt(
+                Math.pow(currentX - this.lastTapX, 2) + 
+                Math.pow(currentY - this.lastTapY, 2)
+            );
+            
+            if (tapDistance < 30) { // Must be within 30px of first tap
+                this.attack();
+                this.lastTap = 0;
+                this.lastTapX = null;
+                this.lastTapY = null;
+                return;
             }
+        }
+    }
+    
+    // Store tap info for next potential double-tap
+    this.lastTap = now;
+    this.lastTapX = currentX;
+    this.lastTapY = currentY;
+    
+    this.isDragging = true;
+    this.lastDragX = currentX;
+    this.lastDragY = currentY;
+}
             
             handleMove(e) {
                 if (!this.isDragging || !this.gameStarted) return;
