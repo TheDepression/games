@@ -757,10 +757,9 @@
     };
     
     const offset = directionOffsets[this.currentDirection];
-    // FIX: Account for visual offset like pyramid code
-    const visualOffset = (32 - 24) / 2;
-    attackEl.style.left = (this.playerX - visualOffset + offset.x - 20) + 'px';
-    attackEl.style.top = (this.playerY - visualOffset + offset.y - 20) + 'px';
+    // EXACT pyramid positioning - no visual offset correction
+    attackEl.style.left = (this.playerX + offset.x - 20) + 'px';
+    attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
     
     this.gameWorld.appendChild(attackEl);
     
