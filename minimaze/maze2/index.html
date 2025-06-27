@@ -730,51 +730,52 @@
                 this.player.textContent = '';
             }
 
-            // Attack function exactly from pyramid boss
             attack() {
-                if (!this.hasWeapon) return;
-                
-                this.attackCooldown = true;
-                
-                const attackEl = document.createElement('div');
-                attackEl.style.position = 'absolute';
-                attackEl.style.width = '40px';
-                attackEl.style.height = '40px';
-                attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
-                attackEl.style.borderRadius = '50%';
-                attackEl.style.pointerEvents = 'none';
-                attackEl.style.zIndex = '400';
-                attackEl.style.animation = 'slashEffect 0.3s ease-out';
-                
-                const directionOffsets = {
-                    'n': {x: 0, y: -25},
-                    'ne': {x: 20, y: -20},
-                    'e': {x: 25, y: 0},
-                    'se': {x: 20, y: 20},
-                    's': {x: 0, y: 25},
-                    'sw': {x: -20, y: 20},
-                    'w': {x: -25, y: 0},
-                    'nw': {x: -20, y: -20}
-                };
-                
-                const offset = directionOffsets[this.currentDirection];
-                attackEl.style.left = (this.playerX + offset.x - 20) + 'px';
-                attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
-                
-                this.gameWorld.appendChild(attackEl);
-                
-                setTimeout(() => {
-                    if (attackEl.parentNode) {
-                        attackEl.remove();
-                    }
-                }, 300);
-                
-                this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
-                
-                setTimeout(() => {
-                    this.attackCooldown = false;
-                }, 500);
-            }
+    if (!this.hasWeapon) return;
+    
+    this.attackCooldown = true;
+    
+    const attackEl = document.createElement('div');
+    attackEl.style.position = 'absolute';
+    attackEl.style.width = '40px';
+    attackEl.style.height = '40px';
+    attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+    attackEl.style.borderRadius = '50%';
+    attackEl.style.pointerEvents = 'none';
+    attackEl.style.zIndex = '400';
+    attackEl.style.animation = 'slashEffect 0.3s ease-out';
+    
+    const directionOffsets = {
+        'n': {x: 0, y: -25},
+        'ne': {x: 20, y: -20},
+        'e': {x: 25, y: 0},
+        'se': {x: 20, y: 20},
+        's': {x: 0, y: 25},
+        'sw': {x: -20, y: 20},
+        'w': {x: -25, y: 0},
+        'nw': {x: -20, y: -20}
+    };
+    
+    const offset = directionOffsets[this.currentDirection];
+    // FIX: Account for visual offset like pyramid code
+    const visualOffset = (32 - 24) / 2;
+    attackEl.style.left = (this.playerX - visualOffset + offset.x - 20) + 'px';
+    attackEl.style.top = (this.playerY - visualOffset + offset.y - 20) + 'px';
+    
+    this.gameWorld.appendChild(attackEl);
+    
+    setTimeout(() => {
+        if (attackEl.parentNode) {
+            attackEl.remove();
+        }
+    }, 300);
+    
+    this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
+    
+    setTimeout(() => {
+        this.attackCooldown = false;
+    }, 500);
+}
 
             checkAttackHits(attackX, attackY) {
                 this.movingEnemies.forEach(enemy => {
