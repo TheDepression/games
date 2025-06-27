@@ -1,0 +1,3471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Adventure: Colorful World</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #2a2a2a;
+            border: 3px solid #555;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #f7faed 0%, #f7f7e1 50%, #ebf7e1 100%);
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 2400px;
+            height: 2400px;
+            transform-origin: 0 0;
+        }
+        
+        /* Background zones with tile patterns */
+        .water-zone {
+            position: absolute;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.3) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.2) 1px, transparent 1px),
+                linear-gradient(135deg, #4fc3f7 0%, #29b6f6 50%, #03a9f4 100%);
+            background-size: 20px 20px, 15px 15px, 100% 100%;
+            background-position: 0 0, 10px 10px, 0 0;
+            opacity: 0.8;
+            animation: waterFlow 4s linear infinite;
+        }
+        
+        .forest-zone {
+            position: absolute;
+            background-image:
+                repeating-conic-gradient(from 0deg at 50% 50%, 
+                    #388e3c 0deg 30deg, 
+                    #4caf50 30deg 60deg, 
+                    #66bb6a 60deg 90deg, 
+                    #4caf50 90deg 120deg),
+                radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px, 25px 25px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.8;
+        }
+        
+        .desert-zone {
+            position: absolute;
+            background-image:
+                linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+                linear-gradient(135deg, #ffcc02 0%, #ffc107 50%, #ff8f00 100%);
+            background-size: 30px 30px, 30px 30px, 30px 30px, 30px 30px, 100% 100%;
+            background-position: 0 0, 0 15px, 15px -15px, -15px 0px, 0 0;
+            opacity: 0.7;
+        }
+
+.castle-zone {
+    position: absolute;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/castle.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.9;
+}
+        
+        .grass-zone {
+            position: absolute;
+            background-image:
+                repeating-linear-gradient(
+                    90deg,
+                    #4caf50 0px,
+                    #66bb6a 2px,
+                    #4caf50 4px,
+                    #388e3c 6px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    rgba(255,255,255,0.1) 1px,
+                    transparent 2px
+                );
+            background-size: 8px 8px, 4px 4px;
+            opacity: 0.8;
+        }
+        .village-zone {
+position: absolute;
+background-image:
+repeating-linear-gradient(
+45deg,
+rgba(144, 238, 144, 0.3) 0px,
+rgba(173, 255, 173, 0.3) 4px,
+rgba(144, 238, 144, 0.3) 8px,
+rgba(152, 251, 152, 0.3) 12px
+);
+background-size: 16px 16px;
+background-color: rgba(144, 238, 144, 0.2);
+opacity: 0.6;
+}
+        .lava-zone {
+            position: absolute;
+            background-image:
+                radial-gradient(circle at 25% 25%, #ff5722 30%, transparent 30%),
+                radial-gradient(circle at 75% 75%, #d84315 20%, transparent 20%),
+                linear-gradient(45deg, #ff3d00 25%, transparent 25%),
+                linear-gradient(-45deg, #bf360c 25%, transparent 25%);
+            background-size: 40px 40px, 30px 30px, 20px 20px, 20px 20px;
+            background-color: #ff5722;
+            opacity: 0.8;
+            animation: lavaFlow 3s ease-in-out infinite;
+        }
+        
+        .breakable-wall {
+            position: absolute;
+            background: #8d6e63;
+            border: 2px dashed #6d4c41;
+            opacity: 0.9;
+        }
+        .tiled-wall {
+    position: absolute;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    border: 1px solid rgba(0,0,0,0.2);
+    opacity: 0.9;
+}
+        .pathway {
+position: absolute;
+background: linear-gradient(135deg, #fffacd 0%, #fff8dc 50%, #ffefd5 100%);
+border: 1px solid rgba(255,235,205,0.3);
+opacity: 0.7;
+z-index: 25;
+}
+        @keyframes waterFlow {
+            0% { background-position: 0 0, 10px 10px, 0 0; }
+            100% { background-position: 20px 0, 30px 10px, 0 0; }
+        }
+        
+        @keyframes lavaFlow {
+            0%, 100% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.2) hue-rotate(10deg); }
+        }
+        
+        #player {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 100;
+    transition: none;
+}
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #444;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #665;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 250; /* Add this line */
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250; /* Change from 200 to 250 */
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250; /* Change from 200 to 250 */
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        .maze-wall {
+            position: absolute;
+            border: 1px solid rgba(0,0,0,0.3);
+        }
+        
+        .tree-wall {
+            position: absolute;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .friendly {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+        }
+        
+        .key {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glow 2s infinite;
+            z-index: 60;
+        }
+        
+        .heart-pickup {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: heartbeat 1s infinite;
+            z-index: 60;
+        }
+        
+        .money-pickup {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glow 2s infinite;
+            z-index: 60;
+        }
+        
+        .exit {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,255,0,0.3);
+            border: 2px solid #00ff00;
+            border-radius: 6px;
+            z-index: 70;
+        }
+        
+        .foreground-enemy {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            font-size: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px gold); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 10px gold); }
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 400;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            opacity: 0.9;
+        }
+        
+        #startScreen, #levelComplete, #pauseMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
+        h2, h3 {
+            margin: 10px 0;
+        }
+        
+        .control-hint {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .forest-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image:
+                radial-gradient(circle at 20% 30%, #2e7d32 8px, transparent 8px),
+                radial-gradient(circle at 60% 20%, #388e3c 6px, transparent 6px),
+                radial-gradient(circle at 80% 60%, #4caf50 10px, transparent 10px),
+                radial-gradient(circle at 30% 80%, #2e7d32 7px, transparent 7px),
+                radial-gradient(circle at 70% 75%, #1b5e20 5px, transparent 5px),
+                linear-gradient(135deg, rgba(46, 125, 50, 0.4) 0%, rgba(27, 94, 32, 0.6) 100%);
+            background-size: 40px 40px, 60px 60px, 35px 35px, 50px 50px, 45px 45px, 100% 100%;
+            background-position: 0 0, 20px 30px, 40px 10px, 10px 40px, 30px 20px, 0 0;
+            pointer-events: none;
+            z-index: 150;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .forest-overlay.active {
+            opacity: 0.8;
+        }
+
+        .forest-vision-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle 111px, transparent 111px, black 111px);
+            pointer-events: none;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .forest-vision-mask.active {
+            opacity: 1;
+        }
+
+        #confirmDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
+
+        .new-game-button {
+            background: #665;
+            font-size: 12px;
+            padding: 8px 16px;
+            opacity: 0.7;
+        }
+        
+        .new-game-button:hover {
+            background: #555;
+            opacity: 1;
+        }
+
+        #confirmDialog .bully-dialogue {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#confirmDialog .bully-image {
+    width: 80px;
+    height: 80px;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 15px;
+}
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🐸 You have:</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+        </div>
+        <div id="timer">0:00</div>
+<button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; right: 80px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️ Pause</button>
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player">🧙‍♂️</div>
+            </div>
+        </div>
+        <div id="message"></div>
+<div id="confirmDialog" style="display: none;">
+  <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+    <p id="confirmText">You are entering the forest...</p>
+    <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
+  </div>
+</div>
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">🐸 Master Frog's Adventure</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
+            </div>
+            <div class="control-hint">
+                <div>🎮 Swipe to explore the colorful world!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Find items, buy upgrades, reach the exit!</div>
+            </div>
+        </div>
+        
+        <div id="startScreen">
+    <h2>🐸 Master Frog's Adventure</h2>
+    <div id="welcomeMessage" style="margin: 20px 0;">Save the World</div>
+    <div id="saveStateInfo" style="font-size: 12px; opacity: 0.8; margin: 10px 0; display: none;"></div>
+    <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
+    
+    <!-- Name input for new players -->
+    <div id="nameInput" style="display: none; margin: 20px 0;">
+        <p>What's your name, brave adventurer?</p>
+        <input type="text" id="playerNameField" placeholder="Enter your name" style="padding: 8px; margin: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        <button onclick="setPlayerName()" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Start Adventure!</button>
+    </div>
+    
+    <div id="gameOptions">
+        <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">Continue</button>
+        <button class="new-game-button" onclick="startNewGame()" id="newGameButton" style="display: none;">New Game</button>
+    </div>
+</div>
+        
+        <div id="levelComplete" style="display: none;">
+            <h3 id="levelCompleteTitle">Level Complete!</h3>
+            <p id="levelCompleteText">Great job!</p>
+            <button id="retryButton" onclick="restartGame()">Play Again</button>
+        </div>
+        <div id="pauseMenu" style="display: none;">
+            <h3>⏸️ Game Paused</h3>
+            <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
+            <button onclick="resumeGame()" style="background: #4CAF50; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Continue Game</button>
+            <button onclick="returnToTitle()" style="background: #ff6b35; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Return to Title</button>
+        </div>
+        <!-- Forest overlay and vision mask -->
+        <div id="forestOverlay" class="forest-overlay"></div>
+        <div id="forestVisionMask" class="forest-vision-mask"></div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/frogtheme.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="forestMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+
+// Check URL access immediately when page loads
+window.addEventListener('DOMContentLoaded', function() {
+    const savedState = localStorage.getItem('mfGameState');
+    const playerName = localStorage.getItem('mfPlayerName');
+    
+    // Check if just returned from boss fight
+    const justReturnedFromBoss = localStorage.getItem('justReturnedFromBoss');
+    if (justReturnedFromBoss) {
+        localStorage.removeItem('justReturnedFromBoss');
+        // Skip start screen, load game directly
+        if (savedState) {
+            continueGame();
+            return;
+        }
+    }
+    
+    if (savedState && playerName) {
+        const gameState = JSON.parse(savedState);
+        
+        // If player should be on a different URL, redirect immediately
+        if (gameState.currentUrl && gameState.currentUrl !== 'main') {
+            window.location.href = `https://thedepression.github.io/games/minimaze/${gameState.currentUrl}`;
+            return;
+        }
+        
+        // Personalize welcome message
+        document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
+        
+        // Show save state info
+        const saveInfo = document.getElementById('saveStateInfo');
+        let itemsList = '';
+        if (gameState.hasKey) itemsList += ' 🔑';
+        if (gameState.hasBoat) itemsList += ' ⛵';
+        if (gameState.hasHammer) itemsList += ' 🔨';
+        if (gameState.hasLavaShoes) itemsList += ' 🥾';
+        if (gameState.hasBaby) itemsList += ' 👶🏻';
+        
+        const minutes = Math.floor(gameState.timeElapsed / 60);
+        const seconds = gameState.timeElapsed % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        saveInfo.innerHTML = `❤️ ${gameState.hearts} | 💰 ${gameState.money}¥ | ⏱️ ${timeString}${itemsList ? ' |' + itemsList : ''}`;
+        saveInfo.style.display = 'block';
+        
+        // Show continue button prominently, new game smaller
+        document.getElementById('continueButton').style.display = 'inline-block';
+        document.getElementById('newGameButton').style.display = 'inline-block';
+    } else if (playerName) {
+        // Has name but no save
+        document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
+        const newGameBtn = document.getElementById('newGameButton');
+        newGameBtn.style.display = 'inline-block';
+        newGameBtn.className = 'start-button';
+        newGameBtn.textContent = 'Start Adventure';
+    } else {
+        // No name - show name input  
+        console.log('Showing name input'); // Debug line
+        const nameInput = document.getElementById('nameInput');
+        nameInput.style.display = 'block';
+        nameInput.style.visibility = 'visible';
+        nameInput.style.opacity = '1';
+    }
+});
+        
+class MazeGame {
+
+getDirectionFromMovement(deltaX, deltaY) {
+    // Calculate angle in radians, then convert to degrees
+    let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+    
+    // Normalize to 0-360 degrees
+    if (angle < 0) angle += 360;
+    
+    // Map to 8 directions (each direction covers 45 degrees)
+    if (angle >= 337.5 || angle < 22.5) return 'e';      // East
+    else if (angle >= 22.5 && angle < 67.5) return 'se';  // Southeast  
+    else if (angle >= 67.5 && angle < 112.5) return 's';  // South
+    else if (angle >= 112.5 && angle < 157.5) return 'sw'; // Southwest
+    else if (angle >= 157.5 && angle < 202.5) return 'w';  // West
+    else if (angle >= 202.5 && angle < 247.5) return 'nw'; // Northwest
+    else if (angle >= 247.5 && angle < 292.5) return 'n';  // North
+    else return 'ne'; // Northeast (292.5 to 337.5)
+}
+
+updatePlayerImage(direction) {
+    this.currentDirection = direction;
+    this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+    this.player.textContent = ''; // Remove emoji
+}
+
+
+preloadPlayerImages() {
+    const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+    this.playerImages = {};
+    
+    directions.forEach(direction => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+        this.playerImages[direction] = img;
+    });
+}
+    
+    
+    constructor() {
+        this.hearts = 3;
+        this.hasKey = false;
+        this.gameStarted = false;
+        this.timeElapsed = 0;
+        this.timerInterval = null;
+        this.isInvulnerable = false;
+        this.money = 0;
+        this.wasOnLava = false;
+        // New items
+        this.hasBoat = false;
+        this.hasHammer = false;
+        this.hasLavaShoes = false;
+        this.lavaProtectionTime = 0;
+this.lavaProtectionActive = false;
+this.lastLavaZoneTime = 0;
+        this.isOnWater = false;
+        this.originalEmoji = '🧙‍♂️';
+        this.currentDirection = 's'; // Start facing south
+        this.lastMoveDirection = 's';
+        this.preloadPlayerImages();
+        this.lastLavaDamage = 0;
+        this.hasBaby = false;
+this.bullyDefeated = false;
+this.motherPaid = false;
+        this.collectedMoney = [];
+this.collectedHearts = [];
+        this.hasFlashlight = false;
+this.hasPencil = false;
+this.hasPyramidKey = false;
+        this.caveBossDefeated = false;
+        this.caveaMoneyCollected = false;
+this.caveaHeartCollected = false;
+        this.cavebMoneyCollected = false;
+this.cavebHeartCollected = false;
+        
+        // Movement properties
+        this.playerX = 400;
+        this.playerY = 1760;
+        this.playerVelocityX = 0;
+        this.playerVelocityY = 0;
+        this.isDragging = false;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
+        this.lastDragX = 0;
+        this.lastDragY = 0;
+        this.isOnDesert = false;
+        this.isInForest = false;
+        this.forestMusic = document.getElementById('forestMusic');
+        
+        this.movingEnemies = [];
+        this.foregroundEnemy = null;
+        this.lastForegroundSpawn = Date.now();
+        this.lastInteractionTime = {};
+        this.pendingAction = null;
+        this.isPaused = false;
+        this.player = document.getElementById('player');
+        this.gameWorld = document.getElementById('gameWorld');
+        this.gameArea = document.getElementById('gameArea');
+        this.controlArea = document.getElementById('controlArea');
+        this.bgMusic = document.getElementById('bgMusic');
+        
+        this.bindEvents();
+        this.startGameLoop();
+        this.loadGameState(); // Load saved game state if exists
+        this.isPaused = false;
+        this.pauseStartTime = 0; // ADD THIS LINE
+    }
+
+    enterForest() {
+        this.playerVelocityX = 0;  // Stop movement immediately
+    this.playerVelocityY = 0;
+    this.isDragging = false;   // Stop any dragging
+    this.gameStarted = false;  // Freeze game temporarily
+  document.getElementById('confirmText').textContent = '🌲 You are entering the dense forest...';
+  document.getElementById('confirmDialog').style.display = 'flex';
+  this.pendingAction = 'enterForest';
+}
+
+    exitForest() {
+        this.playerVelocityX = 0;  // Stop movement immediately
+    this.playerVelocityY = 0;
+    this.isDragging = false;   // Stop any dragging
+    this.gameStarted = false;  // Freeze game temporarily
+  document.getElementById('confirmText').textContent = '🌞 You are exiting the forest...';
+  document.getElementById('confirmDialog').style.display = 'flex';
+  this.pendingAction = 'exitForest';
+}
+
+updateForestVisibility() {
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .breakable-wall, .money-pickup, .heart-pickup, .exit, #forestBully');
+    
+    // First, reset all walls to visible
+    walls.forEach(wall => {
+        wall.style.visibility = 'visible';
+    });
+    
+    // Then hide forest walls if not in forest
+    walls.forEach(wall => {
+        let inForest = false;
+        const wallX = parseInt(wall.style.left) + 10; // center of wall
+        const wallY = parseInt(wall.style.top) + 10;
+        
+        forestZones.forEach(zone => {
+            const zoneLeft = parseInt(zone.style.left);
+            const zoneTop = parseInt(zone.style.top);
+            const zoneRight = zoneLeft + parseInt(zone.style.width);
+            const zoneBottom = zoneTop + parseInt(zone.style.height);
+            
+            if (wallX >= zoneLeft && wallX <= zoneRight && 
+                wallY >= zoneTop && wallY <= zoneBottom) {
+                inForest = true;
+            }
+        });
+        
+        if (inForest) {
+            wall.style.visibility = this.isInForest ? 'visible' : 'hidden';
+        }
+    });
+}
+    
+    bindEvents() {
+        this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+        this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+        this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+        
+        this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+        this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+        this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+        this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+    }
+    
+    handleStart(e) {
+        if (!this.gameStarted) return;
+        e.preventDefault();
+        
+        this.isDragging = true;
+        const point = e.touches ? e.touches[0] : e;
+        this.dragStartX = point.clientX;
+        this.dragStartY = point.clientY;
+        this.lastDragX = point.clientX;
+        this.lastDragY = point.clientY;
+    }
+    
+    handleMove(e) {
+        if (!this.isDragging || !this.gameStarted) return;
+        e.preventDefault();
+        
+        const point = e.touches ? e.touches[0] : e;
+        const deltaX = point.clientX - this.lastDragX;
+const deltaY = point.clientY - this.lastDragY;
+
+// Update player direction based on movement
+if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+    if (newDirection !== this.currentDirection) {
+        // Only update player image if not on water
+        if (!this.isOnWater) {
+            this.updatePlayerImage(newDirection);
+        }
+        this.lastMoveDirection = newDirection;
+    }
+}
+
+// Reduce sensitivity when on desert (quarter speed)
+const baseSensitivity = 0.5;
+const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
+this.playerVelocityX = deltaX * sensitivity;
+this.playerVelocityY = deltaY * sensitivity;
+
+        const maxVelocity = 11;
+        this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+        this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+        
+        this.lastDragX = point.clientX;
+        this.lastDragY = point.clientY;
+    }
+    
+    handleEnd(e) {
+        this.isDragging = false;
+        this.playerVelocityX = 0;
+        this.playerVelocityY = 0;
+    }
+    
+    startGameTimer() {
+    this.gameStarted = true;
+    // timeElapsed is already set by loadGameState() if continuing
+    this.updateTimer();
+    
+    // Don't start background music if already in forest
+    if (!this.isInForest) {
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    }
+    
+    this.timerInterval = setInterval(() => {
+        if (!this.isPaused) {  // Only increment if not paused
+            this.timeElapsed++;
+            this.updateTimer();
+            
+            // Keep strategic auto-saves (every minute for collected items)
+            if (this.timeElapsed % 60 === 0) {
+                this.saveGameState();
+            }
+        }
+    }, 1000);
+}
+    
+    updateTimer() {
+    const minutes = Math.floor(this.timeElapsed / 60);
+    const seconds = this.timeElapsed % 60;
+    const timerEl = document.getElementById('timer');
+    timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Change color as time progresses
+    if (this.timeElapsed >= 600) { // 10+ minutes = red
+        timerEl.style.background = 'rgba(255,0,0,0.8)';
+    } else if (this.timeElapsed >= 300) { // 5+ minutes = orange
+        timerEl.style.background = 'rgba(255,165,0,0.8)';
+    } else {
+        timerEl.style.background = 'rgba(0,128,0,0.8)'; // Under 5 minutes = green
+    }
+}
+    
+    //timeUp() {
+      //  clearInterval(this.timerInterval);
+        //this.gameStarted = false;
+        //this.bgMusic.pause();
+        //this.forestMusic.pause();
+        //this.showMessage('⏰ Time\'s up!');
+        //setTimeout(() => {
+          //  this.showLevelComplete('⏰ Time Up!', 'Try again!');
+        //}, 2000);
+    //}
+    
+    initLevel() {
+        const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone');
+        elements.forEach(el => el.remove());
+        
+        this.movingEnemies = [];
+        this.foregroundEnemy = null;
+        this.lastForegroundSpawn = Date.now();
+        this.hasKey = false;
+        this.lastInteractionTime = {};
+        // Check if returning from battle
+    if (this.bullyDefeated) {
+        const bully = document.getElementById('forestBully');
+        if (bully) {
+            bully.remove();
+        }
+    }
+        this.updateUI();
+        this.generateMaze();
+        
+        // Center camera on player
+        const gameAreaWidth = this.gameArea.offsetWidth;
+        const gameAreaHeight = this.gameArea.offsetHeight;
+        const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+        const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+        this.gameArea.scrollTo({
+            left: scrollX,
+            top: scrollY,
+            behavior: 'auto'
+        });
+    }
+    
+    generateMaze() {
+        // Create background zones
+        this.createBackgroundZones();
+        
+        // Create colored walls from the data
+        this.createColoredWalls();
+        
+        // Add tree walls
+        this.addTreeWalls();
+        
+        /// Set player position (use saved coordinates if available)
+        // Only set default if no saved coordinates exist
+        if (!this.playerX || this.playerX === 420) {
+            this.playerX = 420;
+            this.playerY = 1760;
+        };
+// Center the larger visual character over the smaller hitbox
+const visualOffset = (32 - 24) / 2; // 6.5px offset to center
+this.player.style.left = (this.playerX - visualOffset) + 'px';
+this.player.style.top = (this.playerY - visualOffset) + 'px';
+this.updatePlayerImage('s'); // Start facing south
+        
+        // Create enemies scattered throughout the maze
+        this.createEnemies();
+        
+        // Create friendlies
+        this.createFriendlies();
+        
+        // Create collectibles
+        this.createCollectibles();
+        
+        // Create exit
+        this.createExit();
+        this.updateForestVisibility();
+        this.createCaveEntrances();
+    }
+    
+    createBackgroundZones() {
+        // Water zone with animated wave pattern (top-left) - requires boat
+        const waterZone = document.createElement('div');
+        waterZone.className = 'water-zone';
+        waterZone.style.left = '0px';
+        waterZone.style.top = '160px';
+        waterZone.style.width = '360px';
+        waterZone.style.height = '200px';
+        waterZone.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone);
+        
+        // Water zone 2
+        const waterZone2 = document.createElement('div');
+        waterZone2.className = 'water-zone';
+        waterZone2.style.left = '360px';
+        waterZone2.style.top = '0px';
+        waterZone2.style.width = '1760px';
+        waterZone2.style.height = '160px';
+        waterZone2.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone2);
+
+        // Water zone 3
+        const waterZone3 = document.createElement('div');
+        waterZone3.className = 'water-zone';
+        waterZone3.style.left = '1600px';
+        waterZone3.style.top = '360px';
+        waterZone3.style.width = '800px';
+        waterZone3.style.height = '400px';
+        waterZone3.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone3);
+
+        // Water zone 4
+        const waterZone4 = document.createElement('div');
+        waterZone4.className = 'water-zone';
+        waterZone4.style.left = '1180px';
+        waterZone4.style.top = '160px';
+        waterZone4.style.width = '940px';
+        waterZone4.style.height = '200px';
+        waterZone4.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone4);
+
+        // Water zone 5
+        const waterZone5 = document.createElement('div');
+        waterZone5.className = 'water-zone';
+        waterZone5.style.left = '0px';
+        waterZone5.style.top = '110px';
+        waterZone5.style.width = '360px';
+        waterZone5.style.height = '50px';
+        waterZone5.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone5);
+
+        // Water zone 6
+        const waterZone6 = document.createElement('div');
+        waterZone6.className = 'water-zone';
+        waterZone6.style.left = '260px';
+        waterZone6.style.top = '0px';
+        waterZone6.style.width = '100px';
+        waterZone6.style.height = '110px';
+        waterZone6.dataset.zoneType = 'water';
+        this.gameWorld.appendChild(waterZone6);
+
+        // Grass zone with nice texture (island)
+        const grassZone = document.createElement('div');
+        grassZone.className = 'grass-zone';
+        grassZone.style.left = '0px';
+        grassZone.style.top = '0px';
+        grassZone.style.width = '260px';
+        grassZone.style.height = '110px';
+        this.gameWorld.appendChild(grassZone);
+
+      // Grass zone2 with nice texture (forest)
+        const grassZone2 = document.createElement('div');
+        grassZone2.className = 'grass-zone';
+        grassZone2.style.left = '1400px';
+        grassZone2.style.top = '1280px';
+        grassZone2.style.width = '80px';
+        grassZone2.style.height = '80px';
+        this.gameWorld.appendChild(grassZone2);
+
+      // Grass zone3 with nice texture (castle)
+        const grassZone3 = document.createElement('div');
+        grassZone3.className = 'grass-zone';
+        grassZone3.style.left = '2120px';
+        grassZone3.style.top = '0px';
+        grassZone3.style.width = '280px';
+        grassZone3.style.height = '360px';
+        this.gameWorld.appendChild(grassZone3);
+
+        // Grass zone4 with nice texture (forest hint)
+        const grassZone4 = document.createElement('div');
+        grassZone4.className = 'grass-zone';
+        grassZone4.style.left = '1600px';
+        grassZone4.style.top = '410px';
+        grassZone4.style.width = '5px';
+        grassZone4.style.height = '50px';
+        this.gameWorld.appendChild(grassZone4);
+      
+        // Forest zone with geometric leaf pattern (middle-right)
+        const forestZone = document.createElement('div');
+        forestZone.className = 'forest-zone';
+        forestZone.style.left = '600px';
+        forestZone.style.top = '360px';
+        forestZone.style.width = '1000px';
+        forestZone.style.height = '940px';
+        forestZone.dataset.zoneType = 'forest';
+        this.gameWorld.appendChild(forestZone);
+        
+        // Lava zone - damages player without special shoes
+        const lavaZone = document.createElement('div');
+        lavaZone.className = 'lava-zone';
+        lavaZone.style.left = '1320px';
+        lavaZone.style.top = '1740px';
+        lavaZone.style.width = '280px';
+        lavaZone.style.height = '660px';
+        lavaZone.dataset.zoneType = 'lava';
+        this.gameWorld.appendChild(lavaZone);
+        
+        // Lava zone 2
+        const lavaZone2 = document.createElement('div');
+        lavaZone2.className = 'lava-zone';
+        lavaZone2.style.left = '1600px';
+        lavaZone2.style.top = '1740px';
+        lavaZone2.style.width = '800px';
+        lavaZone2.style.height = '240px';
+        lavaZone2.dataset.zoneType = 'lava';
+        this.gameWorld.appendChild(lavaZone2);
+
+        // Lava zone 3
+        const lavaZone3 = document.createElement('div');
+        lavaZone3.className = 'lava-zone';
+        lavaZone3.style.left = '1800px';
+        lavaZone3.style.top = '2100px';
+        lavaZone3.style.width = '380px';
+        lavaZone3.style.height = '160px';
+        lavaZone3.dataset.zoneType = 'lava';
+        this.gameWorld.appendChild(lavaZone3);
+
+        // Desert zone with sand pattern (bottom-right)
+        const desertZone = document.createElement('div');
+        desertZone.className = 'desert-zone';
+        desertZone.style.left = '1600px';
+        desertZone.style.top = '1000px';
+        desertZone.style.width = '800px';
+        desertZone.style.height = '540px';
+        desertZone.dataset.zoneType = 'desert';
+        this.gameWorld.appendChild(desertZone);
+
+        // Village zone with subtle pale green pattern
+const villageZone = document.createElement('div');
+villageZone.className = 'village-zone';
+villageZone.style.left = '0px';
+villageZone.style.top = '1500px';
+villageZone.style.width = '500px';
+villageZone.style.height = '300px';
+villageZone.dataset.zoneType = 'village';
+this.gameWorld.appendChild(villageZone);
+
+        // Village zone2 with subtle pale green pattern
+const villageZone2 = document.createElement('div');
+villageZone2.className = 'village-zone';
+villageZone2.style.left = '0px';
+villageZone2.style.top = '700px';
+villageZone2.style.width = '400px';
+villageZone2.style.height = '800px';
+villageZone2.dataset.zoneType = 'village';
+this.gameWorld.appendChild(villageZone2);
+
+        // Village zone3 with subtle pale green pattern
+const villageZone3 = document.createElement('div');
+villageZone3.className = 'village-zone';
+villageZone3.style.left = '0px';
+villageZone3.style.top = '580px';
+villageZone3.style.width = '140px';
+villageZone3.style.height = '120px';
+villageZone3.dataset.zoneType = 'village';
+this.gameWorld.appendChild(villageZone3);
+
+        // Village zone4 with subtle pale green pattern
+const villageZone4 = document.createElement('div');
+villageZone4.className = 'village-zone';
+villageZone4.style.left = '2160px';
+villageZone4.style.top = '770px';
+villageZone4.style.width = '230px';
+villageZone4.style.height = '230px';
+villageZone4.dataset.zoneType = 'village';
+this.gameWorld.appendChild(villageZone4);
+
+        // Castle zone with custom image
+const castleZone = document.createElement('div');
+castleZone.className = 'castle-zone';
+castleZone.style.left = '2190px';
+castleZone.style.top = '70px';
+castleZone.style.width = '150px';
+castleZone.style.height = '240px';
+this.gameWorld.appendChild(castleZone);
+
+        // Bully blocking the baby - ONLY show if not defeated
+if (!this.bullyDefeated) {
+    const bullyEl = document.createElement('div');
+    bullyEl.style.position = 'absolute';
+    bullyEl.style.left = '640px';
+    bullyEl.style.top = '480px';
+    bullyEl.style.width = '40px';
+    bullyEl.style.height = '40px';
+    bullyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png")';
+    bullyEl.style.backgroundSize = 'contain';
+    bullyEl.style.backgroundRepeat = 'no-repeat';
+    bullyEl.style.backgroundPosition = 'center';
+    bullyEl.style.zIndex = '45';
+    bullyEl.dataset.type = 'bully';
+    bullyEl.id = 'forestBully';
+    this.gameWorld.appendChild(bullyEl);
+}
+
+    // Pyramid decoration
+const pyramidEl = document.createElement('div');
+pyramidEl.style.position = 'absolute';
+pyramidEl.style.left = '2200px';
+pyramidEl.style.top = '1300px';
+pyramidEl.style.width = '60px';
+pyramidEl.style.height = '60px';
+pyramidEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/pyramid.png")';
+pyramidEl.style.backgroundSize = 'contain';
+pyramidEl.style.backgroundRepeat = 'no-repeat';
+pyramidEl.style.backgroundPosition = 'center';
+pyramidEl.style.zIndex = '35';
+pyramidEl.style.pointerEvents = 'none';
+this.gameWorld.appendChild(pyramidEl);
+    }
+    createColoredWalls() {
+        const wallData = {
+            black: [
+                {x: 0, y: 0, w: 2400, h: 20},
+                {x: 0, y: 0, w: 20, h: 2400},
+                {x: 2400, y: 0, w: 20, h: 2400},
+                {x: 0, y: 2400, w: 2400, h: 20},
+                {x: 600, y: 360, w: 20, h: 920},
+  {x: 600, y: 360, w: 380, h: 20},
+  {x: 1060, y: 360, w: 520, h: 20},
+  {x: 1580, y: 360, w: 20, h: 40},
+  {x: 1580, y: 460, w: 20, h: 840},
+  {x: 600, y: 1280, w: 780, h: 20},
+  {x: 1500, y: 1280, w: 80, h: 20},
+  {x: 1380, y: 1300, w: 20, h: 60},
+  {x: 1480, y: 1300, w: 20, h: 60},
+                {x: 400, y: 1500, w: 100, h: 10},
+  {x: 140, y: 580, w: 10, h: 120},
+  {x: 140, y: 700, w: 60, h: 10},
+  {x: 0, y: 580, w: 140, h: 10},
+  {x: 200, y: 1800, w: 300, h: 10},
+  {x: 490, y: 1500, w: 10, h: 170},
+  {x: 1650, y: 830, w: 120, h: 10},
+  {x: 1750, y: 830, w: 10, h: 50},
+  {x: 1720, y: 880, w: 140, h: 10},
+  {x: 1850, y: 830, w: 90, h: 10},
+  {x: 1990, y: 790, w: 90, h: 10},
+  {x: 2050, y: 790, w: 10, h: 60},
+  {x: 1910, y: 840, w: 10, h: 90},
+  {x: 1890, y: 940, w: 190, h: 10},
+  {x: 2080, y: 880, w: 10, h: 80},
+  {x: 2060, y: 830, w: 90, h: 10},
+  {x: 2160, y: 770, w: 10, h: 60},
+  {x: 2160, y: 770, w: 240, h: 10},
+  {x: 2080, y: 920, w: 80, h: 10},
+  {x: 1670, y: 940, w: 80, h: 10},
+  {x: 1600, y: 900, w: 50, h: 10},
+  {x: 1820, y: 950, w: 10, h: 50},
+  {x: 540, y: 1620, w: 180, h: 10},
+  {x: 620, y: 1500, w: 10, h: 250},
+  {x: 740, y: 1790, w: 150, h: 10},
+  {x: 820, y: 1490, w: 10, h: 240},
+  {x: 720, y: 1520, w: 220, h: 10},
+  {x: 770, y: 1370, w: 10, h: 150},
+  {x: 690, y: 1410, w: 130, h: 10},
+  {x: 950, y: 1550, w: 60, h: 10},
+  {x: 1010, y: 1560, w: 10, h: 290},
+  {x: 1050, y: 1450, w: 110, h: 10},
+  {x: 1070, y: 1380, w: 230, h: 10},
+  {x: 670, y: 1750, w: 10, h: 220},
+  {x: 580, y: 1890, w: 170, h: 10},
+  {x: 850, y: 1950, w: 10, h: 180},
+  {x: 820, y: 2010, w: 80, h: 10},
+  {x: 200, y: 1930, w: 200, h: 10},
+  {x: 350, y: 1930, w: 10, h: 90},
+  {x: 290, y: 2030, w: 130, h: 10},
+  {x: 540, y: 2140, w: 100, h: 10},
+  {x: 550, y: 2090, w: 10, h: 50},
+  {x: 210, y: 2090, w: 360, h: 10},
+  {x: 250, y: 1940, w: 10, h: 150},
+  {x: 160, y: 2040, w: 10, h: 100},
+  {x: 160, y: 2140, w: 310, h: 10},
+  {x: 430, y: 2140, w: 10, h: 60},
+  {x: 430, y: 2200, w: 210, h: 10},
+  {x: 590, y: 2200, w: 10, h: 110},
+  {x: 400, y: 700, w: 10, h: 310},
+  {x: 400, y: 1090, w: 10, h: 410},
+  {x: 470, y: 870, w: 10, h: 160},
+  {x: 470, y: 870, w: 60, h: 10},
+  {x: 530, y: 870, w: 10, h: 260},
+  {x: 400, y: 1170, w: 60, h: 10},
+  {x: 400, y: 1370, w: 210, h: 10},
+  {x: 480, y: 1260, w: 10, h: 150},
+  {x: 2190, y: 60, w: 30, h: 240},
+  {x: 2190, y: 60, w: 150, h: 30},
+  {x: 2340, y: 60, w: 30, h: 240},
+  {x: 2190, y: 300, w: 60, h: 20},
+  {x: 2280, y: 300, w: 60, h: 20},
+  {x: 300, y: 510, w: 10, h: 100},
+  {x: 100, y: 460, w: 270, h: 10},
+  {x: 220, y: 460, w: 10, h: 130},
+  {x: 0, y: 350, w: 230, h: 10},
+  {x: 280, y: 350, w: 80, h: 10},
+  {x: 360, y: 170, w: 10, h: 180},
+  {x: 360, y: 170, w: 810, h: 10},
+  {x: 1170, y: 230, w: 10, h: 120},
+  {x: 2120, y: 10, w: 10, h: 340},
+  {x: 2120, y: 350, w: 110, h: 10},
+  {x: 2280, y: 350, w: 120, h: 10},
+  {x: 2240, y: 240, w: 10, h: 50},
+  {x: 2240, y: 240, w: 50, h: 10},
+  {x: 2290, y: 240, w: 10, h: 60},
+  {x: 1600, y: 770, w: 200, h: 10},
+  {x: 10, y: 100, w: 250, h: 10},
+  {x: 460, y: 250, w: 100, h: 10},
+  {x: 500, y: 250, w: 10, h: 150},
+  {x: 480, y: 540, w: 90, h: 10},
+  {x: 2100, y: 1610, w: 180, h: 10},
+  {x: 1900, y: 1610, w: 120, h: 10},
+  {x: 1770, y: 1670, w: 110, h: 10},
+  {x: 1970, y: 1560, w: 10, h: 50},
+  {x: 2150, y: 1610, w: 10, h: 60},
+  {x: 2000, y: 1680, w: 10, h: 60},
+  {x: 2360, y: 1640, w: 40, h: 10},
+  {x: 1600, y: 1370, w: 10, h: 120},
+  {x: 1550, y: 1440, w: 40, h: 10},
+  {x: 1380, y: 1510, w: 140, h: 10},
+  {x: 1470, y: 1460, w: 10, h: 140},
+  {x: 1160, y: 1630, w: 220, h: 10},
+  {x: 1200, y: 1600, w: 10, h: 270},
+  {x: 1140, y: 1820, w: 60, h: 10},
+  {x: 1140, y: 1740, w: 10, h: 270},
+  {x: 850, y: 2290, w: 10, h: 110},
+  {x: 990, y: 2160, w: 10, h: 150},
+  {x: 1100, y: 2140, w: 10, h: 260},
+  {x: 1200, y: 2050, w: 110, h: 10},
+  {x: 1210, y: 2050, w: 10, h: 170},
+  {x: 710, y: 2200, w: 50, h: 10},
+  {x: 730, y: 2090, w: 10, h: 220},
+  {x: 670, y: 2270, w: 70, h: 10},
+  {x: 690, y: 2270, w: 10, h: 120},
+  {x: 950, y: 2170, w: 30, h: 10},
+  {x: 2250, y: 840, w: 150, h: 10},
+  {x: 2250, y: 910, w: 90, h: 10},
+  {x: 2340, y: 910, w: 10, h: 90}
+                
+            ],
+            red: [
+  {x: 10, y: 880, w: 140, h: 20},
+                {x: 20, y: 580, w: 30, h: 120},
+                {x: 120, y: 580, w: 30, h: 120},
+                {x: 20, y: 700, w: 50, h: 10},
+                {x: 110, y: 700, w: 40, h: 10},
+                {x: 20, y: 580, w: 130, h: 80},
+  {x: 150, y: 880, w: 20, h: 170},
+  {x: 10, y: 1100, w: 140, h: 20}
+            ],
+            green: [
+  {x: 1320, y: 1140, w: 160, h: 20},
+  {x: 680, y: 480, w: 30, h: 20},
+  {x: 1100, y: 1140, w: 140, h: 20},
+  {x: 940, y: 1200, w: 180, h: 20},
+  {x: 1200, y: 1060, w: 20, h: 80},
+  {x: 1200, y: 840, w: 20, h: 140},
+  {x: 1200, y: 840, w: 300, h: 20},
+  {x: 1500, y: 840, w: 20, h: 100},
+  {x: 1320, y: 940, w: 180, h: 20},
+  {x: 1260, y: 1020, w: 320, h: 20},
+  {x: 1120, y: 720, w: 460, h: 20},
+  {x: 1120, y: 720, w: 20, h: 120},
+  {x: 1120, y: 920, w: 20, h: 60},
+  {x: 1120, y: 980, w: 80, h: 20},
+  {x: 1080, y: 780, w: 40, h: 20},
+  {x: 1180, y: 680, w: 20, h: 40},
+  {x: 1180, y: 660, w: 20, h: 20},
+  {x: 1000, y: 680, w: 180, h: 20},
+  {x: 940, y: 1000, w: 100, h: 20},
+  {x: 1060, y: 980, w: 20, h: 160},
+  {x: 840, y: 1200, w: 100, h: 20},
+  {x: 600, y: 1060, w: 260, h: 20},
+  {x: 860, y: 1060, w: 20, h: 140},
+  {x: 660, y: 1200, w: 120, h: 20},
+  {x: 720, y: 1140, w: 20, h: 60},
+  {x: 900, y: 760, w: 20, h: 180},
+  {x: 680, y: 940, w: 100, h: 20},
+  {x: 720, y: 820, w: 20, h: 120},
+  {x: 800, y: 760, w: 100, h: 20},
+  {x: 840, y: 620, w: 20, h: 140},
+  {x: 760, y: 640, w: 140, h: 20},
+  {x: 780, y: 560, w: 20, h: 80},
+  {x: 600, y: 600, w: 180, h: 20},
+  {x: 960, y: 560, w: 20, h: 80},
+  {x: 880, y: 560, w: 80, h: 20},
+  {x: 700, y: 360, w: 20, h: 140},
+  {x: 780, y: 380, w: 20, h: 100},
+  {x: 960, y: 600, w: 280, h: 20},
+  {x: 1320, y: 660, w: 100, h: 20},
+  {x: 1460, y: 500, w: 120, h: 20},
+  {x: 1460, y: 500, w: 20, h: 80},
+  {x: 1340, y: 540, w: 120, h: 20},
+  {x: 1500, y: 640, w: 20, h: 40},
+  {x: 1240, y: 520, w: 20, h: 80},
+  {x: 1240, y: 540, w: 100, h: 20},
+  {x: 1120, y: 360, w: 20, h: 240},
+  {x: 1460, y: 440, w: 20, h: 40},
+  {x: 1380, y: 360, w: 20, h: 120},
+  {x: 1200, y: 440, w: 60, h: 20},
+  {x: 1260, y: 440, w: 20, h: 80},
+  {x: 980, y: 345, w: 10, h: 10},
+  {x: 1060, y: 345, w: 10, h: 10},
+  {x: 970, y: 370, w: 20, h: 60}
+],
+            blue: [
+  {x: 1420, y: 10, w: 10, h: 110},
+  {x: 1350, y: 120, w: 80, h: 10},
+  {x: 1350, y: 60, w: 10, h: 60},
+  {x: 770, y: 70, w: 580, h: 10},
+  {x: 770, y: 50, w: 10, h: 60},
+  {x: 900, y: 70, w: 10, h: 50},
+  {x: 900, y: 100, w: 220, h: 10},
+  {x: 820, y: 130, w: 10, h: 30},
+  {x: 550, y: 60, w: 90, h: 10},
+  {x: 600, y: 120, w: 80, h: 10},
+  {x: 650, y: 50, w: 40, h: 10},
+  {x: 690, y: 20, w: 20, h: 10},
+  {x: 500, y: 150, w: 30, h: 10},
+  {x: 470, y: 130, w: 30, h: 10},
+  {x: 110, y: 150, w: 80, h: 10},
+  {x: 160, y: 150, w: 10, h: 100},
+  {x: 70, y: 180, w: 10, h: 100},
+  {x: 250, y: 160, w: 10, h: 10},
+  {x: 310, y: 230, w: 10, h: 10},
+  {x: 240, y: 230, w: 20, h: 10},
+  {x: 210, y: 280, w: 100, h: 10},
+  {x: 280, y: 180, w: 10, h: 90},
+  {x: 1230, y: 210, w: 80, h: 10},
+  {x: 1270, y: 130, w: 10, h: 80},
+  {x: 1180, y: 130, w: 100, h: 10},
+  {x: 1070, y: 140, w: 10, h: 20},
+  {x: 1230, y: 270, w: 190, h: 10},
+  {x: 1420, y: 270, w: 10, h: 30},
+  {x: 1420, y: 290, w: 90, h: 10},
+  {x: 1590, y: 150, w: 10, h: 130},
+  {x: 1500, y: 220, w: 80, h: 10},
+  {x: 1500, y: 220, w: 10, h: 60},
+  {x: 1370, y: 210, w: 80, h: 10},
+  {x: 1310, y: 170, w: 10, h: 40},
+  {x: 1310, y: 170, w: 350, h: 10},
+  {x: 1670, y: 170, w: 10, h: 90},
+  {x: 1600, y: 550, w: 140, h: 10},
+  {x: 1600, y: 350, w: 60, h: 10},
+  {x: 1640, y: 320, w: 10, h: 140},
+  {x: 1700, y: 410, w: 10, h: 130},
+  {x: 1670, y: 230, w: 80, h: 10},
+  {x: 1750, y: 230, w: 10, h: 220},
+  {x: 1760, y: 460, w: 40, h: 10},
+  {x: 1520, y: 80, w: 190, h: 10},
+  {x: 1480, y: 0, w: 10, h: 100},
+  {x: 1490, y: 130, w: 90, h: 10},
+  {x: 1700, y: 120, w: 100, h: 10},
+  {x: 1800, y: 120, w: 10, h: 150},
+  {x: 1770, y: 270, w: 130, h: 10},
+  {x: 1810, y: 280, w: 10, h: 60},
+  {x: 1780, y: 310, w: 10, h: 80},
+  {x: 1760, y: 160, w: 140, h: 10},
+  {x: 2040, y: 40, w: 10, h: 140},
+  {x: 1850, y: 80, w: 220, h: 10},
+  {x: 1970, y: 140, w: 10, h: 220},
+  {x: 2030, y: 250, w: 90, h: 10},
+  {x: 2050, y: 340, w: 60, h: 10},
+  {x: 1900, y: 340, w: 10, h: 270},
+  {x: 1960, y: 520, w: 340, h: 10},
+  {x: 2020, y: 390, w: 10, h: 260},
+  {x: 1900, y: 710, w: 280, h: 10},
+  {x: 2190, y: 630, w: 10, h: 130},
+  {x: 2110, y: 580, w: 10, h: 70},
+  {x: 2170, y: 570, w: 100, h: 10},
+  {x: 2270, y: 570, w: 10, h: 120},
+  {x: 2140, y: 440, w: 150, h: 10},
+  {x: 1620, y: 590, w: 10, h: 130},
+  {x: 1670, y: 640, w: 130, h: 10},
+  {x: 1800, y: 550, w: 10, h: 140},
+  {x: 1900, y: 580, w: 60, h: 10},
+  {x: 1800, y: 650, w: 50, h: 10},
+  {x: 1970, y: 530, w: 10, h: 70}
+            ],
+            purple: [
+                {x: 332, y: 471, w: 20, h: 20},
+                {x: 867, y: 1493, w: 20, h: 20}
+            ],
+            gray: [
+  {x: 10, y: 1230, w: 120, h: 20},
+  {x: 130, y: 1310, w: 20, h: 180},
+  {x: 10, y: 1490, w: 120, h: 20}
+            ],
+            hotpink: [
+                {x: 100, y: 200, w: 20, h: 20}
+            ],
+            yellow: [
+    {x: 1840, y: 1140, w: 10, h: 240},
+  {x: 2080, y: 1360, w: 10, h: 140},
+  {x: 2080, y: 1500, w: 200, h: 10},
+  {x: 2280, y: 1360, w: 10, h: 140},
+  {x: 2280, y: 1360, w: 120, h: 10},
+  {x: 1720, y: 1260, w: 10, h: 160},
+  {x: 1930, y: 1210, w: 10, h: 160},
+  {x: 1720, y: 1150, w: 120, h: 10},
+  {x: 1720, y: 990, w: 10, h: 160},
+  {x: 1660, y: 1070, w: 10, h: 180},
+  {x: 1710, y: 1200, w: 130, h: 10},
+  {x: 1850, y: 1080, w: 250, h: 10},
+  {x: 1970, y: 1000, w: 370, h: 10},
+  {x: 2340, y: 1000, w: 10, h: 170},
+  {x: 2340, y: 1170, w: 60, h: 10},
+  {x: 1930, y: 1210, w: 110, h: 10},
+  {x: 2010, y: 1160, w: 10, h: 50},
+  {x: 2090, y: 1160, w: 10, h: 120},
+  {x: 2020, y: 1280, w: 80, h: 10},
+  {x: 2020, y: 1280, w: 10, h: 170},
+  {x: 2020, y: 1440, w: 60, h: 10},
+  {x: 1930, y: 1360, w: 10, h: 140},
+  {x: 1930, y: 1500, w: 150, h: 10},
+  {x: 1650, y: 1370, w: 10, h: 110},
+  {x: 2160, y: 1280, w: 10, h: 100},
+  {x: 2160, y: 1280, w: 100, h: 10},
+  {x: 2180, y: 1160, w: 10, h: 50},
+  {x: 2150, y: 1220, w: 90, h: 10},
+  {x: 2270, y: 1160, w: 10, h: 30},
+  {x: 2300, y: 1210, w: 60, h: 10},
+  {x: 2310, y: 1210, w: 10, h: 70},
+  {x: 2260, y: 1280, w: 10, h: 70},
+  {x: 2200, y: 1220, w: 10, h: 50},
+  {x: 2080, y: 1430, w: 100, h: 10},
+  {x: 2180, y: 1090, w: 110, h: 10},
+  {x: 2290, y: 1090, w: 10, h: 40},
+  {x: 1660, y: 1460, w: 180, h: 10},
+  {x: 1780, y: 1200, w: 10, h: 260},
+  {x: 1820, y: 1000, w: 10, h: 20},
+  {x: 1790, y: 1030, w: 70, h: 10},
+  {x: 1600, y: 1260, w: 110, h: 10}
+],
+            tiled: [
+     {x: 1850, y: 2050, w: 10, h: 50},
+  {x: 1850, y: 2050, w: 70, h: 10},
+  {x: 1920, y: 2050, w: 10, h: 150},
+  {x: 1930, y: 2100, w: 250, h: 10},
+  {x: 2180, y: 2100, w: 10, h: 190},
+  {x: 1850, y: 2100, w: 10, h: 160},
+  {x: 1850, y: 2260, w: 280, h: 10},
+  {x: 2120, y: 2160, w: 10, h: 130},
+  {x: 1800, y: 2050, w: 50, h: 10},
+  {x: 1800, y: 2050, w: 10, h: 270},
+  {x: 1800, y: 2320, w: 230, h: 10},
+  {x: 2010, y: 2050, w: 240, h: 10},
+  {x: 1780, y: 1980, w: 250, h: 10},
+  {x: 2300, y: 1700, w: 10, h: 210},
+  {x: 2170, y: 1990, w: 10, h: 50},
+  {x: 2230, y: 1980, w: 10, h: 60},
+  {x: 2230, y: 1980, w: 170, h: 10},
+  {x: 2200, y: 1700, w: 100, h: 10},
+  {x: 2210, y: 1700, w: 10, h: 70},
+  {x: 2240, y: 1810, w: 10, h: 170},
+  {x: 2080, y: 1740, w: 130, h: 10},
+  {x: 2180, y: 1840, w: 50, h: 10},
+  {x: 2080, y: 1740, w: 10, h: 140},
+  {x: 2090, y: 1890, w: 80, h: 10},
+  {x: 2090, y: 1980, w: 80, h: 10},
+  {x: 2090, y: 1980, w: 10, h: 10},
+  {x: 2030, y: 1980, w: 10, h: 60},
+  {x: 1610, y: 1750, w: 10, h: 50},
+  {x: 1610, y: 1790, w: 330, h: 10},
+  {x: 1630, y: 1730, w: 360, h: 10},
+  {x: 2130, y: 1950, w: 10, h: 20},
+  {x: 1790, y: 1900, w: 220, h: 10},
+  {x: 1700, y: 1850, w: 260, h: 10},
+  {x: 1740, y: 1900, w: 60, h: 10},
+  {x: 1740, y: 1900, w: 10, h: 120},
+  {x: 1700, y: 1850, w: 10, h: 170},
+  {x: 1700, y: 2020, w: 40, h: 10},
+  {x: 1610, y: 1790, w: 10, h: 200},
+  {x: 1720, y: 2020, w: 10, h: 70},
+  {x: 2190, y: 2310, w: 40, h: 10},
+  {x: 2240, y: 2150, w: 10, h: 140},
+  {x: 2310, y: 2070, w: 10, h: 240},
+  {x: 1290, y: 1740, w: 250, h: 10},
+  {x: 1540, y: 1680, w: 10, h: 60},
+  {x: 1550, y: 1680, w: 80, h: 10},
+  {x: 1630, y: 1680, w: 10, h: 60},
+  {x: 1290, y: 1800, w: 240, h: 10},
+  {x: 1280, y: 1810, w: 10, h: 60},
+  {x: 1290, y: 1870, w: 230, h: 10},
+  {x: 1280, y: 1880, w: 10, h: 70},
+  {x: 1290, y: 1950, w: 220, h: 10},
+  {x: 1530, y: 1990, w: 80, h: 10},
+  {x: 1260, y: 2180, w: 540, h: 10},
+  {x: 1320, y: 1960, w: 10, h: 200},
+  {x: 1400, y: 2260, w: 10, h: 130},
+  {x: 1500, y: 2180, w: 10, h: 140},
+  {x: 1530, y: 1990, w: 10, h: 40},
+  {x: 1390, y: 2030, w: 140, h: 10},
+  {x: 1470, y: 2040, w: 10, h: 60},
+  {x: 1600, y: 2090, w: 10, h: 80},
+  {x: 2030, y: 2320, w: 10, h: 80},
+  {x: 1310, y: 2160, w: 40, h: 10},
+  {x: 1810, y: 1940, w: 10, h: 40},
+  {x: 1860, y: 1900, w: 10, h: 40},
+  {x: 1960, y: 1900, w: 10, h: 40},
+  {x: 2010, y: 1940, w: 10, h: 40},
+  {x: 1600, y: 2270, w: 10, h: 120,},
+  {x: 10, y: 1855, w: 190, h: 105},
+  {x: 5, y: 1960, w: 95, h: 435},
+  {x: 100, y: 2180, w: 120, h: 220},
+  {x: 220, y: 2220, w: 60, h: 180},
+  {x: 280, y: 2320, w: 40, h: 80},
+  {x: 320, y: 2240, w: 60, h: 160},
+  {x: 380, y: 2300, w: 120, h: 100},
+  {x: 1450, y: 2320, w: 100, h: 10},
+  {x: 2000, y: 1700, w: 80, h: 10},
+  {x: 2080, y: 1700, w: 10, h: 40},
+  {x: 540, y: 2360, w: 560, h: 40},
+  {x: 1100, y: 2320, w: 300, h: 80},
+  {x: 1600, y: 2340, w: 60, h: 60},
+  {x: 2340, y: 1980, w: 60, h: 60},
+  {x: 500, y: 1960, w: 60, h: 40},
+  {x: 880, y: 2220, w: 20, h: 20}, 
+  {x: 500, y: 2360, w: 40, h: 40}
+],
+            pathway: [
+{x: 70, y: 710, w: 30, h: 70},
+  {x: 70, y: 790, w: 220, h: 30},
+  {x: 290, y: 790, w: 30, h: 950},
+  {x: 290, y: 1730, w: 200, h: 30},
+  {x: 290, y: 710, w: 30, h: 130},
+  {x: 60, y: 1730, w: 220, h: 30},
+  {x: 70, y: 1730, w: 30, h: 70},
+  {x: 170, y: 1070, w: 120, h: 30},
+  {x: 140, y: 1270, w: 140, h: 30}
+]
+        };
+        
+        Object.entries(wallData).forEach(([color, walls]) => {
+    walls.forEach(wall => {
+        const wallEl = document.createElement('div');
+        
+        if (color === 'tiled') {
+wallEl.className = 'tiled-wall';
+} else if (color === 'pathway') {
+wallEl.className = 'pathway';
+} else {
+wallEl.className = 'maze-wall';
+wallEl.style.background = color;
+}
+        
+        wallEl.style.left = wall.x + 'px';
+        wallEl.style.top = wall.y + 'px';
+        wallEl.style.width = wall.w + 'px';
+        wallEl.style.height = wall.h + 'px';
+        this.gameWorld.appendChild(wallEl);
+    });
+});
+        
+        // Add some breakable walls
+        this.createBreakableWalls();
+    }
+    
+    createBreakableWalls() {
+        const breakableWalls = [
+            {x: 900, y: 360, w: 20, h: 200},
+  {x: 1020, y: 680, w: 20, h: 300},
+  {x: 740, y: 900, w: 210, h: 20},
+            {x: 1720, y: 1300, w: 220, h: 20},
+  {x: 380, y: 2250, w: 200, h: 10},
+  {x: 280, y: 2260, w: 40, h: 10},
+  {x: 950, y: 1300, w: 10, h: 350},
+  {x: 1190, y: 1300, w: 10, h: 210},
+  {x: 400, y: 1010, w: 10, h: 80},
+  {x: 410, y: 800, w: 170, h: 10},
+  {x: 280, y: 180, w: 70, h: 10},
+  {x: 950, y: 110, w: 10, h: 50},
+  {x: 950, y: 1720, w: 10, h: 240},
+  {x: 880, y: 1860, w: 70, h: 10},
+  {x: 830, y: 1570, w: 120, h: 10},
+  {x: 60, y: 1500, w: 10, h: 50},
+  {x: 2340, y: 920, w: 50, h: 10},
+  {x: 20, y: 1550, w: 40, h: 10},
+            {x: 60, y: 180, w: 100, h: 10},
+  {x: 60, y: 240, w: 100, h: 10},
+  {x: 850, y: 250, w: 310, h: 10}
+        ];
+        
+        breakableWalls.forEach(wall => {
+            const wallEl = document.createElement('div');
+            wallEl.className = 'breakable-wall';
+            wallEl.style.left = wall.x + 'px';
+            wallEl.style.top = wall.y + 'px';
+            wallEl.style.width = wall.w + 'px';
+            wallEl.style.height = wall.h + 'px';
+            wallEl.dataset.breakable = 'true';
+            this.gameWorld.appendChild(wallEl);
+        });
+    }
+    
+    addTreeWalls() {
+        const treePositions = [
+            {x: 1060, y: 1140}, {x: 1080, y: 1140}, {x: 1100, y: 1140},
+            {x: 880, y: 1120}, {x: 900, y: 1120}, {x: 920, y: 1120},
+            {x: 660, y: 740}, {x: 680, y: 740}, {x: 700, y: 740},
+            {x: 1300, y: 1200}, {x: 1320, y: 1200}, {x: 1340, y: 1200},
+            {x: 1440, y: 880}, {x: 1460, y: 880}, {x: 1480, y: 880},
+            {x: 700, y: 1040}, {x: 720, y: 1040}, {x: 740, y: 1040},
+            {x: 860, y: 660}, {x: 880, y: 660}, {x: 900, y: 660},
+            {x: 1200, y: 700}, {x: 1220, y: 700}, {x: 1240, y: 700},
+            {x: 1060, y: 440}, {x: 1080, y: 440}, {x: 1100, y: 440},
+            {x: 960, y: 480}, {x: 980, y: 480}, {x: 1000, y: 480},
+            {x: 800, y: 1080}, {x: 820, y: 1080}, {x: 840, y: 1080},
+            {x: 320, y: 830}, {x: 320, y: 1000}, {x: 260, y: 910},
+  {x: 320, y: 1160}, {x: 260, y: 1240}, {x: 320, y: 1370},
+  {x: 260, y: 1470}, {x: 320, y: 1620}
+        ];
+        
+        const treeEmojis = ['🌲', '🌳', '🎄'];
+        
+        treePositions.forEach((pos, index) => {
+            const treeEl = document.createElement('div');
+            treeEl.className = 'tree-wall';
+            treeEl.textContent = treeEmojis[index % treeEmojis.length];
+            treeEl.style.left = pos.x + 'px';
+            treeEl.style.top = pos.y + 'px';
+            treeEl.style.width = '20px';
+            treeEl.style.height = '20px';
+            this.gameWorld.appendChild(treeEl);
+        });
+        // Add village furniture
+const furniturePositions = [
+{x: 30, y: 910, emoji: '🚽'},
+{x: 2380, y: 850, emoji: '🚽'},
+{x: 30, y: 1070, emoji: '🛌'},
+{x: 30, y: 1250, emoji: '🛌'},
+{x: 2340, y: 900, emoji: '🛌'},
+{x: 2380, y: 780, emoji: '🛌'},
+{x: 60, y: 1230, emoji: '🪟'},
+{x: 90, y: 1460, emoji: '🖥️'},
+{x: 2280, y: 780, emoji: '🖥️'},
+{x: 30, y: 1460, emoji: '🪑'},
+{x: 1840, y: 1020, emoji: '🌵'},
+{x: 2360, y: 1340, emoji: '🌵'},
+{x: 1740, y: 1120, emoji: '🌵'},
+{x: 1860, y: 1340, emoji: '🌵'},
+{x: 2350, y: 850, emoji: '🪑'},
+{x: 90, y: 1430, emoji: '🛋️'}
+];
+
+furniturePositions.forEach(pos => {
+const furnitureEl = document.createElement('div');
+furnitureEl.className = 'tree-wall'; // Reuse tree-wall class for collision
+furnitureEl.textContent = pos.emoji;
+furnitureEl.style.left = pos.x + 'px';
+furnitureEl.style.top = pos.y + 'px';
+furnitureEl.style.width = '20px';
+furnitureEl.style.height = '20px';
+this.gameWorld.appendChild(furnitureEl);
+});
+    }
+    
+    createEnemies() {
+    // Main area enemies (snakes and bad guys)
+    const mainEnemies = [
+        {x: 150, y: 200, moveX: 130, moveY: 200, range: 100, axis: 'x', speed: 0.6, emoji: '🐍'},
+        {x: 400, y: 150, moveX: 400, moveY: 130, range: 80, axis: 'y', speed: 0.5, emoji: '🦹🏻‍♂️'},
+        {x: 300, y: 1400, moveX: 300, moveY: 1380, range: 80, axis: 'y', speed: 0.6, emoji: '🐍'},
+        {x: 200, y: 1600, moveX: 200, moveY: 1580, range: 100, axis: 'y', speed: 0.7, emoji: '🦹🏻‍♂️'},
+        {x: 500, y: 800, moveX: 480, moveY: 800, range: 120, axis: 'x', speed: 0.8, emoji: '🐍'},
+        {x: 2300, y: 600, moveX: 2280, moveY: 600, range: 100, axis: 'x', speed: 0.7, emoji: '🦹🏻‍♂️'}
+    ];
+    
+    // Desert scorpions
+    const desertEnemies = [
+        {x: 1700, y: 1100, moveX: 1680, moveY: 1100, range: 120, axis: 'x', speed: 0.6, emoji: '🦂'},
+        {x: 1800, y: 1200, moveX: 1800, moveY: 1180, range: 100, axis: 'y', speed: 0.5, emoji: '🦂'},
+        {x: 2000, y: 1300, moveX: 1980, moveY: 1300, range: 140, axis: 'x', speed: 0.7, emoji: '🦂'},
+        {x: 2200, y: 1150, moveX: 2200, moveY: 1130, range: 80, axis: 'y', speed: 0.6, emoji: '🦂'}
+    ];
+    
+    // Water puffer fish
+    const waterEnemies = [
+        {x: 200, y: 250, moveX: 180, moveY: 250, range: 100, axis: 'x', speed: 0.4, emoji: '🐡'},
+        {x: 800, y: 80, moveX: 780, moveY: 80, range: 120, axis: 'x', speed: 0.5, emoji: '🐡'},
+        {x: 1300, y: 200, moveX: 1280, moveY: 200, range: 100, axis: 'x', speed: 0.4, emoji: '🐡'},
+        {x: 1700, y: 500, moveX: 1700, moveY: 480, range: 80, axis: 'y', speed: 0.5, emoji: '🐡'}
+    ];
+    
+    // Lava zone enemies
+    const lavaEnemies = [
+        {x: 1400, y: 1800, moveX: 1380, moveY: 1800, range: 100, axis: 'x', speed: 0.6, emoji: '🧌'},
+        {x: 1500, y: 1900, moveX: 1500, moveY: 1880, range: 80, axis: 'y', speed: 0.5, emoji: '👾'},
+        {x: 1800, y: 1850, moveX: 1780, moveY: 1850, range: 120, axis: 'x', speed: 0.7, emoji: '🧌'},
+        {x: 2000, y: 2000, moveX: 2000, moveY: 1980, range: 100, axis: 'y', speed: 0.6, emoji: '👾'}
+    ];
+    
+    // Combine all enemies
+    const allEnemies = [...mainEnemies, ...desertEnemies, ...waterEnemies, ...lavaEnemies];
+    
+    allEnemies.forEach((enemy, index) => {
+        const enemyEl = document.createElement('div');
+        enemyEl.className = 'enemy';
+        enemyEl.textContent = enemy.emoji;
+        enemyEl.style.left = enemy.x + 'px';
+        enemyEl.style.top = enemy.y + 'px';
+        this.gameWorld.appendChild(enemyEl);
+        
+        this.movingEnemies.push({
+            element: enemyEl,
+            startX: enemy.moveX,
+            startY: enemy.moveY,
+            currentX: enemy.x,
+            currentY: enemy.y,
+            range: enemy.range,
+            axis: enemy.axis,
+            direction: 1,
+            speed: enemy.speed
+        });
+    });
+
+
+const sharkEnemies = [
+    {x: 180, y: 280, moveX: 160, moveY: 280, range: 140, axis: 'x', speed: 0.6},
+    {x: 600, y: 120, moveX: 580, moveY: 120, range: 200, axis: 'x', speed: 0.7},
+    {x: 1500, y: 250, moveX: 1480, moveY: 250, range: 160, axis: 'x', speed: 0.5},
+    {x: 1800, y: 450, moveX: 1800, moveY: 430, range: 120, axis: 'y', speed: 0.6}
+];
+
+sharkEnemies.forEach((shark, index) => {
+    const sharkEl = document.createElement('div');
+    sharkEl.className = 'enemy water-shark';
+    sharkEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/shark-min.png")';
+    sharkEl.style.backgroundSize = 'contain';
+    sharkEl.style.backgroundRepeat = 'no-repeat';
+    sharkEl.style.backgroundPosition = 'center';
+    sharkEl.style.width = '28px';
+    sharkEl.style.height = '28px';
+    sharkEl.textContent = ''; // No emoji, using image
+    sharkEl.style.left = shark.x + 'px';
+    sharkEl.style.top = shark.y + 'px';
+    this.gameWorld.appendChild(sharkEl);
+    
+    this.movingEnemies.push({
+        element: sharkEl,
+        startX: shark.moveX,
+        startY: shark.moveY,
+        currentX: shark.x,
+        currentY: shark.y,
+        range: shark.range,
+        axis: shark.axis,
+        direction: 1,
+        speed: shark.speed
+    });
+});
+
+
+        
+    
+    // Add forest bees
+    this.createForestBees();
+}
+    createForestBees() {
+    // Create 5 bees in the forest zone with 120px margin from edges
+    const forestLeft = 600 + 120;
+    const forestRight = 1600 - 120;
+    const forestTop = 360 + 120;
+    const forestBottom = 1300 - 120;
+    
+    for (let i = 0; i < 5; i++) {
+        const startX = forestLeft + Math.random() * (forestRight - forestLeft);
+        const startY = forestTop + Math.random() * (forestBottom - forestTop);
+        
+        const beeEl = document.createElement('div');
+        beeEl.className = 'enemy forest-bee';
+        beeEl.textContent = '🐝';
+        beeEl.style.left = startX + 'px';
+        beeEl.style.top = startY + 'px';
+        beeEl.style.zIndex = '80'; // Higher z-index so they fly over walls
+        this.gameWorld.appendChild(beeEl);
+        
+        this.movingEnemies.push({
+            element: beeEl,
+            type: 'bee',
+            currentX: startX,
+            currentY: startY,
+            targetX: startX,
+            targetY: startY,
+            speed: 1.2,
+            changeDirectionTimer: 0,
+            forestBounds: {
+                left: forestLeft,
+                right: forestRight,
+                top: forestTop,
+                bottom: forestBottom
+            }
+        });
+    }
+        // Add gorilla near the heart in the northeast forest area
+    const gorillaX = 1150;
+    const gorillaY = 530;
+    
+    const gorillaEl = document.createElement('div');
+    gorillaEl.className = 'enemy forest-gorilla';
+    gorillaEl.textContent = '🦍';
+    gorillaEl.style.left = gorillaX + 'px';
+    gorillaEl.style.top = gorillaY + 'px';
+    gorillaEl.style.fontSize = '27px'; // 50% larger
+    gorillaEl.style.width = '33px';
+    gorillaEl.style.height = '33px';
+    this.gameWorld.appendChild(gorillaEl);
+    
+    this.gorilla = {
+        element: gorillaEl,
+        type: 'gorilla',
+        currentX: gorillaX,
+        currentY: gorillaY,
+        startX: gorillaX,
+        startY: gorillaY,  // Add this line for return behavior
+        patrolRange: 80,
+        direction: 1,
+        speed: 0.8,
+        isChasing: false,
+        chaseSpeed: 1.5,
+        returning: false   // Add this line for return behavior
+    };
+}
+    createFriendlies() {
+    const friendlies = [
+        {x: 2280, y: 850, message: "🔑 Need a key? Give me 500¥!", customEmoji: "👴🏻"},
+        {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!", customEmoji: "👩‍⚕️"},
+        {x: 60, y: 60, message: "🔦 Flashlight for sale! Light up dark caves for 600¥!", customEmoji: "🧙‍♀️"},
+        {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 900000000¥!", customEmoji: "👷‍♂️"},
+        {x: 380, y: 1760, message: this.motherPaid ? "You saved my baby! I am forever grateful!" : "Thank god you are here, master frog! The bully took my baby and went into the dark forest! If you can rescue him, I will pay you 200¥. It's all I have! PLEASE!", type: "mother", customEmoji: "👩🏻"},
+        {x: 90, y: 1535, message: "After the Bully raided our town, we do not have much money left. I put it in a safe. No one is going near it!", type: "guard", customEmoji: "💂🏻‍♂️"},
+        {x: 100, y: 1020, message: "The forest is a dangerous place,.. You should walk slowly to avoid death...", type: "traveler", customEmoji: "🧓🏻"},
+        {x: 500, y: 500, message: "No,... I am NOT Mario. Leave me alone!", type: "villager", customEmoji: "👨🏻"},
+        {x: 2250, y: 960, message: "The castle to the far north is always making loud noises and flashing lights. What is happening in there?!", type: "historian", customEmoji: "👵🏻"},
+        {x: 80, y: 670, message: "The rumor is that the bully has found a way to live forever. If that is true, we may all be doomed.", type: "elder", customEmoji: "🤴🏻"},
+        {x: 2270, y: 800, message: this.hasPyramidKey ? "I'll never forget your kindness!" : "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""},
+        {x: 900, y: 2340, message: "There is a secret third entrance to the forest..", type: "cowboy", customEmoji: "🤠"},
+        {x: 2360, y: 2360, message: "Hello fellow frog. I will share a secret with you. Relax under the pink square and wait. You will be rewarded!", type: "frog", customEmoji: "🐸"},
+        {x: 60, y: 1660, message: "I heard there is a gorilla running around town. Watch out!", type: "woman", customEmoji: "👩🏼‍💼"},
+        {x: 860, y: 1600, message: "If you had a hammer, you could break right through these grey walls", type: "cat", customEmoji: "😺"}
+    ];
+    
+    friendlies.forEach((friendly, index) => {
+        const friendlyEl = document.createElement('div');
+        friendlyEl.className = 'friendly';
+        
+        // Special handling for key dealer (index 0) - keep the PNG
+        if (index === 0) {
+            friendlyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png")';
+            friendlyEl.style.backgroundSize = 'contain';
+            friendlyEl.style.backgroundRepeat = 'no-repeat';
+            friendlyEl.style.backgroundPosition = 'center';
+            friendlyEl.style.width = '33px';
+            friendlyEl.style.height = '66px';
+            friendlyEl.textContent = '';
+        } else if (index === 10) {  // NEW: Special handling for pencil NPC
+    friendlyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/hinapink-min.png")';
+    friendlyEl.style.backgroundSize = 'contain';
+    friendlyEl.style.backgroundRepeat = 'no-repeat';
+    friendlyEl.style.backgroundPosition = 'center';
+    friendlyEl.style.width = '50px';
+    friendlyEl.style.height = '50px';
+    friendlyEl.textContent = '';
+} else {
+            friendlyEl.textContent = friendly.customEmoji;
+        }
+        
+        friendlyEl.style.left = friendly.x + 'px';
+        friendlyEl.style.top = friendly.y + 'px';
+        friendlyEl.dataset.message = friendly.message;
+        this.gameWorld.appendChild(friendlyEl);
+    });
+}
+    createCollectibles() {
+        // Money pickups with unique IDs
+const moneyPositions = [
+    {x: 150, y: 1730, id: 'money_1'}, {x: 170, y: 1730, id: 'money_2'}, {x: 190, y: 1730, id: 'money_3'},
+    {x: 150, y: 1750, id: 'money_4'}, {x: 170, y: 1750, id: 'money_5'}, {x: 190, y: 1750, id: 'money_6'},
+    {x: 150, y: 1770, id: 'money_7'}, {x: 170, y: 1770, id: 'money_8'}, {x: 190, y: 1770, id: 'money_9'},
+    {x: 2340, y: 820, id: 'money_10'}, {x: 2360, y: 820, id: 'money_11'}, {x: 1150, y: 540, id: 'money_12'},
+    {x: 650, y: 1120, id: 'money_13'}, {x: 1410, y: 890, id: 'money_14'}, {x: 530, y: 2220, id: 'money_15'},
+    {x: 1390, y: 80, id: 'money_16'}, {x: 2380, y: 30, id: 'money_17'}, {x: 1810, y: 1230, id: 'money_18'},
+    {x: 1830, y: 2070, id: 'money_19'}, {x: 1940, y: 2350, id: 'money_20'}, {x: 1490, y: 350, id: 'money_21'}, 
+    {x: 1640, y: 1770, id: 'money_22'}, {x: 30, y: 1520, id: 'money_23'}, {x: 2350, y: 1240, id: 'money_24'}
+];
+
+moneyPositions.forEach(pos => {
+    // Only create if not already collected
+    if (!this.collectedMoney.includes(pos.id)) {
+        const moneyEl = document.createElement('div');
+        moneyEl.className = 'money-pickup';
+        moneyEl.textContent = '💰';
+        moneyEl.style.left = pos.x + 'px';
+        moneyEl.style.top = pos.y + 'px';
+        moneyEl.dataset.id = pos.id; // Store the ID
+        this.gameWorld.appendChild(moneyEl);
+    }
+});
+        
+        // Heart pickups with unique IDs
+const heartPositions = [
+    {x: 2370, y: 1140, id: 'heart_1'},
+    {x: 650, y: 650, id: 'heart_2'}, {x: 1040, y: 540, id: 'heart_3'}, {x: 870, y: 1540, id: 'heart_4'},
+    {x: 2360, y: 20, id: 'heart_5'}, {x: 1940, y: 550, id: 'heart_6'}, {x: 1900, y: 2360, id: 'heart_7'},
+    {x: 1980, y: 2350, id: 'heart_8'}, {x: 20, y: 1130, id: 'heart_9'}, {x: 20, y: 1160, id: 'heart_10'},
+    {x: 20, y: 1200, id: 'heart_11'}, {x: 20, y: 1180, id: 'heart_12'}, {x: 20, y: 1140, id: 'heart_13'}
+];
+
+heartPositions.forEach(pos => {
+    // Only create if not already collected
+    if (!this.collectedHearts.includes(pos.id)) {
+        const heartEl = document.createElement('div');
+        heartEl.className = 'heart-pickup';
+        heartEl.textContent = '❤️';
+        heartEl.style.left = pos.x + 'px';
+        heartEl.style.top = pos.y + 'px';
+        heartEl.dataset.id = pos.id; // Store the ID
+        this.gameWorld.appendChild(heartEl);
+    }
+});
+
+// Baby collectible - Show if bully NOT defeated (to show what you're fighting for)
+// OR if bully defeated but baby not yet delivered to mother
+if (!this.bullyDefeated || (this.bullyDefeated && !this.motherPaid)) {
+    const babyEl = document.createElement('div');
+    babyEl.className = 'heart-pickup';
+    babyEl.textContent = '👶🏻';
+    babyEl.style.left = '680px';
+    babyEl.style.top = '440px';
+    babyEl.dataset.type = 'baby';
+    this.gameWorld.appendChild(babyEl);
+}}
+    createExit() {
+        // Place exit in the top-left corner area
+        const exitEl = document.createElement('div');
+        exitEl.className = 'exit';
+        exitEl.textContent = '🚪';
+        exitEl.style.left = '2250px';
+        exitEl.style.top = '260px';
+        this.gameWorld.appendChild(exitEl);
+    }
+    createCaveEntrances() {
+    // Cave A entrance
+    const caveAEl = document.createElement('div');
+    caveAEl.className = 'cave-entrance';
+    caveAEl.style.position = 'absolute';
+    caveAEl.style.left = '100px';
+    caveAEl.style.top = '1940px';
+    caveAEl.style.width = '22px';
+    caveAEl.style.height = '22px';
+    caveAEl.style.background = '#000';
+    caveAEl.style.border = '2px solid #333';
+    caveAEl.style.borderRadius = '4px';
+    caveAEl.style.zIndex = '80';
+    caveAEl.dataset.cave = 'A';
+    this.gameWorld.appendChild(caveAEl);
+    
+    // Cave B entrance - blocked by breakable wall initially
+    const caveBWallEl = document.createElement('div');
+    caveBWallEl.className = 'breakable-wall';
+    caveBWallEl.style.left = '300px';
+    caveBWallEl.style.top = '2318px';
+    caveBWallEl.style.width = '22px';
+    caveBWallEl.style.height = '22px';
+    caveBWallEl.dataset.breakable = 'true';
+    this.gameWorld.appendChild(caveBWallEl);
+    
+    // Cave B entrance (hidden behind wall initially)
+    const caveBEl = document.createElement('div');
+    caveBEl.className = 'cave-entrance';
+    caveBEl.style.position = 'absolute';
+    caveBEl.style.left = '300px';
+    caveBEl.style.top = '2318px';
+    caveBEl.style.width = '22px';
+    caveBEl.style.height = '22px';
+    caveBEl.style.background = '#000';
+    caveBEl.style.border = '2px solid #333';
+    caveBEl.style.borderRadius = '4px';
+    caveBEl.style.zIndex = '70'; // Lower than wall
+    caveBEl.dataset.cave = 'B';
+    this.gameWorld.appendChild(caveBEl);
+}
+    startGameLoop() {
+        const gameLoop = () => {
+            if (this.gameStarted) {
+                this.updatePlayer();
+                this.updateMovingEnemies();
+                this.updateForegroundEnemy();
+                this.checkCollisions();
+            }
+            requestAnimationFrame(gameLoop);
+        };
+        gameLoop();
+    }
+    
+    updatePlayer() {
+        if (this.isPaused) return;  // ADD THIS LINE
+        if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+            const newX = this.playerX + this.playerVelocityX;
+            const newY = this.playerY + this.playerVelocityY;
+            
+            if (this.canMoveTo(newX, newY)) {
+                this.playerX = newX;
+                this.playerY = newY;
+                // Center the larger visual character over the smaller hitbox
+const visualOffset = (32 - 24) / 2; // 6.5px offset to center
+this.player.style.left = (this.playerX - visualOffset) + 'px';
+this.player.style.top = (this.playerY - visualOffset) + 'px';
+                
+                // Center player in gameArea
+                const gameAreaWidth = this.gameArea.offsetWidth;
+                const gameAreaHeight = this.gameArea.offsetHeight;
+                const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+                const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+                this.gameArea.scrollTo({
+                    left: scrollX,
+                    top: scrollY,
+                    behavior: 'auto'
+                });
+                // Add this after the scrollTo code:
+if (this.isInForest) {
+  const mask = document.getElementById('forestVisionMask');
+  const gameAreaRect = this.gameArea.getBoundingClientRect();
+  const playerScreenX = gameAreaRect.left + (this.gameArea.offsetWidth / 2);
+  const playerScreenY = gameAreaRect.top + (this.gameArea.offsetHeight / 2);
+  mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
+}
+            }
+            
+            // Apply different friction based on terrain
+            const friction = this.isOnDesert ? 0.7 : 0.9;  // More friction = slower on desert
+            this.playerVelocityX *= friction;
+            this.playerVelocityY *= friction;
+        }
+    }
+    
+    canMoveTo(x, y) {
+        const playerSize = 24;
+        const padding = 2;
+        
+        const points = [
+            {x: x + padding, y: y + padding},
+            {x: x + playerSize - padding, y: y + padding},
+            {x: x + padding, y: y + playerSize - padding},
+            {x: x + playerSize - padding, y: y + playerSize - padding},
+            {x: x + playerSize/2, y: y + padding},
+            {x: x + playerSize/2, y: y + playerSize - padding},
+            {x: x + padding, y: y + playerSize/2},
+            {x: x + playerSize - padding, y: y + playerSize/2}
+        ];
+        
+        const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .tiled-wall');
+        
+        for (let wall of walls) {
+            const wallRect = {
+                left: parseInt(wall.style.left),
+                top: parseInt(wall.style.top),
+                right: parseInt(wall.style.left) + (parseInt(wall.style.width) || 20),
+                bottom: parseInt(wall.style.top) + (parseInt(wall.style.height) || 20)
+            };
+            
+            for (let point of points) {
+                if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                    point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                    
+                    // Check if it's a breakable wall and player has hammer
+                    if (wall.dataset.breakable === 'true' && this.hasHammer) {
+                        this.breakWall(wall);
+                        return true; // Allow movement through broken wall
+                    }
+                    return false;
+                }
+            }
+        }
+        
+        // Check water zones - need boat to enter
+        const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+        let isEnteringWater = false;
+        
+        for (let zone of waterZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (x + playerSize/2 >= zoneRect.left && x + playerSize/2 <= zoneRect.right &&
+                y + playerSize/2 >= zoneRect.top && y + playerSize/2 <= zoneRect.bottom) {
+                isEnteringWater = true;
+                break;
+            }
+        }
+        
+        if (isEnteringWater && !this.hasBoat) {
+            this.showMessage('🌊 You need a boat to cross water!');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    breakWall(wall) {
+        this.showMessage('🔨 *SMASH* Wall broken!');
+        wall.remove();
+    }
+    
+    updateMovingEnemies() {
+        if (this.isPaused) return;  // ADD THIS LINE
+    this.movingEnemies.forEach(enemy => {
+        if (enemy.type === 'bee') {
+            // Update bee movement
+            enemy.changeDirectionTimer--;
+            
+            if (enemy.changeDirectionTimer <= 0) {
+                // Pick new random target within forest bounds
+                enemy.targetX = enemy.forestBounds.left + Math.random() * (enemy.forestBounds.right - enemy.forestBounds.left);
+                enemy.targetY = enemy.forestBounds.top + Math.random() * (enemy.forestBounds.bottom - enemy.forestBounds.top);
+                enemy.changeDirectionTimer = 60 + Math.random() * 120; // 1-3 seconds at 60fps
+            }
+            
+            // Move towards target
+            const deltaX = enemy.targetX - enemy.currentX;
+            const deltaY = enemy.targetY - enemy.currentY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            if (distance > 5) {
+                enemy.currentX += (deltaX / distance) * enemy.speed;
+                enemy.currentY += (deltaY / distance) * enemy.speed;
+            }
+            
+            enemy.element.style.left = enemy.currentX + 'px';
+            enemy.element.style.top = enemy.currentY + 'px';
+        } else {
+            // Original enemy movement for non-bee enemies
+            if (enemy.axis === 'x') {
+                enemy.currentX += enemy.direction * enemy.speed;
+                if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.left = enemy.currentX + 'px';
+            } else {
+                enemy.currentY += enemy.direction * enemy.speed;
+                if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.top = enemy.currentY + 'px';
+            }
+        }
+    });
+    
+    // Update gorilla
+    this.updateGorilla();
+}
+
+    updateGorilla() {
+    if (!this.gorilla) return;
+    
+    const playerDistance = Math.sqrt(
+        Math.pow(this.playerX - this.gorilla.currentX, 2) + 
+        Math.pow(this.playerY - this.gorilla.currentY, 2)
+    );
+    
+    // Check if player is in forest and close enough to start chasing
+    if (this.isInForest && playerDistance <= 60 && !this.gorilla.isChasing) {
+        this.gorilla.isChasing = true;
+        this.showMessage('🦍 ROAR! Gorilla is angry!');
+    }
+    
+    // Stop chasing if player escapes forest or gets far enough away
+if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
+    this.gorilla.isChasing = false;
+    this.gorilla.returning = true;  // Add this line
+    this.showMessage('🦍 Gorilla calmed down...');
+}
+    
+    if (this.gorilla.isChasing) {
+    // Chase the player
+    const deltaX = this.playerX - this.gorilla.currentX;
+    const deltaY = this.playerY - this.gorilla.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        const moveX = (deltaX / distance) * this.gorilla.chaseSpeed;
+        const moveY = (deltaY / distance) * this.gorilla.chaseSpeed;
+        
+        // Check if gorilla can move to new position (don't pass through walls)
+        if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+            this.gorilla.currentX += moveX;
+            this.gorilla.currentY += moveY;
+        }
+    }
+} else if (this.gorilla.returning) {
+    // Return to starting position
+    const deltaX = this.gorilla.startX - this.gorilla.currentX;
+    const deltaY = this.gorilla.startY - this.gorilla.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        const moveX = (deltaX / distance) * this.gorilla.speed * 1.5; // Move faster when returning
+        const moveY = (deltaY / distance) * this.gorilla.speed * 1.5;
+        
+        if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+            this.gorilla.currentX += moveX;
+            this.gorilla.currentY += moveY;
+        }
+    } else {
+        // Reached starting position, resume patrol
+        this.gorilla.returning = false;
+        this.gorilla.currentX = this.gorilla.startX;
+        this.gorilla.currentY = this.gorilla.startY;
+        this.gorilla.direction = 1; // Reset to move right first
+    }
+} else {
+    // Patrol behavior
+    this.gorilla.currentX += this.gorilla.direction * this.gorilla.speed;
+    
+    if (this.gorilla.currentX <= this.gorilla.startX || 
+        this.gorilla.currentX >= this.gorilla.startX + this.gorilla.patrolRange) {
+        this.gorilla.direction *= -1;
+    }
+}
+    
+    this.gorilla.element.style.left = this.gorilla.currentX + 'px';
+    this.gorilla.element.style.top = this.gorilla.currentY + 'px';
+}
+
+canGorillaMoveTo(x, y) {
+    const gorillaSize = 33;
+    const padding = 2;
+    
+    const points = [
+        {x: x + padding, y: y + padding},
+        {x: x + gorillaSize - padding, y: y + padding},
+        {x: x + padding, y: y + gorillaSize - padding},
+        {x: x + gorillaSize - padding, y: y + gorillaSize - padding}
+    ];
+    
+   const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .tiled-wall');
+    
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + (parseInt(wall.style.width) || 20),
+            bottom: parseInt(wall.style.top) + (parseInt(wall.style.height) || 20)
+        };
+        
+        for (let point of points) {
+            if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+    
+    updateForegroundEnemy() {
+        if (this.isPaused) return;  // ADD THIS LINE
+    if (!this.gameStarted) return;
+    const now = Date.now();
+    
+    if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000 && !this.isInForest) {
+        // Spawn in desert zone top-left corner
+        const desertLeft = 1600;
+        const desertTop = 1000;
+        const startX = desertLeft + 50; // 50px from left edge
+        const startY = desertTop + 50;  // 50px from top edge
+        
+        const enemyEl = document.createElement('div');
+        enemyEl.className = 'foreground-enemy';
+        enemyEl.textContent = '🌪️';
+        enemyEl.style.left = startX + 'px';
+        enemyEl.style.top = startY + 'px';
+        this.gameWorld.appendChild(enemyEl);
+        
+        this.foregroundEnemy = {
+            element: enemyEl,
+            x: startX,
+            y: startY,
+            speed: 1.8,
+            state: 'moving', // 'moving' or 'riding'
+            direction: Math.random() < 0.5 ? 'left' : 'right', // Initial random direction
+            rideDistance: 0,
+            targetRideDistance: 0,
+            rideDirection: null // 'up' or 'down'
+        };
+        this.lastForegroundSpawn = now;
+    }
+    
+    if (this.foregroundEnemy) {
+        if (this.foregroundEnemy.state === 'moving') {
+            // Move in current direction
+            if (this.foregroundEnemy.direction === 'left') {
+                this.foregroundEnemy.x -= this.foregroundEnemy.speed;
+                // Hit left wall (x = 20)
+                if (this.foregroundEnemy.x <= 20) {
+                    this.foregroundEnemy.state = 'riding';
+                    this.foregroundEnemy.rideDirection = Math.random() < 0.5 ? 'up' : 'down';
+                    // Random ride distances: 300, 800, or 1500
+                    const distances = [300, 800, 1500];
+                    this.foregroundEnemy.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                    this.foregroundEnemy.rideDistance = 0;
+                    this.foregroundEnemy.x = 20;
+                }
+            } else if (this.foregroundEnemy.direction === 'right') {
+                this.foregroundEnemy.x += this.foregroundEnemy.speed;
+                // Hit right wall (x = 2360)
+                if (this.foregroundEnemy.x >= 2360) {
+                    this.foregroundEnemy.state = 'riding';
+                    this.foregroundEnemy.rideDirection = Math.random() < 0.5 ? 'up' : 'down';
+                    // Random ride distances: 300, 800, or 1500
+                    const distances = [300, 800, 1500];
+                    this.foregroundEnemy.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                    this.foregroundEnemy.rideDistance = 0;
+                    this.foregroundEnemy.x = 2360;
+                }
+            }
+        } else if (this.foregroundEnemy.state === 'riding') {
+            // Ride along wall with bouncing
+            if (this.foregroundEnemy.rideDirection === 'up') {
+                this.foregroundEnemy.y -= this.foregroundEnemy.speed;
+                this.foregroundEnemy.rideDistance += this.foregroundEnemy.speed;
+                
+                // Hit top wall - bounce down
+                if (this.foregroundEnemy.y <= 20) {
+                    this.foregroundEnemy.y = 20;
+                    this.foregroundEnemy.rideDirection = 'down'; // Bounce to down
+                }
+                
+                // Completed ride distance
+                if (this.foregroundEnemy.rideDistance >= this.foregroundEnemy.targetRideDistance) {
+                    this.foregroundEnemy.state = 'moving';
+                    this.foregroundEnemy.direction = this.foregroundEnemy.x <= 20 ? 'right' : 'left';
+                }
+            } else if (this.foregroundEnemy.rideDirection === 'down') {
+                this.foregroundEnemy.y += this.foregroundEnemy.speed;
+                this.foregroundEnemy.rideDistance += this.foregroundEnemy.speed;
+                
+                // Hit bottom wall - bounce up
+                if (this.foregroundEnemy.y >= 2360) {
+                    this.foregroundEnemy.y = 2360;
+                    this.foregroundEnemy.rideDirection = 'up'; // Bounce to up
+                }
+                
+                // Completed ride distance
+                if (this.foregroundEnemy.rideDistance >= this.foregroundEnemy.targetRideDistance) {
+                    this.foregroundEnemy.state = 'moving';
+                    this.foregroundEnemy.direction = this.foregroundEnemy.x <= 20 ? 'right' : 'left';
+                }
+            }
+        }
+        
+        this.foregroundEnemy.element.style.left = this.foregroundEnemy.x + 'px';
+        this.foregroundEnemy.element.style.top = this.foregroundEnemy.y + 'px';
+        
+        // Remove if it goes too far out of bounds
+        if (this.foregroundEnemy.x < -50 || this.foregroundEnemy.x > 2450 || 
+            this.foregroundEnemy.y < -50 || this.foregroundEnemy.y > 2450) {
+            this.foregroundEnemy.element.remove();
+            this.foregroundEnemy = null;
+        }
+    }
+}
+    
+    checkCollisions() {
+        if (this.isPaused) return;  // ADD THIS LINE
+        if (this.isInvulnerable) return;
+        
+        const playerRect = {
+            left: this.playerX,
+            top: this.playerY,
+            right: this.playerX + 24,
+            bottom: this.playerY + 24
+        };
+        
+        // Check zone-based effects
+        this.checkZoneEffects();
+        
+        // Check enemy collisions
+this.movingEnemies.forEach(enemy => {
+    const enemyRect = {
+        left: enemy.currentX,
+        top: enemy.currentY,
+        right: enemy.currentX + 22,
+        bottom: enemy.currentY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage();
+    }
+});
+
+// Check gorilla collision
+if (this.gorilla) {
+    const gorillaRect = {
+        left: this.gorilla.currentX,
+        top: this.gorilla.currentY,
+        right: this.gorilla.currentX + 33,
+        bottom: this.gorilla.currentY + 33
+    };
+    
+    if (this.rectsOverlap(playerRect, gorillaRect)) {
+        this.takeDamage();
+    }
+}
+        
+        // Check foreground enemy collision
+        if (this.foregroundEnemy) {
+            const fgEnemyRect = {
+                left: this.foregroundEnemy.x,
+                top: this.foregroundEnemy.y,
+                right: this.foregroundEnemy.x + 60,
+                bottom: this.foregroundEnemy.y + 60
+            };
+            
+            if (this.rectsOverlap(playerRect, fgEnemyRect)) {
+    this.gameOver(); // Direct game over call
+}
+        }
+        
+        // Check friendly NPCs
+const friendlies = this.gameWorld.querySelectorAll('.friendly');
+friendlies.forEach(friendly => {
+    const friendlyX = parseInt(friendly.style.left);
+    const friendlyY = parseInt(friendly.style.top);
+    const friendlyRect = {
+        left: friendlyX,
+        top: friendlyY,
+        right: friendlyX + 22,
+        bottom: friendlyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, friendlyRect)) {
+        const now = Date.now();
+        const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
+        if (now - lastTime > 3000) {
+            this.handleNPCInteraction(friendly);
+            this.lastInteractionTime[friendly.dataset.message] = now;
+        } else {
+            // Keep message visible while touching NPC
+            this.keepMessageVisible();
+        }
+    }
+});
+
+        // Check bully collision
+const bully = document.getElementById('forestBully');
+if (bully && !this.bullyDefeated) {
+    const bullyX = parseInt(bully.style.left);
+    const bullyY = parseInt(bully.style.top);
+    const distance = Math.sqrt(
+        Math.pow(this.playerX - bullyX, 2) + 
+        Math.pow(this.playerY - bullyY, 2)
+    );
+    
+    if (distance <= 30) {
+        this.handleBullyEncounter();
+    }
+}
+        
+        // Check heart and baby pickup
+const hearts = this.gameWorld.querySelectorAll('.heart-pickup');
+hearts.forEach(heart => {
+    const heartX = parseInt(heart.style.left);
+    const heartY = parseInt(heart.style.top);
+    const heartRect = {
+        left: heartX,
+        top: heartY,
+        right: heartX + 22,
+        bottom: heartY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, heartRect)) {
+        if (heart.dataset.type === 'baby' && this.bullyDefeated) {
+            this.hasBaby = true;
+            this.showMessage('👶🏻 Baby rescued!');
+            this.updateUI();
+            // DON'T auto-save baby pickup - only save when delivered to mother
+            heart.remove();
+        } else if (heart.dataset.type !== 'baby' && this.hearts < 3) {
+            // Regular heart pickup
+            this.hearts++;
+            this.collectedHearts.push(heart.dataset.id); // Track collection
+            this.showMessage('❤️ Health restored!');
+            this.updateUI();
+            this.saveGameState(); // Auto-save hearts
+            heart.remove();
+        }
+    }
+});
+
+// Check money pickup
+const moneyItems = this.gameWorld.querySelectorAll('.money-pickup');
+moneyItems.forEach(money => {
+    const moneyX = parseInt(money.style.left);
+    const moneyY = parseInt(money.style.top);
+    const moneyRect = {
+        left: moneyX,
+        top: moneyY,
+        right: moneyX + 22,
+        bottom: moneyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, moneyRect)) {
+        this.money += 100;
+        this.collectedMoney.push(money.dataset.id); // Track collection
+        this.showMessage('💰 +100¥ collected!');
+        this.updateUI();
+        this.saveGameState(); // Auto-save
+        money.remove();
+    }
+});
+        
+        // Check exit
+        const exit = this.gameWorld.querySelector('.exit');
+        if (exit) {
+            const exitX = parseInt(exit.style.left);
+            const exitY = parseInt(exit.style.top);
+            const exitRect = {
+                left: exitX,
+                top: exitY,
+                right: exitX + 30,
+                bottom: exitY + 30
+            };
+            
+            if (this.rectsOverlap(playerRect, exitRect)) {
+                if (this.hasKey) {
+                    this.completeLevel();
+                } else {
+                    this.showMessage('🔑 You need a key to exit!');
+                }
+            }
+        }
+        // Check cave entrances
+const caveEntrances = this.gameWorld.querySelectorAll('.cave-entrance');
+caveEntrances.forEach(cave => {
+    const caveX = parseInt(cave.style.left);
+    const caveY = parseInt(cave.style.top);
+    const caveRect = {
+        left: caveX,
+        top: caveY,
+        right: caveX + 22,
+        bottom: caveY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, caveRect)) {
+    const caveType = cave.dataset.cave;
+    if (caveType === 'A') {
+        this.saveGameState();
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.currentUrl = 'cavea';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        window.location.href = 'https://thedepression.github.io/games/minimaze/cavea';
+    } else if (caveType === 'B') {
+        this.saveGameState();
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.currentUrl = 'caveb';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        window.location.href = 'https://thedepression.github.io/games/minimaze/caveb';
+    }
+}
+});
+
+// Check pyramid entrance
+const pyramidRect = {
+    left: 2200, // on your pyramid PNG location
+    top: 1300,
+    right: 2260,
+    bottom: 1360
+};
+
+if (this.rectsOverlap(playerRect, pyramidRect)) {
+    if (this.hasPyramidKey) {
+        // Save state and redirect to pyramid
+        this.saveGameState();
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.currentUrl = 'pyramid';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        window.location.href = 'https://thedepression.github.io/games/minimaze/pyramid';
+    } else {
+        this.showMessage('🔺 You need the ancient pyramid key to enter!');
+    }
+}
+
+
+        
+       }
+    
+    checkZoneEffects() {
+        const playerCenterX = this.playerX + 12;
+        const playerCenterY = this.playerY + 12;
+        
+        // Check if on water
+        const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+        let onWater = false;
+        
+        for (let zone of waterZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onWater = true;
+                break;
+            }
+        }
+        
+       // Update player emoji based on water status
+if (onWater && this.hasBoat && !this.isOnWater) {
+    this.isOnWater = true;
+    this.player.style.backgroundImage = '';
+    this.player.textContent = '⛵';
+} else if (!onWater && this.isOnWater) {
+    this.isOnWater = false;
+    this.player.textContent = '';
+    this.updatePlayerImage(this.lastMoveDirection);
+}
+        
+        // Check if on lava
+        const lavaZones = this.gameWorld.querySelectorAll('[data-zone-type="lava"]');
+        let onLava = false;
+        
+        for (let zone of lavaZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onLava = true;
+                break;
+            }
+        }
+        
+        // Lava damage and protection system
+if (onLava) {
+    const now = Date.now();
+    this.wasOnLava = true;
+    
+    if (this.hasLavaShoes) {
+        // If just entered lava zone, start protection (but only if not already active)
+        if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
+            this.lavaProtectionActive = true;
+            this.lavaProtectionTime = 5; // 5 seconds of protection
+            this.showMessage('🥾 Lava shoes protecting you! 5 seconds');
+        }
+        
+        // Count down protection time
+        if (this.lavaProtectionActive && now - this.lastLavaZoneTime > 1000) {
+            this.lavaProtectionTime--;
+            this.lastLavaZoneTime = now;
+            
+            if (this.lavaProtectionTime > 0) {
+                this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
+            } else {
+                // Protection expired
+                this.lavaProtectionActive = false;
+                this.showMessage('🥾 Protection expired! Get out of lava!');
+            }
+        }
+        
+        // Take damage if protection expired
+        if (!this.lavaProtectionActive) {
+            if (now - this.lastLavaDamage > 1000) {
+                this.takeDamage();
+                this.showMessage('🔥 Lava burns! Shoes can\'t protect you anymore!');
+                this.lastLavaDamage = now;
+            }
+        }
+    } else {
+        // No shoes - take damage
+        if (now - this.lastLavaDamage > 1000) {
+            this.takeDamage();
+            this.showMessage('🔥 Lava burns! You need special shoes!');
+            this.lastLavaDamage = now;
+        }
+    }
+} else {
+    // Not on lava - reset protection for next time (ONLY HERE)
+    if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
+        this.lavaProtectionActive = false;
+        this.lavaProtectionTime = 5; // Reset to full protection
+        if (this.wasOnLava) {  // Only show message if actually was on lava
+        this.showMessage('🥾 Stepped off lava! Shoes recharged for next time');
+    }
+}
+this.wasOnLava = false; // Reset the flag
+}
+        // Check if on desert zones
+        const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
+        let onDesert = false;
+
+        for (let zone of desertZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onDesert = true;
+                break;
+            }
+        }
+
+        // Update desert status
+        this.isOnDesert = onDesert;
+
+        // Check if on forest zones
+        const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+        let onForest = false;
+
+        for (let zone of forestZones) {
+            const zoneRect = {
+                left: parseInt(zone.style.left),
+                top: parseInt(zone.style.top),
+                right: parseInt(zone.style.left) + parseInt(zone.style.width),
+                bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+            };
+            
+            if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+                playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+                onForest = true;
+                break;
+            }
+        }
+
+        // Handle forest entry/exit
+        if (onForest && !this.isInForest) {
+            this.enterForest();
+        } else if (!onForest && this.isInForest) {
+            this.exitForest();
+        }
+    }
+
+    initializeZoneEffects() {
+    const playerCenterX = this.playerX + 12;
+    const playerCenterY = this.playerY + 12;
+    
+    // Check if spawning in forest
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    let inForest = false;
+    
+    for (let zone of forestZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            inForest = true;
+            break;
+        }
+    }
+    
+    // Apply forest effects if spawning in forest
+if (inForest) {
+    this.isInForest = true;
+    this.bgMusic.pause();
+    this.bgMusic.currentTime = 0;  // Reset to beginning
+    this.bgMusic.volume = 0;       // Mute it completely
+    this.forestMusic.currentTime = 0;  // Start forest music from beginning
+    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+        document.getElementById('forestOverlay').classList.add('active');
+        document.getElementById('forestVisionMask').classList.add('active');
+        this.updateForestVisibility();
+        
+        // Set the vision mask position immediately
+        const gameAreaRect = this.gameArea.getBoundingClientRect();
+        const playerScreenX = gameAreaRect.left + (this.gameArea.offsetWidth / 2);
+        const playerScreenY = gameAreaRect.top + (this.gameArea.offsetHeight / 2);
+        const mask = document.getElementById('forestVisionMask');
+        mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
+    } else {
+        // Make sure forest effects are OFF if not in forest
+        this.isInForest = false;
+        this.forestMusic.pause();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
+        this.updateForestVisibility();
+    }
+    
+    // Check if spawning on water
+    const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+    let onWater = false;
+    
+    for (let zone of waterZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            onWater = true;
+            break;
+        }
+    }
+    
+    // Apply boat visual if spawning on water with boat
+    if (onWater && this.hasBoat) {
+        this.isOnWater = true;
+        this.player.style.backgroundImage = '';
+        this.player.textContent = '⛵';
+    } else {
+        this.isOnWater = false;
+        this.player.textContent = '';
+        this.updatePlayerImage(this.lastMoveDirection || 's');
+    }
+}
+
+    
+    handleNPCInteraction(friendly) {
+    const message = friendly.dataset.message;
+    
+    if (message === "🔑 Need a key? Give me 500¥!" && !this.hasKey) {
+        if (this.money >= 500) {
+            this.money -= 500;
+            this.hasKey = true;
+            this.showMessage('Thank you! Here\'s your key! 🔑');
+            friendly.dataset.message = 'Thank you for your business!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('🔑 Need a key? Give me 500¥!');
+        }
+    } else if (message === "⛵ Want a boat? 500¥ and you can sail!" && !this.hasBoat) {
+        if (this.money >= 500) {
+            this.money -= 500;
+            this.hasBoat = true;
+            this.showMessage('⛵ Boat purchased! Now you can sail!');
+            friendly.dataset.message = 'Enjoy your boat!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
+        }
+    } else if (message === "🔦 Flashlight for sale! Light up dark caves for 600¥!" && !this.hasFlashlight) {
+        if (this.money >= 600) {
+            this.money -= 600;
+            this.hasFlashlight = true;
+            this.showMessage('🔦 Flashlight purchased! Now you can explore dark caves!');
+            friendly.dataset.message = 'That flashlight will help you in southern caves... But be careful. I heard the Bully was in that area!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('🔦 Flashlight for sale! Light up dark caves for 600¥!');
+        }
+    } else if (message === "🥾 Lava-proof shoes! Only 900000000¥!" && !this.hasLavaShoes) {
+        if (this.money >= 900) {
+            this.money -= 900;
+            this.hasLavaShoes = true;
+            this.lavaProtectionTime = 0;
+            this.lavaProtectionActive = false;
+            this.showMessage('🥾 Lava shoes purchased! 5 seconds protection per entry!');
+            friendly.dataset.message = 'Those shoes will protect you!';
+            this.updateUI();
+            this.saveGameState(); // Auto-save after purchase
+        } else {
+            this.showMessage('🥾 Lava-proof shoes! Only 900000000¥!');
+        }
+    } else if (message.includes("Thank god you are here, master frog") && !this.motherPaid) {
+        if (this.hasBaby) {
+            this.money += 200;
+            this.hasBaby = false;
+            this.motherPaid = true;
+            this.showMessage('Thank you so much! Here is your reward!');
+            friendly.dataset.message = 'You saved my baby! I am forever grateful!';
+            this.updateUI();
+            this.saveGameState(); // ONLY save when baby is delivered to mother
+        } else if (!this.bullyDefeated) {
+            this.showMessage(message);
+        } else {
+            this.showMessage('You need to rescue my baby from the forest first!');
+        }
+    } else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!") {
+        if (this.hasPencil) {
+            // STAGE 2: Exchange with enhanced save
+            this.hasPencil = false;
+            this.hasPyramidKey = true;
+            this.showMessage('🗝️ Thank you so much! Here is the pyramid key!');
+            friendly.dataset.message = "I'll never forget your kindness!";
+            this.updateUI();
+            
+            // ENHANCED SAVE WITH BACKUP
+            this.saveGameState();
+            localStorage.setItem('mfGameState_backup', localStorage.getItem('mfGameState'));
+            
+            // VERIFICATION
+            setTimeout(() => {
+                const check = JSON.parse(localStorage.getItem('mfGameState'));
+                if (check.hasPyramidKey) {
+                    this.showMessage('✏️ Oh! My lovely pencil! Thank You! 🗝️');
+                } else {
+                    this.showMessage('❌ Save failed! Check console.');
+                    console.error('SAVE FAILURE - Main:', check.hasPyramidKey);
+                    console.log('Backup exists:', localStorage.getItem('mfGameState_backup') !== null);
+                }
+            }, 100);
+        } else {
+            // STAGE 1: Show original message
+            this.showMessage(message);
+        }
+    } else if (message === "I'll never forget your kindness!") {
+        // STAGE 3: Post-mission message
+        this.showMessage(message);
+    } else {
+        this.showMessage(message);
+    }
+}
+
+    
+    rectsOverlap(rect1, rect2) {
+        return rect1.left < rect2.right &&
+               rect1.right > rect2.left &&
+               rect1.top < rect2.bottom &&
+               rect1.bottom > rect2.top;
+    }
+    
+    takeDamage() {
+        if (this.isInvulnerable) return;
+        
+        this.hearts--;
+        this.showMessage('💔 Ouch!');
+        this.updateUI();
+        
+        this.isInvulnerable = true;
+        this.player.classList.add('invulnerable');
+        
+        setTimeout(() => {
+            this.isInvulnerable = false;
+            this.player.classList.remove('invulnerable');
+        }, 1000);
+        
+        if (this.hearts <= 0) {
+            this.gameOver();
+        }
+    }
+    
+    showMessage(text) {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.style.display = 'block';
+        
+        clearTimeout(this.messageTimeout);
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+    
+    updateUI() {
+        document.getElementById('hearts').textContent = this.hearts;
+        document.getElementById('money').textContent = this.money;
+        
+        // Update UI to show owned items
+        const ui = document.getElementById('ui');
+        let itemsText = '';
+if (this.hasKey) itemsText += ' 🔑';
+if (this.hasBoat) itemsText += ' ⛵';
+if (this.hasHammer) itemsText += ' 🔨';
+if (this.hasLavaShoes) itemsText += ' 🥾';
+if (this.hasFlashlight) itemsText += ' 🔦';
+if (this.hasPencil) itemsText += ' ✏️';
+if (this.hasPyramidKey) itemsText += ' 🗝️';
+if (this.hasBaby) itemsText += ' 👶🏻';
+        
+        // Add items display if not already there
+        if (!document.getElementById('items')) {
+            const itemsDiv = document.createElement('div');
+            itemsDiv.id = 'items';
+            itemsDiv.textContent = '+' + itemsText;
+            ui.appendChild(itemsDiv);
+        } else {
+            document.getElementById('items').textContent = '+' + itemsText;
+        }
+    }
+    
+    completeLevel() {
+        clearInterval(this.timerInterval);
+        this.gameStarted = false;
+        this.bgMusic.pause();
+        this.forestMusic.pause();
+        this.showLevelComplete('🎉 Adventure Complete!', 'You escaped the colorful maze!');
+    }
+    
+    gameOver() {
+    clearInterval(this.timerInterval);
+    this.gameStarted = false;
+    this.bgMusic.pause();
+    this.forestMusic.pause();
+    
+    // Keep timer running through death - it becomes a time penalty
+    const timeAtDeath = this.timeElapsed;
+    
+    this.showMessage('💀 You died! Returning to spawn point...');
+    setTimeout(() => {
+        // Reset position to spawn point
+        this.playerX = 420;
+        this.playerY = 1760;
+        
+        // Keep time penalty
+        this.timeElapsed = timeAtDeath;
+        
+        // Load other saved progress (items, money, etc.) but not position
+        this.loadGameStateExceptPosition();
+        
+        this.initLevel(); // Regenerate world
+        this.startGameTimer(); // Restart timer from death time
+        
+        // Auto-save the respawn state to prevent pause-exploit
+        this.saveGameState();
+        
+        this.showMessage('🔄 Respawned at start - time penalty applied!');
+    }, 3000);
+}
+    
+    showLevelComplete(title, text) {
+        document.getElementById('levelCompleteTitle').textContent = title;
+        document.getElementById('levelCompleteText').textContent = text;
+        document.getElementById('levelComplete').style.display = 'flex';
+    }
+
+    saveGameState() {
+    const gameState = {
+        hearts: this.hearts,
+        money: this.money,
+        timeElapsed: this.timeElapsed,
+        playerX: this.playerX,
+        playerY: this.playerY,
+        hasKey: this.hasKey,
+        hasBoat: this.hasBoat,
+        hasHammer: this.hasHammer,
+        hasLavaShoes: this.hasLavaShoes,
+        hasBaby: this.hasBaby || false,
+        bullyDefeated: this.bullyDefeated || false,
+        motherPaid: this.motherPaid || false,
+        collectedMoney: this.collectedMoney || [],
+        collectedHearts: this.collectedHearts || [],
+        currentUrl: 'main',
+        lastSaveTime: Date.now(),
+        isInForest: this.isInForest || false,
+        hasFlashlight: this.hasFlashlight,
+hasPencil: this.hasPencil,
+hasPyramidKey: this.hasPyramidKey,
+        caveBossDefeated: this.caveBossDefeated,
+        caveaMoneyCollected: this.caveaMoneyCollected,
+caveaHeartCollected: this.caveaHeartCollected,
+        cavebMoneyCollected: this.cavebMoneyCollected,
+cavebHeartCollected: this.cavebHeartCollected
+    };
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    console.log('Game saved:', gameState); // For debugging
+}
+
+loadGameState() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        this.hearts = gameState.hearts || 3;
+        this.money = gameState.money || 0;
+        this.timeElapsed = gameState.timeElapsed || 0;
+        this.playerX = gameState.playerX || 420;
+        this.playerY = gameState.playerY || 1760;
+        this.hasKey = gameState.hasKey || false;
+        this.hasBoat = gameState.hasBoat || false;
+        this.hasHammer = gameState.hasHammer || false;
+        this.hasLavaShoes = gameState.hasLavaShoes || false;
+        this.hasBaby = gameState.hasBaby || false;
+        this.bullyDefeated = gameState.bullyDefeated || false;
+        this.motherPaid = gameState.motherPaid || false;
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.collectedHearts = gameState.collectedHearts || [];
+        this.isInForest = gameState.isInForest || false;
+        this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasPencil = gameState.hasPencil || false;
+this.hasPyramidKey = gameState.hasPyramidKey || false;
+        this.caveBossDefeated = gameState.caveBossDefeated || false;
+        this.caveaMoneyCollected = gameState.caveaMoneyCollected || false;
+this.caveaHeartCollected = gameState.caveaHeartCollected || false;
+        this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
+this.cavebHeartCollected = gameState.cavebHeartCollected || false;
+        // Set the timer to continue from saved time
+        this.updateTimer();
+        
+        return true;
+    }
+    return false;
+}
+
+    loadGameStateExceptPosition() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        // Load everything EXCEPT position and time
+        this.hearts = 3; // Always respawn with full health
+        this.money = gameState.money || 0;
+        // DON'T load timeElapsed - keep current time for penalty
+        // DON'T load playerX/playerY - use spawn point
+        this.hasKey = gameState.hasKey || false;
+        this.hasBoat = gameState.hasBoat || false;
+        this.hasHammer = gameState.hasHammer || false;
+        this.hasLavaShoes = gameState.hasLavaShoes || false;
+        this.hasBaby = gameState.hasBaby || false;
+        this.bullyDefeated = gameState.bullyDefeated || false;
+        this.motherPaid = gameState.motherPaid || false;
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.collectedHearts = gameState.collectedHearts || [];
+        // FORCE forest state to OFF when respawning (always spawn outside)
+        this.isInForest = false;
+        this.forestMusic.pause();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
+        this.updateForestVisibility();
+        this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasPencil = gameState.hasPencil || false;
+this.hasPyramidKey = gameState.hasPyramidKey || false;
+        this.caveBossDefeated = gameState.caveBossDefeated || false;
+        
+        this.updateUI();
+        return true;
+    }
+    return false;
+}
+
+    
+  // ADD THIS METHOD HERE:
+    handleBullyEncounter() {
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    this.gameStarted = false;
+    
+    // Update save state to forestbully URL
+    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+    gameState.currentUrl = 'forestbully';
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    const confirmDialog = document.getElementById('confirmDialog');
+confirmDialog.innerHTML = `
+    <div class="bully-dialogue">
+        <div class="bully-image"></div>
+        <p>You want this baby?! You have to fight me for it!</p>
+        <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">Fight!</button>
+    </div>
+`;
+    document.getElementById('confirmDialog').style.display = 'flex';
+    this.pendingAction = 'fightBully';
+}
+    keepMessageVisible() {
+    const message = document.getElementById('message');
+    if (message.style.display === 'block') {
+        clearTimeout(this.messageTimeout);
+        // Reset the timer to keep message visible
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+}
+
+checkUrlAccess() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        if (gameState.currentUrl && gameState.currentUrl !== 'main') {
+            window.location.href = `https://thedepression.github.io/games/minimaze/${gameState.currentUrl}`;
+            return false; // Prevent game from starting
+        }
+    }
+    return true; // Allow game to continue
+}
+    
+} // This is the END of the MazeGame class
+
+let game;
+
+// Check for existing save on page load
+window.addEventListener('load', function() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        document.getElementById('continueButton').style.display = 'inline-block';
+    }
+});
+
+function startNewGame() {
+    const playerName = localStorage.getItem('mfPlayerName');
+    
+    // If no name set, show name input first
+    if (!playerName) {
+        document.getElementById('nameInput').style.display = 'block';
+        document.getElementById('newGameButton').style.display = 'none';
+        return;
+    }
+    
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        if (!confirm('Are you sure? This will delete your current progress and start completely over.')) {
+            return; // User cancelled
+        }
+    }
+    
+    // Clear all Master Frog related localStorage except name
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+        if (key.startsWith('mf') && key !== 'mfPlayerName') {
+            localStorage.removeItem(key);
+        }
+    });
+    
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none';
+    
+    game = new MazeGame();
+    game.initLevel();
+    game.startGameTimer();
+}
+
+function continueGame() {
+    // Check URL access first
+    const game_temp = new MazeGame();
+    if (!game_temp.checkUrlAccess()) {
+        return; // Will redirect if needed
+    }
+    
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'none';
+    
+    game = new MazeGame();
+    game.loadGameState(); // This loads the saved state
+    game.initLevel();
+    game.initializeZoneEffects(); // NEW: Fix zone effects on continue
+    game.startGameTimer();
+}
+
+// Keep the old startGame function for compatibility, but redirect to new game
+function startGame() {
+    startNewGame();
+}
+
+function restartGame() {
+    window.location.reload();
+}
+
+        function confirmAction() {
+    // Reset dialog for next use if it was the bully encounter
+    if (game.pendingAction === 'fightBully') {
+        resetConfirmDialog();
+    }
+    
+    document.getElementById('confirmDialog').style.display = 'none';
+  game.gameStarted = true;  // Resume game immediately
+  if (game.pendingAction === 'enterForest') {
+    game.isInForest = true;
+    game.bgMusic.pause();
+    game.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+    document.getElementById('forestOverlay').classList.add('active');
+    document.getElementById('forestVisionMask').classList.add('active');
+    game.showMessage('🌲 Entering the dense forest...');
+      game.updateForestVisibility();
+  } else if (game.pendingAction === 'exitForest') {
+    game.isInForest = false;
+    game.forestMusic.pause();
+    game.bgMusic.play().catch(e => console.log('Music play failed:', e));
+    document.getElementById('forestOverlay').classList.remove('active');
+    document.getElementById('forestVisionMask').classList.remove('active');
+    game.showMessage('🌞 Exiting the forest...');
+      game.updateForestVisibility();
+            } else if (game.pendingAction === 'fightBully') {
+    game.saveGameState();
+    window.location.href = 'https://thedepression.github.io/games/minimaze/forestboss';
+}
+  
+  game.pendingAction = null;
+}
+
+    function pauseGame() {
+    if (game && game.gameStarted) {
+        game.isPaused = true;
+        game.bgMusic.pause();
+        game.forestMusic.pause();
+        document.getElementById('pauseMenu').style.display = 'flex';
+    }
+}
+
+function resumeGame() {
+    if (game) {
+        game.isPaused = false;
+        document.getElementById('pauseMenu').style.display = 'none';
+        
+        // Resume appropriate music
+        if (game.isInForest) {
+            game.forestMusic.play().catch(e => console.log('Forest music resume failed:', e));
+        } else {
+            game.bgMusic.play().catch(e => console.log('Music resume failed:', e));
+        }
+    }
+}
+
+function returnToTitle() {
+    if (game) {
+        // DON'T auto-save when returning to title
+        window.location.reload(); // This will show the title screen with Continue button
+    }
+}
+
+        function resetConfirmDialog() {
+    const confirmDialog = document.getElementById('confirmDialog');
+    confirmDialog.innerHTML = `
+        <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <p id="confirmText">You are entering the forest...</p>
+            <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
+        </div>
+    `;
+}
+
+        function setPlayerName() {
+    const nameField = document.getElementById('playerNameField');
+    const name = nameField.value.trim();
+    
+    if (name.length < 1) {
+        alert('Please enter your name!');
+        return;
+    }
+    
+    if (name.length > 20) {
+        alert('Name too long! Please use 20 characters or less.');
+        return;
+    }
+    
+    // Save the name
+    localStorage.setItem('mfPlayerName', name);
+    
+    // Update welcome message
+    document.getElementById('welcomeMessage').textContent = `Hello ${name}!`;
+    
+    // Hide name input, show new game button
+    document.getElementById('nameInput').style.display = 'none';
+    const newGameBtn = document.getElementById('newGameButton');
+    newGameBtn.style.display = 'inline-block';
+    newGameBtn.className = 'start-button';
+    newGameBtn.textContent = 'Start Adventure';
+}
+        
+    </script>
+</body>
+</html>
