@@ -672,6 +672,10 @@ this.isNearNPC = false;
                     } else if (floorNumber === 4) {
                         this.playerX = 70;
                         this.playerY = 150;
+                        // Secret weapon pickup at exact spawn point - no visual, just give weapon
+    if (!this.hasWeapon) {
+        this.hasWeapon = true;
+    }
                     }
                 }
                 
@@ -1437,6 +1441,20 @@ this.isNearNPC = false;
                     right: this.playerX + 12,
                     bottom: this.playerY + 12
                 };
+
+
+                // Secret weapon at floor 4 spawn point
+if (this.currentFloor === 4 && !this.hasWeapon) {
+    const spawnX = 70;
+    const spawnY = 150;
+    const distance = Math.sqrt(Math.pow(this.playerX - spawnX, 2) + Math.pow(this.playerY - spawnY, 2));
+    
+    if (distance < 10) { // Very close to spawn point
+        this.hasWeapon = true;
+        this.updateUI();
+    }
+}
+
                 
                 // Check enemy collisions
                 this.enemies.forEach(enemy => {
