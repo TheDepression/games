@@ -415,6 +415,34 @@
     </audio>
 
     <script>
+
+        // Check access on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const savedState = localStorage.getItem('mfGameState');
+    if (!savedState) {
+        alert('No game data found! Returning to main world.');
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+        return;
+    }
+
+    const gameState = JSON.parse(savedState);
+    
+    // If pyramid boss is defeated, redirect to proper location
+    if (gameState.pyramidBossDefeated === true) {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+        return;
+    }
+    
+    // If they don't have pyramid access, redirect
+    if (!gameState.hasPyramidKey) {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+        return;
+    }
+});
+        
+        
+        
+        
         class PyramidDungeon {
             constructor() {
     // Check if coming from boss fight FIRST
