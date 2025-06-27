@@ -83,43 +83,43 @@
         
         /* Copy all the zone styles from original but darker */
         .water-zone {
-            position: absolute;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(100,100,100,0.4) 2px, transparent 2px),
-                radial-gradient(circle at 75% 75%, rgba(80,80,80,0.3) 1px, transparent 1px),
-                linear-gradient(135deg, #2a4a4a 0%, #1a3a3a 50%, #0a2a2a 100%);
-            background-size: 20px 20px, 15px 15px, 100% 100%;
-            background-position: 0 0, 10px 10px, 0 0;
-            opacity: 0.9;
-            animation: poisonWater 6s linear infinite;
-        }
+    position: absolute;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(200,200,255,0.3) 2px, transparent 2px),
+        radial-gradient(circle at 75% 75%, rgba(150,150,200,0.2) 1px, transparent 1px),
+        linear-gradient(135deg, #3a5a7a 0%, #2a4a6a 50%, #1a3a5a 100%);
+    background-size: 20px 20px, 15px 15px, 100% 100%;
+    background-position: 0 0, 10px 10px, 0 0;
+    opacity: 0.8;
+    animation: waterFlow 4s linear infinite;
+}
         
         .forest-zone {
-            position: absolute;
-            background-image:
-                repeating-conic-gradient(from 0deg at 50% 50%, 
-                    #2a3a2a 0deg 30deg, 
-                    #1a2a1a 30deg 60deg, 
-                    #3a4a3a 60deg 90deg, 
-                    #2a3a2a 90deg 120deg),
-                radial-gradient(circle at 30% 40%, rgba(100,100,100,0.2) 1px, transparent 1px);
-            background-size: 40px 40px, 25px 25px;
-            background-position: 0 0, 20px 20px;
-            opacity: 0.9;
-        }
+    position: absolute;
+    background-image:
+        repeating-conic-gradient(from 0deg at 50% 50%, 
+            #2a4a2a 0deg 30deg, 
+            #3a5a3a 30deg 60deg, 
+            #4a6a4a 60deg 90deg, 
+            #3a5a3a 90deg 120deg),
+        radial-gradient(circle at 30% 40%, rgba(150,200,150,0.1) 1px, transparent 1px);
+    background-size: 40px 40px, 25px 25px;
+    background-position: 0 0, 20px 20px;
+    opacity: 0.8;
+}
         
         .desert-zone {
-            position: absolute;
-            background-image:
-                linear-gradient(45deg, rgba(100,80,60,0.2) 25%, transparent 25%),
-                linear-gradient(-45deg, rgba(100,80,60,0.2) 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, rgba(100,80,60,0.2) 75%),
-                linear-gradient(-45deg, transparent 75%, rgba(100,80,60,0.2) 75%),
-                linear-gradient(135deg, #6a5a02 0%, #5a4a07 50%, #4a3a00 100%);
-            background-size: 30px 30px, 30px 30px, 30px 30px, 30px 30px, 100% 100%;
-            background-position: 0 0, 0 15px, 15px -15px, -15px 0px, 0 0;
-            opacity: 0.8;
-        }
+    position: absolute;
+    background-image:
+        linear-gradient(45deg, rgba(200,150,100,0.1) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(200,150,100,0.1) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(200,150,100,0.1) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(200,150,100,0.1) 75%),
+        linear-gradient(135deg, #ccaa02 0%, #cca107 50%, #cc9a00 100%);
+    background-size: 30px 30px, 30px 30px, 30px 30px, 30px 30px, 100% 100%;
+    background-position: 0 0, 0 15px, 15px -15px, -15px 0px, 0 0;
+    opacity: 0.7;
+}
 
         .castle-zone {
             position: absolute;
@@ -132,39 +132,39 @@
         }
         
         .grass-zone {
-            position: absolute;
-            background-image:
-                repeating-linear-gradient(
-                    90deg,
-                    #3a4a3a 0px,
-                    #2a3a2a 2px,
-                    #4a5a4a 4px,
-                    #1a2a1a 6px
-                ),
-                repeating-linear-gradient(
-                    0deg,
-                    transparent 0px,
-                    rgba(100,100,100,0.1) 1px,
-                    transparent 2px
-                );
-            background-size: 8px 8px, 4px 4px;
-            opacity: 0.9;
-        }
+    position: absolute;
+    background-image:
+        repeating-linear-gradient(
+            90deg,
+            #3a6a3a 0px,
+            #4a7a4a 2px,
+            #3a6a3a 4px,
+            #2a5a2a 6px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            rgba(200,255,200,0.1) 1px,
+            transparent 2px
+        );
+    background-size: 8px 8px, 4px 4px;
+    opacity: 0.8;
+}
         
         .village-zone {
-            position: absolute;
-            background-image:
-                repeating-linear-gradient(
-                    45deg,
-                    rgba(80, 80, 80, 0.4) 0px,
-                    rgba(60, 60, 60, 0.4) 4px,
-                    rgba(100, 100, 100, 0.3) 8px,
-                    rgba(40, 40, 40, 0.4) 12px
-                );
-            background-size: 16px 16px;
-            background-color: rgba(80, 80, 80, 0.3);
-            opacity: 0.7;
-        }
+    position: absolute;
+    background-image:
+        repeating-linear-gradient(
+            45deg,
+            rgba(120, 200, 120, 0.3) 0px,
+            rgba(140, 220, 140, 0.3) 4px,
+            rgba(120, 200, 120, 0.3) 8px,
+            rgba(130, 210, 130, 0.3) 12px
+        );
+    background-size: 16px 16px;
+    background-color: rgba(120, 200, 120, 0.2);
+    opacity: 0.6;
+}
         
         .lava-zone {
             position: absolute;
