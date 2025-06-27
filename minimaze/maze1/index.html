@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maze Adventure: Colorful World</title>
+    <title>Master Frog's Adventure</title>
     <style>
         body {
             margin: 0;
@@ -509,7 +509,7 @@ z-index: 25;
 <body>
     <div id="gameContainer">
         <div id="ui">
-            <div>🐸 You have:</div>
+            <div>🐸 あるもの:</div>
             <div>❤️ <span id="hearts">3</span></div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
@@ -523,30 +523,30 @@ z-index: 25;
         <div id="message"></div>
 <div id="confirmDialog" style="display: none;">
   <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
-    <p id="confirmText">You are entering the forest...</p>
+    <p id="confirmText">🌳森に入る🌳...</p>
     <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
   </div>
 </div>
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
                 <div style="font-size: 18px; font-weight: bold;">🐸 Master Frog's Adventure</div>
-                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 ここですワイプ</div>
             </div>
             <div class="control-hint">
-                <div>🎮 Swipe to explore the colorful world!</div>
+                <div>🎮 頑張って!</div>
                 <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Find items, buy upgrades, reach the exit!</div>
             </div>
         </div>
         
         <div id="startScreen">
     <h2>🐸 Master Frog's Adventure</h2>
-    <div id="welcomeMessage" style="margin: 20px 0;">Save the World</div>
+    <div id="welcomeMessage" style="margin: 20px 0;">🌍世界を助ける</div>
     <div id="saveStateInfo" style="font-size: 12px; opacity: 0.8; margin: 10px 0; display: none;"></div>
-    <p style="font-size: 12px; opacity: 0.8;">🔑 Buy upgrades, cross water with boats, break walls with hammers! 🔨</p>
+    <p style="font-size: 12px; opacity: 0.8;">色々の人を助けて</p>
     
     <!-- Name input for new players -->
     <div id="nameInput" style="display: none; margin: 20px 0;">
-        <p>What's your name, brave adventurer?</p>
+        <p>お名前は？</p>
         <input type="text" id="playerNameField" placeholder="Enter your name" style="padding: 8px; margin: 8px; border-radius: 4px; border: 1px solid #ccc;">
         <button onclick="setPlayerName()" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Start Adventure!</button>
     </div>
@@ -564,7 +564,7 @@ z-index: 25;
         </div>
         <div id="pauseMenu" style="display: none;">
             <h3>⏸️ Game Paused</h3>
-            <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
+            <p style="margin: 20px 0; opacity: 0.8;">ゆっくりしてね</p>
             <button onclick="resumeGame()" style="background: #4CAF50; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Continue Game</button>
             <button onclick="returnToTitle()" style="background: #ff6b35; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; margin: 8px;">Return to Title</button>
         </div>
@@ -761,7 +761,7 @@ this.cavebHeartCollected = false;
     this.playerVelocityY = 0;
     this.isDragging = false;   // Stop any dragging
     this.gameStarted = false;  // Freeze game temporarily
-  document.getElementById('confirmText').textContent = '🌲 You are entering the dense forest...';
+  document.getElementById('confirmText').textContent = '🌲 森に入る...';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'enterForest';
 }
@@ -771,7 +771,7 @@ this.cavebHeartCollected = false;
     this.playerVelocityY = 0;
     this.isDragging = false;   // Stop any dragging
     this.gameStarted = false;  // Freeze game temporarily
-  document.getElementById('confirmText').textContent = '🌞 You are exiting the forest...';
+  document.getElementById('confirmText').textContent = '🌞 出た！';
   document.getElementById('confirmDialog').style.display = 'flex';
   this.pendingAction = 'exitForest';
 }
@@ -1930,21 +1930,21 @@ sharkEnemies.forEach((shark, index) => {
 }
     createFriendlies() {
     const friendlies = [
-        {x: 2280, y: 850, message: "🔑 Need a key? Give me 500¥!", customEmoji: "👴🏻"},
-        {x: 1200, y: 600, message: "⛵ Want a boat? 500¥ and you can sail!", customEmoji: "👩‍⚕️"},
-        {x: 60, y: 60, message: "🔦 Flashlight for sale! Light up dark caves for 600¥!", customEmoji: "🧙‍♀️"},
-        {x: 1250, y: 1690, message: "🥾 Lava-proof shoes! Only 900000000¥!", customEmoji: "👷‍♂️"},
-        {x: 380, y: 1760, message: this.motherPaid ? "You saved my baby! I am forever grateful!" : "Thank god you are here, master frog! The bully took my baby and went into the dark forest! If you can rescue him, I will pay you 200¥. It's all I have! PLEASE!", type: "mother", customEmoji: "👩🏻"},
-        {x: 90, y: 1535, message: "After the Bully raided our town, we do not have much money left. I put it in a safe. No one is going near it!", type: "guard", customEmoji: "💂🏻‍♂️"},
-        {x: 100, y: 1020, message: "The forest is a dangerous place,.. You should walk slowly to avoid death...", type: "traveler", customEmoji: "🧓🏻"},
-        {x: 500, y: 500, message: "No,... I am NOT Mario. Leave me alone!", type: "villager", customEmoji: "👨🏻"},
-        {x: 2250, y: 960, message: "The castle to the far north is always making loud noises and flashing lights. What is happening in there?!", type: "historian", customEmoji: "👵🏻"},
-        {x: 80, y: 670, message: "The rumor is that the bully has found a way to live forever. If that is true, we may all be doomed.", type: "elder", customEmoji: "🤴🏻"},
-        {x: 2270, y: 800, message: this.hasPyramidKey ? "I'll never forget your kindness!" : "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!", type: "pencil_owner", customEmoji: ""},
-        {x: 900, y: 2340, message: "There is a secret third entrance to the forest..", type: "cowboy", customEmoji: "🤠"},
-        {x: 2360, y: 2360, message: "Hello fellow frog. I will share a secret with you. Relax under the pink square and wait. You will be rewarded!", type: "frog", customEmoji: "🐸"},
-        {x: 60, y: 1660, message: "I heard there is a gorilla running around town. Watch out!", type: "woman", customEmoji: "👩🏼‍💼"},
-        {x: 860, y: 1600, message: "If you had a hammer, you could break right through these grey walls", type: "cat", customEmoji: "😺"}
+        {x: 2280, y: 850, message: "🔑 かぎほしいの？ 2500¥!", customEmoji: "👴🏻"},
+        {x: 1200, y: 600, message: "⛵ ふねいる? 500¥でどうぞ!", customEmoji: "👩‍⚕️"},
+        {x: 60, y: 60, message: "🔦 懐中電灯! くらいどうくつにいい　600円", customEmoji: "🧙‍♀️"},
+        {x: 1250, y: 1690, message: "🥾 マグマのくつ 9おく円！", customEmoji: "👷‍♂️"},
+        {x: 380, y: 1760, message: this.motherPaid ? "あかちゃんを たすけてくれて ありがとう！　ずっと かんしゃしてるよ！" : "マスターフロッグ！良かった！ さっき、いじめ子があたしの赤ちゃんをぬすんで、森に行った! 助けてくれたら 200¥あげる. それしかない! お願い!", type: "mother", customEmoji: "👩🏻"},
+        {x: 90, y: 1535, message: "いじめっこが まちを おそってから、おかねは ほとんど のこってない。 ぜんぶ きんこに いれたよ。だれも ちかづいてない！", type: "guard", customEmoji: "💂🏻‍♂️"},
+        {x: 100, y: 1020, message: "森🌳は危ない,.. 死なないようにゆっくり歩いてね...", type: "traveler", customEmoji: "🧓🏻"},
+        {x: 500, y: 500, message: "マリオじゃないよ. あっち行け!", type: "villager", customEmoji: "👨🏻"},
+        {x: 2250, y: 960, message: "北にある🏰お城はいつも おおきな おとを たてて ピカピカひかってるんだ。 なにが おこってるのかな〜？！", type: "historian", customEmoji: "👵🏻"},
+        {x: 80, y: 670, message: "うわさでは、いじめっこが ずーっと いきる ほうほうを みつけたんだって。それが ほんとうなら、みんな やばいかも。", type: "elder", customEmoji: "🤴🏻"},
+        {x: 2270, y: 800, message: this.hasPyramidKey ? "あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！" : "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、ピラミッドのかぎを あげるよ！", type: "pencil_owner", customEmoji: ""},
+        {x: 900, y: 2340, message: "もりには ひみつの３つめのいりぐちが あるんだ…", type: "cowboy", customEmoji: "🤠"},
+        {x: 2360, y: 2360, message: "やあ、なかまのカエルさん。ひみつを おしえてあげるよ。 ピンクのしかくの 下で ゆっくり まってごらん。いいことが あるよ！", type: "frog", customEmoji: "🐸"},
+        {x: 60, y: 1660, message: "ゴリラが はしりまわってるって きいたよ。きをつけてね！", type: "woman", customEmoji: "👩🏼‍💼"},
+        {x: 860, y: 1600, message: "ハンマーが あれば、この はいいろのかべを こわせるのに。", type: "cat", customEmoji: "😺"}
     ];
     
     friendlies.forEach((friendly, index) => {
@@ -2200,7 +2200,7 @@ if (this.isInForest) {
         }
         
         if (isEnteringWater && !this.hasBoat) {
-            this.showMessage('🌊 You need a boat to cross water!');
+            this.showMessage('🌊 ふねなしで行けない🚣');
             return false;
         }
         
@@ -2208,7 +2208,7 @@ if (this.isInForest) {
     }
     
     breakWall(wall) {
-        this.showMessage('🔨 *SMASH* Wall broken!');
+        this.showMessage('🔨 ＊ガシャーン！＊　かべが こわれた！');
         wall.remove();
     }
     
@@ -2271,14 +2271,14 @@ if (this.isInForest) {
     // Check if player is in forest and close enough to start chasing
     if (this.isInForest && playerDistance <= 60 && !this.gorilla.isChasing) {
         this.gorilla.isChasing = true;
-        this.showMessage('🦍 ROAR! Gorilla is angry!');
+        this.showMessage('🦍 ROAR! ゴリラが怒った!');
     }
     
     // Stop chasing if player escapes forest or gets far enough away
 if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
     this.gorilla.isChasing = false;
     this.gorilla.returning = true;  // Add this line
-    this.showMessage('🦍 Gorilla calmed down...');
+    this.showMessage('🦍 ゴリラがおちついた..');
 }
     
     if (this.gorilla.isChasing) {
@@ -2688,7 +2688,7 @@ if (this.rectsOverlap(playerRect, pyramidRect)) {
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         window.location.href = 'https://thedepression.github.io/games/minimaze/pyramid';
     } else {
-        this.showMessage('🔺 You need the ancient pyramid key to enter!');
+        this.showMessage('🔺 ピラミッドカギ🔑必要');
     }
 }
 
@@ -2759,7 +2759,7 @@ if (onLava) {
         if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
             this.lavaProtectionActive = true;
             this.lavaProtectionTime = 5; // 5 seconds of protection
-            this.showMessage('🥾 Lava shoes protecting you! 5 seconds');
+            this.showMessage('🥾 ⏰５秒守る');
         }
         
         // Count down protection time
@@ -2772,7 +2772,7 @@ if (onLava) {
             } else {
                 // Protection expired
                 this.lavaProtectionActive = false;
-                this.showMessage('🥾 Protection expired! Get out of lava!');
+                this.showMessage('🥾 まもりが 😱きれた！　マグマから にげて！');
             }
         }
         
@@ -2780,7 +2780,7 @@ if (onLava) {
         if (!this.lavaProtectionActive) {
             if (now - this.lastLavaDamage > 1000) {
                 this.takeDamage();
-                this.showMessage('🔥 Lava burns! Shoes can\'t protect you anymore!');
+                this.showMessage('🔥 あつい');
                 this.lastLavaDamage = now;
             }
         }
@@ -2788,7 +2788,7 @@ if (onLava) {
         // No shoes - take damage
         if (now - this.lastLavaDamage > 1000) {
             this.takeDamage();
-            this.showMessage('🔥 Lava burns! You need special shoes!');
+            this.showMessage('🔥 あつい！🥾必要');
             this.lastLavaDamage = now;
         }
     }
@@ -2798,7 +2798,7 @@ if (onLava) {
         this.lavaProtectionActive = false;
         this.lavaProtectionTime = 5; // Reset to full protection
         if (this.wasOnLava) {  // Only show message if actually was on lava
-        this.showMessage('🥾 Stepped off lava! Shoes recharged for next time');
+        this.showMessage('🥾 マグマからおりた！　つぎのために パワーかいふく！☺️');
     }
 }
 this.wasOnLava = false; // Reset the flag
@@ -2938,73 +2938,73 @@ if (inForest) {
     handleNPCInteraction(friendly) {
     const message = friendly.dataset.message;
     
-    if (message === "🔑 Need a key? Give me 500¥!" && !this.hasKey) {
-        if (this.money >= 500) {
-            this.money -= 500;
+    if (message === "🔑 かぎほしいの？ 2500¥!" && !this.hasKey) {
+        if (this.money >= 2500) {
+            this.money -= 2500;
             this.hasKey = true;
-            this.showMessage('Thank you! Here\'s your key! 🔑');
-            friendly.dataset.message = 'Thank you for your business!';
+            this.showMessage('すげ');
+            friendly.dataset.message = 'また来てね';
             this.updateUI();
             this.saveGameState(); // Auto-save after purchase
         } else {
-            this.showMessage('🔑 Need a key? Give me 500¥!');
+            this.showMessage('🔑 かぎほしいの？ 2500¥!');
         }
-    } else if (message === "⛵ Want a boat? 500¥ and you can sail!" && !this.hasBoat) {
+    } else if (message === "⛵ ふねいる? 500¥でどうぞ!" && !this.hasBoat) {
         if (this.money >= 500) {
             this.money -= 500;
             this.hasBoat = true;
-            this.showMessage('⛵ Boat purchased! Now you can sail!');
-            friendly.dataset.message = 'Enjoy your boat!';
+            this.showMessage('⛵ ふね買った 海に行けるようになった');
+            friendly.dataset.message = '海で気をつけてね';
             this.updateUI();
             this.saveGameState(); // Auto-save after purchase
         } else {
-            this.showMessage('⛵ Want a boat? 500¥ and you can sail!');
+            this.showMessage('⛵ ふねいる? 500¥でどうぞ!');
         }
-    } else if (message === "🔦 Flashlight for sale! Light up dark caves for 600¥!" && !this.hasFlashlight) {
+    } else if (message === "🔦 懐中電灯! くらいどうくつにいい　600円" && !this.hasFlashlight) {
         if (this.money >= 600) {
             this.money -= 600;
             this.hasFlashlight = true;
-            this.showMessage('🔦 Flashlight purchased! Now you can explore dark caves!');
-            friendly.dataset.message = 'That flashlight will help you in southern caves... But be careful. I heard the Bully was in that area!';
+            this.showMessage('🔦 懐中電灯を買った! くらいどうくつ行けるようになった!');
+            friendly.dataset.message = '南にあるどうくつに行ったら... ご注意ください. いじめ子はそこら辺にいってたって聞いたよ';
             this.updateUI();
             this.saveGameState(); // Auto-save after purchase
         } else {
-            this.showMessage('🔦 Flashlight for sale! Light up dark caves for 600¥!');
+            this.showMessage('🔦 懐中電灯! くらいどうくつにいい　600円');
         }
-    } else if (message === "🥾 Lava-proof shoes! Only 900000000¥!" && !this.hasLavaShoes) {
-        if (this.money >= 900) {
-            this.money -= 900;
+    } else if (message === "🥾 マグマのくつ 9おく円！" && !this.hasLavaShoes) {
+        if (this.money >= 900000000) {
+            this.money -= 900000000;
             this.hasLavaShoes = true;
             this.lavaProtectionTime = 0;
             this.lavaProtectionActive = false;
-            this.showMessage('🥾 Lava shoes purchased! 5 seconds protection per entry!');
-            friendly.dataset.message = 'Those shoes will protect you!';
+            this.showMessage('🥾 マグマくつを買った5秒れんぞく守ってくれる');
+            friendly.dataset.message = '5秒以内にマグマから出てねそしてすぐまた使える';
             this.updateUI();
             this.saveGameState(); // Auto-save after purchase
         } else {
-            this.showMessage('🥾 Lava-proof shoes! Only 900000000¥!');
+            this.showMessage('🥾 マグマのくつ 9おく円！');
         }
-    } else if (message.includes("Thank god you are here, master frog") && !this.motherPaid) {
+    } else if (message.includes("マスターフロッグ！良かった！") && !this.motherPaid) {
         if (this.hasBaby) {
             this.money += 200;
             this.hasBaby = false;
             this.motherPaid = true;
-            this.showMessage('Thank you so much! Here is your reward!');
-            friendly.dataset.message = 'You saved my baby! I am forever grateful!';
+            this.showMessage('ほんまにサンキュウベリーまっちゅ💰楽しんで');
+            friendly.dataset.message = 'あかちゃんを たすけてくれて ありがとう！　ずっと かんしゃしてるよ！';
             this.updateUI();
             this.saveGameState(); // ONLY save when baby is delivered to mother
         } else if (!this.bullyDefeated) {
             this.showMessage(message);
         } else {
-            this.showMessage('You need to rescue my baby from the forest first!');
+            this.showMessage('赤ちゃんは？');
         }
-    } else if (message === "😢 The bully stole my pencil! I'll give you my pyramid key if you return it!") {
+    } else if (message === "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、ピラミッドのかぎを あげるよ！") {
         if (this.hasPencil) {
             // STAGE 2: Exchange with enhanced save
             this.hasPencil = false;
             this.hasPyramidKey = true;
-            this.showMessage('🗝️ Thank you so much! Here is the pyramid key!');
-            friendly.dataset.message = "I'll never forget your kindness!";
+            this.showMessage('本当にありがとう🗝️かぎどうぞどうぞ　あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！');
+            friendly.dataset.message = "あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！";
             this.updateUI();
             
             // ENHANCED SAVE WITH BACKUP
@@ -3015,7 +3015,7 @@ if (inForest) {
             setTimeout(() => {
                 const check = JSON.parse(localStorage.getItem('mfGameState'));
                 if (check.hasPyramidKey) {
-                    this.showMessage('✏️ Oh! My lovely pencil! Thank You! 🗝️');
+                    this.showMessage('本当にありがとう🗝️かぎどうぞどうぞ　あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！');
                 } else {
                     this.showMessage('❌ Save failed! Check console.');
                     console.error('SAVE FAILURE - Main:', check.hasPyramidKey);
@@ -3026,7 +3026,7 @@ if (inForest) {
             // STAGE 1: Show original message
             this.showMessage(message);
         }
-    } else if (message === "I'll never forget your kindness!") {
+    } else if (message === "あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！") {
         // STAGE 3: Post-mission message
         this.showMessage(message);
     } else {
@@ -3117,7 +3117,7 @@ if (this.hasBaby) itemsText += ' 👶🏻';
     // Keep timer running through death - it becomes a time penalty
     const timeAtDeath = this.timeElapsed;
     
-    this.showMessage('💀 You died! Returning to spawn point...');
+    this.showMessage('💀 死んだ! スタートのばしょにもどるよ...');
     setTimeout(() => {
         // Reset position to spawn point
         this.playerX = 420;
@@ -3265,7 +3265,7 @@ this.hasPyramidKey = gameState.hasPyramidKey || false;
 confirmDialog.innerHTML = `
     <div class="bully-dialogue">
         <div class="bully-image"></div>
-        <p>You want this baby?! You have to fight me for it!</p>
+        <p>この あかちゃんが ほしいのか？！　たたかって てにいれてみろ！</p>
         <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">Fight!</button>
     </div>
 `;
@@ -3319,7 +3319,7 @@ function startNewGame() {
     
     const savedState = localStorage.getItem('mfGameState');
     if (savedState) {
-        if (!confirm('Are you sure? This will delete your current progress and start completely over.')) {
+        if (!confirm('ほんとうに いいの？　いまの げんざいちを けして、さいしょから はじまるよ。')) {
             return; // User cancelled
         }
     }
@@ -3380,7 +3380,7 @@ function restartGame() {
     game.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
     document.getElementById('forestOverlay').classList.add('active');
     document.getElementById('forestVisionMask').classList.add('active');
-    game.showMessage('🌲 Entering the dense forest...');
+    game.showMessage('🌲 森に入る...');
       game.updateForestVisibility();
   } else if (game.pendingAction === 'exitForest') {
     game.isInForest = false;
@@ -3388,7 +3388,7 @@ function restartGame() {
     game.bgMusic.play().catch(e => console.log('Music play failed:', e));
     document.getElementById('forestOverlay').classList.remove('active');
     document.getElementById('forestVisionMask').classList.remove('active');
-    game.showMessage('🌞 Exiting the forest...');
+    game.showMessage('🌞 出た！');
       game.updateForestVisibility();
             } else if (game.pendingAction === 'fightBully') {
     game.saveGameState();
