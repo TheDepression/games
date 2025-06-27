@@ -758,8 +758,8 @@
     
     const offset = directionOffsets[this.currentDirection];
     // ADD 20px correction for both X and Y
-    attackEl.style.left = (this.playerX + offset.x - 20 + 20) + 'px';
-    attackEl.style.top = (this.playerY + offset.y - 20 + 20) + 'px';
+    attackEl.style.left = (this.playerX + offset.x - 20 + 15) + 'px';
+    attackEl.style.top = (this.playerY + offset.y - 20 + 15) + 'px';
     
     this.gameWorld.appendChild(attackEl);
     
