@@ -1002,7 +1002,7 @@ if (hitboxHit) {
                     gameState.hearts = 3; // Reset hearts
                     gameState.money = this.money; // Keep money
                     gameState.timeElapsed = this.timeElapsed; // Keep accumulated time
-                    gameState.hasWeapon = this.hasWeapon; // Keep weapon
+                    gameState.hasWeapon = true; // Force keep weapon when dying in boss
                     
                     // Keep all other items
                     gameState.hasFlashlight = this.hasFlashlight;
