@@ -1813,11 +1813,15 @@ this.lastTapY = null;
                 const padding = 2;
                 
                 const points = [
-                    {x: x + padding, y: y + padding},
-                    {x: x + playerSize - padding, y: y + padding},
-                    {x: x + padding, y: y + playerSize - padding},
-                    {x: x + playerSize - padding, y: y + playerSize - padding}
-                ];
+    {x: x + padding, y: y + padding},
+    {x: x + playerSize - padding, y: y + padding},
+    {x: x + padding, y: y + playerSize - padding},
+    {x: x + playerSize - padding, y: y + playerSize - padding},
+    {x: x + playerSize/2, y: y + padding},
+    {x: x + playerSize/2, y: y + playerSize - padding},
+    {x: x + padding, y: y + playerSize/2},
+    {x: x + playerSize - padding, y: y + playerSize/2}
+];
                 
                 const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .tiled-wall');
                 
