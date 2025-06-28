@@ -2114,29 +2114,30 @@ this.lastTapY = null;
             }
             
             updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('money').textContent = this.money;
-                
-                const ui = document.getElementById('ui');
-                let itemsText = '';
-                if (this.hasKey) itemsText += ' 🔑';
-                if (this.hasBoat) itemsText += ' ⛵';
-                if (this.hasHammer) itemsText += ' 🔨';
-                if (this.hasFlashlight) itemsText += ' 🔦';
-                if (this.hasPencil) itemsText += ' ✏️';
-                if (this.hasPyramidKey) itemsText += ' 🗝️';
-                if (this.hasWeapon) itemsText += ' 🔫';
-                if (this.hasLavaShoes) itemsText += ' 🥾';
-                
-                if (!document.getElementById('items')) {
-                    const itemsDiv = document.createElement('div');
-                    itemsDiv.id = 'items';
-                    itemsDiv.textContent = '+' + itemsText;
-                    ui.appendChild(itemsDiv);
-                } else {
-                    document.getElementById('items').textContent = '+' + itemsText;
-                }
-            }
+    document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money;
+    
+    const ui = document.getElementById('ui');
+    let itemsHTML = ''; // Change from itemsText to itemsHTML
+    if (this.hasKey) itemsHTML += ' 🔑';
+    if (this.hasBoat && !this.boatIsBroken) itemsHTML += ' ⛵';
+    if (this.hasBoat && this.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
+    if (this.hasHammer) itemsHTML += ' 🔨';
+    if (this.hasFlashlight) itemsHTML += ' 🔦';
+    if (this.hasPencil) itemsHTML += ' ✏️';
+    if (this.hasPyramidKey) itemsHTML += ' 🗝️';
+    if (this.hasWeapon) itemsHTML += ' 🔫';
+    if (this.hasLavaShoes) itemsHTML += ' 🥾';
+    
+    if (!document.getElementById('items')) {
+        const itemsDiv = document.createElement('div');
+        itemsDiv.id = 'items';
+        itemsDiv.innerHTML = '+' + itemsHTML; // Change to innerHTML
+        ui.appendChild(itemsDiv);
+    } else {
+        document.getElementById('items').innerHTML = '+' + itemsHTML; // Change to innerHTML
+    }
+}
             
             completeLevel() {
                 clearInterval(this.timerInterval);
