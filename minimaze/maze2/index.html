@@ -1693,13 +1693,7 @@ quicksandPositions.forEach(pos => {
                         this.playerX = newX;
                         this.playerY = newY;
 
-                        // ADD QUICKSAND PULL HERE:
-            if (this.sinkingInQuicksand && this.quicksandCenter) {
-                const pullX = (this.quicksandCenter.x - (this.playerX + 12)) * this.quicksandStrength * 0.1;
-                const pullY = (this.quicksandCenter.y - (this.playerY + 12)) * this.quicksandStrength * 0.1;
-                this.playerX += pullX;
-                this.playerY += pullY;
-            }
+                        
                         const visualOffset = (32 - 24) / 2;
                         this.player.style.left = (this.playerX - visualOffset) + 'px';
                         this.player.style.top = (this.playerY - visualOffset) + 'px';
@@ -1714,6 +1708,49 @@ quicksandPositions.forEach(pos => {
                             behavior: 'auto'
                         });
                     }
+
+updateQuicksand() {
+    if (!this.sinkingInQuicksand || !this.quicksandCenter) return;
+    
+    // Calculate pull towards center
+    const playerCenterX = this.playerX + 12;
+    const playerCenterY = this.playerY + 12;
+    const deltaX = this.quicksandCenter.x - playerCenterX;
+    const deltaY = this.quicksandCenter.y - playerCenterY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 1) { // Prevent jittering at center
+        // Pull strength increases as you get closer to center
+        const pullStrength = Math.max(0.3, (30 - distance) / 30 * 1.5);
+        const pullX = (deltaX / distance) * pullStrength;
+        const pullY = (deltaY / distance) * pullStrength;
+        
+        // Apply pull directly to position (bypassing wall collision)
+        const newX = this.playerX + pullX;
+        const newY = this.playerY + pullY;
+        
+        this.playerX = newX;
+        this.playerY = newY;
+        
+        // Update visual position
+        const visualOffset = (32 - 24) / 2;
+        this.player.style.left = (this.playerX - visualOffset) + 'px';
+        this.player.style.top = (this.playerY - visualOffset) + 'px';
+        
+        // Update camera
+        const gameAreaWidth = this.gameArea.offsetWidth;
+        const gameAreaHeight = this.gameArea.offsetHeight;
+        const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+        const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+        this.gameArea.scrollTo({
+            left: scrollX,
+            top: scrollY,
+            behavior: 'auto'
+        });
+    }
+}
+
+
                     
                     const friction = this.isOnDesert ? 0.7 : 0.9;
                     if (this.sinkingInQuicksand) {
