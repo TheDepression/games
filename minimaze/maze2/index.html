@@ -480,6 +480,46 @@
             margin-top: 10px;
             font-size: 12px;
         }
+
+
+        .quicksand {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, 
+        #8b6914 0%, 
+        #a67c1a 30%, 
+        #c4941f 60%, 
+        #8b6914 100%);
+    opacity: 0.8;
+    z-index: 26;
+    animation: quicksandSpin 4s linear infinite;
+}
+
+@keyframes quicksandSpin {
+    0% { 
+        background: radial-gradient(circle at center, 
+            #8b6914 0%, 
+            #a67c1a 30%, 
+            #c4941f 60%, 
+            #8b6914 100%);
+    }
+    50% {
+        background: radial-gradient(circle at center, 
+            #a67c1a 0%, 
+            #c4941f 30%, 
+            #8b6914 60%, 
+            #a67c1a 100%);
+    }
+    100% { 
+        background: radial-gradient(circle at center, 
+            #8b6914 0%, 
+            #a67c1a 30%, 
+            #c4941f 60%, 
+            #8b6914 100%);
+    }
+}
     </style>
 </head>
 <body>
@@ -717,9 +757,10 @@ this.lastTapY = null;
                     }
                 }
 
-                const sensitivity = 0.5;
-                this.playerVelocityX = deltaX * sensitivity;
-                this.playerVelocityY = deltaY * sensitivity;
+                const baseSensitivity = 0.5;
+const sensitivity = this.isOnDesert ? baseSensitivity * 0.25 : baseSensitivity;
+this.playerVelocityX = deltaX * sensitivity;
+this.playerVelocityY = deltaY * sensitivity;
 
                 const maxVelocity = 11;
                 this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
@@ -1105,6 +1146,22 @@ this.lastTapY = null;
                 desertZone.dataset.zoneType = 'desert';
                 this.gameWorld.appendChild(desertZone);
 
+
+                // Create quicksand pits in desert
+const quicksandPositions = [
+    {x: 1750, y: 1150},
+    {x: 2100, y: 1300},
+    {x: 2000, y: 1450}
+];
+
+quicksandPositions.forEach(pos => {
+    const quicksand = document.createElement('div');
+    quicksand.className = 'quicksand';
+    quicksand.style.left = pos.x + 'px';
+    quicksand.style.top = pos.y + 'px';
+    quicksand.dataset.type = 'quicksand';
+    this.gameWorld.appendChild(quicksand);
+});
                 // Village zones
                 const villageZones = [
                     {x: 0, y: 580, w: 140, h: 120},
