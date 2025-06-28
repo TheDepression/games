@@ -518,6 +518,7 @@
             <div id="welcomeMessage" style="margin: 20px 0;">The world has been destroyed...</div>
             <p style="font-size: 12px; opacity: 0.8;">🔫 You now have a TNT gun! Double-tap to shoot enemies!</p>
             <button class="start-button" onclick="startGame()">Enter the Wasteland</button>
+            <button class="new-game-button" onclick="resetAllProgress()" style="background: #665; font-size: 12px; padding: 8px 16px; opacity: 0.7;">Reset All Progress</button>
         </div>
         
         <div id="levelComplete" style="display: none;">
@@ -2203,6 +2204,27 @@ this.lastTapY = null;
                 window.location.reload();
             }
         }
+
+        function resetAllProgress() {
+    if (confirm('Are you sure? This will delete ALL progress and restart from the very beginning of Master Frog\'s Adventure.')) {
+        // Clear all Master Frog related localStorage except name (keep the name)
+        const playerName = localStorage.getItem('mfPlayerName');
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.startsWith('mf')) {
+                localStorage.removeItem(key);
+            }
+        });
+        
+        // Restore the name if it existed
+        if (playerName) {
+            localStorage.setItem('mfPlayerName', playerName);
+        }
+        
+        // Redirect to the very beginning
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+    }
+}
     </script>
 </body>
 </html>
