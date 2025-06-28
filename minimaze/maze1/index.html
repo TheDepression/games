@@ -2945,7 +2945,7 @@ if (inForest) {
             this.showMessage('すげ');
             friendly.dataset.message = 'また来てね';
             this.updateUI();
-            this.saveGameState(); // Auto-save after purchase
+            this.saveGameState();
         } else {
             this.showMessage('🏰のかぎ🔑ほしい？ 250000¥!');
         }
@@ -2956,7 +2956,7 @@ if (inForest) {
             this.showMessage('⛵ ふね買った 海に行けるようになった');
             friendly.dataset.message = '海で気をつけてね';
             this.updateUI();
-            this.saveGameState(); // Auto-save after purchase
+            this.saveGameState();
         } else {
             this.showMessage('⛵ ふねいる? 500¥でどうぞ!');
         }
@@ -2967,7 +2967,7 @@ if (inForest) {
             this.showMessage('🔦 懐中電灯を買った! くらいどうくつ行けるようになった!');
             friendly.dataset.message = '南にあるどうくつに行ったら... ご注意ください. いじめ子はそこら辺にいってたって聞いたよ';
             this.updateUI();
-            this.saveGameState(); // Auto-save after purchase
+            this.saveGameState();
         } else {
             this.showMessage('🔦 懐中電灯! くらいどうくつにいい　600円');
         }
@@ -2980,7 +2980,7 @@ if (inForest) {
             this.showMessage('🥾 マグマくつを買った5秒れんぞく守ってくれる');
             friendly.dataset.message = '5秒以内にマグマから出てねそしてすぐまた使える';
             this.updateUI();
-            this.saveGameState(); // Auto-save after purchase
+            this.saveGameState();
         } else {
             this.showMessage('🥾 マグマのくつ 700円！');
         }
@@ -2992,41 +2992,38 @@ if (inForest) {
             this.showMessage('ほんまにサンキュウベリーまっちゅ💰楽しんで');
             friendly.dataset.message = 'あかちゃんを たすけてくれて ありがとう！　ずっと かんしゃしてるよ！';
             this.updateUI();
-            this.saveGameState(); // ONLY save when baby is delivered to mother
+            this.saveGameState();
         } else if (!this.bullyDefeated) {
             this.showMessage(message);
         } else {
             this.showMessage('赤ちゃんは？');
         }
-    }  else if (message === "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！") {
-    if (this.hasPencil) {
-        this.hasPencil = false;
-        this.money += 400;
-        this.showMessage('本当にありがとう💰400¥どうぞ！');
-        friendly.dataset.message = "ありがとう！えんぴつをもらえて、ところで　さいきんいじめ子がピラミッドに入るのを見た。今ならたおせる！";
-        this.updateUI();
-        this.saveGameState();
+    } else if (message === "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！") {
+        if (this.hasPencil) {
+            this.hasPencil = false;
+            this.money += 400;
+            this.showMessage('本当にありがとう💰400¥どうぞ！');
+            friendly.dataset.message = "ありがとう！えんぴつをもらえて、とってもうれしいよ！";
+            this.updateUI();
+            this.saveGameState();
+        } else {
+            this.showMessage(message);
+        }
+    } else if (message === "🗝️ ピラミッドのかぎうってるよ！1200¥だよ！" && !this.hasPyramidKey) {
+        if (this.money >= 1200) {
+            this.money -= 1200;
+            this.hasPyramidKey = true;
+            this.showMessage('🗝️ ピラミッドのかぎを買った！');
+            friendly.dataset.message = 'ピラミッドで気をつけてね！';
+            this.updateUI();
+            this.saveGameState();
+        } else {
+            this.showMessage('🗝️ ピラミッドのかぎうってるよ！1200¥だよ！');
+        }
     } else {
         this.showMessage(message);
-    } 
-
-} else if (message === "🗝️ ピラミッドのかぎうってるよ！2000¥だよ！" && !this.hasPyramidKey) {
-    if (this.money >= 2000) {
-        this.money -= 2000;
-        this.hasPyramidKey = true;
-        this.showMessage('🗝️ ピラミッドのかぎを買った！');
-        friendly.dataset.message = 'ピラミッドで気をつけてね！';
-        this.updateUI();
-        this.saveGameState();
-    } else {
-        this.showMessage('🗝️ ピラミッドのかぎうってるよ！2000¥だよ！');
     }
-else {
-    this.showMessage(message);  // <- ADD THIS!
 }
-
-
-    }
     rectsOverlap(rect1, rect2) {
         return rect1.left < rect2.right &&
                rect1.right > rect2.left &&
