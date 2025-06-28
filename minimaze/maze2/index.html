@@ -1674,6 +1674,7 @@ quicksandPositions.forEach(pos => {
                 const gameLoop = () => {
                     if (this.gameStarted) {
                         this.updatePlayer();
+                        this.updateQuicksand(); // Add this line
                         this.updateMovingEnemies();
                         this.updateForegroundEnemy();
                         this.checkCollisions();
