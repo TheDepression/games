@@ -2079,6 +2079,28 @@ this.playerVelocityY *= friction;
                         this.showMessage('🔺 Pyramid Destroyed. Cannot Enter.');
                     }
                 }
+
+
+// Check quicksand
+const quicksands = this.gameWorld.querySelectorAll('[data-type="quicksand"]');
+quicksands.forEach(quicksand => {
+    const quicksandX = parseInt(quicksand.style.left);
+    const quicksandY = parseInt(quicksand.style.top);
+    const distance = Math.sqrt(
+        Math.pow(this.playerX + 12 - (quicksandX + 30), 2) + 
+        Math.pow(this.playerY + 12 - (quicksandY + 30), 2)
+    );
+    
+    if (distance <= 30) { // 30px radius
+        this.showMessage('💀 Quicksand! You\'re sinking!');
+        setTimeout(() => {
+            this.gameOver();
+        }, 1000);
+    }
+});
+
+
+
                 
                 // Check exit
                 const exit = this.gameWorld.querySelector('.exit');
