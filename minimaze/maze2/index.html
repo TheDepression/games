@@ -594,18 +594,18 @@
             const gameState = JSON.parse(savedState);
             
             // Check if they defeated the pyramid boss
-       //     if (!gameState.pyramidBossDefeated) {
-         //       alert('You must defeat the pyramid boss first!');
-           //     window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-             //   return;
-      //      }
+            if (!gameState.pyramidBossDefeated) {
+                alert('You must defeat the pyramid boss first!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
             
             // Check if they're coming from cutscene1
             //if (gameState.currentUrl !== 'cutscene1') {
                 //alert('Invalid access! Redirecting to proper location.');
               //  window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
             //    return;
-          //  }
+      //      }
             
             // Set welcome message
             const playerName = localStorage.getItem('mfPlayerName') || 'Unknown Hero';
@@ -1685,31 +1685,41 @@ quicksandPositions.forEach(pos => {
             }
 
             updatePlayer() {
-                if (this.isPaused) return;
-                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
-                    const newX = this.playerX + this.playerVelocityX;
-                    const newY = this.playerY + this.playerVelocityY;
-                    
-                    if (this.canMoveTo(newX, newY)) {
-                        this.playerX = newX;
-                        this.playerY = newY;
+    if (this.isPaused) return;
+    if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+        const newX = this.playerX + this.playerVelocityX;
+        const newY = this.playerY + this.playerVelocityY;
+        
+        if (this.canMoveTo(newX, newY)) {
+            this.playerX = newX;
+            this.playerY = newY;
+            
+            const visualOffset = (32 - 24) / 2;
+            this.player.style.left = (this.playerX - visualOffset) + 'px';
+            this.player.style.top = (this.playerY - visualOffset) + 'px';
+            
+            const gameAreaWidth = this.gameArea.offsetWidth;
+            const gameAreaHeight = this.gameArea.offsetHeight;
+            const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+            const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+            this.gameArea.scrollTo({
+                left: scrollX,
+                top: scrollY,
+                behavior: 'auto'
+            });
+        }
+        
+        // ADD THE MISSING FRICTION CODE:
+        let friction = this.isOnDesert ? 0.7 : 0.9;
+        if (this.sinkingInQuicksand) {
+            friction *= 0.1; // Very hard to move, but not impossible
+        }
+        this.playerVelocityX *= friction;
+        this.playerVelocityY *= friction;
+    }
+} // <- CLOSE updatePlayer() method here
 
-                        
-                        const visualOffset = (32 - 24) / 2;
-                        this.player.style.left = (this.playerX - visualOffset) + 'px';
-                        this.player.style.top = (this.playerY - visualOffset) + 'px';
-                        
-                        const gameAreaWidth = this.gameArea.offsetWidth;
-                        const gameAreaHeight = this.gameArea.offsetHeight;
-                        const scrollX = this.playerX - gameAreaWidth / 2 + 12;
-                        const scrollY = this.playerY - gameAreaHeight / 2 + 12;
-                        this.gameArea.scrollTo({
-                            left: scrollX,
-                            top: scrollY,
-                            behavior: 'auto'
-                        });
-                    }
-
+// NOW ADD updateQuicksand() as a separate method:
 updateQuicksand() {
     if (!this.sinkingInQuicksand || !this.quicksandCenter) return;
     
@@ -1750,17 +1760,6 @@ updateQuicksand() {
         });
     }
 }
-
-
-                    
-                    const friction = this.isOnDesert ? 0.7 : 0.9;
-                    if (this.sinkingInQuicksand) {
-            friction *= 0.3; // Much harder to move in quicksand
-        }
-this.playerVelocityX *= friction;
-this.playerVelocityY *= friction;
-                }
-            }
 
             updateMovingEnemies() {
                 if (this.isPaused) return;
