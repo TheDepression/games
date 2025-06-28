@@ -1692,6 +1692,14 @@ quicksandPositions.forEach(pos => {
                     if (this.canMoveTo(newX, newY)) {
                         this.playerX = newX;
                         this.playerY = newY;
+
+                        // ADD QUICKSAND PULL HERE:
+            if (this.sinkingInQuicksand && this.quicksandCenter) {
+                const pullX = (this.quicksandCenter.x - (this.playerX + 12)) * this.quicksandStrength * 0.1;
+                const pullY = (this.quicksandCenter.y - (this.playerY + 12)) * this.quicksandStrength * 0.1;
+                this.playerX += pullX;
+                this.playerY += pullY;
+            }
                         const visualOffset = (32 - 24) / 2;
                         this.player.style.left = (this.playerX - visualOffset) + 'px';
                         this.player.style.top = (this.playerY - visualOffset) + 'px';
