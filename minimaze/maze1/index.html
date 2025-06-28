@@ -1930,10 +1930,10 @@ sharkEnemies.forEach((shark, index) => {
 }
     createFriendlies() {
     const friendlies = [
-        {x: 2280, y: 850, message: "🔑 かぎほしいの？ 2500¥!", customEmoji: "👴🏻"},
+        {x: 2280, y: 850, message: "🏰のかぎ🔑ほしい？ 250000¥!", customEmoji: "👴🏻"},
         {x: 1200, y: 600, message: "⛵ ふねいる? 500¥でどうぞ!", customEmoji: "👩‍⚕️"},
         {x: 60, y: 60, message: "🔦 懐中電灯! くらいどうくつにいい　600円", customEmoji: "🧙‍♀️"},
-        {x: 1250, y: 1690, message: "🥾 マグマのくつ 9おく円！", customEmoji: "👷‍♂️"},
+        {x: 1250, y: 1690, message: "🥾 マグマのくつ 700円！", customEmoji: "👷‍♂️"},
         {x: 380, y: 1760, message: this.motherPaid ? "あかちゃんを たすけてくれて ありがとう！　ずっと かんしゃしてるよ！" : "マスターフロッグ！良かった！ さっき、いじめ子があたしの赤ちゃんをぬすんで、森に行った! 助けてくれたら 200¥あげる. それしかない! お願い!", type: "mother", customEmoji: "👩🏻"},
         {x: 90, y: 1535, message: "いじめっこが まちを おそってから、おかねは ほとんど のこってない。 ぜんぶ きんこに いれたよ。だれも ちかづいてない！", type: "guard", customEmoji: "💂🏻‍♂️"},
         {x: 100, y: 1020, message: "森🌳は危ない,.. 死なないようにゆっくり歩いてね...それなのに若い女性👩はそこでふね⛵️をはんばいしてる。信じられへん", type: "traveler", customEmoji: "🧓🏻"},
@@ -2634,7 +2634,7 @@ moneyItems.forEach(money => {
                 if (this.hasKey) {
                     this.completeLevel();
                 } else {
-                    this.showMessage('🔑 You need a key to exit!');
+                    this.showMessage('入るために🔑必要!');
                 }
             }
         }
@@ -2685,7 +2685,7 @@ if (this.rectsOverlap(playerRect, pyramidRect)) {
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         window.location.href = 'https://thedepression.github.io/games/minimaze/pyramid';
     } else {
-        this.showMessage('🔺 ピラミッドカギ🔑必要');
+        this.showMessage('🔺 ピラミッドカギ🗝️必要');
     }
 }
 
@@ -2935,16 +2935,16 @@ if (inForest) {
     handleNPCInteraction(friendly) {
     const message = friendly.dataset.message;
     
-    if (message === "🔑 かぎほしいの？ 2500¥!" && !this.hasKey) {
-        if (this.money >= 2500) {
-            this.money -= 2500;
+    if (message === "🏰のかぎ🔑ほしい？ 250000¥!" && !this.hasKey) {
+        if (this.money >= 250000) {
+            this.money -= 250000;
             this.hasKey = true;
             this.showMessage('すげ');
             friendly.dataset.message = 'また来てね';
             this.updateUI();
             this.saveGameState(); // Auto-save after purchase
         } else {
-            this.showMessage('🔑 かぎほしいの？ 2500¥!');
+            this.showMessage('🏰のかぎ🔑ほしい？ 250000¥!');
         }
     } else if (message === "⛵ ふねいる? 500¥でどうぞ!" && !this.hasBoat) {
         if (this.money >= 500) {
@@ -2968,9 +2968,9 @@ if (inForest) {
         } else {
             this.showMessage('🔦 懐中電灯! くらいどうくつにいい　600円');
         }
-    } else if (message === "🥾 マグマのくつ 9おく円！" && !this.hasLavaShoes) {
-        if (this.money >= 900000000) {
-            this.money -= 900000000;
+    } else if (message === "🥾 マグマのくつ 700円！" && !this.hasLavaShoes) {
+        if (this.money >= 700) {
+            this.money -= 700;
             this.hasLavaShoes = true;
             this.lavaProtectionTime = 0;
             this.lavaProtectionActive = false;
@@ -2979,7 +2979,7 @@ if (inForest) {
             this.updateUI();
             this.saveGameState(); // Auto-save after purchase
         } else {
-            this.showMessage('🥾 マグマのくつ 9おく円！');
+            this.showMessage('🥾 マグマのくつ 700円！');
         }
     } else if (message.includes("マスターフロッグ！良かった！") && !this.motherPaid) {
         if (this.hasBaby) {
@@ -3102,7 +3102,7 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         this.gameStarted = false;
         this.bgMusic.pause();
         this.forestMusic.pause();
-        this.showLevelComplete('🎉 Adventure Complete!', 'You escaped the colorful maze!');
+        this.showLevelComplete('🎉 お前はすげ', 'どうやって🔑を見つけた!');
     }
     
     gameOver() {
