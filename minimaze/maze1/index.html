@@ -1940,11 +1940,14 @@ sharkEnemies.forEach((shark, index) => {
         {x: 500, y: 500, message: "マリオじゃないよ. あっち行け!", type: "villager", customEmoji: "👨🏻"},
         {x: 2250, y: 960, message: "北にある🏰お城はいつも おおきな おとを たてて ピカピカひかってるんだ。 なにが おこってるのかな〜？！", type: "historian", customEmoji: "👵🏻"},
         {x: 80, y: 670, message: "うわさでは、いじめっこが ずーっと いきる ほうほうを みつけたんだって。それが ほんとうなら、みんな やばいかも。", type: "elder", customEmoji: "🤴🏻"},
-        {x: 2270, y: 800, message: this.hasPyramidKey ? "あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！" : "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、ピラミッドのかぎを あげるよ！", type: "pencil_owner", customEmoji: ""},
+        {x: 2270, y: 800, message: "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！", type: "pencil_owner", customEmoji: ""},
         {x: 900, y: 2340, message: "もりには ひみつの３つめのいりぐちが あるんだ…", type: "cowboy", customEmoji: "🤠"},
         {x: 2360, y: 2360, message: "やあ、なかまのカエルさん。ひみつを おしえてあげるよ。 ピンクのしかくの 下で ゆっくり まってごらん。いいことが あるよ！", type: "frog", customEmoji: "🐸"},
         {x: 60, y: 1660, message: "ゴリラが はしりまわってるって きいたよ。きをつけてね！", type: "woman", customEmoji: "👩🏼‍💼"},
-        {x: 860, y: 1600, message: "ハンマーが あれば、この はいいろのかべを こわせるのに。", type: "cat", customEmoji: "😺"}
+        {x: 860, y: 1600, message: "ハンマーが あれば、この はいいろのかべを こわせるのに。", type: "cat", customEmoji: "😺"},
+        {x: 1880, y: 2080, message: "🗝️ ピラミッドのかぎうってるよ！2000¥だよ！", type: "pyramid_seller", customEmoji: "🥸"}
+
+
     ];
     
     friendlies.forEach((friendly, index) => {
@@ -2995,40 +2998,30 @@ if (inForest) {
         } else {
             this.showMessage('赤ちゃんは？');
         }
-    } else if (message === "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、ピラミッドのかぎを あげるよ！") {
-        if (this.hasPencil) {
-            // STAGE 2: Exchange with enhanced save
-            this.hasPencil = false;
-            this.hasPyramidKey = true;
-            this.showMessage('本当にありがとう🗝️かぎどうぞどうぞ　あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！');
-            friendly.dataset.message = "あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！";
-            this.updateUI();
-            
-            // ENHANCED SAVE WITH BACKUP
-            this.saveGameState();
-            localStorage.setItem('mfGameState_backup', localStorage.getItem('mfGameState'));
-            
-            // VERIFICATION
-            setTimeout(() => {
-                const check = JSON.parse(localStorage.getItem('mfGameState'));
-                if (check.hasPyramidKey) {
-                    this.showMessage('本当にありがとう🗝️かぎどうぞどうぞ　あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！');
-                } else {
-                    this.showMessage('❌ Save failed! Check console.');
-                    console.error('SAVE FAILURE - Main:', check.hasPyramidKey);
-                    console.log('Backup exists:', localStorage.getItem('mfGameState_backup') !== null);
-                }
-            }, 100);
-        } else {
-            // STAGE 1: Show original message
-            this.showMessage(message);
-        }
-    } else if (message === "あのね。。いじめ子はピラミッドに行ったばかり！たおしてね！") {
-        // STAGE 3: Post-mission message
-        this.showMessage(message);
+    }  else if (message === "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！") {
+    if (this.hasPencil) {
+        this.hasPencil = false;
+        this.money += 400;
+        this.showMessage('本当にありがとう💰400¥どうぞ！');
+        friendly.dataset.message = "ありがとう！えんぴつをもらえて、ところで　さいきんいじめ子がピラミッドに入るのを見た。今ならたおせる！";
+        this.updateUI();
+        this.saveGameState();
     } else {
         this.showMessage(message);
+    } 
+
+} else if (message === "🗝️ ピラミッドのかぎうってるよ！2000¥だよ！" && !this.hasPyramidKey) {
+    if (this.money >= 2000) {
+        this.money -= 2000;
+        this.hasPyramidKey = true;
+        this.showMessage('🗝️ ピラミッドのかぎを買った！');
+        friendly.dataset.message = 'ピラミッドで気をつけてね！';
+        this.updateUI();
+        this.saveGameState();
+    } else {
+        this.showMessage('🗝️ ピラミッドのかぎうってるよ！2000¥だよ！');
     }
+
 }
 
     
