@@ -355,6 +355,11 @@ this.preloadPlayerImages(); // <-- ADD THIS LINE
                 // Cave items
                 this.hammerCollected = false;
                 this.snakes = [];
+
+                // ADD THESE NEW LINES:
+this.pencilReturned = false;
+this.hasSpokenToFrog = false;
+this.pinkSquareSecretClaimed = false;
                 
                 // Timer
                 this.timerInterval = null;
@@ -387,6 +392,11 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
 this.cavebHeartCollected = gameState.cavebHeartCollected || false;
 
+        // ADD THESE NEW LINES:
+this.pencilReturned = gameState.pencilReturned || false;
+this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
+this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
+
         // ADD ALL MISSING ITEMS:
         this.hasBoat = gameState.hasBoat || false;
         this.hasKey = gameState.hasKey || false;
@@ -415,6 +425,10 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
         this.motherPaid = false;
         this.collectedMoney = [];
         this.collectedHearts = [];
+        // ADD THESE NEW LINES:
+this.pencilReturned = false;
+this.hasSpokenToFrog = false;
+this.pinkSquareSecretClaimed = false;
     }
 }
             
@@ -1184,6 +1198,9 @@ hearts.forEach(heart => {
         gameState.caveaHeartCollected = this.caveaHeartCollected;
         gameState.cavebMoneyCollected = this.cavebMoneyCollected;
         gameState.cavebHeartCollected = this.cavebHeartCollected;
+        gameState.pencilReturned = this.pencilReturned;
+gameState.hasSpokenToFrog = this.hasSpokenToFrog;
+gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
         
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
