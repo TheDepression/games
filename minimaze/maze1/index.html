@@ -3081,6 +3081,8 @@ if (inForest) {
         }
     } else if (message.includes("あかちゃんを たすけてくれて ありがとう")) {
         this.showMessage('あかちゃんを たすけてくれて ありがとう！　ずっと かんしゃしてるよ！');
+        } else if (message.includes("マスターフロッグ！良かった！") && this.motherPaid) {  // <-- ADD THIS LINE
+    this.showMessage('あかちゃんを たすけてくれて ありがとう！　ずっと かんしゃしてるよ！');  // <-- AND THIS LINE
     } else if (message === "やあ、なかまのカエルさん。ひみつを おしえてあげるよ。 ピンクのしかくの 下で ゆっくり まってごらん。いいことが あるよ！") {
         this.hasSpokenToFrog = true;
         this.showMessage(message);
