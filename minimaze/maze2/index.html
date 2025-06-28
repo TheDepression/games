@@ -1872,10 +1872,14 @@ this.lastTapY = null;
                     }
                 }
                 
-                if (isEnteringWater && !this.hasBoat) {
-                    this.showMessage('🌊 You need a boat to cross water!');
-                    return false;
-                }
+                if (isEnteringWater && (!this.hasBoat || this.boatIsBroken)) {
+    if (this.boatIsBroken) {
+        this.showMessage('⛵💔 Your boat is broken. You can\'t ride it!');
+    } else {
+        this.showMessage('🌊 You need a boat to cross water!');
+    }
+    return false;
+}
                 
                 return true;
             }
