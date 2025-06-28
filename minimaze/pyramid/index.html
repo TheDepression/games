@@ -558,6 +558,9 @@ this.isNearNPC = false;
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.collectedHearts = gameState.collectedHearts || [];
                     this.caveBossDefeated = gameState.caveBossDefeated || false;
+                    this.pencilReturned = gameState.pencilReturned || false;
+this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
+this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
                     
                     this.hasWeapon = gameState.hasWeapon || false;
                 } else {
@@ -577,6 +580,10 @@ this.isNearNPC = false;
                     this.collectedMoney = [];
                     this.collectedHearts = [];
                     this.caveBossDefeated = false;
+                    // ADD THESE THREE NEW LINES:
+this.pencilReturned = false;
+this.hasSpokenToFrog = false;
+this.pinkSquareSecretClaimed = false;
                 }
             }
             
@@ -1876,6 +1883,9 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                     gameState.collectedMoney = this.collectedMoney;
                     gameState.collectedHearts = this.collectedHearts;
                     gameState.caveBossDefeated = this.caveBossDefeated;
+                    gameState.pencilReturned = this.pencilReturned;
+gameState.hasSpokenToFrog = this.hasSpokenToFrog;
+gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
                     
                     gameState.playerX = 2200;
                     gameState.playerY = 1400;
