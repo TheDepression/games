@@ -2779,7 +2779,7 @@ if (onLava) {
         // Take damage if protection expired
         if (!this.lavaProtectionActive) {
             if (now - this.lastLavaDamage > 1000) {
-                this.takeDamage();
+                this.takeDamage(2);
                 this.showMessage('🔥 あつい');
                 this.lastLavaDamage = now;
             }
@@ -2787,7 +2787,7 @@ if (onLava) {
     } else {
         // No shoes - take damage
         if (now - this.lastLavaDamage > 1000) {
-            this.takeDamage();
+            this.takeDamage(2);
             this.showMessage('🔥 あつい！🥾必要');
             this.lastLavaDamage = now;
         }
