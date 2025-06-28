@@ -506,6 +506,10 @@
 this.caveaHeartCollected = gameState.caveaHeartCollected || false;
                     this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
 this.cavebHeartCollected = gameState.cavebHeartCollected || false;
+                    // ADD THESE THREE NEW LINES:
+this.pencilReturned = gameState.pencilReturned || false;
+this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
+this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
                 } else {
                     this.hearts = 3;
                     this.money = 0;
@@ -524,6 +528,10 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
                     this.hasPencil = false;
                     this.caveBossDefeated = false;
                     this.hasPyramidKey = gameState.hasPyramidKey || false;
+                    // ADD THESE THREE NEW LINES:
+this.pencilReturned = false;
+this.hasSpokenToFrog = false;
+this.pinkSquareSecretClaimed = false;
                 }
             }
 
@@ -556,7 +564,10 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
                     caveaMoneyCollected: this.caveaMoneyCollected,
 caveaHeartCollected: this.caveaHeartCollected,
                     cavebMoneyCollected: this.cavebMoneyCollected,
-cavebHeartCollected: this.cavebHeartCollected
+cavebHeartCollected: this.cavebHeartCollected,
+                    pencilReturned: this.pencilReturned,
+hasSpokenToFrog: this.hasSpokenToFrog,
+pinkSquareSecretClaimed: this.pinkSquareSecretClaimed
                 };
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
@@ -1235,6 +1246,9 @@ if (this.headingToCorner) {
             isInForest: this.isInForest,
             hasFlashlight: this.hasFlashlight,
             hasPencil: this.hasPencil,
+            pencilReturned: this.pencilReturned,
+hasSpokenToFrog: this.hasSpokenToFrog,
+pinkSquareSecretClaimed: this.pinkSquareSecretClaimed,
             caveBossDefeated: false // Boss NOT defeated if you died
         };
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
