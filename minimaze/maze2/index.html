@@ -2073,6 +2073,27 @@ this.lastTapY = null;
                         this.lastLavaDamage = now;
                     }
                 }
+
+                // Check if on desert zones
+const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
+let onDesert = false;
+
+for (let zone of desertZones) {
+    const zoneRect = {
+        left: parseInt(zone.style.left),
+        top: parseInt(zone.style.top),
+        right: parseInt(zone.style.left) + parseInt(zone.style.width),
+        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+    };
+    
+    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+        onDesert = true;
+        break;
+    }
+}
+
+this.isOnDesert = onDesert;
             }
 
             rectsOverlap(rect1, rect2) {
