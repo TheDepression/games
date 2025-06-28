@@ -3032,25 +3032,25 @@ if (inForest) {
                rect1.bottom > rect2.top;
     }
     
-    takeDamage() {
-        if (this.isInvulnerable) return;
-        
-        this.hearts--;
-        this.showMessage('💔 Ouch!');
-        this.updateUI();
-        
-        this.isInvulnerable = true;
-        this.player.classList.add('invulnerable');
-        
-        setTimeout(() => {
-            this.isInvulnerable = false;
-            this.player.classList.remove('invulnerable');
-        }, 1000);
-        
-        if (this.hearts <= 0) {
-            this.gameOver();
-        }
+    takeDamage(damage = 1) { // Add parameter with default of 1
+    if (this.isInvulnerable) return;
+    
+    this.hearts -= damage; // Use the damage parameter
+    this.showMessage(damage > 1 ? '💔💔 Major damage!' : '💔 Ouch!');
+    this.updateUI();
+    
+    this.isInvulnerable = true;
+    this.player.classList.add('invulnerable');
+    
+    setTimeout(() => {
+        this.isInvulnerable = false;
+        this.player.classList.remove('invulnerable');
+    }, 1000);
+    
+    if (this.hearts <= 0) {
+        this.gameOver();
     }
+}
     
     showMessage(text) {
         const message = document.getElementById('message');
