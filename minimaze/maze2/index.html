@@ -1716,6 +1716,9 @@ quicksandPositions.forEach(pos => {
                     }
                     
                     const friction = this.isOnDesert ? 0.7 : 0.9;
+                    if (this.sinkingInQuicksand) {
+            friction *= 0.3; // Much harder to move in quicksand
+        }
 this.playerVelocityX *= friction;
 this.playerVelocityY *= friction;
                 }
@@ -2292,7 +2295,9 @@ this.isOnDesert = onDesert;
             }
             
             gameOver() {
-                this.sinkingInQuicksand = false; // Reset quicksand flag
+                this.sinkingInQuicksand = false;
+    this.quicksandStrength = 0;
+    this.quicksandCenter = null;
                 clearInterval(this.timerInterval);
                 this.gameStarted = false;
                 this.bgMusic.pause();
