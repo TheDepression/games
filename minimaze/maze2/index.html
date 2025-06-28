@@ -2256,6 +2256,7 @@ this.isOnDesert = onDesert;
             }
             
             gameOver() {
+                this.sinkingInQuicksand = false; // Reset quicksand flag
                 clearInterval(this.timerInterval);
                 this.gameStarted = false;
                 this.bgMusic.pause();
