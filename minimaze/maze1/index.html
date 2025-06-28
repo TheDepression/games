@@ -2894,10 +2894,10 @@ this.wasOnLava = false; // Reset the flag
             if (this.pinkSquareTimer % 60 === 0) {
                 const secondsWaited = this.pinkSquareTimer / 60;
                 
-                if (!this.hasSpokenToFrog) {
-                    this.showMessage('何もない ヒント🐸');
-                    this.pinkSquareTimer = 0; // Reset timer if they haven't spoken to frog
-                } else if (secondsWaited >= 10) {
+                if (!this.hasSpokenToFrog && secondsWaited >= 10) {
+    this.showMessage('🐸何もない');
+    this.pinkSquareTimer = 0; // Reset timer if they haven't spoken to frog
+} else if (secondsWaited >= 10) {
                     // 10 seconds completed!
                     this.pinkSquareSecretClaimed = true;
                     this.money += 1200;
