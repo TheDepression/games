@@ -3079,8 +3079,8 @@ if (inForest) {
         this.saveGameState();
         
     } else if (message === "🗝️ ピラミッドのかぎうってるよ！2000¥だよ！" && !this.hasPyramidKey) {
-        if (this.money >= 1200) {
-            this.money -= 1200;
+        if (this.money >= 2000) {
+            this.money -= 2000;
             this.hasPyramidKey = true;
             this.showMessage('🗝️ ピラミッドのかぎを買った！');
             friendly.dataset.message = 'ピラミッドで気をつけてね！';
