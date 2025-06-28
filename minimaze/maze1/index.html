@@ -3078,7 +3078,7 @@ if (inForest) {
         this.showMessage(message);
         this.saveGameState();
         
-    } else if (message === "🗝️ ピラミッドのかぎうってるよ！1200¥だよ！" && !this.hasPyramidKey) {
+    } else if (message === "🗝️ ピラミッドのかぎうってるよ！2000¥だよ！" && !this.hasPyramidKey) {
         if (this.money >= 1200) {
             this.money -= 1200;
             this.hasPyramidKey = true;
@@ -3087,7 +3087,7 @@ if (inForest) {
             this.updateUI();
             this.saveGameState();
         } else {
-            this.showMessage('🗝️ ピラミッドのかぎうってるよ！1200¥だよ！');
+            this.showMessage('🗝️ ピラミッドのかぎうってるよ！2000¥だよ！');
         }
     } else {
         this.showMessage(message);
