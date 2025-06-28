@@ -64,21 +64,21 @@
     z-index: 151; /* Above zones but below UI */
     opacity: 0.55;
     filter: blur(1px);
-    animation: fogDrift 60s ease-in-out infinite alternate;
+    animation: fogDrift 50s ease-in-out infinite alternate;
 }
 
 @keyframes fogDrift {
     0% { 
         background-position: 0 0, 150px 100px, 75px 200px, 225px 50px, 300px 250px;
-        opacity: 0.4;
+        opacity: 0.5;
     }
     50% {
         background-position: 100px 50px, 250px 150px, 175px 250px, 325px 100px, 400px 300px;
-        opacity: 0.5;
+        opacity: 0.6;
     }
     100% { 
         background-position: 200px 100px, 350px 200px, 275px 300px, 425px 150px, 500px 350px;
-        opacity: 0.4;
+        opacity: 0.5;
     }
 }
         
