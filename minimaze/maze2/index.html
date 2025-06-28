@@ -628,12 +628,12 @@ this.lastTapY = null;
 
                 
                 // FORCE DEFAULT ITEMS (all from maze1 except specified)
-                this.hasKey = true;
+                this.hasKey = false;
                 this.hasBoat = true;
                 this.boatIsBroken = true;
                 this.hasHammer = true;
                 this.hasFlashlight = true;
-                this.hasPencil = true;
+                this.hasPencil = false;
                 this.hasPyramidKey = true;
                 this.hasLavaShoes = false; // NOT obtained yet
                 this.hasWeapon = true; // ALWAYS have gun
@@ -659,6 +659,10 @@ this.lastTapY = null;
                 this.lastDragY = 0;
                 this.currentDirection = 's';
                 this.lastMoveDirection = 's';
+
+              
+    this.sinkingInQuicksand = false; // Add this line
+    
                 
                 // Enemy and interaction properties
                 this.movingEnemies = [];
@@ -2231,7 +2235,6 @@ this.isOnDesert = onDesert;
     if (this.hasHammer) itemsHTML += ' 🔨';
     if (this.hasFlashlight) itemsHTML += ' 🔦';
     if (this.hasPencil) itemsHTML += ' ✏️';
-    if (this.hasPyramidKey) itemsHTML += ' 🗝️';
     if (this.hasWeapon) itemsHTML += ' 🔫';
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
     
