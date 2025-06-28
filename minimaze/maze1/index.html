@@ -2490,6 +2490,10 @@ canGorillaMoveTo(x, y) {
         
         // Check zone-based effects
         this.checkZoneEffects();
+
+
+        // Check pink square secret
+        this.checkPinkSquareSecret();
         
         // Check enemy collisions
 this.movingEnemies.forEach(enemy => {
@@ -2857,6 +2861,60 @@ this.wasOnLava = false; // Reset the flag
         }
     }
 
+    checkPinkSquareSecret() {
+        if (this.pinkSquareSecretClaimed) return;
+        
+        const playerCenterX = this.playerX + 12;
+        const playerCenterY = this.playerY + 12;
+        
+        // Pink square is at x: 100, y: 200, w: 20, h: 20
+        // Check if player is directly under it (touching bottom edge)
+        const pinkSquareLeft = 100;
+        const pinkSquareRight = 120;
+        const pinkSquareBottom = 220; // y + height
+        
+        const isUnderPinkSquare = (
+            playerCenterX >= pinkSquareLeft && 
+            playerCenterX <= pinkSquareRight && 
+            Math.abs(this.playerY - pinkSquareBottom) <= 5 && // Player's top edge near square's bottom
+            Math.abs(this.playerVelocityX) < 0.1 && 
+            Math.abs(this.playerVelocityY) < 0.1 // Player is motionless
+        );
+        
+        if (isUnderPinkSquare) {
+            if (!this.isUnderPinkSquare) {
+                // Just started being under the square
+                this.isUnderPinkSquare = true;
+                this.pinkSquareTimer = 0;
+            }
+            
+            this.pinkSquareTimer++;
+            
+            // Check every 60 frames (1 second at 60fps)
+            if (this.pinkSquareTimer % 60 === 0) {
+                const secondsWaited = this.pinkSquareTimer / 60;
+                
+                if (!this.hasSpokenToFrog) {
+                    this.showMessage('何もない ヒント🐸');
+                    this.pinkSquareTimer = 0; // Reset timer if they haven't spoken to frog
+                } else if (secondsWaited >= 10) {
+                    // 10 seconds completed!
+                    this.pinkSquareSecretClaimed = true;
+                    this.money += 1200;
+                    this.showMessage('🎉 ひみつの ボーナス! +1200¥!');
+                    this.updateUI();
+                    this.saveGameState();
+                }
+            }
+        } else {
+            if (this.isUnderPinkSquare) {
+                // Player moved away from the square
+                this.isUnderPinkSquare = false;
+                this.pinkSquareTimer = 0;
+            }
+        }
+    }
+
     initializeZoneEffects() {
     const playerCenterX = this.playerX + 12;
     const playerCenterY = this.playerY + 12;
@@ -3014,6 +3072,12 @@ if (inForest) {
         } else {
             this.showMessage(message);
         }
+        
+        } else if (message === "やあ、なかまのカエルさん。ひみつを おしえてあげるよ。 ピンクのしかくの 下で ゆっくり まってごらん。いいことが あるよ！") {
+        this.hasSpokenToFrog = true;
+        this.showMessage(message);
+        this.saveGameState();
+        
     } else if (message === "🗝️ ピラミッドのかぎうってるよ！1200¥だよ！" && !this.hasPyramidKey) {
         if (this.money >= 1200) {
             this.money -= 1200;
@@ -3165,7 +3229,9 @@ hasPyramidKey: this.hasPyramidKey,
         caveaMoneyCollected: this.caveaMoneyCollected,
 caveaHeartCollected: this.caveaHeartCollected,
         cavebMoneyCollected: this.cavebMoneyCollected,
-cavebHeartCollected: this.cavebHeartCollected
+cavebHeartCollected: this.cavebHeartCollected,
+        hasSpokenToFrog: this.hasSpokenToFrog,
+        pinkSquareSecretClaimed: this.pinkSquareSecretClaimed
     };
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     console.log('Game saved:', gameState); // For debugging
@@ -3198,6 +3264,8 @@ this.hasPyramidKey = gameState.hasPyramidKey || false;
 this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
 this.cavebHeartCollected = gameState.cavebHeartCollected || false;
+        this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
+        this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
         // Set the timer to continue from saved time
         this.updateTimer();
         
@@ -3235,6 +3303,8 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
 this.hasPencil = gameState.hasPencil || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
+        this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
+        this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
         
         this.updateUI();
         return true;
