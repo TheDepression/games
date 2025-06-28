@@ -661,8 +661,9 @@ this.lastTapY = null;
                 this.lastMoveDirection = 's';
 
               
-    this.sinkingInQuicksand = false; // Add this line
-    
+    this.sinkingInQuicksand = false;
+    this.quicksandStrength = 0; // How strong the pull is
+    this.quicksandCenter = null; // Which quicksand pit center
                 
                 // Enemy and interaction properties
                 this.movingEnemies = [];
@@ -2087,26 +2088,53 @@ this.playerVelocityY *= friction;
 
 // Check quicksand
 const quicksands = this.gameWorld.querySelectorAll('[data-type="quicksand"]');
+let inQuicksand = false;
+let closestQuicksand = null;
+let closestDistance = Infinity;
+
 quicksands.forEach(quicksand => {
     const quicksandX = parseInt(quicksand.style.left);
     const quicksandY = parseInt(quicksand.style.top);
+    const centerX = quicksandX + 30; // Center of 60px circle
+    const centerY = quicksandY + 30;
     const distance = Math.sqrt(
-        Math.pow(this.playerX + 12 - (quicksandX + 30), 2) + 
-        Math.pow(this.playerY + 12 - (quicksandY + 30), 2)
+        Math.pow(this.playerX + 12 - centerX, 2) + 
+        Math.pow(this.playerY + 12 - centerY, 2)
     );
     
-    if (distance <= 30) { // 30px radius
-        if (!this.sinkingInQuicksand) { // Prevent multiple triggers
-            this.sinkingInQuicksand = true;
-            this.showMessage('💀 Quicksand! You\'re sinking!');
-            clearInterval(this.timerInterval); // Stop timer immediately
-            this.gameStarted = false; // Stop game
-            setTimeout(() => {
-                this.gameOver();
-            }, 1000);
+    if (distance <= 30) { // Within quicksand radius
+        inQuicksand = true;
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestQuicksand = {x: centerX, y: centerY, distance: distance};
         }
     }
 });
+
+if (inQuicksand && closestQuicksand) {
+    if (!this.sinkingInQuicksand) {
+        this.sinkingInQuicksand = true;
+        this.showMessage('⚠️ Quicksand! Swipe hard to escape!');
+    }
+    
+    this.quicksandCenter = closestQuicksand;
+    // Increase strength as you get closer to center
+    this.quicksandStrength = Math.max(0.5, (30 - closestQuicksand.distance) / 30 * 2);
+    
+    // Death at very center (within 5px)
+    if (closestQuicksand.distance <= 5) {
+        this.showMessage('💀 Pulled into quicksand!');
+        this.gameOver();
+    }
+} else {
+    // Escaped quicksand
+    if (this.sinkingInQuicksand) {
+        this.sinkingInQuicksand = false;
+        this.quicksandStrength = 0;
+        this.quicksandCenter = null;
+        this.showMessage('🏃 Escaped the quicksand!');
+    }
+}
 
 
 
