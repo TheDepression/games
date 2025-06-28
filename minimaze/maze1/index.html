@@ -712,11 +712,13 @@ this.lastLavaZoneTime = 0;
         this.hasBaby = false;
 this.bullyDefeated = false;
 this.motherPaid = false;
+        
         this.collectedMoney = [];
 this.collectedHearts = [];
         this.hasFlashlight = false;
 this.hasPencil = false;
 this.hasPyramidKey = false;
+        this.pencilReturned = false;
         this.caveBossDefeated = false;
         this.caveaMoneyCollected = false;
 this.caveaHeartCollected = false;
@@ -3052,15 +3054,18 @@ if (inForest) {
             this.showMessage('🥾 マグマのくつ 700円！');
         }
     } else if (message === "😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！") {
-        if (this.hasPencil) {
-            this.hasPencil = false;
-            this.money += 400;
-            this.showMessage('本当にありがとう💰400¥どうぞ！');
-            this.updateUI();
-            this.saveGameState();
-        } else {
-            this.showMessage('😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！');
-        }
+    if (this.pencilReturned) {
+        this.showMessage("ありがとう！えんぴつをもらえて、とってもうれしいよ！");
+    } else if (this.hasPencil) {
+        this.hasPencil = false;
+        this.pencilReturned = true;
+        this.money += 400;
+        this.showMessage('本当にありがとう💰400¥どうぞ！');
+        this.updateUI();
+        this.saveGameState();
+    } else {
+        this.showMessage('😢 あのね。。いじめ子はね。。あたしのえんぴつ✏️を盗んじゃった！ かえしてくれたら、400¥あげるよ！');
+    }
     } else if (message.includes("マスターフロッグ！良かった！") && !this.motherPaid) {
         if (this.hasBaby) {
             this.money += 200;
@@ -3233,6 +3238,7 @@ hasPyramidKey: this.hasPyramidKey,
 caveaHeartCollected: this.caveaHeartCollected,
         cavebMoneyCollected: this.cavebMoneyCollected,
 cavebHeartCollected: this.cavebHeartCollected,
+        pencilReturned: this.pencilReturned,
         hasSpokenToFrog: this.hasSpokenToFrog,
         pinkSquareSecretClaimed: this.pinkSquareSecretClaimed
     };
@@ -3267,6 +3273,7 @@ this.hasPyramidKey = gameState.hasPyramidKey || false;
 this.caveaHeartCollected = gameState.caveaHeartCollected || false;
         this.cavebMoneyCollected = gameState.cavebMoneyCollected || false;
 this.cavebHeartCollected = gameState.cavebHeartCollected || false;
+        this.pencilReturned = gameState.pencilReturned || false;
         this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
         this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
         // Set the timer to continue from saved time
@@ -3306,6 +3313,7 @@ this.cavebHeartCollected = gameState.cavebHeartCollected || false;
 this.hasPencil = gameState.hasPencil || false;
 this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.caveBossDefeated = gameState.caveBossDefeated || false;
+        this.pencilReturned = gameState.pencilReturned || false;
         this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
         this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
         
