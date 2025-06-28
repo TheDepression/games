@@ -2092,10 +2092,15 @@ quicksands.forEach(quicksand => {
     );
     
     if (distance <= 30) { // 30px radius
-        this.showMessage('💀 Quicksand! You\'re sinking!');
-        setTimeout(() => {
-            this.gameOver();
-        }, 1000);
+        if (!this.sinkingInQuicksand) { // Prevent multiple triggers
+            this.sinkingInQuicksand = true;
+            this.showMessage('💀 Quicksand! You\'re sinking!');
+            clearInterval(this.timerInterval); // Stop timer immediately
+            this.gameStarted = false; // Stop game
+            setTimeout(() => {
+                this.gameOver();
+            }, 1000);
+        }
     }
 });
 
