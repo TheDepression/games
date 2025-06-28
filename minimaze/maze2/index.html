@@ -894,6 +894,9 @@ this.lastTapY = null;
                     
                     this.updateTimer();
                     return true;
+
+                    this.hasBoat = true; // Always have boat in maze 2
+                    this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true; // Default broken
                 }
                 return false;
             }
@@ -907,6 +910,7 @@ this.lastTapY = null;
                     playerY: this.playerY,
                     hasKey: true,
                     hasBoat: true,
+        boatIsBroken: this.boatIsBroken, // ADD THIS
                     hasHammer: true,
                     hasFlashlight: true,
                     hasPencil: true,
