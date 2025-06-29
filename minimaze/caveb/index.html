@@ -178,6 +178,20 @@
             font-size: 10px;
             cursor: pointer;
         }
+
+        #deathCounter {
+    position: fixed;
+    top: 10px;
+    right: 160px;
+    z-index: 250;
+    background: rgba(128,0,128,0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #665;
+    pointer-events: none;
+}
         
         #message {
             position: absolute;
@@ -303,8 +317,8 @@
             <div id="items">Items: <span id="itemsList"></span></div>
         </div>
         <div id="timer">0:00 | Room: <span id="roomInfo">0,0</span></div>
-       <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 50px; right: 10px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️</button>
-        
+<div id="deathCounter">☠️0</div>
+<button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 50px; right: 10px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️</button>
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player"></div>
@@ -358,10 +372,10 @@
 if (window.innerHeight <= 667) {
     const style = document.createElement('style');
     style.textContent = `
-        #ui, #timer, #pauseBtn {
+#ui, #timer, #deathCounter, #pauseBtn {
             opacity: 0.6 !important;
         }
-        #ui:hover, #timer:hover, #pauseBtn:hover {
+       #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
             opacity: 1 !important;
             transition: opacity 0.2s ease;
         }
@@ -475,6 +489,8 @@ this.caveaHeartCollected = gameState.caveaHeartCollected || false;
 this.pencilReturned = gameState.pencilReturned || false;
 this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
 this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
+        this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
 
         // ADD ALL MISSING ITEMS:
         this.hasBoat = gameState.hasBoat || false;
@@ -489,6 +505,7 @@ this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
         this.hearts = 3;
         this.money = 0;
         this.timeElapsed = 0;
+        this.deathCount = 0; // ADD THIS LINE
         this.hasFlashlight = false;
         this.hasHammer = false;
         this.hasPencil = false;
