@@ -1267,7 +1267,13 @@ if (this.headingToCorner) {
             pencilReturned: this.pencilReturned,
 hasSpokenToFrog: this.hasSpokenToFrog,
 pinkSquareSecretClaimed: this.pinkSquareSecretClaimed,
-            caveBossDefeated: false // Boss NOT defeated if you died
+            caveBossDefeated: false, // Boss NOT defeated if you died
+            // ADD THESE LINES TO PRESERVE COLLECTION FLAGS:
+            cavebMoneyCollected: this.cavebMoneyCollected,
+            cavebHeartCollected: this.cavebHeartCollected,
+            caveaMoneyCollected: this.caveaMoneyCollected,
+            caveaHeartCollected: this.caveaHeartCollected,
+            hasPyramidKey: this.hasPyramidKey
         };
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
