@@ -1299,6 +1299,7 @@ hearts.forEach(heart => {
         const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
         gameState.hearts = 3;
         gameState.timeElapsed = this.timeElapsed; // ✅ PRESERVE CURRENT TIME
+        gameState.deathCount = (gameState.deathCount || 0) + 1; // INCREMENT SAVED DEATH COUNT
         gameState.playerX = 300;  // ✅ SPAWN NEAR CAVE B ENTRANCE  
         gameState.playerY = 2280; // ✅ SAME AS MANUAL EXIT
         gameState.currentUrl = 'main';
