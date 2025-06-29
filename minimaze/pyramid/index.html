@@ -476,12 +476,14 @@ window.addEventListener('DOMContentLoaded', function() {
     // Check if coming from boss fight FIRST
     const savedState = localStorage.getItem('mfGameState');
     let startFloor = 1;
-    if (savedState) {
-        const gameState = JSON.parse(savedState);
-        if (gameState.comingFromBoss === true) {
-            startFloor = 4; // Coming from boss fight
-        }
+if (savedState) {
+    const gameState = JSON.parse(savedState);
+    if (gameState.bossEncountered === true) {
+        startFloor = 4; // Lock them on floor 4
+    } else if (gameState.comingFromBoss === true) {
+        startFloor = 4; // Coming from boss fight
     }
+}
     
     // Load game state from main world
     this.loadGameState();
@@ -732,7 +734,11 @@ this.pinkSquareSecretClaimed = false;
                 
                 // Set player spawn positions (only if not transitioning)
                 if (!this.isTransitioning) {
-                    if (floorNumber === 1) {
+    if (this.bossEncountered) {
+        // Always spawn on floor 4 if boss encountered
+        this.playerX = 70;
+        this.playerY = 150;
+    } else if (floorNumber === 1) {
                         this.playerX = 100;
                         this.playerY = 350;
                     } else if (floorNumber === 2) {
@@ -1885,6 +1891,7 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                 // Save weapon state before boss fight (ONLY here)
                 const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                 gameState.hasWeapon = this.hasWeapon;
+                gameState.bossEncountered = true;
                 gameState.hearts = this.hearts;
                 gameState.money = this.money;
                 gameState.timeElapsed = this.timeElapsed;
