@@ -3567,12 +3567,13 @@ function returnToTitle() {
     // Update welcome message
     document.getElementById('welcomeMessage').textContent = `Hello ${name}!`;
     
-    // Hide name input, show new game button
+    // Hide name input AND start screen, start the game
     document.getElementById('nameInput').style.display = 'none';
-    const newGameBtn = document.getElementById('newGameButton');
-    newGameBtn.style.display = 'inline-block';
-    newGameBtn.className = 'start-button';
-    newGameBtn.textContent = 'Start Adventure';
+    document.getElementById('startScreen').style.display = 'none';
+    
+    game = new MazeGame();
+    game.initLevel();
+    game.startGameTimer();
 }
         
     </script>
