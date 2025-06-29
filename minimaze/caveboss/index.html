@@ -1264,11 +1264,16 @@ if (this.headingToCorner) {
     this.showMessage('💀 Game Over!');
     
     setTimeout(() => {
+        // Get current saved state and increment death count
+        const savedState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+        const newDeathCount = (savedState.deathCount || 0) + 1;
+        
         // Save state to return to cave entrance
         const gameState = {
             hearts: 3, // Reset to full health
             money: this.money,
             timeElapsed: this.timeElapsed,
+            deathCount: newDeathCount, // ADD THIS LINE
             playerX: 175, // Cave entrance
             playerY: 280,
             currentRoomX: 0, // Entrance room
