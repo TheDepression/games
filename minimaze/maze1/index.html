@@ -3291,6 +3291,7 @@ loadGameState() {
         this.money = gameState.money || 0;
         this.timeElapsed = gameState.timeElapsed || 0;
         this.deathCount = gameState.deathCount || 0; // ADD THIS LINE
+        this.updateDeathCounter(); // ADD THIS LINE
         this.playerX = gameState.playerX || 420;
         this.playerY = gameState.playerY || 1760;
         this.hasKey = gameState.hasKey || false;
