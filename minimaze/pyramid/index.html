@@ -259,6 +259,20 @@
             font-size: 10px;
             cursor: pointer;
         }
+
+        #deathCounter {
+    position: fixed;
+    top: 10px;
+    right: 100px;
+    z-index: 250;
+    background: rgba(128,0,128,0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #665;
+    pointer-events: none;
+}
         
         #message {
             position: absolute;
@@ -367,6 +381,7 @@
             <div id="items">Items: <span id="itemsList"></span></div>
         </div>
         <div id="timer">0:00</div>
+        <div id="deathCounter">☠️0</div>
         <button id="pauseBtn" onclick="pauseGame()">⏸️</button>
         
         <div id="gameArea">
@@ -444,10 +459,10 @@ window.addEventListener('DOMContentLoaded', function() {
         if (window.innerHeight <= 667) {
             const style = document.createElement('style');
             style.textContent = `
-                #ui, #timer, #pauseBtn {
+               #ui, #timer, #deathCounter, #pauseBtn {
                     opacity: 0.6 !important;
                 }
-                #ui:hover, #timer:hover, #pauseBtn:hover {
+                #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
                     opacity: 1 !important;
                     transition: opacity 0.2s ease;
                 }
@@ -518,6 +533,7 @@ this.isNearNPC = false;
                 this.timerInterval = null;
                 this.lastInteractionTime = {};
                 
+                
                 // Elements
                 this.player = document.getElementById('player');
                 this.gameWorld = document.getElementById('gameWorld');
@@ -557,6 +573,8 @@ this.isNearNPC = false;
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
                     this.hasPyramidKey = gameState.hasPyramidKey || false;
                     
                     // Load ALL other items
@@ -581,6 +599,7 @@ this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
                     this.hearts = 3;
                     this.money = 0;
                     this.timeElapsed = 0;
+                    this.deathCount = 0; // ADD THIS LINE
                     this.hasPyramidKey = false;
                     this.hasFlashlight = false;
                     this.hasHammer = false;
@@ -668,6 +687,11 @@ this.pinkSquareSecretClaimed = false;
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
             }
+
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
             
             updatePlayerImage(direction) {
                 this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
@@ -1864,6 +1888,7 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                 gameState.hearts = this.hearts;
                 gameState.money = this.money;
                 gameState.timeElapsed = this.timeElapsed;
+                gameState.deathCount = game.deathCount; // ADD THIS LINE
                 gameState.currentUrl = 'pyramidboss';
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
@@ -1882,6 +1907,7 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                     gameState.hearts = this.hearts;
                     gameState.money = this.money;
                     gameState.timeElapsed = this.timeElapsed;
+                    gameState.deathCount = this.deathCount; // ADD THIS LINE
                     
                     // Save ALL items (but NOT weapon unless from boss)
                     gameState.hasPyramidKey = this.hasPyramidKey;
@@ -1937,6 +1963,8 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
             }
             
             gameOver() {
+                this.deathCount++;
+    this.updateDeathCounter();
                 this.gameStarted = false;
                 this.isPaused = true;
                 if (this.timerInterval) clearInterval(this.timerInterval);
@@ -1948,6 +1976,7 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
                     const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                     gameState.hearts = 3;
                     gameState.timeElapsed = this.timeElapsed;
+                    gameState.deathCount = (gameState.deathCount || 0) + 1; // INCREMENT SAVED DEATH COUNT
                     gameState.playerX = 2200;
                     gameState.playerY = 1400;
                     gameState.currentUrl = 'main';
@@ -1997,6 +2026,7 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
             updateUI() {
                 document.getElementById('hearts').textContent = this.hearts;
                 document.getElementById('money').textContent = this.money;
+                this.updateDeathCounter(); // ADD THIS LINE
                 
                 let items = [];
                 if (this.hasPyramidKey) items.push('🗝️');
