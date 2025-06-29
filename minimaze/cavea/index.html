@@ -334,10 +334,10 @@
 if (window.innerHeight <= 667) {
     const style = document.createElement('style');
     style.textContent = `
-        #ui, #timer, #pauseBtn {
+        #ui, #timer, #deathCounter, #pauseBtn {
             opacity: 0.6 !important;
         }
-        #ui:hover, #timer:hover, #pauseBtn:hover {
+        #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
             opacity: 1 !important;
             transition: opacity 0.2s ease;
         }
@@ -416,6 +416,8 @@ this.pinkSquareSecretClaimed = false;
         this.hearts = gameState.hearts || 3;
         this.money = gameState.money || 0;
         this.timeElapsed = gameState.timeElapsed || 0;
+        this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
         this.hasFlashlight = gameState.hasFlashlight || false;
         this.hasHammer = gameState.hasHammer || false;
         // In loadGameState():
@@ -445,6 +447,7 @@ this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
         this.hearts = 3;
         this.money = 0;
         this.timeElapsed = 0;
+        this.deathCount = 0; // ADD THIS LINE
         this.hasFlashlight = false;
         this.hasHammer = false;
         this.hasBoat = false;
@@ -472,6 +475,10 @@ this.pinkSquareSecretClaimed = false;
                     warningDiv.textContent = "⚠️ WARNING: It's pitch black in there! You'll barely see anything without a flashlight!";
                 }
             }
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
             
             setupControls() {
                 this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
@@ -1178,6 +1185,8 @@ hearts.forEach(heart => {
             }
             
             gameOver() {
+                this.deathCount++;
+    this.updateDeathCounter();
     this.gameStarted = false;
     this.isPaused = true;
     clearInterval(this.timerInterval);
@@ -1189,6 +1198,7 @@ hearts.forEach(heart => {
         const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
         gameState.hearts = 3;
         gameState.timeElapsed = this.timeElapsed; // ✅ PRESERVE CURRENT TIME
+        gameState.deathCount = (gameState.deathCount || 0) + 1; // INCREMENT SAVED DEATH COUNT
         gameState.playerX = 120;  // ✅ SPAWN NEAR CAVE A ENTRANCE
         gameState.playerY = 1980; // ✅ SAME AS MANUAL EXIT
         gameState.currentUrl = 'main';
@@ -1210,6 +1220,7 @@ hearts.forEach(heart => {
         gameState.hearts = this.hearts;
         gameState.money = this.money;
         gameState.timeElapsed = this.timeElapsed;
+        gameState.deathCount = this.deathCount; // ADD THIS LINE
         // SAVE ALL ITEMS, NOT JUST HAMMER:
         gameState.hasHammer = this.hasHammer;
         gameState.hasFlashlight = this.hasFlashlight;
