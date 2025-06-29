@@ -1262,6 +1262,9 @@ if (this.headingToCorner) {
     this.gameStarted = false;
     this.bgMusic.pause();
     this.showMessage('💀 Game Over!');
+                // Increment death count immediately
+    this.deathCount++;
+    this.updateDeathCounter();
     
     setTimeout(() => {
         // Get current saved state and increment death count
