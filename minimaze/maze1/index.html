@@ -3173,6 +3173,7 @@ if (inForest) {
     updateUI() {
         document.getElementById('hearts').textContent = this.hearts;
         document.getElementById('money').textContent = this.money;
+        this.updateDeathCounter(); // ADD THIS LINE
         
         // Update UI to show owned items
         const ui = document.getElementById('ui');
