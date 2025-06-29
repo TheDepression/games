@@ -314,6 +314,22 @@
 
     
     <script>
+
+
+        // Add opacity for small screens
+if (window.innerHeight <= 667) {
+    const style = document.createElement('style');
+    style.textContent = `
+        #ui, #timer, #pauseBtn {
+            opacity: 0.6 !important;
+        }
+        #ui:hover, #timer:hover, #pauseBtn:hover {
+            opacity: 1 !important;
+            transition: opacity 0.2s ease;
+        }
+    `;
+    document.head.appendChild(style);
+}
         class ZeldaCave {
 
 preloadPlayerImages() {
@@ -328,25 +344,6 @@ preloadPlayerImages() {
 }
 
 
-
-// Add opacity for small screens
-if (window.innerHeight <= 667) {
-    const style = document.createElement('style');
-    style.textContent = `
-        #ui, #timer, #pauseBtn {
-            opacity: 0.6 !important;
-        }
-        #ui:hover, #timer:hover, #pauseBtn:hover {
-            opacity: 1 !important;
-            transition: opacity 0.2s ease;
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-
-
-            
             constructor() {
                 // Load game state from main world
                 this.loadGameState();
