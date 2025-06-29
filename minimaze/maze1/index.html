@@ -635,6 +635,9 @@ window.addEventListener('DOMContentLoaded', function() {
         if (gameState.hasHammer) itemsList += ' 🔨';
         if (gameState.hasLavaShoes) itemsList += ' 🥾';
         if (gameState.hasBaby) itemsList += ' 👶🏻';
+        if (gameState.hasFlashlight) itemsList += ' 🔦';
+if (gameState.hasPencil) itemsList += ' ✏️';
+if (gameState.hasPyramidKey) itemsList += ' 🗝️';
         
         const minutes = Math.floor(gameState.timeElapsed / 60);
         const seconds = gameState.timeElapsed % 60;
