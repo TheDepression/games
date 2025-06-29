@@ -1050,6 +1050,7 @@ if (hitboxHit) {
                     gameState.timeElapsed = this.timeElapsed; // Keep accumulated time
                     gameState.deathCount = (gameState.deathCount || 0) + 1; // INCREMENT SAVED DEATH COUNT
                     gameState.hasWeapon = true; // Force keep weapon when dying in boss
+                    gameState.bossEncountered = true; // Keep them locked on floor 4
                     
                     // Keep all other items
                     gameState.hasFlashlight = this.hasFlashlight;
