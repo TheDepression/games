@@ -189,6 +189,20 @@
             backdrop-filter: blur(2px);
             opacity: 0.9;
         }
+
+        #deathCounter {
+    position: fixed;
+    top: 10px;
+    right: 150px;
+    z-index: 250;
+    background: rgba(128,0,128,0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #665;
+    pointer-events: none;
+}
         
         #startScreen, #levelComplete {
             position: absolute;
@@ -306,6 +320,8 @@
             <div>HP: <span id="bossHp">3</span>/3</div>
         </div>
         
+        <div id="deathCounter">☠️0</div>
+        
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player">🧙‍♂️</div>
@@ -390,10 +406,10 @@
         if (window.innerHeight <= 667) {
             const style = document.createElement('style');
             style.textContent = `
-                #ui, #timer, #pauseBtn {
+                #ui, #timer, #deathCounter {
                     opacity: 0.6 !important;
                 }
-                #ui:hover, #timer:hover, #pauseBtn:hover {
+                #ui:hover, #timer:hover, #deathCounter:hover {
                     opacity: 1 !important;
                     transition: opacity 0.2s ease;
                 }
@@ -466,6 +482,8 @@
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
                     this.hasKey = gameState.hasKey || false;
                     this.hasBoat = gameState.hasBoat || false;
                     this.hasHammer = gameState.hasHammer || false;
@@ -480,6 +498,7 @@
                     this.hearts = 3;
                     this.money = 0;
                     this.timeElapsed = 0;
+                    this.deathCount = 0;
                     this.hasKey = false;
                     this.hasBoat = false;
                     this.hasHammer = false;
@@ -498,6 +517,7 @@
                     hearts: this.hearts,
                     money: this.money,
                     timeElapsed: this.timeElapsed,
+                    deathCount: this.deathCount, // ADD THIS LINE
                     playerX: 640, // Return position in main world (near baby spawn)
                     playerY: 530,
                     hasKey: this.hasKey,
@@ -515,6 +535,10 @@
                 };
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
 
             updatePlayerImage(direction) {
                 this.currentDirection = direction;
@@ -1049,6 +1073,9 @@
                 this.gameStarted = false;
                 this.bgMusic.pause();
                 this.showMessage('💀 Game Over!');
+                // Increment death count immediately
+    this.deathCount++;
+    this.updateDeathCounter();
                 
                 setTimeout(() => {
                     this.showLevelComplete('💀 Game Over', 'The bully was too strong!');
