@@ -668,10 +668,10 @@ window.addEventListener('DOMContentLoaded', function() {
 if (window.innerHeight <= 667) {
     const style = document.createElement('style');
     style.textContent = `
-        #ui, #timer, #pauseBtn {
+        #ui, #timer, #deathCounter, #pauseBtn {
             opacity: 0.6 !important;
         }
-        #ui:hover, #timer:hover, #pauseBtn:hover {
+        #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
             opacity: 1 !important;
             transition: opacity 0.2s ease;
         }
@@ -951,17 +951,11 @@ this.playerVelocityY = deltaY * sensitivity;
         timerEl.style.background = 'rgba(0,128,0,0.8)'; // Under 5 minutes = green
     }
 }
-    
-    //timeUp() {
-      //  clearInterval(this.timerInterval);
-        //this.gameStarted = false;
-        //this.bgMusic.pause();
-        //this.forestMusic.pause();
-        //this.showMessage('⏰ Time\'s up!');
-        //setTimeout(() => {
-          //  this.showLevelComplete('⏰ Time Up!', 'Try again!');
-        //}, 2000);
-    //}
+
+    // ADD THE NEW METHOD HERE:
+updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
     
     initLevel() {
         const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .key, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone');
@@ -3360,6 +3354,8 @@ this.hasPyramidKey = gameState.hasPyramidKey || false;
         this.pencilReturned = gameState.pencilReturned || false;
         this.hasSpokenToFrog = gameState.hasSpokenToFrog || false;
         this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
+        this.deathCount = gameState.deathCount || 0; // Load the death count
+this.updateDeathCounter(); // Display it
         
         this.updateUI();
         return true;
@@ -3427,15 +3423,6 @@ window.addEventListener('load', function() {
 });
 
 function startNewGame() {
-    const playerName = localStorage.getItem('mfPlayerName');
-    
-    // If no name set, show name input first
-    if (!playerName) {
-        document.getElementById('nameInput').style.display = 'block';
-        document.getElementById('newGameButton').style.display = 'none';
-        return;
-    }
-    
     const savedState = localStorage.getItem('mfGameState');
     if (savedState) {
         if (!confirm('ほんとうに いいの？　いまの げんざいちを けして、さいしょから はじまるよ。')) {
@@ -3443,20 +3430,19 @@ function startNewGame() {
         }
     }
     
-    // Clear all Master Frog related localStorage except name
+    // Clear ALL Master Frog related localStorage INCLUDING name
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
-        if (key.startsWith('mf') && key !== 'mfPlayerName') {
+        if (key.startsWith('mf')) {
             localStorage.removeItem(key);
         }
     });
     
-    const startScreen = document.getElementById('startScreen');
-    startScreen.style.display = 'none';
-    
-    game = new MazeGame();
-    game.initLevel();
-    game.startGameTimer();
+    // Show name input again
+    document.getElementById('welcomeMessage').textContent = '🌍世界を助ける';
+    document.getElementById('nameInput').style.display = 'block';
+    document.getElementById('gameOptions').style.display = 'none';
+    document.getElementById('saveStateInfo').style.display = 'none';
 }
 
 function continueGame() {
