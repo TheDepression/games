@@ -183,6 +183,20 @@
             border: 1px solid #665;
             pointer-events: none;
         }
+
+        #deathCounter {
+    position: fixed;
+    top: 10px;
+    right: 170px;
+    z-index: 250;
+    background: rgba(128,0,128,0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #665;
+    pointer-events: none;
+}
         
         .boss-health {
             position: fixed;
@@ -310,6 +324,8 @@
             <div>😡 Pyramid Guardian</div>
             <div>HP: <span id="bossHp">500</span>/500</div>
         </div>
+
+        <div id="deathCounter">☠️0</div>
         
         <div id="gameArea">
             <div id="gameWorld">
@@ -359,10 +375,10 @@
         if (window.innerHeight <= 667) {
             const style = document.createElement('style');
             style.textContent = `
-                #ui, #timer, #pauseBtn {
+                #ui, #timer, #deathCounter {
                     opacity: 0.6 !important;
                 }
-                #ui:hover, #timer:hover, #pauseBtn:hover {
+                #ui:hover, #timer:hover, #deathCounter:hover {
                     opacity: 1 !important;
                     transition: opacity 0.2s ease;
                 }
@@ -443,6 +459,8 @@
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
                     this.hasWeapon = gameState.hasWeapon || false;
                     
                     // Load all other items
@@ -463,6 +481,7 @@
                     this.hearts = 3;
                     this.money = 0;
                     this.timeElapsed = 0;
+                    this.deathCount = 0;
                     this.hasWeapon = true; // Should have weapon to reach boss
                 }
             }
@@ -719,6 +738,10 @@ if (hitboxHit) {
                 };
                 gameLoop();
             }
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
             
             updatePlayer() {
                 if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
@@ -973,6 +996,7 @@ if (hitboxHit) {
                 document.getElementById('hearts').textContent = this.hearts;
                 document.getElementById('money').textContent = this.money;
                 document.getElementById('bossHp').textContent = this.bossHp;
+                this.updateDeathCounter(); // ADD THIS LINE
             }
             
             updateTimer() {
@@ -1010,6 +1034,9 @@ if (hitboxHit) {
             }
             
             gameOver() {
+                // Increment death count immediately
+    this.deathCount++;
+    this.updateDeathCounter();
                 this.gameStarted = false;
                 this.bossMusic.pause();
                 
@@ -1021,6 +1048,7 @@ if (hitboxHit) {
                     gameState.hearts = 3; // Reset hearts
                     gameState.money = this.money; // Keep money
                     gameState.timeElapsed = this.timeElapsed; // Keep accumulated time
+                    gameState.deathCount = (gameState.deathCount || 0) + 1; // INCREMENT SAVED DEATH COUNT
                     gameState.hasWeapon = true; // Force keep weapon when dying in boss
                     
                     // Keep all other items
@@ -1082,6 +1110,7 @@ gameState.pyramidFloor = 4;
                 gameState.hearts = game.hearts;
                 gameState.money = game.money;
                 gameState.timeElapsed = game.timeElapsed;
+                gameState.deathCount = game.deathCount; // ADD THIS LINE
                 gameState.hasWeapon = game.hasWeapon;
                 gameState.pyramidBossDefeated = true; // New flag for pyramid boss
                 
