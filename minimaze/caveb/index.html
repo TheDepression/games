@@ -1286,6 +1286,8 @@ hearts.forEach(heart => {
             }
             
             gameOver() {
+                this.deathCount++;
+    this.updateDeathCounter();
     this.gameStarted = false;
     this.isPaused = true;
     clearInterval(this.timerInterval);
@@ -1318,6 +1320,7 @@ hearts.forEach(heart => {
         gameState.hearts = this.hearts;
         gameState.money = this.money;
         gameState.timeElapsed = this.timeElapsed;
+        gameState.deathCount = this.deathCount; // ADD THIS LINE
         // SAVE ALL ITEMS:
         gameState.hasHammer = this.hasHammer;
         gameState.hasPencil = this.hasPencil;
@@ -1374,6 +1377,13 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
                     timerEl.style.background = 'rgba(0,128,0,0.8)';
                 }
             }
+
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
+
+
             
             updateRoomInfo() {
                 document.getElementById('roomInfo').textContent = `${this.currentRoomX},${this.currentRoomY}`;
@@ -1467,6 +1477,7 @@ function acceptBossFight() {
         gameState.hearts = game.hearts;
         gameState.money = game.money;
         gameState.timeElapsed = game.timeElapsed;
+        gameState.deathCount = game.deathCount; // ADD THIS LINE
         gameState.hasHammer = game.hasHammer;
         gameState.currentUrl = 'caveboss';
         gameState.cavebMoneyCollected = game.cavebMoneyCollected;
