@@ -95,6 +95,20 @@
             border: 1px solid #666;
             pointer-events: none;
         }
+
+        #deathCounter {
+    position: fixed;
+    top: 10px;
+    right: 150px;
+    z-index: 250;
+    background: rgba(128,0,128,0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #665;
+    pointer-events: none;
+}
         
         .cave-wall {
             position: absolute;
@@ -321,6 +335,8 @@
             <div>😡 Cave Bully</div>
             <div>HP: <span id="bossHp">4</span>/4</div>
         </div>
+
+        <div id="deathCounter">☠️0</div>
         
         <div id="gameArea">
             <div id="gameWorld">
@@ -407,10 +423,10 @@
         if (window.innerHeight <= 667) {
             const style = document.createElement('style');
             style.textContent = `
-                #ui, #timer, #pauseBtn {
+                #ui, #timer, #deathCounter {
                     opacity: 0.6 !important;
                 }
-                #ui:hover, #timer:hover, #pauseBtn:hover {
+                #ui:hover, #timer:hover, #deathCounter:hover {
                     opacity: 1 !important;
                     transition: opacity 0.2s ease;
                 }
@@ -505,6 +521,8 @@
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
                     this.hasKey = gameState.hasKey || false;
                     this.hasBoat = gameState.hasBoat || false;
                     this.hasHammer = gameState.hasHammer || false;
@@ -531,6 +549,7 @@ this.pinkSquareSecretClaimed = gameState.pinkSquareSecretClaimed || false;
                     this.hearts = 3;
                     this.money = 0;
                     this.timeElapsed = 0;
+                    this.deathCount = 0;
                     this.hasKey = false;
                     this.hasBoat = false;
                     this.hasHammer = false;
@@ -597,6 +616,10 @@ pinkSquareSecretClaimed: this.pinkSquareSecretClaimed
                     darknessOverlay.classList.add('active');
                 }
             }
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
 
             updatePlayerImage(direction) {
                 this.currentDirection = direction;
