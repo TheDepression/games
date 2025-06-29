@@ -640,8 +640,8 @@ window.addEventListener('DOMContentLoaded', function() {
         const seconds = gameState.timeElapsed % 60;
         const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         
-        saveInfo.innerHTML = `❤️ ${gameState.hearts} | 💰 ${gameState.money}¥ | ⏱️ ${timeString}${itemsList ? ' |' + itemsList : ''}`;
-        saveInfo.style.display = 'block';
+        saveInfo.innerHTML = `❤️ ${gameState.hearts} | 💰 ${gameState.money}¥ | ⏱️ ${timeString} | ☠️ ${gameState.deathCount || 0}${itemsList ? ' |' + itemsList : ''}`;
+saveInfo.style.display = 'block';
         
         // Show continue button prominently, new game smaller
         document.getElementById('continueButton').style.display = 'inline-block';
