@@ -353,19 +353,6 @@
     </audio>
 
     <script>
-        class ZeldaCave {
-
-preloadPlayerImages() {
-    const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
-    this.playerImages = {};
-    
-    directions.forEach(direction => {
-        const img = new Image();
-        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
-        this.playerImages[direction] = img;
-    });
-}
-
 
 // Add opacity for small screens
 if (window.innerHeight <= 667) {
@@ -381,6 +368,22 @@ if (window.innerHeight <= 667) {
     `;
     document.head.appendChild(style);
 }
+        
+        class ZeldaCave {
+
+preloadPlayerImages() {
+    const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+    this.playerImages = {};
+    
+    directions.forEach(direction => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+        this.playerImages[direction] = img;
+    });
+}
+
+
+
 
 
             
