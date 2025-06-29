@@ -305,6 +305,20 @@
             border: 1px solid #665;
             pointer-events: none;
         }
+
+        #deathCounter {
+    position: fixed;
+    top: 10px;
+    right: 90px;
+    z-index: 250;
+    background: rgba(128,0,128,0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #665;
+    pointer-events: none;
+}
         
         .maze-wall {
             position: absolute;
@@ -532,7 +546,8 @@
             <div>💰 <span id="money">0</span>¥</div>
         </div>
         <div id="timer">0:00</div>
-        <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; right: 80px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️ Pause</button>
+        <div id="deathCounter">☠️0</div>
+        <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; right: 160px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️ Pause</button>
         
         <div id="gameArea">
             <div id="gameWorld">
@@ -618,10 +633,10 @@
         if (window.innerHeight <= 667) {
             const style = document.createElement('style');
             style.textContent = `
-                #ui, #timer, #pauseBtn {
+                #ui, #timer, #deathCounter, #pauseBtn {
                     opacity: 0.6 !important;
                 }
-                #ui:hover, #timer:hover, #pauseBtn:hover {
+               #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
                     opacity: 1 !important;
                     transition: opacity 0.2s ease;
                 }
@@ -636,6 +651,7 @@
                 this.hearts = 3;
                 this.gameStarted = false;
                 this.timeElapsed = 0;
+                this.deathCount = 0;
                 this.timerInterval = null;
                 this.isInvulnerable = false;
                 this.money = 0;
@@ -953,6 +969,8 @@ this.playerVelocityY = deltaY * sensitivity;
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0; // Continue from where left off
+                    this.deathCount = gameState.deathCount || 0;
+this.updateDeathCounter();
                     this.playerX = gameState.playerX || 400;
                     this.playerY = gameState.playerY || 1760;
                     
@@ -970,6 +988,7 @@ this.playerVelocityY = deltaY * sensitivity;
                     hearts: this.hearts,
                     money: this.money,
                     timeElapsed: this.timeElapsed,
+                     deathCount: this.deathCount, // ADD THIS LINE
                     playerX: this.playerX,
                     playerY: this.playerY,
                     hasKey: true,
@@ -979,7 +998,7 @@ this.playerVelocityY = deltaY * sensitivity;
                     hasFlashlight: true,
                     hasPencil: true,
                     hasPyramidKey: true,
-                    hasLavaShoes: false,
+                    hasLavaShoes: true,
                     hasWeapon: true,
                     bullyDefeated: true,
                     motherPaid: true,
@@ -1040,6 +1059,10 @@ this.playerVelocityY = deltaY * sensitivity;
                     timerEl.style.background = 'rgba(0,128,0,0.8)';
                 }
             }
+
+            updateDeathCounter() {
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
 
             initLevel() {
                 // Clear existing elements
@@ -2319,6 +2342,7 @@ this.isOnDesert = onDesert;
             updateUI() {
     document.getElementById('hearts').textContent = this.hearts;
     document.getElementById('money').textContent = this.money;
+                this.updateDeathCounter(); // ADD THIS LINE
     
     const ui = document.getElementById('ui');
     let itemsHTML = ''; // Change from itemsText to itemsHTML
@@ -2349,6 +2373,8 @@ this.isOnDesert = onDesert;
             }
             
             gameOver() {
+                this.deathCount++;
+    this.updateDeathCounter();
                 this.sinkingInQuicksand = false;
     this.quicksandStrength = 0;
     this.quicksandCenter = null;
