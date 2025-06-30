@@ -611,6 +611,19 @@
             </div>
         </div>
         <div id="message"></div>
+
+
+        <div id="confirmDialog" style="display: none;">
+  <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+    <p id="confirmText">🌳森に入る🌳...</p>
+    <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
+  </div>
+</div>
+
+<!-- Forest overlay and vision mask -->
+<div id="forestOverlay" class="forest-overlay"></div>
+<div id="forestVisionMask" class="forest-vision-mask"></div>
+        
         
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
@@ -649,7 +662,10 @@
         <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/darkmaze.mp3" type="audio/mp3">
         Your browser does not support the audio element.
     </audio>
-
+<audio id="forestMusic" loop>
+    <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">
+    Your browser does not support the audio element.
+</audio>
     <script>
         // CHECK ACCESS AND VALIDATE ENTRY - CRITICAL FIRST
         window.addEventListener('DOMContentLoaded', function() {
@@ -715,16 +731,21 @@
                 this.lastTapX = null;
 this.lastTapY = null;
 
+                // Add these to constructor after existing properties
+this.isInForest = false;
+this.forestMusic = document.getElementById('forestMusic');
+this.pendingAction = null;
+
                 
                 // FORCE DEFAULT ITEMS (all from maze1 except specified)
                 this.hasKey = false;
                 this.hasBoat = true;
                 this.boatIsBroken = true;
-                this.hasHammer = true;
+                this.hasHammer = false; // lost it and must find a new one
                 this.hasFlashlight = true;
                 this.hasPencil = false;
                 this.hasPyramidKey = true;
-                this.hasLavaShoes = false; // NOT obtained yet
+                this.hasLavaShoes = true; 
                 this.hasWeapon = true; // ALWAYS have gun
                 this.bullyDefeated = true;
                 this.motherPaid = true;
