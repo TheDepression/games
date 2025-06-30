@@ -1940,6 +1940,34 @@ this.gameWorld.appendChild(fakeQuicksand);
                 });
             }
 
+
+
+            createEmojiWalls() {
+    // Simple array of emoji walls - just add coordinates and emoji here
+    const emojiWalls = [
+        {x: 420, y: 1800, emoji: '🛌'},
+        {x: 2350, y: 1150, emoji: '🌵'}
+    ];
+    
+    emojiWalls.forEach(wall => {
+        const wallEl = document.createElement('div');
+        wallEl.className = 'emoji-wall';
+        wallEl.textContent = wall.emoji;
+        wallEl.style.position = 'absolute';
+        wallEl.style.left = wall.x + 'px';
+        wallEl.style.top = wall.y + 'px';
+        wallEl.style.width = '20px';
+        wallEl.style.height = '20px';
+        wallEl.style.fontSize = '18px';
+        wallEl.style.display = 'flex';
+        wallEl.style.alignItems = 'center';
+        wallEl.style.justifyContent = 'center';
+        wallEl.style.zIndex = '30';
+        wallEl.style.filter = 'grayscale(0.8) brightness(0.7)'; // Match the apocalyptic theme
+        this.gameWorld.appendChild(wallEl);
+    });
+}
+
             addTreeWalls() {
                 const treePositions = [
                     {x: 1060, y: 1140}, {x: 1080, y: 1140}, {x: 1100, y: 1140},
