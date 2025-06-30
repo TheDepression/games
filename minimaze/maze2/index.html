@@ -1623,8 +1623,8 @@ this.gameWorld.appendChild(fakeQuicksand);
   {x: 2120, y: 350, w: 110, h: 10},
   {x: 2280, y: 350, w: 120, h: 10},
   {x: 2240, y: 240, w: 10, h: 50},
-            {x: 100, y: 1950, w: 20, h: 30},
-            {x: 300, y: 2320, w: 20, h: 30},
+            {x: 115, y: 1950, w: 20, h: 25},
+            {x: 300, y: 2310, w: 20, h: 25},
   {x: 2240, y: 240, w: 50, h: 10},
   {x: 2290, y: 240, w: 10, h: 60},
   {x: 1490, y: 360, w: 110, h: 20},
@@ -1962,7 +1962,7 @@ this.gameWorld.appendChild(fakeQuicksand);
             createEmojiWalls() {
     // Simple array of emoji walls - just add coordinates and emoji here
     const emojiWalls = [
-        {x: 420, y: 1800, emoji: '🛌'},
+        {x: 420, y: 1710, emoji: '🛌'},
         {x: 2350, y: 1150, emoji: '🌵'}
     ];
     
@@ -2174,13 +2174,13 @@ createCollectibles() {
             createMoneyCollectibles() {
     // Create money pickups in the same area as red hearts
     const moneyPositions = [
-        {x: 120, y: 1400, id: 'money_1'},
-        {x: 140, y: 1420, id: 'money_2'},
-        {x: 160, y: 1400, id: 'money_3'},
-        {x: 120, y: 1440, id: 'money_4'},
-        {x: 140, y: 1460, id: 'money_5'},
-        {x: 160, y: 1440, id: 'money_6'},
-        {x: 180, y: 1420, id: 'money_7'}
+        {x: 2340, y: 1480, id: 'money_1'},
+        {x: 2360, y: 1480, id: 'money_2'},
+        {x: 1590, y: 760, id: 'money_3'},
+        {x: 760, y: 320, id: 'money_4'},
+        {x: 1230, y: 410, id: 'money_5'},
+        {x: 1180, y: 840, id: 'money_6'},
+        {x: 2120, y: 2360, id: 'money_7'}
     ];
 
     moneyPositions.forEach(pos => {
