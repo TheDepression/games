@@ -2616,6 +2616,27 @@ purpleHearts.forEach(purpleHeart => {
     }
 });
 
+
+                // Check red hearts (permanent map hearts)
+const redHearts = this.gameWorld.querySelectorAll('.heart-pickup[data-type="redHeart"]');
+redHearts.forEach(heart => {
+    const heartX = parseInt(heart.style.left);
+    const heartY = parseInt(heart.style.top);
+    const heartRect = {
+        left: heartX, top: heartY,
+        right: heartX + 22, bottom: heartY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, heartRect)) {
+        if (this.hearts < this.maxHearts) {
+            this.hearts++;
+            this.showMessage('❤️ Health restored!');
+            this.updateUI();
+            heart.remove();
+        }
+    }
+});
+
                 const moneyDrops = this.gameWorld.querySelectorAll('.money-pickup[data-type="drop"]');
                 moneyDrops.forEach(money => {
                     const moneyX = parseInt(money.style.left);
