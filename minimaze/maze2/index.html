@@ -3132,8 +3132,9 @@ if (inQuicksand && closestQuicksand) {
 
 clearNPCMessage() {
     const message = document.getElementById('message');
-    if (message.style.display === 'block') {
+    if (message.style.display === 'block' && this.currentMessageType === 'npc') {
         message.style.display = 'none';
+        this.currentMessageType = null;
     }
 }
 
