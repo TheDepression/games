@@ -2557,26 +2557,35 @@ updateQuicksand() {
                 }
                 
                 // Check friendly NPCs
-                const friendlies = this.gameWorld.querySelectorAll('.friendly');
-                friendlies.forEach(friendly => {
-                    const friendlyX = parseInt(friendly.style.left);
-                    const friendlyY = parseInt(friendly.style.top);
-                    const friendlyRect = {
-                        left: friendlyX,
-                        top: friendlyY,
-                        right: friendlyX + 22,
-                        bottom: friendlyY + 22
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, friendlyRect)) {
-                        const now = Date.now();
-                        const lastTime = this.lastInteractionTime[friendly.dataset.message] || 0;
-                        if (now - lastTime > 3000) {
-                            this.showMessage(friendly.dataset.message);
-                            this.lastInteractionTime[friendly.dataset.message] = now;
-                        }
-                    }
-                });
+const friendlies = this.gameWorld.querySelectorAll('.friendly');
+let playerOnNPC = false;
+let currentNPCMessage = null;
+
+friendlies.forEach(friendly => {
+    const friendlyX = parseInt(friendly.style.left);
+    const friendlyY = parseInt(friendly.style.top);
+    const friendlyRect = {
+        left: friendlyX,
+        top: friendlyY,
+        right: friendlyX + 22,
+        bottom: friendlyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, friendlyRect)) {
+        playerOnNPC = true;
+        currentNPCMessage = friendly.dataset.message;
+        
+        // Show message immediately if not already showing this message
+        if (document.getElementById('message').textContent !== currentNPCMessage) {
+            this.showMessage(currentNPCMessage, true); // Add persistent flag
+        }
+    }
+});
+
+// Hide message if not standing on any NPC
+if (!playerOnNPC) {
+    this.clearNPCMessage();
+}
 
                 // Check heart and money drops
                 const hearts = this.gameWorld.querySelectorAll('.heart-pickup[data-type="drop"]');
@@ -2902,16 +2911,26 @@ if (inQuicksand && closestQuicksand) {
     }
 }
             
-            showMessage(text) {
-                const message = document.getElementById('message');
-                message.textContent = text;
-                message.style.display = 'block';
-                
-                clearTimeout(this.messageTimeout);
-                this.messageTimeout = setTimeout(() => {
-                    message.style.display = 'none';
-                }, 2000);
-            }
+            showMessage(text, persistent = false) {
+    const message = document.getElementById('message');
+    message.textContent = text;
+    message.style.display = 'block';
+    
+    clearTimeout(this.messageTimeout);
+    
+    if (!persistent) {
+        this.messageTimeout = setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+}
+
+            clearNPCMessage() {
+    const message = document.getElementById('message');
+    if (message.style.display === 'block') {
+        message.style.display = 'none';
+    }
+}
             
             updateUI() {
     document.getElementById('hearts').textContent = this.hearts;
