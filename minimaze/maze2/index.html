@@ -814,6 +814,7 @@
                 // Basic properties first
                 this.collectedRedHearts = []; // Track which red hearts have been collected
                 this.collectedMoney = []; // Track which money has been collected
+                this.currentMessageType = null; // Track what type of message is showing
                 this.hearts = 3;
                 this.gameStarted = false;
                 this.timeElapsed = 0;
@@ -3109,10 +3110,14 @@ if (inQuicksand && closestQuicksand) {
     const message = document.getElementById('message');
     message.textContent = text;
     message.style.display = 'block';
+    this.currentMessageType = 'regular';
     
     clearTimeout(this.messageTimeout);
     this.messageTimeout = setTimeout(() => {
-        message.style.display = 'none';
+        if (this.currentMessageType === 'regular') { // Only clear if still a regular message
+            message.style.display = 'none';
+            this.currentMessageType = null;
+        }
     }, 2000);
 }
 
@@ -3120,6 +3125,7 @@ if (inQuicksand && closestQuicksand) {
     const message = document.getElementById('message');
     message.textContent = text;
     message.style.display = 'block';
+    this.currentMessageType = 'npc';
     clearTimeout(this.messageTimeout); // Clear any existing timeout
     // No timeout - message stays until player moves away
 }
