@@ -2008,6 +2008,16 @@ this.gorilla = {
                 top: scrollY,
                 behavior: 'auto'
             });
+
+
+            // Add this after the scrollTo code:
+if (this.isInForest) {
+    const mask = document.getElementById('forestVisionMask');
+    const gameAreaRect = this.gameArea.getBoundingClientRect();
+    const playerScreenX = gameAreaRect.left + (this.gameArea.offsetWidth / 2);
+    const playerScreenY = gameAreaRect.top + (this.gameArea.offsetHeight / 2);
+    mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
+}
         }
         
         // ADD THE MISSING FRICTION CODE:
@@ -2806,6 +2816,31 @@ if (onForest && !this.isInForest) {
         // Redirect to the very beginning
         window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
     }
+}
+
+        function confirmAction() {
+    document.getElementById('confirmDialog').style.display = 'none';
+    game.gameStarted = true;
+    
+    if (game.pendingAction === 'enterForest') {
+        game.isInForest = true;
+        game.bgMusic.pause();
+        game.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+        document.getElementById('forestOverlay').classList.add('active');
+        document.getElementById('forestVisionMask').classList.add('active');
+        game.showMessage('🌲 Entering the forest...');
+        game.updateForestVisibility();
+    } else if (game.pendingAction === 'exitForest') {
+        game.isInForest = false;
+        game.forestMusic.pause();
+        game.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
+        game.showMessage('🌞 Left the forest!');
+        game.updateForestVisibility();
+    }
+    
+    game.pendingAction = null;
 }
     </script>
 </body>
