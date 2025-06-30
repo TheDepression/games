@@ -2575,8 +2575,9 @@ friendlies.forEach(friendly => {
         playerOnNPC = true;
         currentNPCMessage = friendly.dataset.message;
         
-        // Show message immediately if not already showing this message
-        if (document.getElementById('message').textContent !== currentNPCMessage) {
+        // Show message if not currently visible OR if it's a different message
+        const messageEl = document.getElementById('message');
+        if (messageEl.style.display === 'none' || messageEl.textContent !== currentNPCMessage) {
             this.showMessage(currentNPCMessage, true); // Add persistent flag
         }
     }
