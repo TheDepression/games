@@ -1850,36 +1850,82 @@ quicksandPositions.forEach(pos => {
                     });
                 });
 
-                // Gorilla - unbeatable but trackable
-                const gorillaX = 1150;
-                const gorillaY = 530;
-                
-                const gorillaEl = document.createElement('div');
-                gorillaEl.className = 'enemy forest-gorilla';
-                gorillaEl.textContent = '🦍';
-                gorillaEl.style.left = gorillaX + 'px';
-                gorillaEl.style.top = gorillaY + 'px';
-                gorillaEl.style.fontSize = '27px';
-                gorillaEl.style.width = '33px';
-                gorillaEl.style.height = '33px';
-                this.gameWorld.appendChild(gorillaEl);
-                
-                this.gorilla = {
-                    element: gorillaEl,
-                    type: 'gorilla',
-                    currentX: gorillaX,
-                    currentY: gorillaY,
-                    startX: gorillaX,
-                    startY: gorillaY,
-                    patrolRange: 80,
-                    direction: 1,
-                    speed: 1.04, // 0.8 * 1.3
-                    isChasing: false,
-                    chaseSpeed: 1.95, // 1.5 * 1.3
-                    returning: false,
-                    alive: true
-                };
+                // Add forest bees - killable with 2 HP
+this.createForestBees();
+
+// Gorilla - unbeatable but trackable, follows maze1 behavior
+const gorillaX = 1150;
+const gorillaY = 530;
+
+const gorillaEl = document.createElement('div');
+gorillaEl.className = 'enemy forest-gorilla';
+gorillaEl.textContent = '🦍';
+gorillaEl.style.left = gorillaX + 'px';
+gorillaEl.style.top = gorillaY + 'px';
+gorillaEl.style.fontSize = '27px';
+gorillaEl.style.width = '33px';
+gorillaEl.style.height = '33px';
+this.gameWorld.appendChild(gorillaEl);
+
+this.gorilla = {
+    element: gorillaEl,
+    type: 'gorilla',
+    currentX: gorillaX,
+    currentY: gorillaY,
+    startX: gorillaX,
+    startY: gorillaY,
+    patrolRange: 80,
+    direction: 1,
+    speed: 1.04,
+    isChasing: false,
+    chaseSpeed: 1.95,
+    returning: false,
+    alive: true
+};
             }
+
+
+            // ADD createForestBees METHOD HERE:
+    createForestBees() {
+        const forestLeft = 600 + 120;
+        const forestRight = 1600 - 120;
+        const forestTop = 360 + 120;
+        const forestBottom = 1300 - 120;
+        
+        for (let i = 0; i < 5; i++) {
+            const startX = forestLeft + Math.random() * (forestRight - forestLeft);
+            const startY = forestTop + Math.random() * (forestBottom - forestTop);
+            
+            const beeEl = document.createElement('div');
+            beeEl.className = 'enemy forest-bee';
+            beeEl.textContent = '🐝';
+            beeEl.style.left = startX + 'px';
+            beeEl.style.top = startY + 'px';
+            beeEl.style.zIndex = '80';
+            this.gameWorld.appendChild(beeEl);
+            
+            this.movingEnemies.push({
+                element: beeEl,
+                type: 'bee',
+                currentX: startX,
+                currentY: startY,
+                targetX: startX,
+                targetY: startY,
+                speed: 1.56, // 1.2 * 1.3 (30% faster)
+                changeDirectionTimer: 0,
+                forestBounds: {
+                    left: forestLeft,
+                    right: forestRight,
+                    top: forestTop,
+                    bottom: forestBottom
+                },
+                hp: 2, // 2-hit kill
+                maxHp: 2,
+                alive: true
+            });
+        }
+    }
+
 
             createFriendlies() {
                 // Post-apocalyptic NPC messages - same positions, new dialogue
@@ -2017,72 +2063,123 @@ updateQuicksand() {
 }
 
             updateMovingEnemies() {
-                if (this.isPaused) return;
-                
-                this.movingEnemies.forEach(enemy => {
-                    if (!enemy.alive) return;
-                    
-                    if (enemy.axis === 'x') {
-                        enemy.currentX += enemy.direction * enemy.speed;
-                        if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
-                            enemy.direction *= -1;
-                        }
-                        enemy.element.style.left = enemy.currentX + 'px';
-                    } else {
-                        enemy.currentY += enemy.direction * enemy.speed;
-                        if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
-                            enemy.direction *= -1;
-                        }
-                        enemy.element.style.top = enemy.currentY + 'px';
-                    }
-                });
-                
-                this.updateGorilla();
+    if (this.isPaused) return;
+    
+    this.movingEnemies.forEach(enemy => {
+        if (!enemy.alive) return;
+        
+        if (enemy.type === 'bee') {
+            // Update bee movement
+            enemy.changeDirectionTimer--;
+            
+            if (enemy.changeDirectionTimer <= 0) {
+                enemy.targetX = enemy.forestBounds.left + Math.random() * (enemy.forestBounds.right - enemy.forestBounds.left);
+                enemy.targetY = enemy.forestBounds.top + Math.random() * (enemy.forestBounds.bottom - enemy.forestBounds.top);
+                enemy.changeDirectionTimer = 60 + Math.random() * 120;
             }
+            
+            const deltaX = enemy.targetX - enemy.currentX;
+            const deltaY = enemy.targetY - enemy.currentY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            if (distance > 5) {
+                enemy.currentX += (deltaX / distance) * enemy.speed;
+                enemy.currentY += (deltaY / distance) * enemy.speed;
+            }
+            
+            enemy.element.style.left = enemy.currentX + 'px';
+            enemy.element.style.top = enemy.currentY + 'px';
+        } else {
+            // Original enemy movement for non-bee enemies
+            if (enemy.axis === 'x') {
+                enemy.currentX += enemy.direction * enemy.speed;
+                if (enemy.currentX <= enemy.startX || enemy.currentX >= enemy.startX + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.left = enemy.currentX + 'px';
+            } else {
+                enemy.currentY += enemy.direction * enemy.speed;
+                if (enemy.currentY <= enemy.startY || enemy.currentY >= enemy.startY + enemy.range) {
+                    enemy.direction *= -1;
+                }
+                enemy.element.style.top = enemy.currentY + 'px';
+            }
+        }
+    });
+    
+    this.updateGorilla();
+}
 
             updateGorilla() {
-                if (!this.gorilla) return;
-                
-                const playerDistance = Math.sqrt(
-                    Math.pow(this.playerX - this.gorilla.currentX, 2) + 
-                    Math.pow(this.playerY - this.gorilla.currentY, 2)
-                );
-                
-                if (playerDistance <= 60 && !this.gorilla.isChasing) {
-                    this.gorilla.isChasing = true;
-                    this.showMessage('🦍 ROAR! Gorilla is angry!');
-                }
-                
-                if (this.gorilla.isChasing && playerDistance >= 250) {
-                    this.gorilla.isChasing = false;
-                    this.gorilla.returning = true;
-                    this.showMessage('🦍 Gorilla calmed down...');
-                }
-                
-                if (this.gorilla.isChasing) {
-                    const deltaX = this.playerX - this.gorilla.currentX;
-                    const deltaY = this.playerY - this.gorilla.currentY;
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    
-                    if (distance > 5) {
-                        const moveX = (deltaX / distance) * this.gorilla.chaseSpeed;
-                        const moveY = (deltaY / distance) * this.gorilla.chaseSpeed;
-                        
-                        this.gorilla.currentX += moveX;
-                        this.gorilla.currentY += moveY;
-                    }
-                } else {
-                    this.gorilla.currentX += this.gorilla.direction * this.gorilla.speed;
-                    
-                    if (this.gorilla.currentX <= this.gorilla.startX || 
-                        this.gorilla.currentX >= this.gorilla.startX + this.gorilla.patrolRange) {
-                        this.gorilla.direction *= -1;
-                    }
-                }
-                
-                this.gorilla.element.style.left = this.gorilla.currentX + 'px';
-                this.gorilla.element.style.top = this.gorilla.currentY + 'px';
+    if (!this.gorilla) return;
+    
+    const playerDistance = Math.sqrt(
+        Math.pow(this.playerX - this.gorilla.currentX, 2) + 
+        Math.pow(this.playerY - this.gorilla.currentY, 2)
+    );
+    
+    // Check if player is in forest and close enough to start chasing
+    if (this.isInForest && playerDistance <= 60 && !this.gorilla.isChasing) {
+        this.gorilla.isChasing = true;
+        this.showMessage('🦍 ROAR! Gorilla is angry!');
+    }
+    
+    // Stop chasing if player escapes forest or gets far enough away
+    if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
+        this.gorilla.isChasing = false;
+        this.gorilla.returning = true;
+        this.showMessage('🦍 Gorilla calmed down...');
+    }
+    
+    if (this.gorilla.isChasing) {
+        // Chase the player
+        const deltaX = this.playerX - this.gorilla.currentX;
+        const deltaY = this.playerY - this.gorilla.currentY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (distance > 5) {
+            const moveX = (deltaX / distance) * this.gorilla.chaseSpeed;
+            const moveY = (deltaY / distance) * this.gorilla.chaseSpeed;
+            
+            // Check if gorilla can move to new position
+            if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+                this.gorilla.currentX += moveX;
+                this.gorilla.currentY += moveY;
             }
+        }
+    } else if (this.gorilla.returning) {
+        // Return to starting position
+        const deltaX = this.gorilla.startX - this.gorilla.currentX;
+        const deltaY = this.gorilla.startY - this.gorilla.currentY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (distance > 5) {
+            const moveX = (deltaX / distance) * this.gorilla.speed * 1.5;
+            const moveY = (deltaY / distance) * this.gorilla.speed * 1.5;
+            
+            if (this.canGorillaMoveTo(this.gorilla.currentX + moveX, this.gorilla.currentY + moveY)) {
+                this.gorilla.currentX += moveX;
+                this.gorilla.currentY += moveY;
+            }
+        } else {
+            this.gorilla.returning = false;
+            this.gorilla.currentX = this.gorilla.startX;
+            this.gorilla.currentY = this.gorilla.startY;
+            this.gorilla.direction = 1;
+        }
+    } else {
+        // Patrol behavior
+        this.gorilla.currentX += this.gorilla.direction * this.gorilla.speed;
+        
+        if (this.gorilla.currentX <= this.gorilla.startX || 
+            this.gorilla.currentX >= this.gorilla.startX + this.gorilla.patrolRange) {
+            this.gorilla.direction *= -1;
+        }
+    }
+    
+    this.gorilla.element.style.left = this.gorilla.currentX + 'px';
+    this.gorilla.element.style.top = this.gorilla.currentY + 'px';
+}
 
             updateForegroundEnemy() {
                 if (this.isPaused) return;
@@ -2514,6 +2611,34 @@ for (let zone of desertZones) {
 }
 
 this.isOnDesert = onDesert;
+
+                // Add this to the end of checkZoneEffects method:
+
+// Check if on forest zones
+const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+let onForest = false;
+
+for (let zone of forestZones) {
+    const zoneRect = {
+        left: parseInt(zone.style.left),
+        top: parseInt(zone.style.top),
+        right: parseInt(zone.style.left) + parseInt(zone.style.width),
+        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+    };
+    
+    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+        onForest = true;
+        break;
+    }
+}
+
+// Handle forest entry/exit
+if (onForest && !this.isInForest) {
+    this.enterForest();
+} else if (!onForest && this.isInForest) {
+    this.exitForest();
+}
             }
 
             rectsOverlap(rect1, rect2) {
