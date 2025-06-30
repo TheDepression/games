@@ -81,6 +81,47 @@
         opacity: 0.5;
     }
 }
+
+
+
+        .apocalypse-overlay-fast {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2400px;
+    height: 2400px;
+    background-image: 
+        radial-gradient(ellipse 150px 60px at 10% 15%, rgba(90,90,90,0.2) 25%, transparent 65%),
+        radial-gradient(ellipse 120px 45px at 30% 35%, rgba(70,70,70,0.18) 20%, transparent 60%),
+        radial-gradient(ellipse 180px 75px at 55% 55%, rgba(80,80,80,0.15) 30%, transparent 70%),
+        radial-gradient(ellipse 140px 50px at 75% 25%, rgba(85,85,85,0.22) 25%, transparent 65%),
+        radial-gradient(ellipse 160px 65px at 20% 75%, rgba(75,75,75,0.16) 28%, transparent 68%),
+        radial-gradient(ellipse 110px 40px at 45% 10%, rgba(95,95,95,0.19) 22%, transparent 62%),
+        radial-gradient(ellipse 170px 70px at 85% 65%, rgba(65,65,65,0.17) 26%, transparent 66%),
+        radial-gradient(ellipse 130px 55px at 15% 45%, rgba(88,88,88,0.21) 24%, transparent 64%);
+    background-size: 600px 600px, 500px 500px, 700px 700px, 550px 550px, 650px 650px, 480px 480px, 680px 680px, 520px 520px;
+    background-position: 0 0, 300px 200px, 150px 400px, 450px 100px, 600px 500px, 250px 350px, 500px 250px, 100px 150px;
+    pointer-events: none;
+    z-index: 152; /* Above the original fog layer */
+    opacity: 0.35;
+    filter: blur(1.5px);
+    animation: fastFogDrift 25s ease-in-out infinite alternate;
+}
+
+@keyframes fastFogDrift {
+    0% { 
+        background-position: 0 0, 200px 150px, 100px 300px, 350px 50px, 450px 400px, 150px 250px, 400px 200px, 50px 100px;
+        opacity: 0.3;
+    }
+    50% {
+        background-position: 300px 100px, 500px 250px, 400px 500px, 650px 200px, 750px 600px, 450px 450px, 700px 400px, 350px 300px;
+        opacity: 0.4;
+    }
+    100% { 
+        background-position: 600px 200px, 800px 350px, 700px 700px, 950px 350px, 1050px 800px, 750px 650px, 1000px 600px, 650px 500px;
+        opacity: 0.3;
+    }
+}
         
         /* Copy all the zone styles from original but darker */
         .water-zone {
@@ -647,6 +688,7 @@
             <div id="gameWorld">
                 <div id="player"></div>
                 <div class="apocalypse-overlay"></div>
+                <div class="apocalypse-overlay-fast"></div> <!-- ADD THIS LINE -->
             </div>
         </div>
         <div id="message"></div>
