@@ -1275,6 +1275,7 @@ this.playerVelocityY = deltaY * sensitivity;
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
+                    this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0; // Continue from where left off
@@ -1297,6 +1298,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
             saveGameState() {
                 const gameState = {
                     collectedRedHearts: this.collectedRedHearts,
+                    collectedMoney: this.collectedMoney,
                     hearts: this.hearts,
                     money: this.money,
                     timeElapsed: this.timeElapsed,
@@ -2752,6 +2754,32 @@ redHearts.forEach(heart => {
         }
     }
 });
+
+
+                // Check permanent money pickups
+const permanentMoney = this.gameWorld.querySelectorAll('.money-pickup[data-type="permanentMoney"]');
+permanentMoney.forEach(money => {
+    const moneyX = parseInt(money.style.left);
+    const moneyY = parseInt(money.style.top);
+    const moneyRect = {
+        left: moneyX, top: moneyY,
+        right: moneyX + 22, bottom: moneyY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, moneyRect)) {
+        const value = parseInt(money.dataset.value);
+        this.money += value;
+        this.collectedMoney.push(money.dataset.id); // Track collection
+        this.showMessage(`💰 +${value}¥ collected!`);
+        this.updateUI();
+        this.saveGameState(); // Autosave the collection
+        money.remove();
+    }
+});
+
+
+
+                
 
                 const moneyDrops = this.gameWorld.querySelectorAll('.money-pickup[data-type="drop"]');
                 moneyDrops.forEach(money => {
