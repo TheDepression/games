@@ -2583,7 +2583,7 @@ updateQuicksand() {
                     };
                     
                     if (this.rectsOverlap(playerRect, heartRect)) {
-                        if (this.hearts < 3) {
+                        if (this.hearts < this.maxHearts) {
                             this.hearts++;
                             this.showMessage('❤️ Health restored!');
                             this.updateUI();
