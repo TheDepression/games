@@ -818,6 +818,142 @@ this.pendingAction = null;
                 this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
             }
 
+
+
+            enterForest() {
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    this.gameStarted = false;
+    document.getElementById('confirmText').textContent = '🌲 Entering the forest...';
+    document.getElementById('confirmDialog').style.display = 'flex';
+    this.pendingAction = 'enterForest';
+}
+
+exitForest() {
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    this.gameStarted = false;
+    document.getElementById('confirmText').textContent = '🌞 Leaving the forest!';
+    document.getElementById('confirmDialog').style.display = 'flex';
+    this.pendingAction = 'exitForest';
+}
+
+updateForestVisibility() {
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .breakable-wall, .money-pickup, .heart-pickup, .exit');
+    
+    // First, reset all walls to visible
+    walls.forEach(wall => {
+        wall.style.visibility = 'visible';
+    });
+    
+    // Then hide forest walls if not in forest
+    walls.forEach(wall => {
+        let inForest = false;
+        const wallX = parseInt(wall.style.left) + 10;
+        const wallY = parseInt(wall.style.top) + 10;
+        
+        forestZones.forEach(zone => {
+            const zoneLeft = parseInt(zone.style.left);
+            const zoneTop = parseInt(zone.style.top);
+            const zoneRight = zoneLeft + parseInt(zone.style.width);
+            const zoneBottom = zoneTop + parseInt(zone.style.height);
+            
+            if (wallX >= zoneLeft && wallX <= zoneRight && 
+                wallY >= zoneTop && wallY <= zoneBottom) {
+                inForest = true;
+            }
+        });
+        
+        if (inForest) {
+            wall.style.visibility = this.isInForest ? 'visible' : 'hidden';
+        }
+    });
+}
+
+initializeZoneEffects() {
+    const playerCenterX = this.playerX + 12;
+    const playerCenterY = this.playerY + 12;
+    
+    // Check if spawning in forest
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    let inForest = false;
+    
+    for (let zone of forestZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            inForest = true;
+            break;
+        }
+    }
+    
+    if (inForest) {
+        this.isInForest = true;
+        this.bgMusic.pause();
+        this.bgMusic.currentTime = 0;
+        this.bgMusic.volume = 0;
+        this.forestMusic.currentTime = 0;
+        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+        document.getElementById('forestOverlay').classList.add('active');
+        document.getElementById('forestVisionMask').classList.add('active');
+        this.updateForestVisibility();
+        
+        const gameAreaRect = this.gameArea.getBoundingClientRect();
+        const playerScreenX = gameAreaRect.left + (this.gameArea.offsetWidth / 2);
+        const playerScreenY = gameAreaRect.top + (this.gameArea.offsetHeight / 2);
+        const mask = document.getElementById('forestVisionMask');
+        mask.style.background = `radial-gradient(circle 111px at ${playerScreenX}px ${playerScreenY}px, transparent 111px, black 111px)`;
+    } else {
+        this.isInForest = false;
+        this.forestMusic.pause();
+        this.bgMusic.play().catch(e => console.log('Music play failed:', e));
+        document.getElementById('forestOverlay').classList.remove('active');
+        document.getElementById('forestVisionMask').classList.remove('active');
+        this.updateForestVisibility();
+    }
+}
+
+canGorillaMoveTo(x, y) {
+    const gorillaSize = 33;
+    const padding = 2;
+    
+    const points = [
+        {x: x + padding, y: y + padding},
+        {x: x + gorillaSize - padding, y: y + padding},
+        {x: x + padding, y: y + gorillaSize - padding},
+        {x: x + gorillaSize - padding, y: y + gorillaSize - padding}
+    ];
+    
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .tiled-wall');
+    
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + (parseInt(wall.style.width) || 20),
+            bottom: parseInt(wall.style.top) + (parseInt(wall.style.height) || 20)
+        };
+        
+        for (let point of points) {
+            if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
             handleStart(e) {
     if (!this.gameStarted) return;
     e.preventDefault();
