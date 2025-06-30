@@ -429,6 +429,45 @@
             animation: heartbeat 1s infinite;
             z-index: 60;
         }
+
+
+        .purple-heart-pickup {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: purpleHeartbeat 1.5s infinite;
+    z-index: 60;
+}
+
+@keyframes purpleHeartbeat {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px purple);
+    }
+    50% { 
+        transform: scale(1.3);
+        filter: drop-shadow(0 0 10px purple) brightness(1.2);
+    }
+}
+
+.fake-quicksand {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, 
+        #8b6914 0%, 
+        #a67c1a 30%, 
+        #c4941f 60%, 
+        #8b6914 100%);
+    opacity: 0.8;
+    z-index: 80; /* Higher than purple heart */
+    animation: quicksandSpin 4s linear infinite;
+}
         
         .money-pickup {
             position: absolute;
@@ -735,6 +774,10 @@ this.lastTapY = null;
 this.isInForest = false;
 this.forestMusic = document.getElementById('forestMusic');
 this.pendingAction = null;
+
+                // Add these after existing properties in constructor
+this.maxHearts = 3; // Starting max hearts
+this.collectedPurpleHearts = []; // Track which purple hearts have been collected
 
                 
                 // FORCE DEFAULT ITEMS (all from maze1 except specified)
@@ -1198,6 +1241,10 @@ this.updateDeathCounter();
                     this.updateTimer();
                     return true;
 
+                    // Add these lines in loadGameState() after existing properties
+this.maxHearts = gameState.maxHearts || 3;
+this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+
                     this.hasBoat = true; // Always have boat in maze 2
                     this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true; // Default broken
                 }
@@ -1210,6 +1257,11 @@ this.updateDeathCounter();
                     money: this.money,
                     timeElapsed: this.timeElapsed,
                      deathCount: this.deathCount, // ADD THIS LINE
+
+                    // Add these lines in saveGameState() after existing properties
+maxHearts: this.maxHearts,
+collectedPurpleHearts: this.collectedPurpleHearts,
+                    
                     playerX: this.playerX,
                     playerY: this.playerY,
                     hasKey: true,
@@ -1457,6 +1509,16 @@ quicksandPositions.forEach(pos => {
                 castleZone.style.width = '150px';
                 castleZone.style.height = '240px';
                 this.gameWorld.appendChild(castleZone);
+
+                // Add fake quicksand with hidden purple heart at the end of createBackgroundZones()
+
+// Create fake quicksand (visual only, no collision)
+const fakeQuicksand = document.createElement('div');
+fakeQuicksand.className = 'fake-quicksand';
+fakeQuicksand.style.left = '2260px'; // Center the 60px circle around x:2290
+fakeQuicksand.style.top = '1190px'; // Center the 60px circle around y:1220
+fakeQuicksand.dataset.type = 'fakeQuicksand';
+this.gameWorld.appendChild(fakeQuicksand);
             }
 
             createColoredWalls() {
