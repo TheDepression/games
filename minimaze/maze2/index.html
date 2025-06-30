@@ -1237,13 +1237,11 @@ this.playerVelocityY = deltaY * sensitivity;
 this.updateDeathCounter();
                     this.playerX = gameState.playerX || 400;
                     this.playerY = gameState.playerY || 1760;
+                    this.maxHearts = gameState.maxHearts || 3;
+this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                     
                     this.updateTimer();
                     return true;
-
-                    // Add these lines in loadGameState() after existing properties
-this.maxHearts = gameState.maxHearts || 3;
-this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
 
                     this.hasBoat = true; // Always have boat in maze 2
                     this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true; // Default broken
@@ -2946,6 +2944,10 @@ if (inQuicksand && closestQuicksand) {
                     this.playerY = 1760;
                     this.timeElapsed = timeAtDeath; // Keep time penalty
                     this.hearts = 3; // Reset hearts
+                    
+                    // Restore the max hearts after initLevel
+    this.maxHearts = savedMaxHearts;
+    this.collectedPurpleHearts = savedCollectedPurpleHearts;
                     
                     this.initLevel();
                     this.startGameTimer();
