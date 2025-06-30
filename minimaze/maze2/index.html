@@ -2711,8 +2711,10 @@ redHearts.forEach(heart => {
     if (this.rectsOverlap(playerRect, heartRect)) {
         if (this.hearts < this.maxHearts) {
             this.hearts++;
+            this.collectedRedHearts.push(heart.dataset.id); // Track collection
             this.showMessage('❤️ Health restored!');
             this.updateUI();
+            this.saveGameState(); // Save the collection
             heart.remove();
         }
     }
