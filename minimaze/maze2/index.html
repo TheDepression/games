@@ -774,6 +774,13 @@ this.pendingAction = null;
     this.sinkingInQuicksand = false;
     this.quicksandStrength = 0; // How strong the pull is
     this.quicksandCenter = null; // Which quicksand pit center
+
+                // Add these after existing properties in constructor
+this.wasOnLava = false;
+this.lavaProtectionTime = 5; // Start with full protection
+this.lavaProtectionActive = false;
+this.lastLavaZoneTime = 0;
+this.lastLavaDamage = 0;
                 
                 // Enemy and interaction properties
                 this.movingEnemies = [];
@@ -788,6 +795,8 @@ this.pendingAction = null;
                 this.gameArea = document.getElementById('gameArea');
                 this.controlArea = document.getElementById('controlArea');
                 this.bgMusic = document.getElementById('bgMusic');
+
+        
                 
                 // Initialize
                 this.preloadPlayerImages();
@@ -2576,33 +2585,60 @@ if (inQuicksand && closestQuicksand) {
                 const playerCenterX = this.playerX + 12;
                 const playerCenterY = this.playerY + 12;
                 
-                // Check lava damage
-                const lavaZones = this.gameWorld.querySelectorAll('[data-zone-type="lava"]');
-                let onLava = false;
-                
-                for (let zone of lavaZones) {
-                    const zoneRect = {
-                        left: parseInt(zone.style.left),
-                        top: parseInt(zone.style.top),
-                        right: parseInt(zone.style.left) + parseInt(zone.style.width),
-                        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
-                    };
-                    
-                    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
-                        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
-                        onLava = true;
-                        break;
-                    }
-                }
-                
-                if (onLava && !this.hasLavaShoes) {
-                    const now = Date.now();
-                    if (now - (this.lastLavaDamage || 0) > 1000) {
-                        this.takeDamage();
-                        this.showMessage('🔥 Lava burns! You need special shoes!');
-                        this.lastLavaDamage = now;
-                    }
-                }
+                // Replace the existing lava damage code with this:
+if (onLava) {
+    const now = Date.now();
+    this.wasOnLava = true;
+    
+    if (this.hasLavaShoes) {
+        // If just entered lava zone, start protection (but only if not already active)
+        if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
+            this.lavaProtectionActive = true;
+            this.lavaProtectionTime = 5; // 5 seconds of protection
+            this.showMessage('🥾 ⏰5 seconds of protection');
+        }
+        
+        // Count down protection time
+        if (this.lavaProtectionActive && now - this.lastLavaZoneTime > 1000) {
+            this.lavaProtectionTime--;
+            this.lastLavaZoneTime = now;
+            
+            if (this.lavaProtectionTime > 0) {
+                this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
+            } else {
+                // Protection expired
+                this.lavaProtectionActive = false;
+                this.showMessage('🥾 Protection expired! Escape the lava!');
+            }
+        }
+        
+        // Take damage if protection expired
+        if (!this.lavaProtectionActive) {
+            if (now - this.lastLavaDamage > 1000) {
+                this.takeDamage(2); // 2 hearts damage
+                this.showMessage('🔥 Burning hot!');
+                this.lastLavaDamage = now;
+            }
+        }
+    } else {
+        // No shoes - take damage
+        if (now - this.lastLavaDamage > 1000) {
+            this.takeDamage(2); // 2 hearts damage
+            this.showMessage('🔥 Burning hot! You need special shoes!');
+            this.lastLavaDamage = now;
+        }
+    }
+} else {
+    // Not on lava - reset protection for next time (ONLY HERE)
+    if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
+        this.lavaProtectionActive = false;
+        this.lavaProtectionTime = 5; // Reset to full protection
+        if (this.wasOnLava) {  // Only show message if actually was on lava
+            this.showMessage('🥾 Left the lava! Power recharged for next time! ☺️');
+        }
+    }
+    this.wasOnLava = false; // Reset the flag
+}
 
                 // Check if on desert zones
 const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
