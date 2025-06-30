@@ -2582,113 +2582,130 @@ if (inQuicksand && closestQuicksand) {
             }
 
             checkZoneEffects() {
-                const playerCenterX = this.playerX + 12;
-                const playerCenterY = this.playerY + 12;
-                
-                // Replace the existing lava damage code with this:
-if (onLava) {
-    const now = Date.now();
-    this.wasOnLava = true;
+    const playerCenterX = this.playerX + 12;
+    const playerCenterY = this.playerY + 12;
     
-    if (this.hasLavaShoes) {
-        // If just entered lava zone, start protection (but only if not already active)
-        if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
-            this.lavaProtectionActive = true;
-            this.lavaProtectionTime = 5; // 5 seconds of protection
-            this.showMessage('🥾 ⏰5 seconds of protection');
-        }
+    // Check lava zones FIRST - define onLava variable
+    const lavaZones = this.gameWorld.querySelectorAll('[data-zone-type="lava"]');
+    let onLava = false;
+    
+    for (let zone of lavaZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
         
-        // Count down protection time
-        if (this.lavaProtectionActive && now - this.lastLavaZoneTime > 1000) {
-            this.lavaProtectionTime--;
-            this.lastLavaZoneTime = now;
-            
-            if (this.lavaProtectionTime > 0) {
-                this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
-            } else {
-                // Protection expired
-                this.lavaProtectionActive = false;
-                this.showMessage('🥾 Protection expired! Escape the lava!');
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            onLava = true;
+            break;
+        }
+    }
+    
+    // NOW use the onLava variable in the lava protection system
+    if (onLava) {
+        const now = Date.now();
+        this.wasOnLava = true;
+        
+        if (this.hasLavaShoes) {
+            // If just entered lava zone, start protection (but only if not already active)
+            if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
+                this.lavaProtectionActive = true;
+                this.lavaProtectionTime = 5; // 5 seconds of protection
+                this.showMessage('🥾 ⏰5 seconds of protection');
             }
-        }
-        
-        // Take damage if protection expired
-        if (!this.lavaProtectionActive) {
+            
+            // Count down protection time
+            if (this.lavaProtectionActive && now - this.lastLavaZoneTime > 1000) {
+                this.lavaProtectionTime--;
+                this.lastLavaZoneTime = now;
+                
+                if (this.lavaProtectionTime > 0) {
+                    this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
+                } else {
+                    // Protection expired
+                    this.lavaProtectionActive = false;
+                    this.showMessage('🥾 Protection expired! Escape the lava!');
+                }
+            }
+            
+            // Take damage if protection expired
+            if (!this.lavaProtectionActive) {
+                if (now - this.lastLavaDamage > 1000) {
+                    this.takeDamage(2); // 2 hearts damage
+                    this.showMessage('🔥 Burning hot!');
+                    this.lastLavaDamage = now;
+                }
+            }
+        } else {
+            // No shoes - take damage
             if (now - this.lastLavaDamage > 1000) {
                 this.takeDamage(2); // 2 hearts damage
-                this.showMessage('🔥 Burning hot!');
+                this.showMessage('🔥 Burning hot! You need special shoes!');
                 this.lastLavaDamage = now;
             }
         }
     } else {
-        // No shoes - take damage
-        if (now - this.lastLavaDamage > 1000) {
-            this.takeDamage(2); // 2 hearts damage
-            this.showMessage('🔥 Burning hot! You need special shoes!');
-            this.lastLavaDamage = now;
-        }
-    }
-} else {
-    // Not on lava - reset protection for next time (ONLY HERE)
-    if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
-        this.lavaProtectionActive = false;
-        this.lavaProtectionTime = 5; // Reset to full protection
-        if (this.wasOnLava) {  // Only show message if actually was on lava
-            this.showMessage('🥾 Left the lava! Power recharged for next time! ☺️');
-        }
-    }
-    this.wasOnLava = false; // Reset the flag
-}
-
-                // Check if on desert zones
-const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
-let onDesert = false;
-
-for (let zone of desertZones) {
-    const zoneRect = {
-        left: parseInt(zone.style.left),
-        top: parseInt(zone.style.top),
-        right: parseInt(zone.style.left) + parseInt(zone.style.width),
-        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
-    };
-    
-    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
-        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
-        onDesert = true;
-        break;
-    }
-}
-
-this.isOnDesert = onDesert;
-
-                // Add this to the end of checkZoneEffects method:
-
-// Check if on forest zones
-const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
-let onForest = false;
-
-for (let zone of forestZones) {
-    const zoneRect = {
-        left: parseInt(zone.style.left),
-        top: parseInt(zone.style.top),
-        right: parseInt(zone.style.left) + parseInt(zone.style.width),
-        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
-    };
-    
-    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
-        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
-        onForest = true;
-        break;
-    }
-}
-
-// Handle forest entry/exit
-if (onForest && !this.isInForest) {
-    this.enterForest();
-} else if (!onForest && this.isInForest) {
-    this.exitForest();
-}
+        // Not on lava - reset protection for next time (ONLY HERE)
+        if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
+            this.lavaProtectionActive = false;
+            this.lavaProtectionTime = 5; // Reset to full protection
+            if (this.wasOnLava) {  // Only show message if actually was on lava
+                this.showMessage('🥾 Left the lava! Power recharged for next time! ☺️');
             }
+        }
+        this.wasOnLava = false; // Reset the flag
+    }
+
+    // Check if on desert zones
+    const desertZones = this.gameWorld.querySelectorAll('[data-zone-type="desert"]');
+    let onDesert = false;
+
+    for (let zone of desertZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            onDesert = true;
+            break;
+        }
+    }
+
+    this.isOnDesert = onDesert;
+
+    // Check if on forest zones
+    const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
+    let onForest = false;
+
+    for (let zone of forestZones) {
+        const zoneRect = {
+            left: parseInt(zone.style.left),
+            top: parseInt(zone.style.top),
+            right: parseInt(zone.style.left) + parseInt(zone.style.width),
+            bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+        };
+        
+        if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+            playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+            onForest = true;
+            break;
+        }
+    }
+
+    // Handle forest entry/exit
+    if (onForest && !this.isInForest) {
+        this.enterForest();
+    } else if (!onForest && this.isInForest) {
+        this.exitForest();
+    }
+}
 
             rectsOverlap(rect1, rect2) {
                 return rect1.left < rect2.right &&
