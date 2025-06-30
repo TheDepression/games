@@ -317,7 +317,7 @@
         
         .pathway {
             position: absolute;
-            background: linear-gradient(135deg, #4a4a3a 0%, #3a3a2a 50%, #5a5a4a 100%);
+            background: linear-gradient(135deg, #d1d1ba 0%, #91916d 50%, #9c9c73 100%);
             border: 1px solid rgba(100,100,80,0.2);
             opacity: 0.6;
             z-index: 25;
@@ -1864,9 +1864,9 @@ this.gameWorld.appendChild(fakeQuicksand);
   {x: 2010, y: 1940, w: 10, h: 40},
   {x: 1600, y: 2270, w: 10, h: 120},
   {x: 1440, y: 2320, w: 120, h: 10},
-  {x: 130, y: 1990, w: 50, h: 170},
-  {x: 160, y: 1990, w: 160, h: 50},
-  {x: 290, y: 2200, w: 220, h: 50},
+  {x: 120, y: 1990, w: 60, h: 110},
+  {x: 160, y: 1980, w: 60, h: 50},
+  {x: 270, y: 2220, w: 220, h: 50},
   {x: 1340, y: 1360, w: 160, h: 50},
   {x: 980, y: 1920, w: 50, h: 80},
   {x: 1000, y: 1960, w: 100, h: 50},
@@ -2230,8 +2230,8 @@ createCollectibles() {
             createFakeTiledWalls() {
     // Fake tiled walls that look real but you can walk through
     const fakeTiledWalls = [
-        {x: 0, y: 1860, w: 40, h: 540},
-        {x: 0, y: 2360, w: 440, h: 40}
+        {x: 20, y: 1860, w: 40, h: 540},
+        {x: 20, y: 2360, w: 280, h: 40}
     ];
     
     fakeTiledWalls.forEach(wall => {
