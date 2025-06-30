@@ -2105,14 +2105,17 @@ createCollectibles() {
     ];
 
     redHeartPositions.forEach(pos => {
-        const heartEl = document.createElement('div');
-        heartEl.className = 'heart-pickup';
-        heartEl.textContent = '❤️';
-        heartEl.style.left = pos.x + 'px';
-        heartEl.style.top = pos.y + 'px';
-        heartEl.dataset.id = pos.id;
-        heartEl.dataset.type = 'redHeart';
-        this.gameWorld.appendChild(heartEl);
+        // Only create if not already collected
+        if (!this.collectedRedHearts.includes(pos.id)) {
+            const heartEl = document.createElement('div');
+            heartEl.className = 'heart-pickup';
+            heartEl.textContent = '❤️';
+            heartEl.style.left = pos.x + 'px';
+            heartEl.style.top = pos.y + 'px';
+            heartEl.dataset.id = pos.id;
+            heartEl.dataset.type = 'redHeart';
+            this.gameWorld.appendChild(heartEl);
+        }
     });
 }
 
