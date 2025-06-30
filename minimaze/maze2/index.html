@@ -2592,6 +2592,29 @@ updateQuicksand() {
                     }
                 });
 
+
+                // Check purple heart pickup
+const purpleHearts = this.gameWorld.querySelectorAll('.purple-heart-pickup');
+purpleHearts.forEach(purpleHeart => {
+    const heartX = parseInt(purpleHeart.style.left);
+    const heartY = parseInt(purpleHeart.style.top);
+    const heartRect = {
+        left: heartX, top: heartY,
+        right: heartX + 22, bottom: heartY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, heartRect)) {
+        // Increase max hearts permanently
+        this.maxHearts++;
+        this.hearts = this.maxHearts; // Fill to new max
+        this.collectedPurpleHearts.push(purpleHeart.dataset.id); // Track collection
+        this.showMessage(`💜 Max health increased to ${this.maxHearts}! ⚡`);
+        this.updateUI();
+        this.saveGameState(); // Auto-save the permanent upgrade
+        purpleHeart.remove();
+    }
+});
+
                 const moneyDrops = this.gameWorld.querySelectorAll('.money-pickup[data-type="drop"]');
                 moneyDrops.forEach(money => {
                     const moneyX = parseInt(money.style.left);
