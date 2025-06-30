@@ -302,6 +302,18 @@
             opacity: 0.9;
             filter: brightness(0.4) desaturate(0.5);
         }
+
+        .fake-tiled-wall {
+    position: absolute;
+    background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    border: 1px solid rgba(0,0,0,0.4);
+    opacity: 0.9;
+    filter: brightness(0.4) desaturate(0.5);
+    z-index: 25; /* Same as regular walls but no collision */
+    pointer-events: none; /* Make sure it doesn't interfere */
+}
         
         .pathway {
             position: absolute;
@@ -1396,6 +1408,7 @@ collectedPurpleHearts: this.collectedPurpleHearts,
                 this.updateUI();
                 this.generateMaze();
                 this.createEmojiWalls(); // ADD THIS LINE
+                this.createFakeTiledWalls(); // ADD THIS LINE
 
                 this.createCollectibles();
                 this.createMoneyCollectibles(); // ADD THIS LINE
@@ -2210,6 +2223,26 @@ createCollectibles() {
             
             this.gameWorld.appendChild(purpleHeartEl);
         }
+    });
+}
+
+
+            createFakeTiledWalls() {
+    // Fake tiled walls that look real but you can walk through
+    const fakeTiledWalls = [
+        {x: 0, y: 1860, w: 40, h: 540},
+        {x: 0, y: 2360, w: 440, h: 40}
+    ];
+    
+    fakeTiledWalls.forEach(wall => {
+        const wallEl = document.createElement('div');
+        wallEl.className = 'fake-tiled-wall';
+        wallEl.style.left = wall.x + 'px';
+        wallEl.style.top = wall.y + 'px';
+        wallEl.style.width = wall.w + 'px';
+        wallEl.style.height = wall.h + 'px';
+        wallEl.dataset.type = 'fake-wall'; // For identification if needed
+        this.gameWorld.appendChild(wallEl);
     });
 }
 
