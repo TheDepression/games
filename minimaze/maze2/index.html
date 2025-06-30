@@ -2740,10 +2740,10 @@ friendlies.forEach(friendly => {
         playerOnNPC = true;
         currentNPCMessage = friendly.dataset.message;
         
-        // Show message if not currently visible OR if it's a different message
+        // Show NPC message if not currently visible OR if it's a different message
         const messageEl = document.getElementById('message');
         if (messageEl.style.display === 'none' || messageEl.textContent !== currentNPCMessage) {
-            this.showMessage(currentNPCMessage, true); // Add persistent flag
+            this.showNPCMessage(currentNPCMessage); // Use NPC-specific method
         }
     }
 });
