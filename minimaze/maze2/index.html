@@ -1349,6 +1349,9 @@ collectedPurpleHearts: this.collectedPurpleHearts,
                 
                 this.updateUI();
                 this.generateMaze();
+
+                this.createCollectibles();
+this.createPurpleHearts();
                 
                 // Center camera on player
                 const gameAreaWidth = this.gameArea.offsetWidth;
