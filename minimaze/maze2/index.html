@@ -2945,10 +2945,6 @@ if (inQuicksand && closestQuicksand) {
                     this.timeElapsed = timeAtDeath; // Keep time penalty
                     this.hearts = 3; // Reset hearts
                     
-                    // Restore the max hearts after initLevel
-    this.maxHearts = savedMaxHearts;
-    this.collectedPurpleHearts = savedCollectedPurpleHearts;
-                    
                     this.initLevel();
                     this.startGameTimer();
                     this.saveGameState();
