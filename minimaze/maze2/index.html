@@ -894,7 +894,7 @@ exitForest() {
 
 updateForestVisibility() {
     const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
-    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .breakable-wall, .money-pickup, .heart-pickup, .exit');
+    const walls = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .enemy, .friendly, .breakable-wall, .money-pickup, .heart-pickup, .purple-heart-pickup, .exit');
     
     // First, reset all walls to visible
     walls.forEach(wall => {
