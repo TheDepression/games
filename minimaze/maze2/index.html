@@ -3105,26 +3105,33 @@ if (inQuicksand && closestQuicksand) {
     }
 }
             
-            showMessage(text, persistent = false) {
+            showMessage(text) {
     const message = document.getElementById('message');
     message.textContent = text;
     message.style.display = 'block';
     
     clearTimeout(this.messageTimeout);
-    
-    if (!persistent) {
-        this.messageTimeout = setTimeout(() => {
-            message.style.display = 'none';
-        }, 2000);
-    }
+    this.messageTimeout = setTimeout(() => {
+        message.style.display = 'none';
+    }, 2000);
 }
 
-            clearNPCMessage() {
+            showNPCMessage(text) {
+    const message = document.getElementById('message');
+    message.textContent = text;
+    message.style.display = 'block';
+    clearTimeout(this.messageTimeout); // Clear any existing timeout
+    // No timeout - message stays until player moves away
+}
+
+clearNPCMessage() {
     const message = document.getElementById('message');
     if (message.style.display === 'block') {
         message.style.display = 'none';
     }
 }
+
+        
             
             updateUI() {
     document.getElementById('hearts').textContent = this.hearts;
