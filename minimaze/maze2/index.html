@@ -1927,7 +1927,7 @@ this.gameWorld.appendChild(fakeQuicksand);
                     });
                 });
 
-                // Add forest bees - killable with 2 HP
+                // Add forest bees - killable with 100 HP
 this.createForestBees();
 
 // Gorilla - unbeatable but trackable, follows maze1 behavior
@@ -1996,8 +1996,8 @@ this.gorilla = {
                     top: forestTop,
                     bottom: forestBottom
                 },
-                hp: 2, // 2-hit kill
-                maxHp: 2,
+                hp: 100, // 2-hit kill
+                maxHp: 100,
                 alive: true
             });
         }
