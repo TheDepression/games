@@ -801,6 +801,7 @@
             constructor() {
                 // Basic properties first
                 this.collectedRedHearts = []; // Track which red hearts have been collected
+                this.collectedMoney = []; // Track which money has been collected
                 this.hearts = 3;
                 this.gameStarted = false;
                 this.timeElapsed = 0;
@@ -1273,6 +1274,7 @@ this.playerVelocityY = deltaY * sensitivity;
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
+                    this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0; // Continue from where left off
@@ -1294,6 +1296,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
 
             saveGameState() {
                 const gameState = {
+                    collectedRedHearts: this.collectedRedHearts,
                     hearts: this.hearts,
                     money: this.money,
                     timeElapsed: this.timeElapsed,
@@ -2115,6 +2118,35 @@ createCollectibles() {
             heartEl.dataset.id = pos.id;
             heartEl.dataset.type = 'redHeart';
             this.gameWorld.appendChild(heartEl);
+        }
+    });
+}
+
+
+            createMoneyCollectibles() {
+    // Create money pickups in the same area as red hearts
+    const moneyPositions = [
+        {x: 120, y: 1400, id: 'money_1'},
+        {x: 140, y: 1420, id: 'money_2'},
+        {x: 160, y: 1400, id: 'money_3'},
+        {x: 120, y: 1440, id: 'money_4'},
+        {x: 140, y: 1460, id: 'money_5'},
+        {x: 160, y: 1440, id: 'money_6'},
+        {x: 180, y: 1420, id: 'money_7'}
+    ];
+
+    moneyPositions.forEach(pos => {
+        // Only create if not already collected
+        if (!this.collectedMoney.includes(pos.id)) {
+            const moneyEl = document.createElement('div');
+            moneyEl.className = 'money-pickup';
+            moneyEl.textContent = '💰';
+            moneyEl.style.left = pos.x + 'px';
+            moneyEl.style.top = pos.y + 'px';
+            moneyEl.dataset.id = pos.id;
+            moneyEl.dataset.type = 'permanentMoney';
+            moneyEl.dataset.value = '50'; // 50 yen each
+            this.gameWorld.appendChild(moneyEl);
         }
     });
 }
