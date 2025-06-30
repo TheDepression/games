@@ -2021,6 +2021,62 @@ this.gorilla = {
                 });
             }
 
+            // ADD THIS NEW METHOD:
+createCollectibles() {
+    // Create red hearts for testing (around x:40 y:1400 area)
+    const redHeartPositions = [
+        {x: 40, y: 1400, id: 'red_heart_1'},
+        {x: 60, y: 1420, id: 'red_heart_2'},
+        {x: 80, y: 1400, id: 'red_heart_3'},
+        {x: 100, y: 1420, id: 'red_heart_4'},
+        {x: 40, y: 1440, id: 'red_heart_5'},
+        {x: 60, y: 1460, id: 'red_heart_6'},
+        {x: 80, y: 1440, id: 'red_heart_7'},
+        {x: 100, y: 1460, id: 'red_heart_8'}
+    ];
+
+    redHeartPositions.forEach(pos => {
+        const heartEl = document.createElement('div');
+        heartEl.className = 'heart-pickup';
+        heartEl.textContent = '❤️';
+        heartEl.style.left = pos.x + 'px';
+        heartEl.style.top = pos.y + 'px';
+        heartEl.dataset.id = pos.id;
+        heartEl.dataset.type = 'redHeart';
+        this.gameWorld.appendChild(heartEl);
+    });
+}
+
+         
+
+            createPurpleHearts() {
+    const purpleHeartPositions = [
+        {x: 420, y: 2330, id: 'purple_heart_1'},
+        {x: 1220, y: 355, id: 'purple_heart_2'},
+        {x: 2290, y: 1220, id: 'purple_heart_3'} // Hidden under fake quicksand
+    ];
+
+    purpleHeartPositions.forEach(pos => {
+        // Only create if not already collected
+        if (!this.collectedPurpleHearts.includes(pos.id)) {
+            const purpleHeartEl = document.createElement('div');
+            purpleHeartEl.className = 'purple-heart-pickup';
+            purpleHeartEl.textContent = '💜';
+            purpleHeartEl.style.left = pos.x + 'px';
+            purpleHeartEl.style.top = pos.y + 'px';
+            purpleHeartEl.dataset.id = pos.id;
+            purpleHeartEl.dataset.type = 'purpleHeart';
+            
+            // Special handling for the hidden heart (lower z-index so fake quicksand covers it)
+            if (pos.id === 'purple_heart_3') {
+                purpleHeartEl.style.zIndex = '70'; // Lower than fake quicksand (80)
+            }
+            
+            this.gameWorld.appendChild(purpleHeartEl);
+        }
+    });
+}
+
             createExit() {
                 const exitEl = document.createElement('div');
                 exitEl.className = 'exit';
