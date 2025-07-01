@@ -785,6 +785,14 @@
               //  window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
             //    return;
       //      }
+
+
+            // Check if returning from pink boss fight
+if (gameState.currentUrl === 'pinkBoss' && gameState.pinkBossDefeated) {
+    // Player completed the pink boss, update the flag
+    gameState.currentUrl = 'maze2';
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+}
             
             // Set welcome message
             const playerName = localStorage.getItem('mfPlayerName') || 'Unknown Hero';
@@ -817,6 +825,7 @@
                 this.currentMessageType = null; // Track what type of message is showing
                 this.collectedBanana = false; // Track if banana has been collected
                 this.gorillaEncounterComplete = false; // Track if gorilla encounter is done
+                this.pinkBossDefeated = false;
 this.hasOrangePower = false; // Track if player has orange power upgrade
 this.gorillaDialogStep = 0; // Track which dialog step we're on
                 this.hearts = 3;
@@ -1297,6 +1306,7 @@ this.hasOrangePower = gameState.hasOrangePower || false;
                     if (this.hasOrangePower) {
     this.attackDamage = 100; // Restore the power upgrade
 }
+                    this.pinkBossDefeated = gameState.pinkBossDefeated || false;
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
@@ -1335,6 +1345,7 @@ collectedPurpleHearts: this.collectedPurpleHearts,
                     gorillaEncounterComplete: this.gorillaEncounterComplete,
 hasOrangePower: this.hasOrangePower,
                     attackDamage: this.attackDamage,
+                    pinkBossDefeated: this.pinkBossDefeated,
                     
                     playerX: this.playerX,
                     playerY: this.playerY,
@@ -3002,6 +3013,26 @@ permanentMoney.forEach(money => {
                     }
                 }
 
+                // Check pink square hitbox (after gorilla encounter)
+if (this.gorillaEncounterComplete && !this.pinkBossDefeated) {
+    const pinkSquareX = 100; // x position of the pink square
+    const pinkSquareY = 200; // y position of the pink square
+    
+    // Create expanded hitbox (5px around the 20x20 square)
+    const pinkSquareRect = {
+        left: pinkSquareX - 5,
+        top: pinkSquareY - 5,
+        right: pinkSquareX + 20 + 5,
+        bottom: pinkSquareY + 20 + 5
+    };
+    
+    if (this.rectsOverlap(playerRect, pinkSquareRect)) {
+        // Transfer to cutscene
+        this.transferToCutscene();
+    }
+}
+
+                
 
 // Check quicksand
 const quicksands = this.gameWorld.querySelectorAll('[data-type="quicksand"]');
@@ -3458,6 +3489,27 @@ completeGorillaEncounter() {
     this.showMessage('🍊 Power Orange consumed! Gun damage increased to 100! 🔫⚡');
 }
 
+
+
+
+            transferToCutscene() {
+    // Save current game state before transfer
+    this.saveGameState();
+    
+    // Update the current URL in the save state to track progression
+    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+    gameState.currentUrl = 'cutscene2';
+    gameState.lastSaveTime = Date.now();
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    // Show transition message
+    this.showMessage('🌸 Approaching the mysterious island...');
+    
+    // Transfer after brief delay
+    setTimeout(() => {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene2';
+    }, 1500);
+}
         
             
             updateUI() {
