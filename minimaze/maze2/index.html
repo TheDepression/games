@@ -2747,10 +2747,15 @@ friendlies.forEach(friendly => {
         playerOnNPC = true;
         currentNPCMessage = friendly.dataset.message;
         
-        // Show NPC message if not currently visible OR if it's a different message
-        const messageEl = document.getElementById('message');
-        if (messageEl.style.display === 'none' || messageEl.textContent !== currentNPCMessage) {
-            this.showNPCMessage(currentNPCMessage); // Use NPC-specific method
+        // Check if this is the boat repair NPC
+        if (friendlyX === 1400 && friendlyY === 1330) {
+            this.checkBoatRepairTransaction(friendly);
+        } else {
+            // Show NPC message if not currently visible OR if it's a different message
+            const messageEl = document.getElementById('message');
+            if (messageEl.style.display === 'none' || messageEl.textContent !== currentNPCMessage) {
+                this.showNPCMessage(currentNPCMessage); // Use NPC-specific method
+            }
         }
     }
 });
@@ -3134,6 +3139,49 @@ if (inQuicksand && closestQuicksand) {
     this.currentMessageType = 'npc';
     clearTimeout(this.messageTimeout); // Clear any existing timeout
     // No timeout - message stays until player moves away
+}
+
+checkBoatRepairTransaction(npc) {
+    if (!this.boatIsBroken) {
+        // Boat is already repaired
+        this.showNPCMessage("👩‍⚕️ Your boat looks fine to me! Safe travels!");
+        return;
+    }
+    
+    if (this.money >= 700) {
+        // Player has enough money - show transaction option
+        const now = Date.now();
+        const interactionKey = 'boatRepair_1400_1330';
+        
+        // Prevent spam clicking (once per 3 seconds)
+        if (this.lastInteractionTime[interactionKey] && 
+            now - this.lastInteractionTime[interactionKey] < 3000) {
+            return;
+        }
+        
+        // Check if player just arrived (allow immediate first interaction)
+        if (!this.lastInteractionTime[interactionKey]) {
+            this.showNPCMessage("👩‍⚕️ Your boat is broken? I can repair it for 700¥. Stay here to confirm!");
+            this.lastInteractionTime[interactionKey] = now - 2500; // Allow next interaction in 0.5s
+            return;
+        }
+        
+        // Second interaction - perform the transaction
+        this.money -= 700;
+        this.boatIsBroken = false;
+        this.showNPCMessage("👩‍⚕️ ⛵ Boat repaired! You can now cross water safely!");
+        this.updateUI();
+        this.saveGameState();
+        this.lastInteractionTime[interactionKey] = now;
+        
+        // Update the NPC's message permanently
+        npc.dataset.message = "👩‍⚕️ Your boat is working perfectly! Take care on the water!";
+        
+    } else {
+        // Not enough money
+        const needed = 700 - this.money;
+        this.showNPCMessage(`👩‍⚕️ Boat repair costs 700¥. You need ${needed}¥ more!`);
+    }
 }
 
 clearNPCMessage() {
