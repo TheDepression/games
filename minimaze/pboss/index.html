@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P-Monster Boss Fight</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #2a2a2a;
+            border: 3px solid #555;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 570px;
+            height: 580px;
+            transform-origin: 0 0;
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #444;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #665;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 250;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
+        .water-zone {
+            position: absolute;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(200,200,255,0.3) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(150,150,200,0.2) 1px, transparent 1px),
+                linear-gradient(135deg, #3a5a7a 0%, #2a4a6a 50%, #1a3a5a 100%);
+            background-size: 20px 20px, 15px 15px, 100% 100%;
+            background-position: 0 0, 10px 10px, 0 0;
+            opacity: 0.8;
+            animation: waterFlow 4s linear infinite;
+        }
+        
+        @keyframes waterFlow {
+            0% { background-position: 0 0, 10px 10px, 0 0; }
+            100% { background-position: 20px 0, 30px 10px, 0 0; }
+        }
+        
+        .pink-platform {
+            position: absolute;
+            background: hotpink;
+            border: 3px solid #ff1493;
+            border-radius: 8px;
+            opacity: 0.8;
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 100;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .boss-enemy {
+            position: absolute;
+            width: 78px;
+            height: 78px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 200;
+        }
+        
+        .projectile {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+        }
+        
+        .caged-cat {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 90;
+        }
+        
+        @keyframes slashEffect {
+            0% { 
+                transform: scale(0.5) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes damageFloat {
+            0% {
+                transform: translateY(0px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #665;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        #deathCounter {
+            position: fixed;
+            top: 10px;
+            right: 90px;
+            z-index: 250;
+            background: rgba(128,0,128,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        #bossHealthBar {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #665;
+            text-align: center;
+            opacity: 0.6;
+        }
+        
+        .health-bar {
+            width: 200px;
+            height: 20px;
+            background: #333;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff8888);
+            transition: width 0.3s ease;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 400;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            opacity: 0.9;
+        }
+        
+        #victoryScreen, #defeatScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🐸 vs P-Monster</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+            <div id="items">+</div>
+        </div>
+        <div id="timer">0:00</div>
+        <div id="deathCounter">☠️0</div>
+        
+        <div id="bossHealthBar">
+            <div>P-Monster HP</div>
+            <div class="health-bar">
+                <div class="health-fill" id="bossHealthFill" style="width: 100%;"></div>
+            </div>
+        </div>
+        
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+            </div>
+        </div>
+        <div id="message"></div>
+        
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">🐸 vs P-Monster</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe to move, double-tap to shoot!</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px;">
+                <div>🔫 Defeat the P-Monster to rescue the cat!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Watch out for projectiles!</div>
+            </div>
+        </div>
+        
+        <div id="startScreen">
+            <h2>🐸 vs P-Monster</h2>
+            <p style="font-size: 16px; margin: 20px 0;">The final battle begins...</p>
+            <p style="font-size: 12px; opacity: 0.8;">🔫 Use your TNT gun to defeat the P-Monster!</p>
+            <button class="start-button" onclick="startBossFight()">Start Battle</button>
+        </div>
+        
+        <div id="victoryScreen">
+            <h2>🎉 Victory!</h2>
+            <p>You defeated the P-Monster and rescued the cat!</p>
+            <button onclick="returnToWorld()">Return to World</button>
+        </div>
+        
+        <div id="defeatScreen">
+            <h2>💀 Defeat</h2>
+            <p>The P-Monster was too strong this time...</p>
+            <button onclick="returnToWorld()">Return to World</button>
+        </div>
+    </div>
+
+    <audio id="bossMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/darkmaze.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        // Check access on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            if (!savedState) {
+                alert('No game data found! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+
+            const gameState = JSON.parse(savedState);
+            
+            // Check if they have access (completed gorilla encounter)
+            if (!gameState.gorillaEncounterComplete) {
+                alert('You must complete the gorilla encounter first!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+            
+            // Check if they're coming from cutscene2
+            if (gameState.currentUrl !== 'pboss') {
+                alert('Invalid access! Redirecting to proper location.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+        });
+
+        let game;
+
+        function startBossFight() {
+            document.getElementById('startScreen').style.display = 'none';
+            game = new PBossFight();
+        }
+
+        class PBossFight {
+            constructor() {
+                // Load game state
+                this.loadGameState();
+                
+                // Player properties
+                this.playerX = 285; // Center of platform
+                this.playerY = 400; // Near bottom of platform
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.lastDragX = 0;
+                this.lastDragY = 0;
+                this.currentDirection = 's';
+                this.isInvulnerable = false;
+                
+                // Attack properties
+                this.attackCooldown = false;
+                this.attackRange = 45;
+                this.attackDamage = 100;
+                this.lastTap = 0;
+                this.lastTapX = null;
+                this.lastTapY = null;
+                
+                // Boss properties
+                this.boss = {
+                    x: 50,
+                    y: 50,
+                    speed: 2.07,
+                    state: 'horizontal', // 'horizontal' or 'vertical'
+                    direction: 'right', // 'left', 'right', 'up', 'down'
+                    rideDistance: 0,
+                    targetRideDistance: 0,
+                    hp: 500,
+                    maxHp: 500,
+                    lastShot: 0,
+                    shotCooldown: 2000
+                };
+                
+                this.projectiles = [];
+                this.gameStarted = false;
+                this.timerInterval = null;
+                
+                // DOM elements
+                this.player = document.getElementById('player');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.gameArea = document.getElementById('gameArea');
+                this.bossMusic = document.getElementById('bossMusic');
+                
+                this.preloadPlayerImages();
+                this.bindEvents();
+                this.initBossFight();
+            }
+            
+            loadGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    this.hearts = gameState.hearts || 3;
+                    this.money = gameState.money || 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+                    this.hasWeapon = gameState.hasWeapon || false;
+                    this.hasOrangePower = gameState.hasOrangePower || false;
+                    
+                    if (this.hasOrangePower) {
+                        this.attackDamage = 100;
+                    }
+                }
+            }
+            
+            saveGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    gameState.hearts = this.hearts;
+                    gameState.money = this.money;
+                    gameState.timeElapsed = this.timeElapsed;
+                    gameState.deathCount = this.deathCount;
+                    gameState.lastSaveTime = Date.now();
+                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                }
+            }
+            
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+            
+            bindEvents() {
+                this.controlArea = document.getElementById('controlArea');
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+            
+            handleStart(e) {
+                if (!this.gameStarted) return;
+                e.preventDefault();
+                
+                const now = Date.now();
+                const point = e.touches ? e.touches[0] : e;
+                const currentX = point.clientX;
+                const currentY = point.clientY;
+                
+                if (this.hasWeapon && now - this.lastTap < 250 && !this.attackCooldown) {
+                    if (this.lastTapX && this.lastTapY) {
+                        const tapDistance = Math.sqrt(
+                            Math.pow(currentX - this.lastTapX, 2) + 
+                            Math.pow(currentY - this.lastTapY, 2)
+                        );
+                        
+                        if (tapDistance < 30) {
+                            this.attack();
+                            this.lastTap = 0;
+                            this.lastTapX = null;
+                            this.lastTapY = null;
+                            return;
+                        }
+                    }
+                }
+                
+                this.lastTap = now;
+                this.lastTapX = currentX;
+                this.lastTapY = currentY;
+                
+                this.isDragging = true;
+                this.lastDragX = currentX;
+                this.lastDragY = currentY;
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging || !this.gameStarted) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.updatePlayerImage(newDirection);
+                    }
+                }
+
+                this.playerVelocityX = deltaX * 0.5;
+                this.playerVelocityY = deltaY * 0.5;
+
+                const maxVelocity = 11;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            updatePlayerImage(direction) {
+                this.currentDirection = direction;
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+                this.player.textContent = '';
+            }
+            
+            attack() {
+                if (!this.hasWeapon) return;
+                
+                this.attackCooldown = true;
+                
+                const attackEl = document.createElement('div');
+                attackEl.style.position = 'absolute';
+                attackEl.style.width = '40px';
+                attackEl.style.height = '40px';
+                attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+                attackEl.style.borderRadius = '50%';
+                attackEl.style.pointerEvents = 'none';
+                attackEl.style.zIndex = '400';
+                attackEl.style.animation = 'slashEffect 0.3s ease-out';
+                
+                const directionOffsets = {
+                    'n': {x: 0, y: -25}, 'ne': {x: 20, y: -20}, 'e': {x: 25, y: 0}, 'se': {x: 20, y: 20},
+                    's': {x: 0, y: 25}, 'sw': {x: -20, y: 20}, 'w': {x: -25, y: 0}, 'nw': {x: -20, y: -20}
+                };
+                
+                const offset = directionOffsets[this.currentDirection];
+                attackEl.style.left = (this.playerX + offset.x - 20 + 15) + 'px';
+                attackEl.style.top = (this.playerY + offset.y - 20 + 15) + 'px';
+                
+                this.gameWorld.appendChild(attackEl);
+                
+                setTimeout(() => {
+                    if (attackEl.parentNode) {
+                        attackEl.remove();
+                    }
+                }, 300);
+                
+                this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
+                
+                setTimeout(() => {
+                    this.attackCooldown = false;
+                }, 500);
+            }
+            
+            checkAttackHits(attackX, attackY) {
+                const distance = Math.sqrt(
+                    Math.pow(attackX - (this.boss.x + 39), 2) + 
+                    Math.pow(attackY - (this.boss.y + 39), 2)
+                );
+                
+                if (distance <= this.attackRange) {
+                    this.boss.hp -= this.attackDamage;
+                    
+                    const damageText = document.createElement('div');
+                    damageText.style.position = 'absolute';
+                    damageText.style.color = '#ff4444';
+                    damageText.style.fontWeight = 'bold';
+                    damageText.style.fontSize = '14px';
+                    damageText.style.pointerEvents = 'none';
+                    damageText.style.zIndex = '500';
+                    damageText.style.animation = 'damageFloat 1s ease-out';
+                    damageText.textContent = `-${this.attackDamage}`;
+                    damageText.style.left = this.boss.x + 'px';
+                    damageText.style.top = this.boss.y + 'px';
+                    this.gameWorld.appendChild(damageText);
+                    
+                    setTimeout(() => {
+                        if (damageText.parentNode) {
+                            damageText.remove();
+                        }
+                    }, 1000);
+                    
+                    this.updateBossHealthBar();
+                    
+                    if (this.boss.hp <= 0) {
+                        this.victory();
+                    }
+                }
+            }
+            
+            initBossFight() {
+                // Create water zones (130px border around the platform)
+                const waterTop = document.createElement('div');
+                waterTop.className = 'water-zone';
+                waterTop.style.left = '0px';
+                waterTop.style.top = '0px';
+                waterTop.style.width = '570px';
+                waterTop.style.height = '130px';
+                this.gameWorld.appendChild(waterTop);
+                
+                const waterBottom = document.createElement('div');
+                waterBottom.className = 'water-zone';
+                waterBottom.style.left = '0px';
+                waterBottom.style.top = '450px';
+                waterBottom.style.width = '570px';
+                waterBottom.style.height = '130px';
+                this.gameWorld.appendChild(waterBottom);
+                
+                const waterLeft = document.createElement('div');
+                waterLeft.className = 'water-zone';
+                waterLeft.style.left = '0px';
+                waterLeft.style.top = '130px';
+                waterLeft.style.width = '130px';
+                waterLeft.style.height = '320px';
+                this.gameWorld.appendChild(waterLeft);
+                
+                const waterRight = document.createElement('div');
+                waterRight.className = 'water-zone';
+                waterRight.style.left = '440px';
+                waterRight.style.top = '130px';
+                waterRight.style.width = '130px';
+                waterRight.style.height = '320px';
+                this.gameWorld.appendChild(waterRight);
+                
+                // Create pink platform (310x320 in center)
+                const platform = document.createElement('div');
+                platform.className = 'pink-platform';
+                platform.style.left = '130px';
+                platform.style.top = '130px';
+                platform.style.width = '310px';
+                platform.style.height = '320px';
+                this.gameWorld.appendChild(platform);
+                
+                // Create caged cat (top left of platform)
+                const cagedCat = document.createElement('div');
+                cagedCat.className = 'caged-cat';
+                cagedCat.style.left = '140px';
+                cagedCat.style.top = '140px';
+                cagedCat.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/caged.png")';
+                this.gameWorld.appendChild(cagedCat);
+                
+                // Create boss
+                const bossEl = document.createElement('div');
+                bossEl.className = 'boss-enemy';
+                bossEl.id = 'boss';
+                bossEl.style.left = this.boss.x + 'px';
+                bossEl.style.top = this.boss.y + 'px';
+                bossEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/pmonster-min.png")';
+                this.gameWorld.appendChild(bossEl);
+                
+                // Set player position and image
+                const visualOffset = (32 - 24) / 2;
+                this.player.style.left = (this.playerX - visualOffset) + 'px';
+                this.player.style.top = (this.playerY - visualOffset) + 'px';
+                this.updatePlayerImage('s');
+                
+                // Center camera on player initially
+                this.updateCamera();
+                
+                this.updateUI();
+                this.updateBossHealthBar();
+                this.startGame();
+            }
+            
+            startGame() {
+                this.gameStarted = true;
+                this.bossMusic.play().catch(e => console.log('Music play failed:', e));
+                
+                this.timerInterval = setInterval(() => {
+                    this.timeElapsed++;
+                    this.updateTimer();
+                    
+                    if (this.timeElapsed % 60 === 0) {
+                        this.saveGameState();
+                    }
+                }, 1000);
+                
+                this.startGameLoop();
+                this.showMessage('💀 Defeat the P-Monster to rescue the cat!');
+            }
+            
+            startGameLoop() {
+                const gameLoop = () => {
+                    if (this.gameStarted) {
+                        this.updatePlayer();
+                        this.updateBoss();
+                        this.updateProjectiles();
+                        this.checkCollisions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+            
+            updatePlayer() {
+                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                    const newX = this.playerX + this.playerVelocityX;
+                    const newY = this.playerY + this.playerVelocityY;
+                    
+                    if (this.canMoveTo(newX, newY)) {
+                        this.playerX = newX;
+                        this.playerY = newY;
+                        
+                        const visualOffset = (32 - 24) / 2;
+                        this.player.style.left = (this.playerX - visualOffset) + 'px';
+                        this.player.style.top = (this.playerY - visualOffset) + 'px';
+                        
+                        this.updateCamera();
+                    }
+                }
+                
+                this.playerVelocityX *= 0.9;
+                this.playerVelocityY *= 0.9;
+            }
+            
+            updateCamera() {
+                const gameAreaWidth = this.gameArea.offsetWidth;
+                const gameAreaHeight = this.gameArea.offsetHeight;
+                const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+                const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+                this.gameArea.scrollTo({
+                    left: scrollX,
+                    top: scrollY,
+                    behavior: 'auto'
+                });
+            }
+            
+            canMoveTo(x, y) {
+                const playerSize = 24;
+                
+                // Platform boundaries (130px margin + 3px border = 133px start, 310px width)
+                const platformLeft = 133;
+                const platformTop = 133;
+                const platformRight = 133 + 310 - playerSize;
+                const platformBottom = 133 + 320 - playerSize;
+                
+                return x >= platformLeft && x <= platformRight && 
+                       y >= platformTop && y <= platformBottom;
+            }
+            
+            updateBoss() {
+                const bossEl = document.getElementById('boss');
+                const now = Date.now();
+                
+                if (this.boss.state === 'horizontal') {
+                    if (this.boss.direction === 'right') {
+                        this.boss.x += this.boss.speed;
+                        if (this.boss.x >= 570 - 78 - 130) { // Stop before water margin
+                            this.boss.x = 570 - 78 - 130;
+                            this.boss.state = 'vertical';
+                            this.boss.direction = Math.random() < 0.5 ? 'up' : 'down';
+                            const distances = [100, 200, 300];
+                            this.boss.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                            this.boss.rideDistance = 0;
+                        }
+                    } else if (this.boss.direction === 'left') {
+                        this.boss.x -= this.boss.speed;
+                        if (this.boss.x <= 130) { // Stop before water margin
+                            this.boss.x = 130;
+                            this.boss.state = 'vertical';
+                            this.boss.direction = Math.random() < 0.5 ? 'up' : 'down';
+                            const distances = [100, 200, 300];
+                            this.boss.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                            this.boss.rideDistance = 0;
+                        }
+                    }
+                } else if (this.boss.state === 'vertical') {
+                    // Shoot projectiles while moving vertically
+                    if (now - this.boss.lastShot > this.boss.shotCooldown) {
+                        this.createProjectile();
+                        this.boss.lastShot = now;
+                    }
+                    
+                    if (this.boss.direction === 'up') {
+                        this.boss.y -= this.boss.speed;
+                        this.boss.rideDistance += this.boss.speed;
+                        
+                        if (this.boss.y <= 130) { // Stop before water margin
+                            this.boss.y = 130;
+                            this.boss.direction = 'down';
+                        }
+                        
+                        if (this.boss.rideDistance >= this.boss.targetRideDistance) {
+                            this.boss.state = 'horizontal';
+                            this.boss.direction = this.boss.x <= 130 ? 'right' : 'left';
+                        }
+                    } else if (this.boss.direction === 'down') {
+                        this.boss.y += this.boss.speed;
+                        this.boss.rideDistance += this.boss.speed;
+                        
+                        if (this.boss.y >= 570 - 78 - 130) { // Stop before water margin
+                            this.boss.y = 570 - 78 - 130;
+                            this.boss.direction = 'up';
+                        }
+                        
+                        if (this.boss.rideDistance >= this.boss.targetRideDistance) {
+                            this.boss.state = 'horizontal';
+                            this.boss.direction = this.boss.x <= 130 ? 'right' : 'left';
+                        }
+                    }
+                }
+                
+                bossEl.style.left = this.boss.x + 'px';
+                bossEl.style.top = this.boss.y + 'px';
+            }
+            
+            createProjectile() {
+                const projectile = document.createElement('div');
+                projectile.className = 'projectile';
+                projectile.textContent = '💩';
+                
+                // Start from boss center
+                const startX = this.boss.x + 39;
+                const startY = this.boss.y + 39;
+                
+                // Aim towards player
+                const deltaX = (this.playerX + 12) - startX;
+                const deltaY = (this.playerY + 12) - startY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                const speed = 3;
+                const velocityX = (deltaX / distance) * speed;
+                const velocityY = (deltaY / distance) * speed;
+                
+                projectile.style.left = startX + 'px';
+                projectile.style.top = startY + 'px';
+                
+                this.gameWorld.appendChild(projectile);
+                
+                this.projectiles.push({
+                    element: projectile,
+                    x: startX,
+                    y: startY,
+                    velocityX: velocityX,
+                    velocityY: velocityY
+                });
+            }
+            
+            updateProjectiles() {
+                for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                    const projectile = this.projectiles[i];
+                    
+                    projectile.x += projectile.velocityX;
+                    projectile.y += projectile.velocityY;
+                    
+                    projectile.element.style.left = projectile.x + 'px';
+                    projectile.element.style.top = projectile.y + 'px';
+                    
+                    // Remove if out of bounds
+                    if (projectile.x < -20 || projectile.x > 590 || 
+                        projectile.y < -20 || projectile.y > 600) {
+                        projectile.element.remove();
+                        this.projectiles.splice(i, 1);
+                    }
+                }
+            }
+            
+            checkCollisions() {
+                if (this.isInvulnerable) return;
+                
+                const playerRect = {
+                    left: this.playerX,
+                    top: this.playerY,
+                    right: this.playerX + 24,
+                    bottom: this.playerY + 24
+                };
+                
+                // Check boss collision
+                const bossRect = {
+                    left: this.boss.x,
+                    top: this.boss.y,
+                    right: this.boss.x + 78,
+                    bottom: this.boss.y + 78
+                };
+                
+                if (this.rectsOverlap(playerRect, bossRect)) {
+                    this.takeDamage();
+                }
+                
+                // Check projectile collisions
+                for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                    const projectile = this.projectiles[i];
+                    const projRect = {
+                        left: projectile.x,
+                        top: projectile.y,
+                        right: projectile.x + 20,
+                        bottom: projectile.y + 20
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, projRect)) {
+                        this.takeDamage();
+                        projectile.element.remove();
+                        this.projectiles.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            
+            rectsOverlap(rect1, rect2) {
+                return rect1.left < rect2.right &&
+                       rect1.right > rect2.left &&
+                       rect1.top < rect2.bottom &&
+                       rect1.bottom > rect2.top;
+            }
+            
+            takeDamage() {
+                if (this.isInvulnerable) return;
+                
+                this.hearts--;
+                this.showMessage('💔 Ouch!');
+                this.updateUI();
+                
+                this.isInvulnerable = true;
+                this.player.classList.add('invulnerable');
+                
+                setTimeout(() => {
+                    this.isInvulnerable = false;
+                    this.player.classList.remove('invulnerable');
+                }, 1000);
+                
+                if (this.hearts <= 0) {
+                    this.defeat();
+                }
+            }
+            
+            victory() {
+                clearInterval(this.timerInterval);
+                this.gameStarted = false;
+                this.bossMusic.pause();
+                
+                // Mark pink boss as defeated
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    gameState.pinkBossDefeated = true;
+                    gameState.currentUrl = 'maze2';
+                    gameState.hearts = this.hearts;
+                    gameState.money = this.money;
+                    gameState.timeElapsed = this.timeElapsed;
+                    gameState.deathCount = this.deathCount;
+                    gameState.playerX = 100; // At pink square
+                    gameState.playerY = 200;
+                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                }
+                
+                document.getElementById('victoryScreen').style.display = 'flex';
+            }
+            
+            defeat() {
+                clearInterval(this.timerInterval);
+                this.gameStarted = false;
+                this.bossMusic.pause();
+                
+                this.deathCount++;
+                
+                // Save state with death count and time
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    gameState.currentUrl = 'maze2';
+                    gameState.hearts = 3; // Reset hearts
+                    gameState.money = this.money;
+                    gameState.timeElapsed = this.timeElapsed;
+                    gameState.deathCount = this.deathCount;
+                    gameState.playerX = 150; // 50px north of pink square
+                    gameState.playerY = 150;
+                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                }
+                
+                document.getElementById('defeatScreen').style.display = 'flex';
+            }
+            
+            updateUI() {
+                document.getElementById('hearts').textContent = this.hearts;
+                document.getElementById('money').textContent = this.money;
+                document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+                
+                const ui = document.getElementById('ui');
+                let itemsHTML = '';
+                if (this.hasWeapon && this.hasOrangePower) {
+                    itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
+                } else if (this.hasWeapon) {
+                    itemsHTML += ' 🔫';
+                }
+                
+                if (!document.getElementById('items')) {
+                    const itemsDiv = document.createElement('div');
+                    itemsDiv.id = 'items';
+                    itemsDiv.innerHTML = '+' + itemsHTML;
+                    ui.appendChild(itemsDiv);
+                } else {
+                    document.getElementById('items').innerHTML = '+' + itemsHTML;
+                }
+            }
+            
+            updateTimer() {
+                const minutes = Math.floor(this.timeElapsed / 60);
+                const seconds = this.timeElapsed % 60;
+                const timerEl = document.getElementById('timer');
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (this.timeElapsed >= 600) {
+                    timerEl.style.background = 'rgba(255,0,0,0.8)';
+                } else if (this.timeElapsed >= 300) {
+                    timerEl.style.background = 'rgba(255,165,0,0.8)';
+                } else {
+                    timerEl.style.background = 'rgba(0,128,0,0.8)';
+                }
+            }
+            
+            updateBossHealthBar() {
+                const healthPercentage = (this.boss.hp / this.boss.maxHp) * 100;
+                document.getElementById('bossHealthFill').style.width = healthPercentage + '%';
+            }
+            
+            showMessage(text) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.style.display = 'block';
+                
+                clearTimeout(this.messageTimeout);
+                this.messageTimeout = setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        function returnToWorld() {
+            window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+        }
+        
+        // Don't auto-start - wait for button click
+        window.onload = function() {
+            // Just show the start screen
+        };
+    </script>
+</body>
+</html>
+                        
