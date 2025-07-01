@@ -3111,6 +3111,47 @@ if (inQuicksand && closestQuicksand) {
 
     this.isOnDesert = onDesert;
 
+
+
+                // Check if on water zones - change player to boat
+const waterZones = this.gameWorld.querySelectorAll('[data-zone-type="water"]');
+let onWater = false;
+
+for (let zone of waterZones) {
+    const zoneRect = {
+        left: parseInt(zone.style.left),
+        top: parseInt(zone.style.top),
+        right: parseInt(zone.style.left) + parseInt(zone.style.width),
+        bottom: parseInt(zone.style.top) + parseInt(zone.style.height)
+    };
+    
+    if (playerCenterX >= zoneRect.left && playerCenterX <= zoneRect.right &&
+        playerCenterY >= zoneRect.top && playerCenterY <= zoneRect.bottom) {
+        onWater = true;
+        break;
+    }
+}
+
+// Switch player sprite based on water status
+if (onWater && this.hasBoat && !this.boatIsBroken) {
+    // On water with working boat - show boat emoji
+    this.player.style.backgroundImage = '';
+    this.player.textContent = '⛵';
+    this.player.style.fontSize = '24px';
+    this.player.style.display = 'flex';
+    this.player.style.alignItems = 'center';
+    this.player.style.justifyContent = 'center';
+} else if (this.currentDirection) {
+    // On land or no boat - show normal frog sprite
+    this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${this.currentDirection}.PNG")`;
+    this.player.textContent = '';
+    this.player.style.fontSize = '';
+}
+
+
+
+                
+
     // Check if on forest zones
     const forestZones = this.gameWorld.querySelectorAll('[data-zone-type="forest"]');
     let onForest = false;
