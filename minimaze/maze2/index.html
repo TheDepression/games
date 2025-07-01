@@ -2290,8 +2290,8 @@ createCollectibles() {
 
 
             createBanana() {
-    // Only create if not already collected
-    if (!this.collectedBanana) {
+    // Only create if not collected AND encounter not complete
+    if (!this.collectedBanana && !this.gorillaEncounterComplete) {
         const bananaEl = document.createElement('div');
         bananaEl.className = 'banana-pickup';
         bananaEl.style.position = 'absolute';
