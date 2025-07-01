@@ -2903,6 +2903,22 @@ redHearts.forEach(heart => {
 });
 
 
+                // Check gorilla encounter
+const gorillaEncounter = this.gameWorld.querySelector('.gorilla-encounter');
+if (gorillaEncounter && this.collectedBanana && !this.gorillaEncounterComplete) {
+    const gorillaX = parseInt(gorillaEncounter.style.left);
+    const gorillaY = parseInt(gorillaEncounter.style.top);
+    const gorillaRect = {
+        left: gorillaX, top: gorillaY,
+        right: gorillaX + 33, bottom: gorillaY + 33
+    };
+    
+    if (this.rectsOverlap(playerRect, gorillaRect)) {
+        this.startGorillaDialog();
+    }
+}
+
+
                 // Check banana pickup
 const banana = this.gameWorld.querySelector('.banana-pickup');
 if (banana) {
