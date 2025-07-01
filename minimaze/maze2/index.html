@@ -815,6 +815,7 @@
                 this.collectedRedHearts = []; // Track which red hearts have been collected
                 this.collectedMoney = []; // Track which money has been collected
                 this.currentMessageType = null; // Track what type of message is showing
+                this.collectedBanana = false; // Track if banana has been collected
                 this.hearts = 3;
                 this.gameStarted = false;
                 this.timeElapsed = 0;
@@ -1287,6 +1288,7 @@ this.playerVelocityY = deltaY * sensitivity;
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
+                    this.collectedBanana = gameState.collectedBanana || false;
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
@@ -1320,6 +1322,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                     // Add these lines in saveGameState() after existing properties
 maxHearts: this.maxHearts,
 collectedPurpleHearts: this.collectedPurpleHearts,
+                    collectedBanana: this.collectedBanana,
                     
                     playerX: this.playerX,
                     playerY: this.playerY,
@@ -1414,6 +1417,7 @@ collectedPurpleHearts: this.collectedPurpleHearts,
                 this.createCollectibles();
                 this.createMoneyCollectibles(); // ADD THIS LINE
 this.createPurpleHearts();
+                this.createBanana();
                 
                 // Center camera on player
                 const gameAreaWidth = this.gameArea.offsetWidth;
@@ -1885,7 +1889,7 @@ this.gameWorld.appendChild(fakeQuicksand);
   {x: 2300, y: 840, w: 60, h: 50},
   {x: 2300, y: 860, w: 50, h: 20},
   {x: 560, y: 980, w: 30, h: 240},
-  {x: 300, y: 1120, w: 220, h: 50},
+  {x: 330, y: 1120, w: 190, h: 50},
   {x: 0, y: 1160, w: 380, h: 50},
   {x: 820, y: 1300, w: 150, h: 20},
   {x: 860, y: 1320, w: 80, h: 50},
@@ -2233,6 +2237,29 @@ createCollectibles() {
             this.gameWorld.appendChild(purpleHeartEl);
         }
     });
+}
+
+
+
+            createBanana() {
+    // Only create if not already collected
+    if (!this.collectedBanana) {
+        const bananaEl = document.createElement('div');
+        bananaEl.className = 'banana-pickup';
+        bananaEl.style.position = 'absolute';
+        bananaEl.style.left = '290px';
+        bananaEl.style.top = '1100px';
+        bananaEl.style.width = '25px';
+        bananaEl.style.height = '35px';
+        bananaEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bananaprize-min.png")';
+        bananaEl.style.backgroundSize = 'contain';
+        bananaEl.style.backgroundRepeat = 'no-repeat';
+        bananaEl.style.backgroundPosition = 'center';
+        bananaEl.style.zIndex = '60';
+        bananaEl.style.animation = 'glow 2s infinite';
+        bananaEl.dataset.type = 'banana';
+        this.gameWorld.appendChild(bananaEl);
+    }
 }
 
 
@@ -2832,6 +2859,27 @@ redHearts.forEach(heart => {
 });
 
 
+                // Check banana pickup
+const banana = this.gameWorld.querySelector('.banana-pickup');
+if (banana) {
+    const bananaX = parseInt(banana.style.left);
+    const bananaY = parseInt(banana.style.top);
+    const bananaRect = {
+        left: bananaX, top: bananaY,
+        right: bananaX + 25, bottom: bananaY + 35
+    };
+    
+    if (this.rectsOverlap(playerRect, bananaRect)) {
+        this.collectedBanana = true;
+        this.showMessage('🍌 Mysterious banana collected!');
+        this.updateUI();
+        this.saveGameState();
+        banana.remove();
+    }
+}
+
+                
+
                 // Check permanent money pickups
 const permanentMoney = this.gameWorld.querySelectorAll('.money-pickup[data-type="permanentMoney"]');
 permanentMoney.forEach(money => {
@@ -3209,6 +3257,7 @@ clearNPCMessage() {
     if (this.hasPencil) itemsHTML += ' ✏️';
     if (this.hasWeapon) itemsHTML += ' 🔫';
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
+                if (this.collectedBanana) itemsHTML += ' 🍌';
     
     if (!document.getElementById('items')) {
         const itemsDiv = document.createElement('div');
