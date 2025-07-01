@@ -1294,6 +1294,9 @@ this.playerVelocityY = deltaY * sensitivity;
                     this.collectedBanana = gameState.collectedBanana || false;
                     this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
 this.hasOrangePower = gameState.hasOrangePower || false;
+                    if (this.hasOrangePower) {
+    this.attackDamage = 100; // Restore the power upgrade
+}
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
@@ -1331,6 +1334,7 @@ collectedPurpleHearts: this.collectedPurpleHearts,
                     collectedBanana: this.collectedBanana,
                     gorillaEncounterComplete: this.gorillaEncounterComplete,
 hasOrangePower: this.hasOrangePower,
+                    attackDamage: this.attackDamage,
                     
                     playerX: this.playerX,
                     playerY: this.playerY,
@@ -3545,20 +3549,27 @@ else if (this.hasWeapon) itemsHTML += ' 🔫';
         }
 
         function pauseGame() {
-            if (game && game.gameStarted) {
-                game.isPaused = true;
-                game.bgMusic.pause();
-                document.getElementById('pauseMenu').style.display = 'flex';
-            }
-        }
+    if (game && game.gameStarted) {
+        game.isPaused = true;
+        game.bgMusic.pause();
+        game.forestMusic.pause(); // Also pause forest music
+        document.getElementById('pauseMenu').style.display = 'flex';
+    }
+}
 
         function resumeGame() {
-            if (game) {
-                game.isPaused = false;
-                document.getElementById('pauseMenu').style.display = 'none';
-                game.bgMusic.play().catch(e => console.log('Music resume failed:', e));
-            }
+    if (game) {
+        game.isPaused = false;
+        document.getElementById('pauseMenu').style.display = 'none';
+        
+        // Resume appropriate music based on location
+        if (game.isInForest) {
+            game.forestMusic.play().catch(e => console.log('Forest music resume failed:', e));
+        } else {
+            game.bgMusic.play().catch(e => console.log('Music resume failed:', e));
         }
+    }
+}
 
         function returnToTitle() {
             if (game) {
