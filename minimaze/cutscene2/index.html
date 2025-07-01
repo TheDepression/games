@@ -279,13 +279,19 @@
             }
 
             // Check if this is the last slide
-            if (index === endingSequence.length - 1) {
-                nextButton.style.display = 'none';
-                fightButton.style.display = 'block';
-            } else {
-                nextButton.style.display = 'block';
-                fightButton.style.display = 'none';
-            }
+if (index === endingSequence.length - 1) {
+    nextButton.style.display = 'none';
+    fightButton.style.display = 'block';
+    fightButton.disabled = true; // Disable initially
+    
+    // Enable fight button after 3 seconds
+    setTimeout(() => {
+        fightButton.disabled = false;
+    }, 3000);
+} else {
+    nextButton.style.display = 'block';
+    fightButton.style.display = 'none';
+}
         }
 
         function nextSlide() {
