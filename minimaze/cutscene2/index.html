@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Frog: Pyramid Escape</title>
+    <title>Master Frog: Cat Rescue</title>
     <style>
         body {
             margin: 0;
@@ -102,14 +102,14 @@
             display: block;
         }
         
-        #escapeButton {
+        #fightButton {
             background: #ff6b35;
             display: none;
             font-size: 18px;
             padding: 15px 30px;
         }
         
-        #escapeButton:hover {
+        #fightButton:hover {
             background: #ff5722;
         }
         
@@ -121,62 +121,12 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        
-        #endingVideo {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: none;
-        }
-
-        #endingVideo::-webkit-media-controls {
-            display: none !important;
-        }
-
-        #endingVideo::-webkit-media-controls-panel {
-            display: none !important;
-        }
-
-        #endingVideo::-webkit-media-controls-play-button {
-            display: none !important;
-        }
-
-        #endingVideo::-webkit-media-controls-start-playback-button {
-            display: none !important;
-        }
-
-        #endingVideo::-moz-media-controls {
-            display: none !important;
-        }
-
-        #endingVideo::-ms-media-controls {
-            display: none !important;
-        }
-
-        #replayButton {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: none;
-            z-index: 10;
-        }
-
-        #replayButton:hover {
-            background: rgba(0, 0, 0, 0.9);
-        }
     </style>
 </head>
 <body>
     <div id="startScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center;">
-        <h2>🏺 Pyramid Escape</h2>
-        <p style="font-size: 18px; margin: 20px 0;">The Guardian has been defeated...</p>
+        <h2>🌸 Cat Rescue Mission</h2>
+        <p style="font-size: 18px; margin: 20px 0;">You've reached the mysterious island...</p>
         <button class="start-button" style="background: #ff6b35; font-size: 20px; padding: 15px 30px;" onclick="startEnding()">Watch Cutscene</button>
     </div>
 
@@ -187,14 +137,13 @@
                 Your browser does not support the video element.
             </video>
             <img id="endingImage" src="" alt="Ending Scene">
-            <button id="replayButton" onclick="replayVideo()">🔄 Replay</button>
         </div>
         <div id="subtitleBox">
             <p id="subtitleText">Loading...</p>
         </div>
         <div id="navigationContainer">
             <button id="nextButton" onclick="nextSlide()" disabled>Next</button>
-            <button id="escapeButton" onclick="escapePyramid()">Escape Pyramid!</button>
+            <button id="fightButton" onclick="startFight()">Fight!</button>
         </div>
     </div>
 
@@ -214,8 +163,18 @@
             }
 
             const gameState = JSON.parse(savedState);
-            if (gameState.currentUrl !== 'cutscene1') {
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+            
+            // Check if they completed the gorilla encounter (have access to this cutscene)
+            if (!gameState.gorillaEncounterComplete) {
+                alert('You must complete the gorilla encounter first!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+            
+            // Check if they're coming from maze2
+            if (gameState.currentUrl !== 'cutscene2') {
+                alert('Invalid access! Redirecting to proper location.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 return;
             }
         });
@@ -224,35 +183,19 @@
         const endingSequence = [
             {
                 type: 'image',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/gotyou.jpg',
-                subtitle: 'いまこそ つかまえたぞ、いじめっこ！もう まちで わるさは させない！'
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/cs21-min.png',
+                subtitle: 'Oh look! There she is!!!'
             },
             {
                 type: 'image',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/sillyfrog.jpg',
-                subtitle: 'ハハハハ！バカなカエルめ！しらないのか？俺をたおせないんだ。キズは つけられても、ころされない。俺には 色々なマシンがある。'
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/cs22-min.png',
+                subtitle: 'Don\'t worry, cat... I am here to rescue you!'
             },
             {
                 type: 'image',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/stronger.jpg',
-                subtitle: 'つよくなるマシン、'
-            },
-            {
-                type: 'image',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/pmonster.png',
-                subtitle: 'モンスターを 作るマシン、'
-            },
-            {
-                type: 'video',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/bulllybutton.mp4',
-                subtitle: '後、たてものを こわすマシン。ハーハハハハ！'
-            },
-            {
-                type: 'video',
-                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/pyramidshake.mp4',
-                subtitle: 'たいへんだ！ピラミッドが ゆれてる！にげなきゃ！'
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/cs23-min.png',
+                subtitle: 'Watch out, frog! The P-Monster is guarding me!!'
             }
-            
         ];
 
         let currentSlide = 0;
@@ -275,13 +218,11 @@
         }
 
         function showSlide(index) {
-            // Hide replay button when changing slides
-            document.getElementById('replayButton').style.display = 'none';
             const video = document.getElementById('endingVideo');
             const image = document.getElementById('endingImage');
             const subtitle = document.getElementById('subtitleText');
             const nextButton = document.getElementById('nextButton');
-            const escapeButton = document.getElementById('escapeButton');
+            const fightButton = document.getElementById('fightButton');
             const currentItem = endingSequence[index];
 
             // Update subtitle
@@ -307,8 +248,6 @@
                 // Enable next button when video ends
                 video.onended = function() {
                     nextButton.disabled = false;
-                    // Show replay button for videos only
-                    document.getElementById('replayButton').style.display = 'block';
                 };
                 
                 // Auto-play video with better error handling
@@ -342,10 +281,10 @@
             // Check if this is the last slide
             if (index === endingSequence.length - 1) {
                 nextButton.style.display = 'none';
-                escapeButton.style.display = 'block';
+                fightButton.style.display = 'block';
             } else {
                 nextButton.style.display = 'block';
-                escapeButton.style.display = 'none';
+                fightButton.style.display = 'none';
             }
         }
 
@@ -356,21 +295,7 @@
             }
         }
 
-        function replayVideo() {
-            const video = document.getElementById('endingVideo');
-            const nextButton = document.getElementById('nextButton');
-            const replayButton = document.getElementById('replayButton');
-            
-            // Hide replay button and disable next button during replay
-            replayButton.style.display = 'none';
-            nextButton.disabled = true;
-            
-            // Restart video
-            video.currentTime = 0;
-            video.play().catch(e => console.log('Replay failed:', e));
-        }
-
-        function escapePyramid() {
+        function startFight() {
             // Stop music
             const bgMusic = document.getElementById('bgMusic');
             bgMusic.pause();
@@ -380,32 +305,18 @@
             if (savedState) {
                 const gameState = JSON.parse(savedState);
                 
-                // Mark pyramid as completed
-                gameState.pyramidBossDefeated = true;
-                gameState.pyramidCompleted = true;
+                // Update current URL to track progression
+                gameState.currentUrl = 'pboss';
+                gameState.lastSaveTime = Date.now();
                 
-                // Save all current state including weapon and items
-                gameState.currentUrl = 'maze2';
+                // Save the updated state
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
-                // Check if they have access to maze2 (pyramid boss defeated)
-                if (!gameState.pyramidBossDefeated) {
-                    // If somehow they don't have access, send to maze1
-                    gameState.currentUrl = 'main';
-                    gameState.playerX = 2200;
-                    gameState.playerY = 1400;
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-                } else {
-                    // They have access, go to maze2
-                    // Set spawn position for maze2 (you can adjust these coordinates)
-                    gameState.playerX = 140;
-                    gameState.playerY = 1580;
-                    
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
-                }
+                // Transfer to pink boss fight
+                window.location.href = 'https://thedepression.github.io/games/minimaze/pboss';
             } else {
-                // No game state, send to maze1
+                // No game state, send back to maze1
+                alert('Game state lost! Returning to main world.');
                 window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
             }
         }
