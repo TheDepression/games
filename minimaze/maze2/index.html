@@ -3341,6 +3341,119 @@ clearNPCMessage() {
     }
 }
 
+
+            startGorillaDialog() {
+    if (this.gorillaDialogStep > 0) return; // Prevent multiple triggers
+    
+    this.gorillaDialogStep = 1;
+    this.gameStarted = false; // Pause game
+    this.showGorillaDialog();
+}
+
+showGorillaDialog() {
+    // Create dialog overlay
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'gorillaDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    // Add image
+    const img = document.createElement('img');
+    img.style.width = '80px';
+    img.style.height = '80px';
+    img.style.marginBottom = '15px';
+    img.style.borderRadius = '8px';
+    
+    // Add text
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    
+    // Add button
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '10px 20px';
+    button.style.borderRadius = '5px';
+    button.style.cursor = 'pointer';
+    button.style.fontSize = '14px';
+    
+    // Set content based on step
+    if (this.gorillaDialogStep === 1) {
+        img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/happygorilla.png';
+        text.textContent = "🦍 Thanks! I don't usually trust humans but you're kind.";
+        button.textContent = 'Next';
+        button.onclick = () => {
+            this.gorillaDialogStep = 2;
+            dialogOverlay.remove();
+            this.showGorillaDialog();
+        };
+    } else if (this.gorillaDialogStep === 2) {
+        img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/gfcat-min.png';
+        text.textContent = "🦍 My girlfriend was locked in a cage by the bully in a pink square in the water. I can't swim but you have a boat. Please get her!";
+        button.textContent = 'Next';
+        button.onclick = () => {
+            this.gorillaDialogStep = 3;
+            dialogOverlay.remove();
+            this.showGorillaDialog();
+        };
+    } else if (this.gorillaDialogStep === 3) {
+        img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/orangehealth-min.png';
+        text.textContent = "🦍 Take this power orange! It'll increase your gun power to 100 instead of 50. You can break through grey walls, break holes in weak areas, and break into my girlfriend's cage!";
+        button.textContent = 'Accept Power';
+        button.onclick = () => {
+            this.completeGorillaEncounter();
+            dialogOverlay.remove();
+        };
+    }
+    
+    dialogBox.appendChild(img);
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(button);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+completeGorillaEncounter() {
+    // Remove banana from inventory and UI
+    this.collectedBanana = false;
+    
+    // Give orange power upgrade
+    this.hasOrangePower = true;
+    this.attackDamage = 100;
+    
+    // Mark encounter as complete
+    this.gorillaEncounterComplete = true;
+    
+    // Restart game and save
+    this.gameStarted = true;
+    this.updateUI();
+    this.saveGameState();
+    
+    // Recreate the level to spawn friendly gorilla
+    this.initLevel();
+    
+    this.showMessage('🍊 Power Orange consumed! Gun damage increased to 100! 🔫⚡');
+}
+
         
             
             updateUI() {
@@ -3356,7 +3469,8 @@ clearNPCMessage() {
     if (this.hasHammer) itemsHTML += ' 🔨';
     if (this.hasFlashlight) itemsHTML += ' 🔦';
     if (this.hasPencil) itemsHTML += ' ✏️';
-    if (this.hasWeapon) itemsHTML += ' 🔫';
+    if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: drop-shadow(0 0 8px orange) brightness(1.3);">🔫</span>';
+else if (this.hasWeapon) itemsHTML += ' 🔫';
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
                 if (this.collectedBanana) itemsHTML += ' 🍌';
     
