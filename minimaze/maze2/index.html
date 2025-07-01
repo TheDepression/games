@@ -1300,12 +1300,13 @@ this.updateDeathCounter();
                     this.playerY = gameState.playerY || 1760;
                     this.maxHearts = gameState.maxHearts || 3;
 this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+
+                    this.hasBoat = true; // Always have boat in maze 2
+                    this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true; // Default broken
                     
                     this.updateTimer();
                     return true;
 
-                    this.hasBoat = true; // Always have boat in maze 2
-                    this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true; // Default broken
                 }
                 return false;
             }
