@@ -1292,6 +1292,8 @@ this.playerVelocityY = deltaY * sensitivity;
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
                     this.collectedBanana = gameState.collectedBanana || false;
+                    this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
+this.hasOrangePower = gameState.hasOrangePower || false;
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
@@ -1327,6 +1329,8 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
 maxHearts: this.maxHearts,
 collectedPurpleHearts: this.collectedPurpleHearts,
                     collectedBanana: this.collectedBanana,
+                    gorillaEncounterComplete: this.gorillaEncounterComplete,
+hasOrangePower: this.hasOrangePower,
                     
                     playerX: this.playerX,
                     playerY: this.playerY,
