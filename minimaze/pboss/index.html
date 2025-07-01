@@ -646,10 +646,12 @@
             }
             
             checkAttackHits(attackX, attackY) {
-                const distance = Math.sqrt(
-                    Math.pow(attackX - (this.boss.x + 39), 2) + 
-                    Math.pow(attackY - (this.boss.y + 39), 2)
-                );
+                // Adjust boss center point - move it 15px higher for attack detection
+const bossHitY = this.boss.y + 39 - 15; // Makes him more reachable from above
+const distance = Math.sqrt(
+    Math.pow(attackX - (this.boss.x + 39), 2) + 
+    Math.pow(attackY - bossHitY, 2)
+);
                 
                 if (distance <= this.attackRange) {
                     this.boss.hp -= this.attackDamage;
@@ -960,11 +962,11 @@
                 
                 // Check boss collision
                 const bossRect = {
-                    left: this.boss.x,
-                    top: this.boss.y,
-                    right: this.boss.x + 78,
-                    bottom: this.boss.y + 78
-                };
+    left: this.boss.x,
+    top: this.boss.y + 5, // Shrink upper hitbox by 5px
+    right: this.boss.x + 78,
+    bottom: this.boss.y + 78
+};
                 
                 if (this.rectsOverlap(playerRect, bossRect)) {
                     this.takeDamage();
