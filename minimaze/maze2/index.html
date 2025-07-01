@@ -2060,36 +2060,72 @@ this.gameWorld.appendChild(fakeQuicksand);
                 // Add forest bees - killable with 100 HP
 this.createForestBees();
 
-// Gorilla - unbeatable but trackable, follows maze1 behavior
-const gorillaX = 1360;
-const gorillaY = 980;
-
-const gorillaEl = document.createElement('div');
-gorillaEl.className = 'enemy forest-gorilla';
-gorillaEl.textContent = '🦍';
-gorillaEl.style.left = gorillaX + 'px';
-gorillaEl.style.top = gorillaY + 'px';
-gorillaEl.style.fontSize = '27px';
-gorillaEl.style.width = '33px';
-gorillaEl.style.height = '33px';
-this.gameWorld.appendChild(gorillaEl);
-
-this.gorilla = {
-    element: gorillaEl,
-    type: 'gorilla',
-    currentX: gorillaX,
-    currentY: gorillaY,
-    startX: gorillaX,
-    startY: gorillaY,
-    patrolRange: 80,
-    direction: 1,
-    speed: 1.04,
-    isChasing: false,
-    chaseSpeed: 1.95,
-    returning: false,
-    alive: true
-};
+// Create appropriate gorilla based on encounter status
+this.createGorilla();
             }
+
+
+            createGorilla() {
+    const gorillaX = 1360;
+    const gorillaY = 980;
+    
+    if (this.gorillaEncounterComplete) {
+        // Create friendly stationary gorilla
+        const friendlyGorillaEl = document.createElement('div');
+        friendlyGorillaEl.className = 'friendly gorilla-friend';
+        friendlyGorillaEl.textContent = '🦍';
+        friendlyGorillaEl.style.left = gorillaX + 'px';
+        friendlyGorillaEl.style.top = gorillaY + 'px';
+        friendlyGorillaEl.style.fontSize = '27px';
+        friendlyGorillaEl.style.width = '33px';
+        friendlyGorillaEl.style.height = '33px';
+        friendlyGorillaEl.style.filter = 'none'; // Remove the grayscale filter
+        friendlyGorillaEl.dataset.message = "🦍 Thank you for saving my girlfriend! Use your new power wisely!";
+        this.gameWorld.appendChild(friendlyGorillaEl);
+        this.gorilla = null; // No aggressive gorilla anymore
+    } else if (this.collectedBanana) {
+        // Create encounter gorilla (stationary, for dialog)
+        const encounterGorillaEl = document.createElement('div');
+        encounterGorillaEl.className = 'gorilla-encounter';
+        encounterGorillaEl.textContent = '🦍';
+        encounterGorillaEl.style.left = gorillaX + 'px';
+        encounterGorillaEl.style.top = gorillaY + 'px';
+        encounterGorillaEl.style.fontSize = '27px';
+        encounterGorillaEl.style.width = '33px';
+        encounterGorillaEl.style.height = '33px';
+        encounterGorillaEl.style.filter = 'brightness(1.2)'; // Slightly brighter to show he's friendly
+        encounterGorillaEl.dataset.type = 'gorillaEncounter';
+        this.gameWorld.appendChild(encounterGorillaEl);
+        this.gorilla = null; // No aggressive gorilla anymore
+    } else {
+        // Create aggressive patrolling gorilla (original behavior)
+        const gorillaEl = document.createElement('div');
+        gorillaEl.className = 'enemy forest-gorilla';
+        gorillaEl.textContent = '🦍';
+        gorillaEl.style.left = gorillaX + 'px';
+        gorillaEl.style.top = gorillaY + 'px';
+        gorillaEl.style.fontSize = '27px';
+        gorillaEl.style.width = '33px';
+        gorillaEl.style.height = '33px';
+        this.gameWorld.appendChild(gorillaEl);
+
+        this.gorilla = {
+            element: gorillaEl,
+            type: 'gorilla',
+            currentX: gorillaX,
+            currentY: gorillaY,
+            startX: gorillaX,
+            startY: gorillaY,
+            patrolRange: 80,
+            direction: 1,
+            speed: 1.04,
+            isChasing: false,
+            chaseSpeed: 1.95,
+            returning: false,
+            alive: true
+        };
+    }
+}
 
 
             // ADD createForestBees METHOD HERE:
