@@ -826,6 +826,10 @@ if (gameState.currentUrl === 'pinkBoss' && gameState.pinkBossDefeated) {
                 this.collectedBanana = false; // Track if banana has been collected
                 this.gorillaEncounterComplete = false; // Track if gorilla encounter is done
                 this.pinkBossDefeated = false;
+                // Add these after existing properties in constructor
+this.hasHammerPower = false; // Track if gun has hammer power upgrade
+this.gorillaFinalDialogComplete = false; // Track if final gorilla dialog is done
+this.weakPointsBlasted = []; // Track which weak points have been blasted open
 this.hasOrangePower = false; // Track if player has orange power upgrade
 this.gorillaDialogStep = 0; // Track which dialog step we're on
                 this.hearts = 3;
@@ -1307,6 +1311,15 @@ this.hasOrangePower = gameState.hasOrangePower || false;
     this.attackDamage = 100; // Restore the power upgrade
 }
                     this.pinkBossDefeated = gameState.pinkBossDefeated || false;
+                    // Add these lines in loadGameState() after existing gameState properties
+this.hasHammerPower = gameState.hasHammerPower || false;
+this.gorillaFinalDialogComplete = gameState.gorillaFinalDialogComplete || false;
+this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+
+// Apply hammer power gun damage if loaded
+if (this.hasHammerPower) {
+    this.attackDamage = 100; // Keep the 100 damage from orange power
+}
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
@@ -1346,6 +1359,10 @@ collectedPurpleHearts: this.collectedPurpleHearts,
 hasOrangePower: this.hasOrangePower,
                     attackDamage: this.attackDamage,
                     pinkBossDefeated: this.pinkBossDefeated,
+                    // Add these lines in saveGameState() after existing properties
+hasHammerPower: this.hasHammerPower,
+gorillaFinalDialogComplete: this.gorillaFinalDialogComplete,
+weakPointsBlasted: this.weakPointsBlasted,
                     
                     playerX: this.playerX,
                     playerY: this.playerY,
@@ -2094,10 +2111,22 @@ this.createGorilla();
         friendlyGorillaEl.style.fontSize = '27px';
         friendlyGorillaEl.style.width = '33px';
         friendlyGorillaEl.style.height = '33px';
-        friendlyGorillaEl.style.filter = 'none'; // Remove the grayscale filter
-        friendlyGorillaEl.dataset.message = "🦍 Good luck saving my girlfriend! If you suceed, I will give you one more power!";
+        friendlyGorillaEl.style.filter = 'none';
+        
+        // Check if player has defeated pink boss and not yet got hammer power
+        if (this.pinkBossDefeated && !this.hasHammerPower) {
+            friendlyGorillaEl.dataset.type = 'gorillaFinalDialog';
+        } else if (this.gorillaFinalDialogComplete) {
+            friendlyGorillaEl.dataset.message = "You are my hero, frog. Go get that Bully!";
+        } else {
+            friendlyGorillaEl.dataset.message = "🦍 Good luck saving my girlfriend! If you succeed, I will give you one more power!";
+        }
+        
         this.gameWorld.appendChild(friendlyGorillaEl);
         this.gorilla = null; // No aggressive gorilla anymore
+        
+        // Create girlfriend cat if encounter is complete
+        this.createGorillaGirlfriend();
     } else if (this.collectedBanana) {
         // Create encounter gorilla (stationary, for dialog)
         const encounterGorillaEl = document.createElement('div');
@@ -2108,10 +2137,10 @@ this.createGorilla();
         encounterGorillaEl.style.fontSize = '27px';
         encounterGorillaEl.style.width = '33px';
         encounterGorillaEl.style.height = '33px';
-        encounterGorillaEl.style.filter = 'brightness(1.2)'; // Slightly brighter to show he's friendly
+        encounterGorillaEl.style.filter = 'brightness(1.2)';
         encounterGorillaEl.dataset.type = 'gorillaEncounter';
         this.gameWorld.appendChild(encounterGorillaEl);
-        this.gorilla = null; // No aggressive gorilla anymore
+        this.gorilla = null;
     } else {
         // Create aggressive patrolling gorilla (original behavior)
         const gorillaEl = document.createElement('div');
@@ -2140,6 +2169,83 @@ this.createGorilla();
             alive: true
         };
     }
+}
+
+
+
+            createGorillaGirlfriend() {
+    const catX = 1460; // 100px to the right of gorilla
+    const catY = 980; // Same Y as gorilla
+    
+    const catEl = document.createElement('div');
+    catEl.className = 'friendly cat-girlfriend';
+    catEl.style.left = catX + 'px';
+    catEl.style.top = catY + 'px';
+    catEl.style.width = '25px';
+    catEl.style.height = '25px';
+    catEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/gfcat-min.png")';
+    catEl.style.backgroundSize = 'contain';
+    catEl.style.backgroundRepeat = 'no-repeat';
+    catEl.style.backgroundPosition = 'center';
+    catEl.style.zIndex = '40';
+    
+    // Set message based on dialog completion
+    if (!this.gorillaFinalDialogComplete) {
+        catEl.dataset.type = 'catFirstDialog';
+    } else {
+        catEl.dataset.message = "Cat POWER!!";
+    }
+    
+    this.gameWorld.appendChild(catEl);
+}
+
+
+            createWeakPoints() {
+    const weakPointPositions = [
+        {x: 80, y: 1180, id: 'weak_point_1', url: 'underground'},
+        {x: 120, y: 1200, id: 'weak_point_2', url: 'cavec'},
+        {x: 100, y: 1240, id: 'weak_point_3', url: 'caved'}
+    ];
+    
+    weakPointPositions.forEach(pos => {
+        // Check if this weak point has been blasted
+        const isBlasted = this.weakPointsBlasted.includes(pos.id);
+        
+        if (isBlasted) {
+            // Create black square entrance
+            const entrance = document.createElement('div');
+            entrance.className = 'weak-point-entrance';
+            entrance.style.position = 'absolute';
+            entrance.style.left = pos.x + 'px';
+            entrance.style.top = pos.y + 'px';
+            entrance.style.width = '20px';
+            entrance.style.height = '20px';
+            entrance.style.background = 'black';
+            entrance.style.border = '1px solid #333';
+            entrance.style.zIndex = '200';
+            entrance.dataset.url = pos.url;
+            entrance.dataset.type = 'weakPointEntrance';
+            this.gameWorld.appendChild(entrance);
+        } else {
+            // Create unblasted weak point
+            const weakPoint = document.createElement('div');
+            weakPoint.className = 'weak-point';
+            weakPoint.style.position = 'absolute';
+            weakPoint.style.left = pos.x + 'px';
+            weakPoint.style.top = pos.y + 'px';
+            weakPoint.style.width = '20px';
+            weakPoint.style.height = '20px';
+            weakPoint.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/weak.png")';
+            weakPoint.style.backgroundSize = 'contain';
+            weakPoint.style.backgroundRepeat = 'no-repeat';
+            weakPoint.style.backgroundPosition = 'center';
+            weakPoint.style.zIndex = '200';
+            weakPoint.dataset.id = pos.id;
+            weakPoint.dataset.url = pos.url;
+            weakPoint.dataset.type = 'weakPoint';
+            this.gameWorld.appendChild(weakPoint);
+        }
+    });
 }
 
 
