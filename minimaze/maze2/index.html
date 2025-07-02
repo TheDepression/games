@@ -3683,6 +3683,196 @@ completeGorillaEncounter() {
 }
 
 
+            startGorillaFinalDialog() {
+    if (this.gorillaFinalDialogComplete) return; // Prevent multiple triggers
+    
+    this.gameStarted = false; // Pause game
+    this.showGorillaFinalDialog();
+}
+
+showGorillaFinalDialog() {
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'gorillaFinalDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const img = document.createElement('img');
+    img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/happygorilla.png';
+    img.style.width = '80px';
+    img.style.height = '80px';
+    img.style.marginBottom = '15px';
+    img.style.borderRadius = '8px';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = "🦍 Thank you for rescuing my girlfriend! Here is your new power... hammer power on your gun! With this hammer power, your gun can now break through grey walls, and any cracked surfaces or walls you find... enjoy!";
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '10px 20px';
+    button.style.borderRadius = '5px';
+    button.style.cursor = 'pointer';
+    button.style.fontSize = '14px';
+    button.textContent = 'Accept Hammer Power';
+    button.onclick = () => {
+        this.completeGorillaFinalDialog();
+        dialogOverlay.remove();
+    };
+    
+    dialogBox.appendChild(img);
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(button);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+completeGorillaFinalDialog() {
+    // Give hammer power upgrade
+    this.hasHammerPower = true;
+    
+    // Mark final dialog as complete
+    this.gorillaFinalDialogComplete = true;
+    
+    // Restart game and save
+    this.gameStarted = true;
+    this.updateUI();
+    this.saveGameState();
+    
+    // Recreate the level to update gorilla message
+    this.initLevel();
+    
+    this.showMessage('🔫🔨 Hammer Power acquired! Gun can now break walls and weak points!');
+}
+
+startCatFirstDialog() {
+    if (this.gorillaFinalDialogComplete) return; // Prevent multiple triggers if already completed
+    
+    this.gameStarted = false; // Pause game
+    this.showCatFirstDialog();
+}
+
+showCatFirstDialog() {
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'catFirstDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const img = document.createElement('img');
+    img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/gfcat-min.png';
+    img.style.width = '80px';
+    img.style.height = '80px';
+    img.style.marginBottom = '15px';
+    img.style.borderRadius = '8px';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = "The Bully kidnapped me because of my power to heal. He took my DNA, but I can still heal. That's why he never stays down for long. Come here anytime to fill your health. Meow.";
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '10px 20px';
+    button.style.borderRadius = '5px';
+    button.style.cursor = 'pointer';
+    button.style.fontSize = '14px';
+    button.textContent = 'OK';
+    button.onclick = () => {
+        this.completeCatFirstDialog();
+        dialogOverlay.remove();
+    };
+    
+    dialogBox.appendChild(img);
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(button);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+completeCatFirstDialog() {
+    // Mark cat dialog as seen and heal player
+    this.gorillaFinalDialogComplete = true; // This tracks both dialogs are complete
+    this.hearts = this.maxHearts;
+    
+    // Restart game and save
+    this.gameStarted = true;
+    this.updateUI();
+    this.saveGameState();
+    
+    // Recreate the level to update cat message
+    this.initLevel();
+    
+    this.showMessage('💖 Health fully restored!');
+}
+
+handleCatHealing() {
+    if (this.hearts < this.maxHearts) {
+        this.hearts = this.maxHearts;
+        this.showNPCMessage("Cat POWER!!");
+        this.updateUI();
+        this.saveGameState();
+    } else {
+        this.showNPCMessage("Cat POWER!!");
+    }
+}
+
+transferToWeakPoint(url) {
+    // Save current game state before transfer
+    this.saveGameState();
+    
+    // Update the current URL in the save state
+    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+    gameState.currentUrl = url;
+    gameState.lastSaveTime = Date.now();
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    // Show transition message
+    this.showMessage('🕳️ Entering the secret passage...');
+    
+    // Transfer after brief delay
+    setTimeout(() => {
+        window.location.href = `https://thedepression.github.io/games/minimaze/${url}`;
+    }, 1500);
+}
+
 
 
             transferToCutscene() {
