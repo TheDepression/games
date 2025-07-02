@@ -3756,7 +3756,7 @@ completeGorillaFinalDialog() {
     this.hasHammerPower = true;
     
     // Mark final dialog as complete
-    this.gorillaFinalDialogComplete = true;
+    this.gorillaHammerDialogComplete = true;
     
     // Restart game and save
     this.gameStarted = true;
@@ -3770,7 +3770,7 @@ completeGorillaFinalDialog() {
 }
 
 startCatFirstDialog() {
-    if (this.gorillaFinalDialogComplete) return; // Prevent multiple triggers if already completed
+    if (this.catFirstDialogComplete) return; // Prevent multiple triggers if already completed
     
     this.gameStarted = false; // Pause game
     this.showCatFirstDialog();
@@ -3834,7 +3834,7 @@ showCatFirstDialog() {
 
 completeCatFirstDialog() {
     // Mark cat dialog as seen and heal player
-    this.gorillaFinalDialogComplete = true; // This tracks both dialogs are complete
+    this.catFirstDialogComplete = true;
     this.hearts = this.maxHearts;
     
     // Restart game and save
