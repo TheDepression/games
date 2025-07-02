@@ -2186,8 +2186,10 @@ this.createGorilla();
         this.gameWorld.appendChild(friendlyGorillaEl);
         this.gorilla = null; // No aggressive gorilla anymore
         
-        // Create girlfriend cat if encounter is complete
-        this.createGorillaGirlfriend();
+        / Only create girlfriend cat AFTER pink boss is defeated
+        if (this.pinkBossDefeated) {
+            this.createGorillaGirlfriend();
+        }
     } else if (this.collectedBanana) {
         // Create encounter gorilla (stationary, for dialog)
         const encounterGorillaEl = document.createElement('div');
