@@ -828,7 +828,8 @@ if (gameState.currentUrl === 'pinkBoss' && gameState.pinkBossDefeated) {
                 this.pinkBossDefeated = false;
                 // Add these after existing properties in constructor
 this.hasHammerPower = false; // Track if gun has hammer power upgrade
-this.gorillaFinalDialogComplete = false; // Track if final gorilla dialog is done
+this.gorillaHammerDialogComplete = false; // Track if hammer dialog is done
+this.catFirstDialogComplete = false; // Track if cat's first dialog is done
 this.weakPointsBlasted = []; // Track which weak points have been blasted open
 this.hasOrangePower = false; // Track if player has orange power upgrade
 this.gorillaDialogStep = 0; // Track which dialog step we're on
@@ -1373,7 +1374,8 @@ this.hasOrangePower = gameState.hasOrangePower || false;
                     this.pinkBossDefeated = gameState.pinkBossDefeated || false;
                     // Add these lines in loadGameState() after existing gameState properties
 this.hasHammerPower = gameState.hasHammerPower || false;
-this.gorillaFinalDialogComplete = gameState.gorillaFinalDialogComplete || false;
+this.gorillaHammerDialogComplete = gameState.gorillaHammerDialogComplete || false;
+this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
 this.weakPointsBlasted = gameState.weakPointsBlasted || [];
 
 // Apply hammer power gun damage if loaded
@@ -1421,7 +1423,8 @@ hasOrangePower: this.hasOrangePower,
                     pinkBossDefeated: this.pinkBossDefeated,
                     // Add these lines in saveGameState() after existing properties
 hasHammerPower: this.hasHammerPower,
-gorillaFinalDialogComplete: this.gorillaFinalDialogComplete,
+gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
+catFirstDialogComplete: this.catFirstDialogComplete,
 weakPointsBlasted: this.weakPointsBlasted,
                     
                     playerX: this.playerX,
@@ -2177,8 +2180,8 @@ this.createGorilla();
         // Check if player has defeated pink boss and not yet got hammer power
         if (this.pinkBossDefeated && !this.hasHammerPower) {
             friendlyGorillaEl.dataset.type = 'gorillaFinalDialog';
-        } else if (this.gorillaFinalDialogComplete) {
-            friendlyGorillaEl.dataset.message = "You are my hero, frog. Go get that Bully!";
+        } else if (this.gorillaHammerDialogComplete) {
+    friendlyGorillaEl.dataset.message = "You are my hero, frog. Go get that Bully!";
         } else {
             friendlyGorillaEl.dataset.message = "🦍 Good luck saving my girlfriend! If you succeed, I will give you one more power!";
         }
@@ -2252,8 +2255,8 @@ this.createGorilla();
     catEl.style.zIndex = '40';
     
     // Set message based on dialog completion
-    if (!this.gorillaFinalDialogComplete) {
-        catEl.dataset.type = 'catFirstDialog';
+    if (!this.catFirstDialogComplete) {
+    catEl.dataset.type = 'catFirstDialog';
     } else {
         catEl.dataset.message = "Cat POWER!! -- You have full health.";
     }
