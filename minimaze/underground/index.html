@@ -732,7 +732,7 @@ checkAttackHits(attackX, attackY) {
                 if (!this.kingMoneyReceived) {
                     king.dataset.type = 'kingFirstMeeting';
                 } else {
-                    king.dataset.message = 'がんばって！ブリーをたおして！'; // "Good luck! Defeat the bully!"
+                    king.dataset.message = 'がんばって！いじめ子をたおして！'; // "Good luck! Defeat the bully!"
                 }
                 
                 this.gameWorld.appendChild(king);
@@ -760,7 +760,7 @@ queen.className = 'friendly queen-npc';
 queen.textContent = '👰‍♀️';
 queen.style.left = '120px';
 queen.style.top = '180px';
-queen.dataset.message = 'おうさまと けっこんした。つぎのひ、ブリーが おしろを ぬすんだ。いまは ここに すんでいる、かなしく... おかねを ためているといいな';
+queen.dataset.message = 'おうさまと けっこんした。つぎの日、いじめ子が おしろをぬすんだ。いまは ここにすんでいる、かなしく... 🤴がちゃんとおかねを ためているかな〜';
 this.gameWorld.appendChild(queen);
             }
 
@@ -932,7 +932,7 @@ if (queen) {
                 const text = document.createElement('p');
                 text.style.margin = '10px 0';
                 text.style.fontSize = '14px';
-                text.textContent = 'せかいが あぶない。ここに かくれている！おかねを もって。カジノを さがして。もりの したに あるって ほんと？！';
+                text.textContent = 'せかいが あぶない。ここに かくれている！俺のおかねをぜんぶ取って。カジノを さがして。もりの中にあるって ほんとかな〜？！';
                 
                 const button = document.createElement('button');
                 button.style.background = '#4CAF50';
@@ -964,7 +964,7 @@ if (queen) {
                 const king = this.gameWorld.querySelector('.king-npc');
                 if (king) {
                     king.dataset.type = '';
-                    king.dataset.message = 'がんばって！ブリーをたおして！'; // "Good luck! Defeat the bully!"
+                    king.dataset.message = 'がんばって！いじめ子をたおして！'; // "Good luck! Defeat the bully!"
                 }
                 
                 // Restart game and save
