@@ -2255,7 +2255,7 @@ this.createGorilla();
     if (!this.gorillaFinalDialogComplete) {
         catEl.dataset.type = 'catFirstDialog';
     } else {
-        catEl.dataset.message = "Cat POWER!!";
+        catEl.dataset.message = "Cat POWER!! -- You have full health.";
     }
     
     this.gameWorld.appendChild(catEl);
@@ -3848,11 +3848,11 @@ completeCatFirstDialog() {
 handleCatHealing() {
     if (this.hearts < this.maxHearts) {
         this.hearts = this.maxHearts;
-        this.showNPCMessage("Cat POWER!!");
+        this.showNPCMessage("Cat POWER!! -- You have full health.");
         this.updateUI();
         this.saveGameState();
     } else {
-        this.showNPCMessage("Cat POWER!!");
+        this.showNPCMessage("Cat POWER!! -- You have full health.");
     }
 }
 
