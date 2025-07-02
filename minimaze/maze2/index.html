@@ -2204,6 +2204,20 @@ this.createGorilla();
     }
 }
 
+refreshGorilla() {
+    // Remove existing gorilla if it exists
+    if (this.gorilla && this.gorilla.element) {
+        this.gorilla.element.remove();
+        this.gorilla = null;
+    }
+    
+    // Remove any existing gorilla elements
+    const existingGorillas = this.gameWorld.querySelectorAll('.enemy.forest-gorilla, .gorilla-encounter, .gorilla-friend');
+    existingGorillas.forEach(g => g.remove());
+    
+    // Recreate the gorilla with current state
+    this.createGorilla();
+}
 
 
             createGorillaGirlfriend() {
@@ -3118,6 +3132,8 @@ if (banana) {
         this.updateUI();
         this.saveGameState();
         banana.remove();
+        // ADD THIS LINE TO REFRESH THE GORILLA:
+        this.refreshGorilla();
     }
 }
 
