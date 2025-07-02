@@ -3908,7 +3908,9 @@ transferToWeakPoint(url) {
     if (this.hasHammer) itemsHTML += ' 🔨';
     if (this.hasFlashlight) itemsHTML += ' 🔦';
     if (this.hasPencil) itemsHTML += ' ✏️';
-    if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
+    // Replace the gun section in updateUI() with this:
+if (this.hasWeapon && this.hasHammerPower) itemsHTML += ' <span style="filter: grayscale(0.6) brightness(0.8);">🔫</span>';
+else if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
 else if (this.hasWeapon) itemsHTML += ' 🔫';
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
                if (this.collectedBanana && !this.gorillaEncounterComplete) itemsHTML += ' 🍌';
