@@ -1220,64 +1220,124 @@ this.playerVelocityY = deltaY * sensitivity;
 }
 
             checkAttackHits(attackX, attackY) {
-                this.movingEnemies.forEach(enemy => {
-                    if (!enemy.alive || enemy.type === 'gorilla') return; // Gorilla unbeatable
-                    
-                    const distance = Math.sqrt(
-                        Math.pow(attackX - enemy.currentX, 2) + 
-                        Math.pow(attackY - enemy.currentY, 2)
-                    );
-                    
-                    if (distance <= this.attackRange) {
-                        enemy.hp -= this.attackDamage;
-                        
-                        // Show damage number
-                        const damageText = document.createElement('div');
-                        damageText.style.position = 'absolute';
-                        damageText.style.color = '#ff4444';
-                        damageText.style.fontWeight = 'bold';
-                        damageText.style.fontSize = '14px';
-                        damageText.style.pointerEvents = 'none';
-                        damageText.style.zIndex = '500';
-                        damageText.style.animation = 'damageFloat 1s ease-out';
-                        damageText.textContent = `-${this.attackDamage}`;
-                        damageText.style.left = enemy.currentX + 'px';
-                        damageText.style.top = enemy.currentY + 'px';
-                        this.gameWorld.appendChild(damageText);
-                        
-                        setTimeout(() => {
-                            if (damageText.parentNode) {
-                                damageText.remove();
-                            }
-                        }, 1000);
-                        
-                        if (enemy.hp <= 0) {
-                            enemy.alive = false;
-                            enemy.element.classList.add('defeated');
-                            
-                            // Drop rewards
-                            if (Math.random() < 0.10) { // 10% money drop
-                                this.createMoneyDrop(enemy.currentX, enemy.currentY);
-                            }
-                            if (Math.random() < 0.05) { // 5% heart drop
-                                this.createHeartDrop(enemy.currentX, enemy.currentY);
-                            }
-                        }
-                    }
-                });
-
-                // Check gorilla collision for attack (but don't damage)
-                if (this.gorilla && this.gorilla.alive) {
-                    const distance = Math.sqrt(
-                        Math.pow(attackX - this.gorilla.currentX, 2) + 
-                        Math.pow(attackY - this.gorilla.currentY, 2)
-                    );
-                    
-                    if (distance <= this.attackRange) {
-                        this.showMessage('🦍 The gorilla seems friendly now...');
-                    }
+    // Check weak points (only if has hammer power)
+    if (this.hasHammerPower) {
+        const weakPoints = this.gameWorld.querySelectorAll('.weak-point');
+        weakPoints.forEach(weakPoint => {
+            const weakX = parseInt(weakPoint.style.left) + 10;
+            const weakY = parseInt(weakPoint.style.top) + 10;
+            const distance = Math.sqrt(
+                Math.pow(attackX - weakX, 2) + 
+                Math.pow(attackY - weakY, 2)
+            );
+            
+            if (distance <= this.attackRange) {
+                // Blast open the weak point
+                const weakId = weakPoint.dataset.id;
+                const weakUrl = weakPoint.dataset.url;
+                
+                this.weakPointsBlasted.push(weakId);
+                this.saveGameState();
+                
+                weakPoint.remove();
+                
+                // Create black square entrance
+                const entrance = document.createElement('div');
+                entrance.className = 'weak-point-entrance';
+                entrance.style.position = 'absolute';
+                entrance.style.left = (weakX - 10) + 'px';
+                entrance.style.top = (weakY - 10) + 'px';
+                entrance.style.width = '20px';
+                entrance.style.height = '20px';
+                entrance.style.background = 'black';
+                entrance.style.border = '1px solid #333';
+                entrance.style.zIndex = '200';
+                entrance.dataset.url = weakUrl;
+                entrance.dataset.type = 'weakPointEntrance';
+                this.gameWorld.appendChild(entrance);
+                
+                this.showMessage('💥 Weak point blasted open!');
+            }
+        });
+    }
+    
+    // Check breakable walls (with hammer power)
+    if (this.hasHammerPower) {
+        const breakableWalls = this.gameWorld.querySelectorAll('.breakable-wall');
+        breakableWalls.forEach(wall => {
+            const wallX = parseInt(wall.style.left) + parseInt(wall.style.width)/2;
+            const wallY = parseInt(wall.style.top) + parseInt(wall.style.height)/2;
+            const distance = Math.sqrt(
+                Math.pow(attackX - wallX, 2) + 
+                Math.pow(attackY - wallY, 2)
+            );
+            
+            if (distance <= this.attackRange) {
+                this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
+                wall.remove();
+            }
+        });
+    }
+    
+    // Existing enemy hit detection code
+    this.movingEnemies.forEach(enemy => {
+        if (!enemy.alive || enemy.type === 'gorilla') return;
+        
+        const distance = Math.sqrt(
+            Math.pow(attackX - enemy.currentX, 2) + 
+            Math.pow(attackY - enemy.currentY, 2)
+        );
+        
+        if (distance <= this.attackRange) {
+            enemy.hp -= this.attackDamage;
+            
+            // Show damage number
+            const damageText = document.createElement('div');
+            damageText.style.position = 'absolute';
+            damageText.style.color = '#ff4444';
+            damageText.style.fontWeight = 'bold';
+            damageText.style.fontSize = '14px';
+            damageText.style.pointerEvents = 'none';
+            damageText.style.zIndex = '500';
+            damageText.style.animation = 'damageFloat 1s ease-out';
+            damageText.textContent = `-${this.attackDamage}`;
+            damageText.style.left = enemy.currentX + 'px';
+            damageText.style.top = enemy.currentY + 'px';
+            this.gameWorld.appendChild(damageText);
+            
+            setTimeout(() => {
+                if (damageText.parentNode) {
+                    damageText.remove();
+                }
+            }, 1000);
+            
+            if (enemy.hp <= 0) {
+                enemy.alive = false;
+                enemy.element.classList.add('defeated');
+                
+                // Drop rewards
+                if (Math.random() < 0.10) {
+                    this.createMoneyDrop(enemy.currentX, enemy.currentY);
+                }
+                if (Math.random() < 0.05) {
+                    this.createHeartDrop(enemy.currentX, enemy.currentY);
                 }
             }
+        }
+    });
+
+    // Check gorilla collision for attack (but don't damage)
+    if (this.gorilla && this.gorilla.alive) {
+        const distance = Math.sqrt(
+            Math.pow(attackX - this.gorilla.currentX, 2) + 
+            Math.pow(attackY - this.gorilla.currentY, 2)
+        );
+        
+        if (distance <= this.attackRange) {
+            this.showMessage('🦍 The gorilla seems friendly now...');
+        }
+    }
+}
 
             createMoneyDrop(x, y) {
                 const money = document.createElement('div');
