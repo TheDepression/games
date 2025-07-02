@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underground Bunker - King's Hideout</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #2a2a2a;
+            border: 3px solid #555;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #3a3a2a 0%, #2a2a1a 50%, #1a1a0a 100%);
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 350px;
+            height: 357.5px;
+            transform-origin: 0 0;
+        }
+        
+        .bunker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(ellipse 30px 15px at 20% 30%, rgba(100,80,60,0.2) 40%, transparent 70%),
+                radial-gradient(ellipse 25px 12px at 70% 20%, rgba(80,60,40,0.15) 35%, transparent 65%),
+                radial-gradient(ellipse 40px 20px at 50% 70%, rgba(90,70,50,0.18) 38%, transparent 72%);
+            background-size: 100px 100px, 80px 80px, 120px 120px;
+            background-position: 0 0, 40px 30px, 20px 60px;
+            pointer-events: none;
+            z-index: 151;
+            opacity: 0.7;
+            animation: bunkerAmbience 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes bunkerAmbience {
+            0% { 
+                background-position: 0 0, 30px 20px, 15px 45px;
+                opacity: 0.6;
+            }
+            50% {
+                background-position: 20px 10px, 50px 40px, 35px 65px;
+                opacity: 0.8;
+            }
+            100% { 
+                background-position: 40px 20px, 70px 60px, 55px 85px;
+                opacity: 0.6;
+            }
+        }
+        
+        .bunker-wall {
+            position: absolute;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+            background-repeat: repeat;
+            background-size: 20px 20px;
+            border: 1px solid rgba(0,0,0,0.6);
+            opacity: 0.9;
+            filter: brightness(0.3) sepia(0.3) hue-rotate(30deg);
+        }
+        
+        .entrance-exit {
+            position: absolute;
+            background: linear-gradient(180deg, #1a1a0a 0%, #0a0a00 100%);
+            border: 2px solid #3a3a2a;
+            border-radius: 8px 8px 0 0;
+            z-index: 200;
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 100;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .friendly {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+            filter: brightness(1.2) drop-shadow(0 0 8px gold);
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #444;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #665;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 250;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+
+        #deathCounter {
+            position: fixed;
+            top: 10px;
+            right: 90px;
+            z-index: 250;
+            background: rgba(128,0,128,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 400;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            opacity: 0.9;
+        }
+        
+        #startScreen, #pauseMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+        
+        h2, h3 {
+            margin: 10px 0;
+        }
+        
+        .control-hint {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        /* Add opacity for small screens */
+        @media (max-height: 667px) {
+            #ui, #timer, #deathCounter, #pauseBtn {
+                opacity: 0.6 !important;
+            }
+            #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
+                opacity: 1 !important;
+                transition: opacity 0.2s ease;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🐸 Underground Bunker</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+        </div>
+        <div id="timer">0:00</div>
+        <div id="deathCounter">☠️0</div>
+        <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; right: 160px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️</button>
+        
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+                <div class="bunker-overlay"></div>
+            </div>
+        </div>
+        <div id="message"></div>
+        
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">🏰 King's Underground Bunker</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe to move around the bunker</div>
+            </div>
+            <div class="control-hint">
+                <div>🤴 The king is hiding from the apocalypse...</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Step on the entrance to return to the surface</div>
+            </div>
+        </div>
+        
+        <div id="startScreen">
+            <h2>🏰 Underground Bunker</h2>
+            <div style="margin: 20px 0;">The king's secret hideout...</div>
+            <p style="font-size: 12px; opacity: 0.8;">🤴 Speak with the king to learn about the casino!</p>
+            <button class="start-button" onclick="startGame()">Enter Bunker</button>
+        </div>
+        
+        <div id="pauseMenu" style="display: none;">
+            <h3>⏸️ Game Paused</h3>
+            <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
+            <button onclick="resumeGame()">Continue Game</button>
+            <button onclick="returnToSurface()">Return to Surface</button>
+        </div>
+    </div>
+
+    <!-- Commented out background music placeholder -->
+    <!--
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/darkmaze.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    -->
+    
+    <script>
+        // CHECK ACCESS AND VALIDATE ENTRY
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            
+            if (!savedState) {
+                alert('No game data found! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+            
+            const gameState = JSON.parse(savedState);
+            
+            // Check if they have access to this area
+            if (!gameState.pyramidBossDefeated) {
+                alert('You must defeat the pyramid boss first!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+        });
+
+        class UndergroundBunker {
+            constructor() {
+                // Load state from main game
+                this.loadGameState();
+                
+                // Movement properties
+                this.playerX = 175; // Center of room
+                this.playerY = 300; // Near bottom (entrance)
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.lastDragX = 0;
+                this.lastDragY = 0;
+                this.currentDirection = 'n'; // Facing up initially
+                this.lastMoveDirection = 'n';
+
+                this.gameStarted = false;
+                this.timeElapsed = 0;
+                this.timerInterval = null;
+                this.isPaused = false;
+                this.currentMessageType = null;
+                
+                // DOM elements
+                this.player = document.getElementById('player');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.gameArea = document.getElementById('gameArea');
+                this.controlArea = document.getElementById('controlArea');
+                // this.bgMusic = document.getElementById('bgMusic'); // Commented out for now
+                
+                // Initialize
+                this.preloadPlayerImages();
+                this.bindEvents();
+                this.startGameLoop();
+            }
+
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+
+            bindEvents() {
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+
+            handleStart(e) {
+                if (!this.gameStarted) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                this.isDragging = true;
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging || !this.gameStarted) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.updatePlayerImage(newDirection);
+                        this.lastMoveDirection = newDirection;
+                    }
+                }
+
+                const sensitivity = 0.5;
+                this.playerVelocityX = deltaX * sensitivity;
+                this.playerVelocityY = deltaY * sensitivity;
+
+                const maxVelocity = 11;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+
+            updatePlayerImage(direction) {
+                this.currentDirection = direction;
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+                this.player.textContent = '';
+            }
+
+            loadGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    this.hearts = gameState.hearts || 3;
+                    this.money = gameState.money || 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+                    this.maxHearts = gameState.maxHearts || 3;
+                    this.kingMoneyReceived = gameState.kingMoneyReceived || false;
+                    
+                    this.updateUI();
+                    this.updateTimer();
+                    this.updateDeathCounter();
+                    return true;
+                }
+                return false;
+            }
+
+            saveGameState() {
+                const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+                gameState.hearts = this.hearts;
+                gameState.money = this.money;
+                gameState.timeElapsed = this.timeElapsed;
+                gameState.deathCount = this.deathCount;
+                gameState.maxHearts = this.maxHearts;
+                gameState.kingMoneyReceived = this.kingMoneyReceived;
+                gameState.currentUrl = 'underground';
+                gameState.lastSaveTime = Date.now();
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+            }
+
+            startGameTimer() {
+                this.gameStarted = true;
+                this.updateTimer();
+                // this.bgMusic.play().catch(e => console.log('Music play failed:', e)); // Commented out
+                
+                this.timerInterval = setInterval(() => {
+                    if (!this.isPaused) {
+                        this.timeElapsed++;
+                        this.updateTimer();
+                        
+                        // Auto-save every minute
+                        if (this.timeElapsed % 60 === 0) {
+                            this.saveGameState();
+                        }
+                    }
+                }, 1000);
+            }
+
+            updateTimer() {
+                const minutes = Math.floor(this.timeElapsed / 60);
+                const seconds = this.timeElapsed % 60;
+                const timerEl = document.getElementById('timer');
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (this.timeElapsed >= 600) {
+                    timerEl.style.background = 'rgba(255,0,0,0.8)';
+                } else if (this.timeElapsed >= 300) {
+                    timerEl.style.background = 'rgba(255,165,0,0.8)';
+                } else {
+                    timerEl.style.background = 'rgba(0,128,0,0.8)';
+                }
+            }
+
+            updateDeathCounter() {
+                document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+            }
+
+            initLevel() {
+                // Clear existing elements
+                const elements = this.gameWorld.querySelectorAll('.bunker-wall, .friendly, .entrance-exit');
+                elements.forEach(el => el.remove());
+                
+                this.createBunkerWalls();
+                this.createEntrance();
+                this.createKing();
+                
+                // Set player position and image
+                const visualOffset = (32 - 24) / 2;
+                this.player.style.left = (this.playerX - visualOffset) + 'px';
+                this.player.style.top = (this.playerY - visualOffset) + 'px';
+                this.updatePlayerImage('n'); // Face up initially
+                
+                this.updateUI();
+            }
+
+            createBunkerWalls() {
+                // Create bunker walls around the perimeter
+                const walls = [
+                    // Top wall
+                    {x: 0, y: 0, w: 350, h: 20},
+                    // Left wall  
+                    {x: 0, y: 0, w: 20, h: 357.5},
+                    // Right wall
+                    {x: 330, y: 0, w: 20, h: 357.5},
+                    // Bottom wall (with gap for entrance)
+                    {x: 0, y: 337.5, w: 140, h: 20},
+                    {x: 210, y: 337.5, w: 140, h: 20},
+                    // Some decorative internal walls
+                    {x: 60, y: 60, w: 60, h: 20},
+                    {x: 230, y: 60, w: 60, h: 20},
+                    {x: 60, y: 280, w: 60, h: 20},
+                    {x: 230, y: 280, w: 60, h: 20}
+                ];
+                
+                walls.forEach(wall => {
+                    const wallEl = document.createElement('div');
+                    wallEl.className = 'bunker-wall';
+                    wallEl.style.left = wall.x + 'px';
+                    wallEl.style.top = wall.y + 'px';
+                    wallEl.style.width = wall.w + 'px';
+                    wallEl.style.height = wall.h + 'px';
+                    this.gameWorld.appendChild(wallEl);
+                });
+            }
+
+            createEntrance() {
+                // Create entrance/exit at bottom center
+                const entrance = document.createElement('div');
+                entrance.className = 'entrance-exit';
+                entrance.style.left = '140px';
+                entrance.style.top = '320px';
+                entrance.style.width = '70px';
+                entrance.style.height = '37.5px';
+                entrance.dataset.type = 'bunkerExit';
+                this.gameWorld.appendChild(entrance);
+            }
+
+            createKing() {
+                // Create the king NPC
+                const king = document.createElement('div');
+                king.className = 'friendly king-npc';
+                king.textContent = '🤴';
+                king.style.left = '175px'; // Center of room
+                king.style.top = '150px'; // Upper middle
+                
+                // Set Japanese dialog
+                if (!this.kingMoneyReceived) {
+                    king.dataset.type = 'kingFirstMeeting';
+                } else {
+                    king.dataset.message = 'がんばって！ブリーをたおして！'; // "Good luck! Defeat the bully!"
+                }
+                
+                this.gameWorld.appendChild(king);
+            }
+
+            startGameLoop() {
+                const gameLoop = () => {
+                    if (this.gameStarted) {
+                        this.updatePlayer();
+                        this.checkCollisions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+
+            updatePlayer() {
+                if (this.isPaused) return;
+                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                    const newX = this.playerX + this.playerVelocityX;
+                    const newY = this.playerY + this.playerVelocityY;
+                    
+                    if (this.canMoveTo(newX, newY)) {
+                        this.playerX = newX;
+                        this.playerY = newY;
+                        
+                        const visualOffset = (32 - 24) / 2;
+                        this.player.style.left = (this.playerX - visualOffset) + 'px';
+                        this.player.style.top = (this.playerY - visualOffset) + 'px';
+                    }
+                    
+                    const friction = 0.9;
+                    this.playerVelocityX *= friction;
+                    this.playerVelocityY *= friction;
+                }
+            }
+
+            canMoveTo(x, y) {
+                const playerSize = 24;
+                const padding = 2;
+                
+                const points = [
+                    {x: x + padding, y: y + padding},
+                    {x: x + playerSize - padding, y: y + padding},
+                    {x: x + padding, y: y + playerSize - padding},
+                    {x: x + playerSize - padding, y: y + playerSize - padding}
+                ];
+                
+                const walls = this.gameWorld.querySelectorAll('.bunker-wall');
+                
+                for (let wall of walls) {
+                    const wallRect = {
+                        left: parseInt(wall.style.left),
+                        top: parseInt(wall.style.top),
+                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+                    };
+                    
+                    for (let point of points) {
+                        if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                            point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
+            }
+
+            checkCollisions() {
+                if (this.isPaused) return;
+                
+                const playerRect = {
+                    left: this.playerX,
+                    top: this.playerY,
+                    right: this.playerX + 24,
+                    bottom: this.playerY + 24
+                };
+                
+                // Check king interaction
+                const king = this.gameWorld.querySelector('.king-npc');
+                if (king) {
+                    const kingX = parseInt(king.style.left);
+                    const kingY = parseInt(king.style.top);
+                    const kingRect = {
+                        left: kingX,
+                        top: kingY,
+                        right: kingX + 22,
+                        bottom: kingY + 22
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, kingRect)) {
+                        if (king.dataset.type === 'kingFirstMeeting') {
+                            this.startKingDialog();
+                        } else {
+                            this.showNPCMessage(king.dataset.message);
+                        }
+                    } else {
+                        this.clearNPCMessage();
+                    }
+                }
+                
+                // Check entrance/exit
+                const entrance = this.gameWorld.querySelector('.entrance-exit');
+                if (entrance) {
+                    const entranceX = parseInt(entrance.style.left);
+                    const entranceY = parseInt(entrance.style.top);
+                    const entranceRect = {
+                        left: entranceX,
+                        top: entranceY,
+                        right: entranceX + 70,
+                        bottom: entranceY + 37.5
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, entranceRect)) {
+                        this.returnToSurface();
+                    }
+                }
+            }
+
+            startKingDialog() {
+                if (this.kingMoneyReceived) return; // Prevent multiple triggers
+                
+                this.gameStarted = false; // Pause game
+                this.showKingDialog();
+            }
+
+            showKingDialog() {
+                const dialogOverlay = document.createElement('div');
+                dialogOverlay.id = 'kingDialog';
+                dialogOverlay.style.position = 'fixed';
+                dialogOverlay.style.top = '0';
+                dialogOverlay.style.left = '0';
+                dialogOverlay.style.width = '100%';
+                dialogOverlay.style.height = '100%';
+                dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+                dialogOverlay.style.display = 'flex';
+                dialogOverlay.style.justifyContent = 'center';
+                dialogOverlay.style.alignItems = 'center';
+                dialogOverlay.style.zIndex = '400';
+                
+                const dialogBox = document.createElement('div');
+                dialogBox.style.background = 'rgba(0,0,0,0.9)';
+                dialogBox.style.color = 'white';
+                dialogBox.style.padding = '20px';
+                dialogBox.style.borderRadius = '10px';
+                dialogBox.style.textAlign = 'center';
+                dialogBox.style.maxWidth = '300px';
+                dialogBox.style.border = '2px solid #555';
+                
+                const img = document.createElement('div');
+                img.style.fontSize = '60px';
+                img.style.marginBottom = '15px';
+                img.textContent = '🤴';
+                
+                const text = document.createElement('p');
+                text.style.margin = '10px 0';
+                text.style.fontSize = '14px';
+                text.textContent = 'せかいが あぶない。ここに かくれている！おかねを もって。カジノを さがして。もりの したに あるって ほんと？！';
+                
+                const button = document.createElement('button');
+                button.style.background = '#4CAF50';
+                button.style.color = 'white';
+                button.style.border = 'none';
+                button.style.padding = '10px 20px';
+                button.style.borderRadius = '5px';
+                button.style.cursor = 'pointer';
+                button.style.fontSize = '14px';
+                button.textContent = 'ありがとう！'; // "Thank you!"
+                button.onclick = () => {
+                    this.completeKingEncounter();
+                    dialogOverlay.remove();
+                };
+                
+                dialogBox.appendChild(img);
+                dialogBox.appendChild(text);
+                dialogBox.appendChild(button);
+                dialogOverlay.appendChild(dialogBox);
+                document.body.appendChild(dialogOverlay);
+            }
+
+            completeKingEncounter() {
+                // Give money to player
+                this.money += 700;
+                this.kingMoneyReceived = true;
+                
+                // Update king's message for future interactions
+                const king = this.gameWorld.querySelector('.king-npc');
+                if (king) {
+                    king.dataset.type = '';
+                    king.dataset.message = 'がんばって！ブリーをたおして！'; // "Good luck! Defeat the bully!"
+                }
+                
+                // Restart game and save
+                this.gameStarted = true;
+                this.updateUI();
+                this.saveGameState();
+                
+                this.showMessage('💰 +700¥ おうさまから もらった！'); // "+700¥ received from the king!"
+            }
+
+            rectsOverlap(rect1, rect2) {
+                return rect1.left < rect2.right &&
+                       rect1.right > rect2.left &&
+                       rect1.top < rect2.bottom &&
+                       rect1.bottom > rect2.top;
+            }
+            
+            showMessage(text) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.style.display = 'block';
+                this.currentMessageType = 'regular';
+                
+                clearTimeout(this.messageTimeout);
+                this.messageTimeout = setTimeout(() => {
+                    if (this.currentMessageType === 'regular') {
+                        message.style.display = 'none';
+                        this.currentMessageType = null;
+                    }
+                }, 2000);
+            }
+
+            showNPCMessage(text) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.style.display = 'block';
+                this.currentMessageType = 'npc';
+                clearTimeout(this.messageTimeout);
+            }
+
+            clearNPCMessage() {
+                const message = document.getElementById('message');
+                if (message.style.display === 'block' && this.currentMessageType === 'npc') {
+                    message.style.display = 'none';
+                    this.currentMessageType = null;
+                }
+            }
+
+            returnToSurface() {
+                // Save current game state before transfer
+                this.saveGameState();
+                
+                // Update the current URL in the save state
+                const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+                gameState.currentUrl = 'maze2';
+                gameState.playerX = 60; // Spawn away from weak point
+                gameState.playerY = 670;
+                gameState.lastSaveTime = Date.now();
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                
+                // Show transition message
+                this.showMessage('🏃 ちじょうに もどる...'); // "Returning to surface..."
+                
+                // Transfer after brief delay
+                setTimeout(() => {
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                }, 1500);
+            }
+            
+            updateUI() {
+                document.getElementById('hearts').textContent = this.hearts;
+                document.getElementById('money').textContent = this.money;
+                this.updateDeathCounter();
+                
+                // Show collected items from main game
+                const ui = document.getElementById('ui');
+                let itemsHTML = '';
+                
+                // Load items from saved state
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    if (gameState.hasKey) itemsHTML += ' 🔑';
+                    if (gameState.hasBoat && !gameState.boatIsBroken) itemsHTML += ' ⛵';
+                    if (gameState.hasBoat && gameState.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
+                    if (gameState.hasHammer) itemsHTML += ' 🔨';
+                    if (gameState.hasFlashlight) itemsHTML += ' 🔦';
+                    if (gameState.hasPencil) itemsHTML += ' ✏️';
+                    if (gameState.hasWeapon && gameState.hasHammerPower) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
+                    else if (gameState.hasWeapon && gameState.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
+                    else if (gameState.hasWeapon) itemsHTML += ' 🔫';
+                    if (gameState.hasLavaShoes) itemsHTML += ' 🥾';
+                }
+                
+                if (!document.getElementById('items')) {
+                    const itemsDiv = document.createElement('div');
+                    itemsDiv.id = 'items';
+                    itemsDiv.innerHTML = '+' + itemsHTML;
+                    ui.appendChild(itemsDiv);
+                } else {
+                    document.getElementById('items').innerHTML = '+' + itemsHTML;
+                }
+            }
+        }
+
+        let game;
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            game = new UndergroundBunker();
+            game.initLevel();
+            game.startGameTimer();
+        }
+
+        function pauseGame() {
+            if (game && game.gameStarted) {
+                game.isPaused = true;
+                // game.bgMusic.pause(); // Commented out
+                document.getElementById('pauseMenu').style.display = 'flex';
+            }
+        }
+
+        function resumeGame() {
+            if (game) {
+                game.isPaused = false;
+                document.getElementById('pauseMenu').style.display = 'none';
+                // game.bgMusic.play().catch(e => console.log('Music resume failed:', e)); // Commented out
+            }
+        }
+
+        function returnToSurface() {
+            if (game) {
+                game.returnToSurface();
+            }
+        }
+    </script>
+</body>
+</html>
