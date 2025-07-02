@@ -2981,7 +2981,7 @@ updateQuicksand() {
                     }
                 }
                 
-                // Check friendly NPCs
+                // Check friendly NPCs (replace the existing friendly NPC section)
 const friendlies = this.gameWorld.querySelectorAll('.friendly');
 let playerOnNPC = false;
 let currentNPCMessage = null;
@@ -3000,14 +3000,22 @@ friendlies.forEach(friendly => {
         playerOnNPC = true;
         currentNPCMessage = friendly.dataset.message;
         
-        // Check if this is the boat repair NPC
-        if (friendlyX === 1400 && friendlyY === 1330) {
+        // Check for special dialog types
+        if (friendly.dataset.type === 'gorillaFinalDialog') {
+            this.startGorillaFinalDialog();
+        } else if (friendly.dataset.type === 'catFirstDialog') {
+            this.startCatFirstDialog();
+        } else if (friendlyX === 1400 && friendlyY === 1330) {
+            // Boat repair NPC
             this.checkBoatRepairTransaction(friendly);
+        } else if (friendly.classList.contains('cat-girlfriend')) {
+            // Cat healing power
+            this.handleCatHealing();
         } else {
-            // Show NPC message if not currently visible OR if it's a different message
+            // Regular NPC message
             const messageEl = document.getElementById('message');
             if (messageEl.style.display === 'none' || messageEl.textContent !== currentNPCMessage) {
-                this.showNPCMessage(currentNPCMessage); // Use NPC-specific method
+                this.showNPCMessage(currentNPCMessage);
             }
         }
     }
@@ -3017,6 +3025,24 @@ friendlies.forEach(friendly => {
 if (!playerOnNPC) {
     this.clearNPCMessage();
 }
+
+// Check weak point entrances
+const entrances = this.gameWorld.querySelectorAll('.weak-point-entrance');
+entrances.forEach(entrance => {
+    const entranceX = parseInt(entrance.style.left);
+    const entranceY = parseInt(entrance.style.top);
+    const entranceRect = {
+        left: entranceX - 5,
+        top: entranceY - 5,
+        right: entranceX + 25,
+        bottom: entranceY + 25
+    };
+    
+    if (this.rectsOverlap(playerRect, entranceRect)) {
+        const url = entrance.dataset.url;
+        this.transferToWeakPoint(url);
+    }
+});
 
                 // Check heart and money drops
                 const hearts = this.gameWorld.querySelectorAll('.heart-pickup[data-type="drop"]');
