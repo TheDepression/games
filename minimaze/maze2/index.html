@@ -2759,7 +2759,7 @@ updateQuicksand() {
                 if (!this.gameStarted) return;
                 const now = Date.now();
                 
-                if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000) {
+                if (!this.foregroundEnemy && now - this.lastForegroundSpawn > 20000 && !this.pinkBossDefeated) {
                     const desertLeft = 1600;
                     const desertTop = 1000;
                     const startX = desertLeft + 50;
