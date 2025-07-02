@@ -1382,6 +1382,7 @@ this.weakPointsBlasted = gameState.weakPointsBlasted || [];
 if (this.hasHammerPower) {
     this.attackDamage = 100; // Keep the 100 damage from orange power
 }
+                    this.kingMoneyReceived = gameState.kingMoneyReceived || false;
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
                     this.hearts = gameState.hearts || 3;
@@ -1412,6 +1413,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                     money: this.money,
                     timeElapsed: this.timeElapsed,
                      deathCount: this.deathCount, // ADD THIS LINE
+                    kingMoneyReceived: this.kingMoneyReceived,  // ADD THIS
 
                     // Add these lines in saveGameState() after existing properties
 maxHearts: this.maxHearts,
