@@ -596,11 +596,15 @@ checkAttackHits(attackX, attackY) {
                     const gameState = JSON.parse(savedState);
                     // Add ALL these missing lines:
         this.hasKey = gameState.hasKey || false;
-        this.hasBoat = gameState.hasBoat || false;
-        this.boatIsBroken = gameState.boatIsBroken || false;
-        this.hasWeapon = gameState.hasWeapon || false;
-        this.hasOrangePower = gameState.hasOrangePower || false;
-        this.hasHammerPower = gameState.hasHammerPower || false;
+this.hasBoat = gameState.hasBoat || false;
+this.boatIsBroken = gameState.boatIsBroken || false;
+this.hasWeapon = gameState.hasWeapon || false;
+this.hasOrangePower = gameState.hasOrangePower || false;
+this.hasHammerPower = gameState.hasHammerPower || false;
+this.hasFlashlight = gameState.hasFlashlight || false;
+this.hasHammer = gameState.hasHammer || false;
+this.hasPencil = gameState.hasPencil || false;
+this.hasLavaShoes = gameState.hasLavaShoes || false;
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
