@@ -1050,29 +1050,39 @@ if (queen) {
     const ui = document.getElementById('ui');
     let itemsHTML = '';
     
-    // Load items from saved state
+    // Load items from saved state with stricter checking
     const savedState = localStorage.getItem('mfGameState');
     if (savedState) {
         const gameState = JSON.parse(savedState);
+        
+        // Only show items that are explicitly true (not undefined, null, or false)
         if (gameState.hasKey === true) itemsHTML += ' 🔑';
         if (gameState.hasBoat === true && gameState.boatIsBroken !== true) itemsHTML += ' ⛵';
         if (gameState.hasBoat === true && gameState.boatIsBroken === true) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
         if (gameState.hasHammer === true) itemsHTML += ' 🔨';
         if (gameState.hasFlashlight === true) itemsHTML += ' 🔦';
         if (gameState.hasPencil === true) itemsHTML += ' ✏️';
-        if (gameState.hasWeapon === true && gameState.hasHammerPower === true) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
-        else if (gameState.hasWeapon === true && gameState.hasOrangePower === true) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-        else if (gameState.hasWeapon === true) itemsHTML += ' 🔫';
+        
+        // Weapon variations - check all conditions carefully
+        if (gameState.hasWeapon === true && gameState.hasHammerPower === true) {
+            itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
+        } else if (gameState.hasWeapon === true && gameState.hasOrangePower === true) {
+            itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
+        } else if (gameState.hasWeapon === true) {
+            itemsHTML += ' 🔫';
+        }
+        
         if (gameState.hasLavaShoes === true) itemsHTML += ' 🥾';
     }
     
+    // Only show the items div if there are actually items
     if (!document.getElementById('items')) {
         const itemsDiv = document.createElement('div');
         itemsDiv.id = 'items';
-        itemsDiv.innerHTML = '+' + itemsHTML;
+        itemsDiv.innerHTML = itemsHTML.trim() ? '+' + itemsHTML : '';
         ui.appendChild(itemsDiv);
     } else {
-        document.getElementById('items').innerHTML = '+' + itemsHTML;
+        document.getElementById('items').innerHTML = itemsHTML.trim() ? '+' + itemsHTML : '';
     }
 }
         }
