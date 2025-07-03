@@ -595,6 +595,13 @@ checkAttackHits(attackX, attackY) {
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
+                    // Add ALL these missing lines:
+        this.hasKey = gameState.hasKey || false;
+        this.hasBoat = gameState.hasBoat || false;
+        this.boatIsBroken = gameState.boatIsBroken || false;
+        this.hasWeapon = gameState.hasWeapon || false;
+        this.hasOrangePower = gameState.hasOrangePower || false;
+        this.hasHammerPower = gameState.hasHammerPower || false;
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
@@ -624,6 +631,7 @@ checkAttackHits(attackX, attackY) {
             }
 
             startGameTimer() {
+                if (this.timerInterval) return; // Prevent multiple timers
     this.gameStarted = true;
     this.updateTimer();
     
@@ -673,7 +681,6 @@ checkAttackHits(attackX, attackY) {
                 this.player.style.left = (this.playerX - visualOffset) + 'px';
                 this.player.style.top = (this.playerY - visualOffset) + 'px';
                 this.updatePlayerImage('n'); // Face up initially
-                this.gameStarted = true; // Add this line
                 this.updateUI();
             }
 
