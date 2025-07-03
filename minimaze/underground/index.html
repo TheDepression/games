@@ -1042,39 +1042,39 @@ if (queen) {
             }
             
             updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('money').textContent = this.money;
-                this.updateDeathCounter();
-                
-                // Show collected items from main game
-                const ui = document.getElementById('ui');
-                let itemsHTML = '';
-                
-                // Load items from saved state
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    if (gameState.hasKey) itemsHTML += ' 🔑';
-                    if (gameState.hasBoat && !gameState.boatIsBroken) itemsHTML += ' ⛵';
-                    if (gameState.hasBoat && gameState.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
-                    if (gameState.hasHammer) itemsHTML += ' 🔨';
-                    if (gameState.hasFlashlight) itemsHTML += ' 🔦';
-                    if (gameState.hasPencil) itemsHTML += ' ✏️';
-                    if (gameState.hasWeapon && gameState.hasHammerPower) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
-                    else if (gameState.hasWeapon && gameState.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-                    else if (gameState.hasWeapon) itemsHTML += ' 🔫';
-                    if (gameState.hasLavaShoes) itemsHTML += ' 🥾';
-                }
-                
-                if (!document.getElementById('items')) {
-                    const itemsDiv = document.createElement('div');
-                    itemsDiv.id = 'items';
-                    itemsDiv.innerHTML = '+' + itemsHTML;
-                    ui.appendChild(itemsDiv);
-                } else {
-                    document.getElementById('items').innerHTML = '+' + itemsHTML;
-                }
-            }
+    document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money;
+    this.updateDeathCounter();
+    
+    // Show collected items from main game
+    const ui = document.getElementById('ui');
+    let itemsHTML = '';
+    
+    // Load items from saved state
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        if (gameState.hasKey === true) itemsHTML += ' 🔑';
+        if (gameState.hasBoat === true && gameState.boatIsBroken !== true) itemsHTML += ' ⛵';
+        if (gameState.hasBoat === true && gameState.boatIsBroken === true) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
+        if (gameState.hasHammer === true) itemsHTML += ' 🔨';
+        if (gameState.hasFlashlight === true) itemsHTML += ' 🔦';
+        if (gameState.hasPencil === true) itemsHTML += ' ✏️';
+        if (gameState.hasWeapon === true && gameState.hasHammerPower === true) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
+        else if (gameState.hasWeapon === true && gameState.hasOrangePower === true) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
+        else if (gameState.hasWeapon === true) itemsHTML += ' 🔫';
+        if (gameState.hasLavaShoes === true) itemsHTML += ' 🥾';
+    }
+    
+    if (!document.getElementById('items')) {
+        const itemsDiv = document.createElement('div');
+        itemsDiv.id = 'items';
+        itemsDiv.innerHTML = '+' + itemsHTML;
+        ui.appendChild(itemsDiv);
+    } else {
+        document.getElementById('items').innerHTML = '+' + itemsHTML;
+    }
+}
         }
 
         let game;
