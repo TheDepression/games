@@ -623,12 +623,6 @@ checkAttackHits(attackX, attackY) {
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
 
-            startGameTimer() {
-                this.gameStarted = true;
-                this.updateTimer();
-                // this.bgMusic.play().catch(e => console.log('Music play failed:', e)); // Commented out
-                
-            }
 
             updateTimer() {
                 const minutes = Math.floor(this.timeElapsed / 60);
@@ -663,7 +657,7 @@ checkAttackHits(attackX, attackY) {
                 this.player.style.left = (this.playerX - visualOffset) + 'px';
                 this.player.style.top = (this.playerY - visualOffset) + 'px';
                 this.updatePlayerImage('n'); // Face up initially
-                
+                this.gameStarted = true; // Add this line
                 this.updateUI();
             }
 
