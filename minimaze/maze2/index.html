@@ -3882,22 +3882,20 @@ handleCatHealing() {
 }
 
 transferToWeakPoint(url) {
-    // Save current game state before transfer
+    // Save everything in one operation like the working transfers
     this.saveGameState();
     
-    // Update the current URL in the save state
+    // Then just update the URL (but verify timeElapsed is preserved)
     const gameState = JSON.parse(localStorage.getItem('mfGameState'));
     gameState.currentUrl = url;
+    gameState.timeElapsed = this.timeElapsed; // Ensure time is preserved
     gameState.lastSaveTime = Date.now();
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     
-    // Show transition message
     this.showMessage('🕳️ Entering the secret passage...');
-    
-    // Transfer after brief delay
     setTimeout(() => {
         window.location.href = `https://thedepression.github.io/games/minimaze/${url}`;
-    }, 1500);
+    }, 500);
 }
 
 
@@ -3909,6 +3907,7 @@ transferToWeakPoint(url) {
     // Update the current URL in the save state to track progression
     const gameState = JSON.parse(localStorage.getItem('mfGameState'));
     gameState.currentUrl = 'cutscene2';
+                gameState.timeElapsed = this.timeElapsed; // Ensure time is preserved
     gameState.lastSaveTime = Date.now();
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     
@@ -3918,7 +3917,7 @@ transferToWeakPoint(url) {
     // Transfer after brief delay
     setTimeout(() => {
         window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene2';
-    }, 1500);
+    }, 500);
 }
         
             
