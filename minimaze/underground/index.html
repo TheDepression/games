@@ -628,17 +628,6 @@ checkAttackHits(attackX, attackY) {
                 this.updateTimer();
                 // this.bgMusic.play().catch(e => console.log('Music play failed:', e)); // Commented out
                 
-                this.timerInterval = setInterval(() => {
-                    if (!this.isPaused) {
-                        this.timeElapsed++;
-                        this.updateTimer();
-                        
-                        // Auto-save every minute
-                        if (this.timeElapsed % 60 === 0) {
-                            this.saveGameState();
-                        }
-                    }
-                }, 1000);
             }
 
             updateTimer() {
