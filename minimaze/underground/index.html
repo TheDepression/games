@@ -623,6 +623,22 @@ checkAttackHits(attackX, attackY) {
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
             }
 
+            startGameTimer() {
+    this.gameStarted = true;
+    this.updateTimer();
+    
+    this.timerInterval = setInterval(() => {
+        if (!this.isPaused) {
+            this.timeElapsed++;  // ✅ Keep this
+            this.updateTimer();
+            
+            if (this.timeElapsed % 60 === 0) {
+                this.saveGameState();
+            }
+        }
+    }, 1000);
+}
+
 
             updateTimer() {
                 const minutes = Math.floor(this.timeElapsed / 60);
@@ -997,11 +1013,13 @@ if (queen) {
             }
 
             returnToSurface() {
+                
                 // Save current game state before transfer
                 this.saveGameState();
                 
                 // Update the current URL in the save state
                 const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+                gameState.timeElapsed = this.timeElapsed; // ✅ Make sure this exists
                 gameState.currentUrl = 'maze2';
                 gameState.playerX = 60; // Spawn away from weak point
                 gameState.playerY = 670;
