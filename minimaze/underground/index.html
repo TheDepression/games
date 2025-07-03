@@ -1051,11 +1051,8 @@ if (queen) {
     document.getElementById('money').textContent = this.money;
     this.updateDeathCounter();
     
-    // Show collected items from main game
     const ui = document.getElementById('ui');
     let itemsHTML = '';
-    
-    // Use the already loaded item properties (remove === true checks)
     if (this.hasKey) itemsHTML += ' 🔑';
     if (this.hasBoat && !this.boatIsBroken) itemsHTML += ' ⛵';
     if (this.hasBoat && this.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
@@ -1070,10 +1067,10 @@ if (queen) {
     if (!document.getElementById('items')) {
         const itemsDiv = document.createElement('div');
         itemsDiv.id = 'items';
-        itemsDiv.innerHTML = itemsHTML.trim() ? '+' + itemsHTML : '';
+        itemsDiv.innerHTML = '+' + itemsHTML;
         ui.appendChild(itemsDiv);
     } else {
-        document.getElementById('items').innerHTML = itemsHTML.trim() ? '+' + itemsHTML : '';
+        document.getElementById('items').innerHTML = '+' + itemsHTML;
     }
 }
             
