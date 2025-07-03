@@ -597,7 +597,7 @@ checkAttackHits(attackX, attackY) {
                     const gameState = JSON.parse(savedState);
                     this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
-                    this.timeElapsed = gameState.timeElapsed !== undefined ? gameState.timeElapsed : 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
                     this.deathCount = gameState.deathCount || 0;
                     this.maxHearts = gameState.maxHearts || 3;
                     this.kingMoneyReceived = gameState.kingMoneyReceived || false;
