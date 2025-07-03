@@ -440,11 +440,28 @@
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
+                    
+                    // Load ALL properties from the game state to preserve everything
+                    this.collectedRedHearts = gameState.collectedRedHearts || [];
+                    this.collectedMoney = gameState.collectedMoney || [];
+                    this.hearts = gameState.hearts || 3;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
-                    // Load other necessary properties
-                    this.hearts = gameState.hearts || 3;
+                    this.deathCount = gameState.deathCount || 0;
                     this.maxHearts = gameState.maxHearts || 3;
+                    this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+                    this.collectedBanana = gameState.collectedBanana || false;
+                    this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
+                    this.hasOrangePower = gameState.hasOrangePower || false;
+                    this.attackDamage = gameState.attackDamage || 50;
+                    this.pinkBossDefeated = gameState.pinkBossDefeated || false;
+                    this.hasHammerPower = gameState.hasHammerPower || false;
+                    this.gorillaHammerDialogComplete = gameState.gorillaHammerDialogComplete || false;
+                    this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
+                    this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+                    this.kingMoneyReceived = gameState.kingMoneyReceived || false;
+                    
+                    // Items
                     this.hasKey = gameState.hasKey || false;
                     this.hasBoat = gameState.hasBoat || false;
                     this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : false;
@@ -454,6 +471,13 @@
                     this.hasPyramidKey = gameState.hasPyramidKey || false;
                     this.hasLavaShoes = gameState.hasLavaShoes || false;
                     this.hasWeapon = gameState.hasWeapon || false;
+                    
+                    // Progress flags
+                    this.bullyDefeated = gameState.bullyDefeated || false;
+                    this.motherPaid = gameState.motherPaid || false;
+                    this.caveBossDefeated = gameState.caveBossDefeated || false;
+                    this.pyramidBossDefeated = gameState.pyramidBossDefeated || false;
+                    
                     return true;
                 }
                 return false;
@@ -461,24 +485,25 @@
 
             saveGameState() {
                 const gameState = {
-                    // Preserve all main game properties
-                    collectedRedHearts: this.collectedRedHearts || [],
-                    collectedMoney: this.collectedMoney || [],
+                    // Preserve ALL main game properties exactly as they were
+                    collectedRedHearts: this.collectedRedHearts,
+                    collectedMoney: this.collectedMoney,
                     hearts: this.hearts,
                     money: this.money,
                     timeElapsed: this.timeElapsed, // Keep timer running
-                    deathCount: this.deathCount || 0,
+                    deathCount: this.deathCount,
                     maxHearts: this.maxHearts,
-                    collectedPurpleHearts: this.collectedPurpleHearts || [],
-                    collectedBanana: this.collectedBanana || false,
-                    gorillaEncounterComplete: this.gorillaEncounterComplete || false,
-                    hasOrangePower: this.hasOrangePower || false,
-                    attackDamage: this.attackDamage || 50,
-                    pinkBossDefeated: this.pinkBossDefeated || false,
-                    hasHammerPower: this.hasHammerPower || false,
-                    gorillaHammerDialogComplete: this.gorillaHammerDialogComplete || false,
-                    catFirstDialogComplete: this.catFirstDialogComplete || false,
-                    weakPointsBlasted: this.weakPointsBlasted || [],
+                    collectedPurpleHearts: this.collectedPurpleHearts,
+                    collectedBanana: this.collectedBanana,
+                    gorillaEncounterComplete: this.gorillaEncounterComplete,
+                    hasOrangePower: this.hasOrangePower,
+                    attackDamage: this.attackDamage,
+                    pinkBossDefeated: this.pinkBossDefeated,
+                    hasHammerPower: this.hasHammerPower,
+                    gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
+                    catFirstDialogComplete: this.catFirstDialogComplete,
+                    weakPointsBlasted: this.weakPointsBlasted,
+                    kingMoneyReceived: this.kingMoneyReceived,
                     
                     // Player position will be overridden when exiting
                     playerX: this.playerX,
@@ -496,10 +521,10 @@
                     hasWeapon: this.hasWeapon,
                     
                     // Progress flags
-                    bullyDefeated: true,
-                    motherPaid: true,
-                    caveBossDefeated: true,
-                    pyramidBossDefeated: true,
+                    bullyDefeated: this.bullyDefeated,
+                    motherPaid: this.motherPaid,
+                    caveBossDefeated: this.caveBossDefeated,
+                    pyramidBossDefeated: this.pyramidBossDefeated,
                     
                     currentUrl: 'casino',
                     lastSaveTime: Date.now()
@@ -1111,6 +1136,6 @@
             game.initLevel();
             game.startGameTimer();
         }
-        </script>
+                    </script>
 </body>
 </html>
