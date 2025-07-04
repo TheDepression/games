@@ -693,11 +693,16 @@
                 this.dogY = 330;
                 this.dogRunning = false;
                 this.dogSpeed = 5;
+                this.dogCaught = false; // Add this line
 
                 // Popup and game state
                 this.popupOpen = false;
                 this.currentNPC = null;
                 this.npcCooldowns = {};
+
+                // NPC animation properties
+this.npcAnimations = {};
+this.animationTimers = {};
                 
                 // Toilet checked flag
                 this.toiletChecked = false;
@@ -933,6 +938,7 @@
                 
                 this.updateUI();
                 this.generateCasino();
+                this.startNPCAnimations(); // Add this line
                 
                 // Center camera on player
                 const gameAreaWidth = this.gameArea.offsetWidth;
@@ -1017,14 +1023,14 @@
 
             createBlackWalls() {
                 const blackWallData = [
-                    {x: 200, y: 0, w: 10, h: 60},
-                    {x: 300, y: 0, w: 10, h: 60},
+                    {x: 200, y: 20, w: 10, h: 40},
+                    {x: 300, y: 20, w: 10, h: 40},
                     {x: 460, y: 340, w: 100, h: 10},
                     {x: 58, y: 200, w: 10, h: 101},
                     {x: 58, y: 199, w: 40, h: 10},
                     {x: 91, y: 199, w: 10, h: 101},
                     {x: 58, y: 291, w: 40, h: 10},
-                    {x: 510, y: 10, w: 10, h: 50}
+                    {x: 510, y: 20, w: 10, h: 40}
                 ];
 
                 blackWallData.forEach(wall => {
@@ -1521,6 +1527,38 @@
                         this.checkToilet();
                     }
                 }
+
+                // Check dog catch
+const dog = this.gameWorld.querySelector('.casino-dog');
+if (dog && !this.dogCaught) {
+    // Create a small 4x4 hitbox at dog center
+    const dogCenterX = this.dogX + 12.5; // Dog is 25px wide, so center is +12.5
+    const dogCenterY = this.dogY + 12.5;
+    const dogHitbox = {
+        left: dogCenterX - 2,
+        top: dogCenterY - 2,
+        right: dogCenterX + 2,
+        bottom: dogCenterY + 2
+    };
+    
+    if (this.rectsOverlap(playerRect, dogHitbox)) {
+        this.catchDog();
+    }
+} else if (dog && this.dogCaught) {
+    // Check for already caught dog
+    const dogCenterX = this.dogX + 12.5;
+    const dogCenterY = this.dogY + 12.5;
+    const dogHitbox = {
+        left: dogCenterX - 2,
+        top: dogCenterY - 2,
+        right: dogCenterX + 2,
+        bottom: dogCenterY + 2
+    };
+    
+    if (this.rectsOverlap(playerRect, dogHitbox)) {
+        this.dogAlreadyCaught();
+    }
+}
             }
 
             checkToilet() {
@@ -1537,6 +1575,9 @@
             }
 
             exitCasino() {
+
+                / Clean up animations
+    Object.values(this.animationTimers).forEach(timer => clearInterval(timer));
                 // Save current game state before transfer
                 this.saveGameState();
                 
@@ -3080,6 +3121,162 @@ memoryGameLost() {
             <button class="rps-btn rps-btn-secondary" onclick="game.hideMemoryOverlay()">Better Luck Next Time</button>
         </div>
     `;
+}
+
+            catchDog() {
+    if (this.popupOpen) return; // Prevent during other interactions
+    
+    this.dogCaught = true;
+    this.popupOpen = true;
+    
+    const popup = document.getElementById('npcPopup');
+    const image = document.getElementById('npcImage');
+    const name = document.getElementById('npcName');
+    const message = document.getElementById('npcMessage');
+    
+    // Use a dog image or emoji
+    image.src = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><text y="50" font-size="60">🐕</text></svg>');
+    name.textContent = 'Playful Casino Dog';
+    message.textContent = 'Woof! You got me! Here is 100 yen! 🎾';
+    
+    // Change buttons
+    popup.querySelector('.popup-buttons').innerHTML = '<button class="play-button" onclick="game.acceptDogMoney()">Accept Money</button>';
+    
+    popup.style.display = 'block';
+}
+
+dogAlreadyCaught() {
+    if (this.popupOpen) return;
+    
+    this.popupOpen = true;
+    
+    const popup = document.getElementById('npcPopup');
+    const image = document.getElementById('npcImage');
+    const name = document.getElementById('npcName');
+    const message = document.getElementById('npcMessage');
+    
+    image.src = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><text y="50" font-size="60">🐕</text></svg>');
+    name.textContent = 'Playful Casino Dog';
+    message.textContent = 'Woof... no more money for you! 🐾';
+    
+    // Change buttons
+    popup.querySelector('.popup-buttons').innerHTML = '<button class="decline-button" onclick="game.closePopup()">OK</button>';
+    
+    popup.style.display = 'block';
+}
+
+acceptDogMoney() {
+    this.money += 100;
+    this.updateUI();
+    this.saveGameState();
+    this.showMessage('🐕 The dog gave you 100¥!');
+    this.closePopup();
+}
+
+            startNPCAnimations() {
+    // Clear any existing timers
+    Object.values(this.animationTimers).forEach(timer => clearInterval(timer));
+    this.animationTimers = {};
+    
+    // Rock Paper Scissors - slow stroll left/right
+    this.startNPCStroll('Rock Paper Scissors', 30);
+    
+    // Simon Says - slow stroll left/right  
+    this.startNPCStroll('Simon Says', 30);
+    
+    // Lottery Seller - slow stroll left/right
+    this.startNPCStroll('Lottery Seller', 30);
+    
+    // Monty Hall - horizontal flip every 2 seconds
+    this.startNPCFlip('Monty Hall Host', 2000);
+    
+    // Slot Machine - horizontal flip every 2 seconds
+    this.startNPCFlip('Slot Machine', 2000);
+    
+    // Memory Master - subtle pulsate
+    this.startNPCPulsate('Memory Master');
+    
+    // Lucky Cat - mild bounce
+    this.startNPCBounce('Lucky Cat');
+    
+    // Race Master - mild bounce  
+    this.startNPCBounce('Race Master');
+}
+
+startNPCStroll(npcName, distance) {
+    const npc = this.gameWorld.querySelector(`[data-name="${npcName}"]`);
+    if (!npc) return;
+    
+    const originalX = parseInt(npc.style.left);
+    let direction = 1;
+    let currentOffset = 0;
+    
+    this.animationTimers[npcName] = setInterval(() => {
+        currentOffset += direction * 2;
+        
+        if (Math.abs(currentOffset) >= distance) {
+            direction *= -1;
+        }
+        
+        npc.style.left = (originalX + currentOffset) + 'px';
+    }, 100); // Move every 100ms for smooth slow movement
+}
+
+startNPCFlip(npcName, interval) {
+    const npc = this.gameWorld.querySelector(`[data-name="${npcName}"]`);
+    if (!npc) return;
+    
+    this.animationTimers[npcName] = setInterval(() => {
+        npc.style.transform = npc.style.transform === 'scaleX(-1)' ? 'scaleX(1)' : 'scaleX(-1)';
+    }, interval);
+}
+
+startNPCPulsate(npcName) {
+    const npc = this.gameWorld.querySelector(`[data-name="${npcName}"]`);
+    if (!npc) return;
+    
+    let scale = 1;
+    let growing = true;
+    
+    this.animationTimers[npcName] = setInterval(() => {
+        if (growing) {
+            scale += 0.01;
+            if (scale >= 1.1) growing = false;
+        } else {
+            scale -= 0.01;
+            if (scale <= 0.95) growing = true;
+        }
+        
+        npc.style.transform = `scale(${scale})`;
+    }, 50);
+}
+
+startNPCBounce(npcName) {
+    const npc = this.gameWorld.querySelector(`[data-name="${npcName}"]`);
+    if (!npc) return;
+    
+    const originalY = parseInt(npc.style.top);
+    let bounceOffset = 0;
+    let bouncing = false;
+    
+    this.animationTimers[npcName] = setInterval(() => {
+        if (!bouncing) {
+            // Start bounce every 3-5 seconds randomly
+            if (Math.random() < 0.02) { // 2% chance each frame
+                bouncing = true;
+                bounceOffset = 0;
+            }
+        } else {
+            bounceOffset += 0.5;
+            const bounceHeight = Math.sin(bounceOffset) * 3; // 3px max bounce
+            npc.style.top = (originalY - Math.abs(bounceHeight)) + 'px';
+            
+            if (bounceOffset >= Math.PI * 2) { // Complete bounce cycle
+                bouncing = false;
+                npc.style.top = originalY + 'px';
+            }
+        }
+    }, 50);
 }
             
 
