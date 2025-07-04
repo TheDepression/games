@@ -1185,21 +1185,26 @@ let moveY = (deltaY / distance) * escapeSpeed;
 
             canMoveTo(x, y) {
     const playerSize = 32;
-    const padding = 1;
+    const padding = 1; // Reduced padding for tighter collision
     
-    // 8-point collision detection for better wall collision
-    const points = [
-        // 4 corners
-        {x: x + padding, y: y + padding},
-        {x: x + playerSize - padding, y: y + padding},
-        {x: x + padding, y: y + playerSize - padding},
-        {x: x + playerSize - padding, y: y + playerSize - padding},
-        // 4 midpoints of edges
-        {x: x + playerSize/2, y: y + padding}, // top middle
-        {x: x + playerSize/2, y: y + playerSize - padding}, // bottom middle
-        {x: x + padding, y: y + playerSize/2}, // left middle
-        {x: x + playerSize - padding, y: y + playerSize/2} // right middle
-    ];
+    // More comprehensive collision detection with edge sampling
+    const points = [];
+    
+    // Sample more points along each edge for thin wall detection
+    for (let i = 0; i <= 4; i++) {
+        const ratio = i / 4;
+        const edgeX = x + padding + (playerSize - 2 * padding) * ratio;
+        const edgeY = y + padding + (playerSize - 2 * padding) * ratio;
+        
+        // Top edge
+        points.push({x: edgeX, y: y + padding});
+        // Bottom edge  
+        points.push({x: edgeX, y: y + playerSize - padding});
+        // Left edge
+        points.push({x: x + padding, y: edgeY});
+        // Right edge
+        points.push({x: x + playerSize - padding, y: edgeY});
+    }
     
     const walls = this.gameWorld.querySelectorAll('.funky-wall, .black-wall');
     
