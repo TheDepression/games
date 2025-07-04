@@ -979,7 +979,7 @@ this.gameWorld.appendChild(slotMachine);
         Math.pow(this.playerY - this.dogY, 2)
     );
 
-    if (playerDistance < 90) {
+    if (playerDistance < 110) {
         // Dog runs away with smart pathfinding
         this.dogRunning = true;
         
@@ -990,7 +990,7 @@ this.gameWorld.appendChild(slotMachine);
         
         if (distance > 0) {
            // Dynamic escape speed based on proximity
-const escapeSpeed = playerDistance < 700 ? this.dogSpeed * 3 : this.dogSpeed * 0.9;
+const escapeSpeed = playerDistance < 80 ? this.dogSpeed * 3 : this.dogSpeed * 0.9;
 let moveX = (deltaX / distance) * escapeSpeed;
 let moveY = (deltaY / distance) * escapeSpeed;
             
