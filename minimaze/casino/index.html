@@ -71,6 +71,7 @@
             animation-duration: 2s;
             animation-iteration-count: infinite;
             animation-timing-function: ease-in-out;
+            will-change: background, box-shadow; /* Add this line */
         }
         
         @keyframes colorCycle1 {
@@ -432,6 +433,7 @@
                 
                 // Initialize
                 this.preloadPlayerImages();
+                this.preloadNPCImages();
                 this.bindEvents();
                 this.startGameLoop();
             }
@@ -542,6 +544,20 @@
                     this.playerImages[direction] = img;
                 });
             }
+
+            preloadNPCImages() {
+    const npcImages = [
+        'cgmonty.PNG', 'cgcat.PNG', 'cg1race.PNG', 'cgmemory.PNG', 
+        'cgrock.PNG', 'cglottery.PNG', 'cgsimon.png', 'cgslot.PNG', 'cggreet.PNG'
+    ];
+    
+    this.npcImages = {};
+    npcImages.forEach(imageName => {
+        const img = new Image();
+        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${imageName}`;
+        this.npcImages[imageName] = img;
+    });
+}
 
             bindEvents() {
                 this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
@@ -709,15 +725,12 @@
                         circle.style.width = circleSize + 'px';
                         circle.style.height = circleSize + 'px';
                         
-                        // Random animation pattern
-                        const animationNames = ['colorCycle1', 'colorCycle2', 'colorCycle3'];
-                        const randomAnimation = animationNames[Math.floor(Math.random() * animationNames.length)];
-                        const randomDelay = Math.random() * 2;
-                        const randomDuration = 2 + Math.random() * 2;
-                        
-                        circle.style.animationName = randomAnimation;
-                        circle.style.animationDelay = randomDelay + 's';
-                        circle.style.animationDuration = randomDuration + 's';
+                        // More efficient animation assignment
+const animationIndex = Math.floor(Math.random() * 3);
+const animationNames = ['colorCycle1', 'colorCycle2', 'colorCycle3'];
+circle.style.animationName = animationNames[animationIndex];
+circle.style.animationDelay = (Math.random() * 1) + 's'; // Shorter delay range
+circle.style.animationDuration = '3s'; // Fixed duration for consistency
                         
                         wallElement.appendChild(circle);
                     }
