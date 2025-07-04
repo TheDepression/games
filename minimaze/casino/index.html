@@ -658,7 +658,7 @@ this.currentNPC = null;
             }
 
             handleStart(e) {
-                if (!this.gameStarted) return;
+               if (!this.gameStarted || this.popupOpen) return;
                 e.preventDefault();
                 
                 const point = e.touches ? e.touches[0] : e;
