@@ -990,7 +990,7 @@ this.gameWorld.appendChild(slotMachine);
         
         if (distance > 0) {
            // Dynamic escape speed based on proximity
-const escapeSpeed = playerDistance < 50 ? this.dogSpeed * 2 : this.dogSpeed * 0.7;
+const escapeSpeed = playerDistance < 700 ? this.dogSpeed * 3 : this.dogSpeed * 0.9;
 let moveX = (deltaX / distance) * escapeSpeed;
 let moveY = (deltaY / distance) * escapeSpeed;
             
@@ -1036,7 +1036,7 @@ let moveY = (deltaY / distance) * escapeSpeed;
             this.dogX = Math.max(25, Math.min(535, this.dogX + moveX));
             this.dogY = Math.max(25, Math.min(395, this.dogY + moveY));
         }
-    } else if (playerDistance > 80) {
+    } else if (playerDistance > 110) {
         if (this.dogRunning) {
             // Just stopped running, initialize wandering
             this.dogRunning = false;
