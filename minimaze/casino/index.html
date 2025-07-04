@@ -3129,18 +3129,28 @@ memoryGameLost() {
     this.dogCaught = true;
     this.popupOpen = true;
     
+    // Stop the dog from moving
+    const dog = this.gameWorld.querySelector('.casino-dog');
+    if (dog) {
+        dog.style.left = this.dogX + 'px';
+        dog.style.top = this.dogY + 'px';
+    }
+    
     const popup = document.getElementById('npcPopup');
     const image = document.getElementById('npcImage');
     const name = document.getElementById('npcName');
     const message = document.getElementById('npcMessage');
     
-    // Use a dog image or emoji
-    image.src = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><text y="50" font-size="60">🐕</text></svg>');
+    // Simple approach - use existing image or fallback
+    image.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cggreet.PNG'; // Use an existing image as fallback
     name.textContent = 'Playful Casino Dog';
     message.textContent = 'Woof! You got me! Here is 100 yen! 🎾';
     
-    // Change buttons
-    popup.querySelector('.popup-buttons').innerHTML = '<button class="play-button" onclick="game.acceptDogMoney()">Accept Money</button>';
+    // Reset buttons to default format first
+    popup.querySelector('.popup-buttons').innerHTML = `
+        <button class="play-button" onclick="game.acceptDogMoney()">Accept Money</button>
+        <button class="decline-button" onclick="game.closePopup()">Cancel</button>
+    `;
     
     popup.style.display = 'block';
 }
@@ -3169,8 +3179,8 @@ acceptDogMoney() {
     this.money += 100;
     this.updateUI();
     this.saveGameState();
-    this.showMessage('🐕 The dog gave you 100¥!');
     this.closePopup();
+    this.showMessage('🐕 The dog gave you 100¥!');
 }
 
             startNPCAnimations() {
@@ -3278,7 +3288,10 @@ startNPCBounce(npcName) {
         }
     }, 50);
 }
-            
+
+
+
+        
 
             updateUI() {
                 document.getElementById('money').textContent = this.money;
