@@ -491,6 +491,30 @@
         .rps-btn-info:hover {
             background: #1976D2;
         }
+
+        .lottery-number-box {
+    width: 60px;
+    height: 60px;
+    background: #333;
+    border: 2px solid #555;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lottery-number-box:hover {
+    background: #444;
+    border-color: #ffd700;
+}
+
+.lottery-number-box.locked {
+    background: #1a1a1a;
+    border-color: #ffd700;
+    cursor: default;
+}
         
         #startScreen {
             position: absolute;
@@ -1943,6 +1967,225 @@ if (url === 'spa') {
 </div>
                 `;
             }
+
+
+            // Lottery SPA Game Methods
+startLotteryGame() {
+    this.popupOpen = true;
+    this.lotteryGameState = {
+        playerNumbers: [0, 0, 0],
+        winningNumbers: [0, 0, 0],
+        gameStarted: false,
+        numbersLocked: false
+    };
+    
+    this.showLotteryOverlay();
+    this.showLotteryWelcome();
+}
+
+showLotteryOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    // Change the NPC image to lottery seller
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cglottery.PNG';
+    document.querySelector('.rps-title').textContent = 'Lucky Lottery!';
+}
+
+hideLotteryOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+}
+
+showLotteryWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to the Lucky Lottery! Pick your numbers and test your fortune!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                Choose 3 digits and see if you can match the winning combination!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showLotteryRules()">View Prizes</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.startLotteryPicking()">Pick Numbers!</button>
+        </div>
+    `;
+}
+
+showLotteryRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🎫 Prize Structure
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • Pick 3 numbers (0-9 each)<br>
+                • Numbers must match in exact position<br><br>
+                <strong>Prizes:</strong><br>
+                • 1 match: 200¥ (100¥ profit)<br>
+                • 2 matches: 1000¥ (900¥ profit)<br>
+                • 3 matches: 6000¥ (5900¥ profit)<br>
+                • 0 matches: Nothing (100¥ loss)
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.startLotteryPicking()">Got It!</button>
+            <button class="rps-btn rps-btn-info" onclick="game.showLotteryRules()">Read Again</button>
+        </div>
+    `;
+}
+
+startLotteryPicking() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; color: #ffd700; margin-bottom: 15px;">Pick Your Numbers</div>
+            <div style="font-size: 14px; margin-bottom: 20px;">Tap each box to change the number (0-9)</div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0;">
+            <div class="lottery-number-box" onclick="game.incrementLotteryNumber(0)">
+                <div style="font-size: 32px; font-weight: bold;">${this.lotteryGameState.playerNumbers[0]}</div>
+            </div>
+            <div class="lottery-number-box" onclick="game.incrementLotteryNumber(1)">
+                <div style="font-size: 32px; font-weight: bold;">${this.lotteryGameState.playerNumbers[1]}</div>
+            </div>
+            <div class="lottery-number-box" onclick="game.incrementLotteryNumber(2)">
+                <div style="font-size: 32px; font-weight: bold;">${this.lotteryGameState.playerNumbers[2]}</div>
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.confirmLotteryNumbers()">Confirm & Draw!</button>
+        </div>
+    `;
+}
+
+incrementLotteryNumber(index) {
+    if (this.lotteryGameState.numbersLocked) return;
+    
+    this.lotteryGameState.playerNumbers[index] = (this.lotteryGameState.playerNumbers[index] + 1) % 10;
+    this.startLotteryPicking(); // Refresh display
+}
+
+confirmLotteryNumbers() {
+    this.lotteryGameState.numbersLocked = true;
+    
+    // Generate random winning numbers
+    this.lotteryGameState.winningNumbers = [
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10)
+    ];
+    
+    this.revealLotteryResults();
+}
+
+revealLotteryResults() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; color: #ffd700; margin-bottom: 15px;">Your Numbers</div>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <div class="lottery-number-box locked">
+                    <div style="font-size: 32px; font-weight: bold;">${this.lotteryGameState.playerNumbers[0]}</div>
+                </div>
+                <div class="lottery-number-box locked">
+                    <div style="font-size: 32px; font-weight: bold;">${this.lotteryGameState.playerNumbers[1]}</div>
+                </div>
+                <div class="lottery-number-box locked">
+                    <div style="font-size: 32px; font-weight: bold;">${this.lotteryGameState.playerNumbers[2]}</div>
+                </div>
+            </div>
+            <div style="font-size: 16px; margin-bottom: 15px;">Drawing winning numbers...</div>
+        </div>
+        <div id="lotteryReveal" style="margin: 20px 0; min-height: 60px;">
+            <div style="font-size: 18px;">🎲 The first digit is...</div>
+        </div>
+    `;
+    
+    this.revealSequence = 0;
+    setTimeout(() => this.revealNextNumber(), 2000);
+}
+
+revealNextNumber() {
+    const reveal = document.getElementById('lotteryReveal');
+    const winningNum = this.lotteryGameState.winningNumbers[this.revealSequence];
+    
+    if (this.revealSequence === 0) {
+        reveal.innerHTML = `
+            <div style="font-size: 18px;">🎲 The first digit is...</div>
+            <div style="font-size: 48px; color: #ffd700; margin: 10px 0;">${winningNum}</div>
+        `;
+        this.revealSequence++;
+        setTimeout(() => this.revealNextNumber(), 2000);
+    } else if (this.revealSequence === 1) {
+        reveal.innerHTML += `
+            <div style="font-size: 18px; margin-top: 15px;">🎲 The second digit is...</div>
+            <div style="font-size: 48px; color: #ffd700; margin: 10px 0;">${winningNum}</div>
+        `;
+        this.revealSequence++;
+        setTimeout(() => this.revealNextNumber(), 2000);
+    } else {
+        reveal.innerHTML += `
+            <div style="font-size: 18px; margin-top: 15px;">🎲 The third digit is...</div>
+            <div style="font-size: 48px; color: #ffd700; margin: 10px 0;">${winningNum}</div>
+        `;
+        setTimeout(() => this.calculateLotteryWinnings(), 2000);
+    }
+}
+
+calculateLotteryWinnings() {
+    let matches = 0;
+    for (let i = 0; i < 3; i++) {
+        if (this.lotteryGameState.playerNumbers[i] === this.lotteryGameState.winningNumbers[i]) {
+            matches++;
+        }
+    }
+    
+    let winnings = 0;
+    if (matches === 1) winnings = 200;
+    else if (matches === 2) winnings = 1000;
+    else if (matches === 3) winnings = 6000;
+    
+    if (winnings > 0) {
+        this.money += winnings;
+        this.updateUI();
+        this.saveGameState();
+    }
+    
+    this.showLotteryFinalResult(matches, winnings);
+}
+
+showLotteryFinalResult(matches, winnings) {
+    const content = document.getElementById('rpsContent');
+    
+    let resultMessage;
+    if (matches === 0) {
+        resultMessage = `<div style="color: #f44336; font-size: 18px;">😞 No matches! Better luck next time!</div>`;
+    } else if (matches === 1) {
+        resultMessage = `<div style="color: #4CAF50; font-size: 18px;">🎉 One match! You won ${winnings}¥!</div>`;
+    } else if (matches === 2) {
+        resultMessage = `<div style="color: #4CAF50; font-size: 18px;">🎉🎉 Two matches! You won ${winnings}¥!</div>`;
+    } else {
+        resultMessage = `<div style="color: #ffd700; font-size: 20px;">🎊 JACKPOT! All three matches! You won ${winnings}¥! 🎊</div>`;
+    }
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">Final Results</div>
+            <div style="font-size: 14px; margin-bottom: 10px;">
+                Your: ${this.lotteryGameState.playerNumbers.join('-')} | 
+                Winning: ${this.lotteryGameState.winningNumbers.join('-')}
+            </div>
+            <div style="margin-bottom: 15px;">${matches} matches!</div>
+            ${resultMessage}
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.hideLotteryOverlay()">Return to Casino</button>
+        </div>
+    `;
+}
 
             updateUI() {
                 document.getElementById('money').textContent = this.money;
