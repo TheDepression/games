@@ -1390,18 +1390,22 @@ npcs.forEach(npc => {
     const npcX = parseInt(npc.style.left);
     const npcY = parseInt(npc.style.top);
     const npcRect = {
-        left: npcX + 5,        // Shaved 5px from left
-        top: npcY + 5,         // Shaved 5px from top  
+        left: npcX + 5,
+        top: npcY + 5,
         right: npcX + 27,
         bottom: npcY + 27
     };
     
     if (this.rectsOverlap(playerRect, npcRect)) {
+        // Check if this NPC is on cooldown
+        const cooldownTime = this.npcCooldowns[npc.dataset.name];
+        if (cooldownTime && Date.now() < cooldownTime) {
+            return; // Skip this NPC if still on cooldown
+        }
+        
         if (npc.dataset.name === 'Casino Greeter') {
-            // Keep old message style for greeter
             this.showMessage(npc.dataset.message);
         } else {
-            // Show popup for game NPCs
             this.showNPCPopup(npc);
         }
     }
@@ -1543,6 +1547,10 @@ acceptGame() {
 }
 
 declineGame() {
+    if (this.currentNPC) {
+        // Set a cooldown for this specific NPC
+        this.npcCooldowns[this.currentNPC.dataset.name] = Date.now() + 2000; // 2 second cooldown
+    }
     this.closePopup();
 }
 
