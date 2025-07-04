@@ -1578,9 +1578,11 @@
                 this.closePopup();
                 
                 // Check if this is the RPS SPA game
-                if (url === 'spa') {
-                    this.startRPSGame();
-                } else if (url) {
+if (url === 'spa') {
+    this.startRPSGame();
+} else if (url === 'spa-lottery') {
+    this.startLotteryGame();
+} else if (url) {
                     // Navigate to external game
                     this.showMessage(`Starting game... Good luck!`);
                     setTimeout(() => {
