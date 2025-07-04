@@ -1549,10 +1549,10 @@ if (dog && !this.dogCaught) {
     const dogCenterX = this.dogX + 12.5;
     const dogCenterY = this.dogY + 12.5;
     const dogHitbox = {
-        left: dogCenterX - 2,
-        top: dogCenterY - 2,
-        right: dogCenterX + 2,
-        bottom: dogCenterY + 2
+        left: dogCenterX - 6,
+        top: dogCenterY - 6,
+        right: dogCenterX + 6,
+        bottom: dogCenterY + 6
     };
     
     if (this.rectsOverlap(playerRect, dogHitbox)) {
