@@ -2973,6 +2973,13 @@ checkMemoryMatch() {
             return;
         }
         
+        // Reset for next turn (only for successful matches)
+        setTimeout(() => {
+            this.memoryGameState.flippedCards = [];
+            this.memoryGameState.canFlip = true;
+            this.showMemoryBoard();
+        }, 1500);
+        
     } else {
         // No match - strike
         this.memoryGameState.strikes++;
@@ -2981,26 +2988,31 @@ checkMemoryMatch() {
             <span style="color: #f44336;">❌ No match! Strike ${this.memoryGameState.strikes}/3</span>
         `;
         
-        // Flip cards back after showing them
+        // Check if game is lost FIRST
+        if (this.memoryGameState.strikes >= 3) {
+            setTimeout(() => {
+                firstCard.flipped = false;
+                secondCard.flipped = false;
+                this.resetMemoryCards(firstIndex, secondIndex);
+                this.memoryGameLost(); // End the game here
+            }, 1000);
+            return; // IMPORTANT: Exit here, don't continue
+        }
+        
+        // Only continue if game isn't over
         setTimeout(() => {
             firstCard.flipped = false;
             secondCard.flipped = false;
             this.resetMemoryCards(firstIndex, secondIndex);
             
-            // Check if game is lost
-            if (this.memoryGameState.strikes >= 3) {
-                this.memoryGameLost();
-                return;
-            }
+            // Reset for next turn
+            setTimeout(() => {
+                this.memoryGameState.flippedCards = [];
+                this.memoryGameState.canFlip = true;
+                this.showMemoryBoard();
+            }, 500);
         }, 1000);
     }
-    
-    // Reset for next turn
-    setTimeout(() => {
-        this.memoryGameState.flippedCards = [];
-        this.memoryGameState.canFlip = true;
-        this.showMemoryBoard(); // Refresh the board
-    }, 1500);
 }
 
 resetMemoryCards(firstIndex, secondIndex) {
