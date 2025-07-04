@@ -515,6 +515,18 @@
     border-color: #ffd700;
     cursor: default;
 }
+
+
+        @keyframes confettiFall {
+    0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes skullSpin {
+    0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
+    50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
+    100% { transform: rotate(360deg) scale(1); opacity: 0; }
+}
         
         #startScreen {
             position: absolute;
@@ -1157,11 +1169,11 @@
             getNPCData(name) {
                 const npcData = {
                     'Monty Hall Host': {
-                        message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
-                        price: 400,
-                        url: 'games/minimaze/casinogames/monty',
-                        image: 'cgmonty.PNG'
-                    },
+    message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
+    price: 400,
+    url: 'spa-monty', // Change this from the external URL
+    image: 'cgmonty.PNG'
+},
                     'Lucky Cat': {
                         message: '🐱 Meow! I bring good luck to gamblers! Pet me and test your fortune!',
                         price: 100,
@@ -1608,6 +1620,8 @@ if (url === 'spa') {
     this.startLotteryGame();
 } else if (url === 'spa-simon') {
     this.startSimonGame();
+} else if (url === 'spa-monty') {
+    this.startMontyGame();
 } else if (url) {
                     // Navigate to external game
                     this.showMessage(`Starting game... Good luck!`);
@@ -2474,6 +2488,289 @@ showSimonResult(success, prize) {
         </div>
     `;
 }
+
+
+
+
+            // Monty Hall SPA Game Methods
+startMontyGame() {
+    this.popupOpen = true;
+    this.montyGameState = {
+        doors: [false, false, false], // false = zombie, true = prize
+        playerChoice: null,
+        hostRemovedDoor: null,
+        gamePhase: 'welcome', // welcome, picking, host-reveal, switch-choice, final-reveal
+        prizeLocation: Math.floor(Math.random() * 3)
+    };
+    
+    // Set the prize location
+    this.montyGameState.doors[this.montyGameState.prizeLocation] = true;
+    
+    this.showMontyOverlay();
+    this.showMontyWelcome();
+}
+
+showMontyOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cgmonty.PNG';
+    document.querySelector('.rps-title').textContent = 'Monty Hall Challenge!';
+}
+
+hideMontyOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+}
+
+            showMontyWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to the classic Monty Hall Challenge! Test your luck and logic!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                Three doors, one prize, two zombies. Choose wisely!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showMontyRules()">Explain Rules</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.startMontyPicking()">Let's Play!</button>
+        </div>
+    `;
+}
+
+showMontyRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🎯 Game Rules
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • 3 doors: Behind 2 are zombies 🧟‍♂️ (no prize)<br>
+                • Behind 1 door is 800¥ 💰<br>
+                • Pick your door first<br>
+                • I'll remove a zombie door<br>
+                • You can switch or stay with your choice<br>
+                • Win: 800¥ | Lose: Nothing (400¥ loss)
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.startMontyPicking()">Got It!</button>
+        </div>
+    `;
+}
+
+            startMontyPicking() {
+    this.montyGameState.gamePhase = 'picking';
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 18px; color: #ffd700;">Choose Your Door</div>
+            <div style="font-size: 14px;">Pick one of the three doors below</div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 20px; margin: 30px 0;">
+            <div class="monty-door" onclick="game.selectDoor(0)" style="font-size: 80px; cursor: pointer; transition: transform 0.3s; padding: 10px;">
+                🚪
+            </div>
+            <div class="monty-door" onclick="game.selectDoor(1)" style="font-size: 80px; cursor: pointer; transition: transform 0.3s; padding: 10px;">
+                🚪
+            </div>
+            <div class="monty-door" onclick="game.selectDoor(2)" style="font-size: 80px; cursor: pointer; transition: transform 0.3s; padding: 10px;">
+                🚪
+            </div>
+        </div>
+        <div id="montyStatus" style="margin: 15px 0; min-height: 30px; font-size: 14px;"></div>
+    `;
+    
+    // Add hover effects with CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .monty-door:hover { transform: scale(1.1); }
+        .monty-door.selected { background: rgba(255, 215, 0, 0.3); border-radius: 10px; }
+    `;
+    document.head.appendChild(style);
+}
+
+selectDoor(doorIndex) {
+    if (this.montyGameState.gamePhase !== 'picking') return;
+    
+    this.montyGameState.playerChoice = doorIndex;
+    this.montyGameState.gamePhase = 'host-reveal';
+    
+    // Highlight selected door
+    document.querySelectorAll('.monty-door').forEach((door, index) => {
+        if (index === doorIndex) {
+            door.classList.add('selected');
+        }
+        door.style.pointerEvents = 'none'; // Disable clicking
+    });
+    
+    document.getElementById('montyStatus').textContent = `You chose door ${doorIndex + 1}. Now I'll remove a zombie door...`;
+    
+    setTimeout(() => this.hostRemovesDoor(), 2000);
+}
+
+            hostRemovesDoor() {
+    // Find a door that isn't the player's choice and doesn't have the prize
+    let doorToRemove;
+    for (let i = 0; i < 3; i++) {
+        if (i !== this.montyGameState.playerChoice && !this.montyGameState.doors[i]) {
+            doorToRemove = i;
+            break;
+        }
+    }
+    
+    this.montyGameState.hostRemovedDoor = doorToRemove;
+    
+    // Create smoke effect and reveal zombie
+    const doorElement = document.querySelectorAll('.monty-door')[doorToRemove];
+    doorElement.style.transition = 'opacity 0.5s, transform 0.5s';
+    doorElement.style.opacity = '0.3';
+    doorElement.style.transform = 'scale(0.8)';
+    
+    setTimeout(() => {
+        doorElement.innerHTML = '🧟‍♂️';
+        doorElement.style.opacity = '1';
+        doorElement.style.transform = 'scale(1)';
+        doorElement.style.background = 'rgba(255, 0, 0, 0.2)';
+        
+        document.getElementById('montyStatus').textContent = `Behind door ${doorToRemove + 1} was a zombie! Would you like to switch doors?`;
+        
+        setTimeout(() => this.showSwitchChoice(), 1000);
+    }, 500);
+}
+
+showSwitchChoice() {
+    const content = document.getElementById('rpsContent');
+    const remainingDoor = [0, 1, 2].find(i => i !== this.montyGameState.playerChoice && i !== this.montyGameState.hostRemovedDoor);
+    
+    content.innerHTML += `
+        <div style="margin-top: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                You picked door ${this.montyGameState.playerChoice + 1}. 
+                Would you like to switch to door ${remainingDoor + 1}?
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-primary" onclick="game.switchDoor(true)">Yes, Switch!</button>
+                <button class="rps-btn rps-btn-secondary" onclick="game.switchDoor(false)">No, Stay!</button>
+            </div>
+        </div>
+    `;
+}
+
+
+            switchDoor(shouldSwitch) {
+    this.montyGameState.gamePhase = 'final-reveal';
+    
+    if (shouldSwitch) {
+        const remainingDoor = [0, 1, 2].find(i => i !== this.montyGameState.playerChoice && i !== this.montyGameState.hostRemovedDoor);
+        this.montyGameState.playerChoice = remainingDoor;
+    }
+    
+    // Pause background music if possible
+    if (this.bgMusic) {
+        this.bgMusic.pause();
+    }
+    
+    document.getElementById('rpsContent').innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 18px; color: #ffd700;">Opening your chosen door...</div>
+            <div style="font-size: 14px;">Door ${this.montyGameState.playerChoice + 1}</div>
+        </div>
+        <div style="display: flex; justify-content: center; margin: 30px 0;">
+            <div style="font-size: 120px;">🚪</div>
+        </div>
+        <div style="margin: 20px 0; font-size: 16px;">The moment of truth...</div>
+    `;
+    
+    setTimeout(() => this.revealFinalResult(), 3000);
+}
+
+revealFinalResult() {
+    const won = this.montyGameState.doors[this.montyGameState.playerChoice];
+    
+    const content = document.getElementById('rpsContent');
+    
+    if (won) {
+        // Win: Show money and confetti effect
+        this.money += 800;
+        this.updateUI();
+        this.saveGameState();
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 24px; color: #4CAF50;">🎉 WINNER! 🎉</div>
+                <div style="font-size: 80px; margin: 20px 0;">💰</div>
+                <div style="font-size: 18px; color: #ffd700;">You won 800¥!</div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-primary" onclick="game.hideMontyOverlay()">Collect Prize!</button>
+            </div>
+        `;
+        
+        // Confetti effect
+        this.showConfetti();
+        
+    } else {
+        // Loss: Show zombie and skull effect
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 24px; color: #f44336;">💀 ZOMBIE! 💀</div>
+                <div style="font-size: 80px; margin: 20px 0;">🧟‍♂️</div>
+                <div style="font-size: 16px;">No prize this time!</div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-secondary" onclick="game.hideMontyOverlay()">Try Again Later</button>
+            </div>
+        `;
+        
+        // Skull effect
+        this.showSkulls();
+    }
+    
+    // Resume background music
+    if (this.bgMusic) {
+        this.bgMusic.play();
+    }
+}
+
+            showConfetti() {
+    const overlay = document.getElementById('rpsGameOverlay');
+    for (let i = 0; i < 20; i++) {
+        const confetti = document.createElement('div');
+        confetti.textContent = Math.random() > 0.5 ? '🎉' : '✨';
+        confetti.style.position = 'absolute';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.top = Math.random() * 100 + '%';
+        confetti.style.fontSize = '20px';
+        confetti.style.animation = 'confettiFall 2s ease-out forwards';
+        confetti.style.pointerEvents = 'none';
+        overlay.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), 2000);
+    }
+}
+
+showSkulls() {
+    const overlay = document.getElementById('rpsGameOverlay');
+    for (let i = 0; i < 10; i++) {
+        const skull = document.createElement('div');
+        skull.textContent = '💀';
+        skull.style.position = 'absolute';
+        skull.style.left = Math.random() * 100 + '%';
+        skull.style.top = Math.random() * 100 + '%';
+        skull.style.fontSize = '30px';
+        skull.style.opacity = '0.7';
+        skull.style.animation = 'skullSpin 1s ease-in-out';
+        skull.style.pointerEvents = 'none';
+        overlay.appendChild(skull);
+        
+        setTimeout(() => skull.remove(), 1000);
+    }
+}
+
+            
 
             updateUI() {
                 document.getElementById('money').textContent = this.money;
