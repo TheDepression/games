@@ -1026,11 +1026,17 @@ this.gameWorld.appendChild(slotMachine);
             // Just stopped running, initialize wandering
             this.dogRunning = false;
             this.dogWanderTime = 0;
-            this.dogWanderDirection = Math.random() * Math.PI * 2; // Random direction
+            this.dogWanderDirection = Math.random() * Math.PI * 2;
+        }
+        
+        // Initialize wander properties if they don't exist
+        if (this.dogWanderTime === undefined) {
+            this.dogWanderTime = 0;
+            this.dogWanderDirection = Math.random() * Math.PI * 2;
         }
         
         // Wander freely when not being chased
-        this.dogWanderTime = (this.dogWanderTime || 0) + 1;
+        this.dogWanderTime += 1;
         
         // Change direction every 60-120 frames
         if (this.dogWanderTime > 60 + Math.random() * 60) {
@@ -1048,11 +1054,122 @@ this.gameWorld.appendChild(slotMachine);
         const nextY = this.dogY + wanderY;
         
         if (nextX <= 25 || nextX >= 535) {
-            this.dogWanderDirection = Math.PI - this.dogWanderDirection; // Flip X direction
+            this.dogWanderDirection = Math.PI - this.dogWanderDirection;
             wanderX = -wanderX;
         }
         if (nextY <= 25 || nextY >= 395) {
-            this.dogWanderDirection = -this.dogWanderDirection; // Flip Y direction
+            this.dogWanderDirection = -this.dogWanderDirection;
+            wanderY = -wanderY;
+        }
+        
+        this.dogX = Math.max(25, Math.min(535, this.dogX + wanderX));
+        this.dogY = Math.max(25, Math.min(395, this.dogY + wanderY));
+    }
+
+    dogEl.style.left = this.dogX + 'px';
+    dogEl.style.top = this.dogY + 'px';
+}updateDog() {
+    const dogEl = this.gameWorld.querySelector('.casino-dog');
+    if (!dogEl) return;
+
+    const playerDistance = Math.sqrt(
+        Math.pow(this.playerX - this.dogX, 2) + 
+        Math.pow(this.playerY - this.dogY, 2)
+    );
+
+    if (playerDistance < 70) {
+        // Dog runs away with smart pathfinding
+        this.dogRunning = true;
+        
+        // Calculate primary escape direction (away from player)
+        const deltaX = this.dogX - this.playerX;
+        const deltaY = this.dogY - this.playerY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (distance > 0) {
+            let moveX = (deltaX / distance) * this.dogSpeed;
+            let moveY = (deltaY / distance) * this.dogSpeed;
+            
+            // Check if primary escape direction is blocked by boundaries
+            const newX = this.dogX + moveX;
+            const newY = this.dogY + moveY;
+            
+            // If blocked, try alternative directions
+            if (newX <= 25 || newX >= 535 || newY <= 25 || newY >= 395) {
+                // Try perpendicular directions
+                const perpMoveX = (deltaY / distance) * this.dogSpeed;
+                const perpMoveY = -(deltaX / distance) * this.dogSpeed;
+                
+                // Test both perpendicular directions
+                const alt1X = this.dogX + perpMoveX;
+                const alt1Y = this.dogY + perpMoveY;
+                const alt2X = this.dogX - perpMoveX;
+                const alt2Y = this.dogY - perpMoveY;
+                
+                // Choose the perpendicular direction that's not blocked
+                if (alt1X > 25 && alt1X < 535 && alt1Y > 25 && alt1Y < 395) {
+                    moveX = perpMoveX;
+                    moveY = perpMoveY;
+                } else if (alt2X > 25 && alt2X < 535 && alt2Y > 25 && alt2Y < 395) {
+                    moveX = -perpMoveX;
+                    moveY = -perpMoveY;
+                } else {
+                    // If both perpendicular blocked, try moving toward center
+                    const centerX = 280;
+                    const centerY = 210;
+                    const toCenterX = centerX - this.dogX;
+                    const toCenterY = centerY - this.dogY;
+                    const toCenterDist = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+                    
+                    if (toCenterDist > 0) {
+                        moveX = (toCenterX / toCenterDist) * this.dogSpeed;
+                        moveY = (toCenterY / toCenterDist) * this.dogSpeed;
+                    }
+                }
+            }
+            
+            // Apply movement with bounds checking
+            this.dogX = Math.max(25, Math.min(535, this.dogX + moveX));
+            this.dogY = Math.max(25, Math.min(395, this.dogY + moveY));
+        }
+    } else if (playerDistance > 80) {
+        if (this.dogRunning) {
+            // Just stopped running, initialize wandering
+            this.dogRunning = false;
+            this.dogWanderTime = 0;
+            this.dogWanderDirection = Math.random() * Math.PI * 2;
+        }
+        
+        // Initialize wander properties if they don't exist
+        if (this.dogWanderTime === undefined) {
+            this.dogWanderTime = 0;
+            this.dogWanderDirection = Math.random() * Math.PI * 2;
+        }
+        
+        // Wander freely when not being chased
+        this.dogWanderTime += 1;
+        
+        // Change direction every 60-120 frames
+        if (this.dogWanderTime > 60 + Math.random() * 60) {
+            this.dogWanderDirection = Math.random() * Math.PI * 2;
+            this.dogWanderTime = 0;
+        }
+        
+        // Move in wander direction at slower speed
+        const wanderSpeed = this.dogSpeed * 0.4;
+        let wanderX = Math.cos(this.dogWanderDirection) * wanderSpeed;
+        let wanderY = Math.sin(this.dogWanderDirection) * wanderSpeed;
+        
+        // Check bounds and bounce off walls
+        const nextX = this.dogX + wanderX;
+        const nextY = this.dogY + wanderY;
+        
+        if (nextX <= 25 || nextX >= 535) {
+            this.dogWanderDirection = Math.PI - this.dogWanderDirection;
+            wanderX = -wanderX;
+        }
+        if (nextY <= 25 || nextY >= 395) {
+            this.dogWanderDirection = -this.dogWanderDirection;
             wanderY = -wanderY;
         }
         
