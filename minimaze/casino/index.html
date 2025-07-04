@@ -275,6 +275,77 @@
             backdrop-filter: blur(2px);
             opacity: 0.9;
         }
+
+        #npcPopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    padding: 20px;
+    z-index: 600;
+    display: none;
+    text-align: center;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+#npcPopup img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #444;
+}
+
+#npcPopup .npc-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+#npcPopup .npc-message {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+#npcPopup .popup-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+#npcPopup button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#npcPopup .play-button {
+    background: #4CAF50;
+    color: white;
+}
+
+#npcPopup .play-button:hover {
+    background: #45a049;
+}
+
+#npcPopup .decline-button {
+    background: #f44336;
+    color: white;
+}
+
+#npcPopup .decline-button:hover {
+    background: #da190b;
+}
         
         #startScreen {
             position: absolute;
@@ -345,6 +416,16 @@
             </div>
         </div>
         <div id="message"></div>
+
+        <div id="npcPopup">
+    <img id="npcImage" src="" alt="">
+    <div id="npcName" class="npc-name"></div>
+    <div id="npcMessage" class="npc-message"></div>
+    <div class="popup-buttons">
+        <button class="play-button" onclick="game.acceptGame()">Play Game</button>
+        <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
+    </div>
+</div>
         
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
@@ -404,6 +485,7 @@
                 this.gameStarted = false;
                 this.timerInterval = null;
                 
+                
                 // Movement properties
                 this.playerX = 100;
                 this.playerY = 380;
@@ -420,6 +502,10 @@
                 this.dogY = 330;
                 this.dogRunning = false;
                 this.dogSpeed = 5;
+
+                // Add these lines in your constructor after the existing properties
+this.popupOpen = false;
+this.currentNPC = null;
                 
                 // Toilet checked flag
                 this.toiletChecked = false;
@@ -860,44 +946,93 @@ this.gameWorld.appendChild(slotMachine);
             }
 
             createNPCs() {
-                const npcData = [
-                    {x: 240, y: 60, image: 'cgmonty.PNG', name: 'Monty Hall Host'},
-                    {x: 80, y: 100, image: 'cgcat.PNG', name: 'Lucky Cat'},
-                    {x: 420, y: 100, image: 'cg1race.PNG', name: 'Race Master'},
-                    {x: 30, y: 240, image: 'cgmemory.PNG', name: 'Memory Master'},
-                    {x: 240, y: 240, image: 'cgrock.PNG', name: 'Rock Paper Scissors'},
-                    {x: 260, y: 140, image: 'cglottery.PNG', name: 'Lottery Seller'},
-                    {x: 380, y: 240, image: 'cgsimon.png', name: 'Simon Says'},
-                    {x: 500, y: 380, image: 'cgslot.PNG', name: 'Slot Machine'},
-                    {x: 180, y: 358, image: 'cggreet.PNG', name: 'Casino Greeter'}
-                ];
+    const npcData = [
+        {x: 240, y: 60, image: 'cgmonty.PNG', name: 'Monty Hall Host'},
+        {x: 80, y: 100, image: 'cgcat.PNG', name: 'Lucky Cat'},
+        {x: 420, y: 100, image: 'cg1race.PNG', name: 'Race Master'},
+        {x: 30, y: 240, image: 'cgmemory.PNG', name: 'Memory Master'},
+        {x: 240, y: 240, image: 'cgrock.PNG', name: 'Rock Paper Scissors'},
+        {x: 260, y: 140, image: 'cglottery.PNG', name: 'Lottery Seller'},
+        {x: 380, y: 240, image: 'cgsimon.png', name: 'Simon Says'},
+        {x: 500, y: 380, image: 'cgslot.PNG', name: 'Slot Machine'},
+        {x: 180, y: 358, image: 'cggreet.PNG', name: 'Casino Greeter'}
+    ];
 
-                npcData.forEach(npc => {
-                    const npcEl = document.createElement('div');
-                    npcEl.className = 'casino-npc';
-                    npcEl.style.left = npc.x + 'px';
-                    npcEl.style.top = npc.y + 'px';
-                    npcEl.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.image}")`;
-                    npcEl.dataset.name = npc.name;
-                    npcEl.dataset.message = this.getNPCMessage(npc.name);
-                    this.gameWorld.appendChild(npcEl);
-                });
-            }
+    npcData.forEach(npc => {
+        const npcEl = document.createElement('div');
+        npcEl.className = 'casino-npc';
+        npcEl.style.left = npc.x + 'px';
+        npcEl.style.top = npc.y + 'px';
+        npcEl.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.image}")`;
+        npcEl.dataset.name = npc.name;
+        const npcInfo = this.getNPCData(npc.name);
+        npcEl.dataset.message = npcInfo.message;
+        npcEl.dataset.price = npcInfo.price;
+        npcEl.dataset.url = npcInfo.url;
+        npcEl.dataset.image = npcInfo.image;
+        this.gameWorld.appendChild(npcEl);
+    });
+}
 
-            getNPCMessage(name) {
-                const messages = {
-                    'Monty Hall Host': '🎲 Welcome to Monty Hall! Pick a door, win a prize! (Coming soon)',
-                    'Lucky Cat': '🐱 Meow! I bring good luck to gamblers! Pet me for fortune!',
-                    'Race Master': '🏃 Ready to race? Bet on who wins! (Coming soon)',
-                    'Memory Master': '🧠 Test your memory skills! Match the cards! (Coming soon)',
-                    'Rock Paper Scissors': '✂️ Classic game! Best 2 out of 3 wins! (Coming soon)',
-                    'Lottery Seller': '🎫 Buy a lottery ticket! Only 50¥ each! (Coming soon)',
-                    'Simon Says': '🎵 Follow the pattern, win the jackpot! (Coming soon)',
-                    'Slot Machine': '🎰 Pull the lever and try your luck! (Coming soon)',
-                    'Casino Greeter': '🎰 Welcome to our casino! Try all the games and win big!'
-                };
-                return messages[name] || 'Hello there!';
-            }
+            getNPCData(name) {
+    const npcData = {
+        'Monty Hall Host': {
+            message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
+            price: 400,
+            url: 'games/minimaze/casinogames/monty',
+            image: 'cgmonty.PNG'
+        },
+        'Lucky Cat': {
+            message: '🐱 Meow! I bring good luck to gamblers! Pet me and test your fortune!',
+            price: 100,
+            url: 'games/minimaze/casinogames/cat',
+            image: 'cgcat.PNG'
+        },
+        'Race Master': {
+            message: '🏃 Ready to race? Bet on the fastest runner and win big prizes!',
+            price: 100,
+            url: 'games/minimaze/casinogames/race',
+            image: 'cg1race.PNG'
+        },
+        'Memory Master': {
+            message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
+            price: 400,
+            url: 'games/minimaze/casinogames/memory',
+            image: 'cgmemory.PNG'
+        },
+        'Rock Paper Scissors': {
+            message: '✂️ Classic game of chance! Best 2 out of 3 rounds wins!',
+            price: 100,
+            url: 'games/minimaze/casinogames/rps',
+            image: 'cgrock.PNG'
+        },
+        'Lottery Seller': {
+            message: '🎫 Try your luck with our lottery! You could win hundreds of yen!',
+            price: 100,
+            url: 'games/minimaze/casinogames/lottery',
+            image: 'cglottery.PNG'
+        },
+        'Simon Says': {
+            message: '🎵 Follow the pattern perfectly and win the musical jackpot!',
+            price: 100,
+            url: 'games/minimaze/casinogames/simon',
+            image: 'cgsimon.png'
+        },
+        'Slot Machine': {
+            message: '🎰 Pull the lever and try your luck! Line up the symbols to win!',
+            price: 100,
+            url: 'games/minimaze/casinogames/slot',
+            image: 'cgslot.PNG'
+        },
+        'Casino Greeter': {
+            message: '🎰 Welcome to our casino! Try all the games and win big!',
+            price: 0,
+            url: null,
+            image: 'cggreet.PNG'
+        }
+    };
+    return npcData[name] || {message: 'Hello there!', price: 0, url: null, image: null};
+}
 
             createInteractables() {
                 // Exit ladder
@@ -1249,21 +1384,27 @@ let moveY = (deltaY / distance) * escapeSpeed;
                 };
                 
                 // Check NPCs
-                const npcs = this.gameWorld.querySelectorAll('.casino-npc');
-                npcs.forEach(npc => {
-                    const npcX = parseInt(npc.style.left);
-                    const npcY = parseInt(npc.style.top);
-                    const npcRect = {
-                        left: npcX,
-                        top: npcY,
-                        right: npcX + 32,
-                        bottom: npcY + 32
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, npcRect)) {
-                        this.showMessage(npc.dataset.message);
-                    }
-                });
+const npcs = this.gameWorld.querySelectorAll('.casino-npc');
+npcs.forEach(npc => {
+    const npcX = parseInt(npc.style.left);
+    const npcY = parseInt(npc.style.top);
+    const npcRect = {
+        left: npcX + 5,        // Shaved 5px from left
+        top: npcY + 5,         // Shaved 5px from top  
+        right: npcX + 27,
+        bottom: npcY + 27
+    };
+    
+    if (this.rectsOverlap(playerRect, npcRect)) {
+        if (npc.dataset.name === 'Casino Greeter') {
+            // Keep old message style for greeter
+            this.showMessage(npc.dataset.message);
+        } else {
+            // Show popup for game NPCs
+            this.showNPCPopup(npc);
+        }
+    }
+});
                 
                 // Check exit ladder
                 const ladder = this.gameWorld.querySelector('.ladder-exit');
@@ -1349,6 +1490,73 @@ let moveY = (deltaY / distance) * escapeSpeed;
                     message.style.display = 'none';
                 }, 3000);
             }
+
+
+            showNPCPopup(npc) {
+    if (this.popupOpen) return; // Prevent multiple popups
+    
+    this.popupOpen = true;
+    this.currentNPC = npc;
+    
+    const popup = document.getElementById('npcPopup');
+    const image = document.getElementById('npcImage');
+    const name = document.getElementById('npcName');
+    const message = document.getElementById('npcMessage');
+    
+    image.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.dataset.image}`;
+    name.textContent = npc.dataset.name;
+    message.textContent = `${npc.dataset.message}\n\nCost: ${npc.dataset.price}¥`;
+    
+    popup.style.display = 'block';
+}
+
+acceptGame() {
+    if (!this.currentNPC) return;
+    
+    const price = parseInt(this.currentNPC.dataset.price);
+    const url = this.currentNPC.dataset.url;
+    
+    if (this.money < price) {
+        document.getElementById('npcMessage').textContent = `I'm sorry, you don't seem to have enough money to play. You need ${price}¥ but only have ${this.money}¥.`;
+        // Change buttons temporarily
+        const popup = document.getElementById('npcPopup');
+        popup.querySelector('.popup-buttons').innerHTML = '<button class="decline-button" onclick="game.declineGame()">Okay</button>';
+        return;
+    }
+    
+    // Deduct money and save
+    this.money -= price;
+    this.updateUI();
+    this.saveGameState();
+    
+    // Close popup
+    this.closePopup();
+    
+    // Navigate to game
+    if (url) {
+        this.showMessage(`Starting game... Good luck!`);
+        setTimeout(() => {
+            window.location.href = `https://thedepression.github.io/${url}`;
+        }, 1000);
+    }
+}
+
+declineGame() {
+    this.closePopup();
+}
+
+closePopup() {
+    document.getElementById('npcPopup').style.display = 'none';
+    this.popupOpen = false;
+    this.currentNPC = null;
+    
+    // Reset buttons in case they were changed
+    const popup = document.getElementById('npcPopup');
+    popup.querySelector('.popup-buttons').innerHTML = `
+        <button class="play-button" onclick="game.acceptGame()">Play Game</button>
+        <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
+    `;
+}
 
             updateUI() {
                 document.getElementById('money').textContent = this.money;
