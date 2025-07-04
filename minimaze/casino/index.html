@@ -1535,10 +1535,10 @@ if (dog && !this.dogCaught) {
     const dogCenterX = this.dogX + 12.5; // Dog is 25px wide, so center is +12.5
     const dogCenterY = this.dogY + 12.5;
     const dogHitbox = {
-        left: dogCenterX - 2,
-        top: dogCenterY - 2,
-        right: dogCenterX + 2,
-        bottom: dogCenterY + 2
+        left: dogCenterX - 1,
+        top: dogCenterY - 1,
+        right: dogCenterX + 3,
+        bottom: dogCenterY + 3
     };
     
     if (this.rectsOverlap(playerRect, dogHitbox)) {
@@ -3179,13 +3179,13 @@ acceptDogMoney() {
     this.animationTimers = {};
     
     // Rock Paper Scissors - slow stroll left/right
-    this.startNPCStroll('Rock Paper Scissors', 30);
+    this.startNPCStroll('Rock Paper Scissors', 20);
     
     // Simon Says - slow stroll left/right  
-    this.startNPCStroll('Simon Says', 30);
+    this.startNPCStroll('Simon Says', 17);
     
     // Lottery Seller - slow stroll left/right
-    this.startNPCStroll('Lottery Seller', 30);
+    this.startNPCStroll('Lottery Seller', 25);
     
     // Monty Hall - horizontal flip every 2 seconds
     this.startNPCFlip('Monty Hall Host', 2000);
