@@ -71,7 +71,7 @@
             animation-duration: 2s;
             animation-iteration-count: infinite;
             animation-timing-function: ease-in-out;
-            will-change: background, box-shadow; /* Add this line */
+            will-change: background, box-shadow;
         }
         
         @keyframes colorCycle1 {
@@ -202,7 +202,6 @@
             height: 25px;
             cursor: pointer;
         }
-
         
         .casino-dog {
             position: absolute;
@@ -277,75 +276,221 @@
         }
 
         #npcPopup {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.95);
-    border: 3px solid #ffd700;
-    border-radius: 15px;
-    padding: 20px;
-    z-index: 600;
-    display: none;
-    text-align: center;
-    min-width: 280px;
-    max-width: 320px;
-}
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 600;
+            display: none;
+            text-align: center;
+            min-width: 280px;
+            max-width: 320px;
+        }
 
-#npcPopup img {
-    width: 80px;
-    height: 80px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border: 2px solid #444;
-}
+        #npcPopup img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #444;
+        }
 
-#npcPopup .npc-name {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ffd700;
-    margin-bottom: 10px;
-}
+        #npcPopup .npc-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
 
-#npcPopup .npc-message {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 15px;
-    line-height: 1.4;
-}
+        #npcPopup .npc-message {
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
 
-#npcPopup .popup-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-}
+        #npcPopup .popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
 
-#npcPopup button {
-    padding: 10px 20px;
-    font-size: 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
+        #npcPopup button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-#npcPopup .play-button {
-    background: #4CAF50;
-    color: white;
-}
+        #npcPopup .play-button {
+            background: #4CAF50;
+            color: white;
+        }
 
-#npcPopup .play-button:hover {
-    background: #45a049;
-}
+        #npcPopup .play-button:hover {
+            background: #45a049;
+        }
 
-#npcPopup .decline-button {
-    background: #f44336;
-    color: white;
-}
+        #npcPopup .decline-button {
+            background: #f44336;
+            color: white;
+        }
 
-#npcPopup .decline-button:hover {
-    background: #da190b;
-}
+        #npcPopup .decline-button:hover {
+            background: #da190b;
+        }
+
+        /* Rock Paper Scissors Game Styles */
+        #rpsGameOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 700;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #rpsGameContainer {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 300px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .rps-npc-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            border: 2px solid #444;
+        }
+
+        .rps-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .rps-countdown-display {
+            font-size: 48px;
+            margin: 20px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .rps-choices {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .rps-choice {
+            background: #333;
+            border: 2px solid #555;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rps-choice:hover {
+            background: #444;
+            border-color: #ffd700;
+            transform: scale(1.05);
+        }
+
+        .rps-choice.selected {
+            background: #ffd700;
+            border-color: #fff;
+            color: #000;
+        }
+
+        .rps-choice.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .rps-result {
+            margin: 20px 0;
+            font-size: 16px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rps-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .rps-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .rps-btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .rps-btn-primary:hover {
+            background: #45a049;
+        }
+
+        .rps-btn-secondary {
+            background: #f44336;
+            color: white;
+        }
+
+        .rps-btn-secondary:hover {
+            background: #da190b;
+        }
+
+        .rps-btn-info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .rps-btn-info:hover {
+            background: #1976D2;
+        }
         
         #startScreen {
             position: absolute;
@@ -418,14 +563,25 @@
         <div id="message"></div>
 
         <div id="npcPopup">
-    <img id="npcImage" src="" alt="">
-    <div id="npcName" class="npc-name"></div>
-    <div id="npcMessage" class="npc-message"></div>
-    <div class="popup-buttons">
-        <button class="play-button" onclick="game.acceptGame()">Play Game</button>
-        <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
-    </div>
-</div>
+            <img id="npcImage" src="" alt="">
+            <div id="npcName" class="npc-name"></div>
+            <div id="npcMessage" class="npc-message"></div>
+            <div class="popup-buttons">
+                <button class="play-button" onclick="game.acceptGame()">Play Game</button>
+                <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
+            </div>
+        </div>
+
+        <!-- Rock Paper Scissors Game Overlay -->
+        <div id="rpsGameOverlay">
+            <div id="rpsGameContainer">
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/cgrock.PNG" alt="RPS NPC" class="rps-npc-image">
+                <div class="rps-title">Rock Paper Scissors!</div>
+                <div id="rpsContent">
+                    <!-- Content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
         
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
@@ -485,7 +641,6 @@
                 this.gameStarted = false;
                 this.timerInterval = null;
                 
-                
                 // Movement properties
                 this.playerX = 100;
                 this.playerY = 380;
@@ -503,10 +658,10 @@
                 this.dogRunning = false;
                 this.dogSpeed = 5;
 
-                // Add these lines in your constructor after the existing properties
-this.popupOpen = false;
-this.currentNPC = null;
-                this.npcCooldowns = {}; // Track cooldown for each NPC
+                // Popup and game state
+                this.popupOpen = false;
+                this.currentNPC = null;
+                this.npcCooldowns = {};
                 
                 // Toilet checked flag
                 this.toiletChecked = false;
@@ -633,18 +788,18 @@ this.currentNPC = null;
             }
 
             preloadNPCImages() {
-    const npcImages = [
-        'cgmonty.PNG', 'cgcat.PNG', 'cg1race.PNG', 'cgmemory.PNG', 
-        'cgrock.PNG', 'cglottery.PNG', 'cgsimon.png', 'cgslot.PNG', 'cggreet.PNG'
-    ];
-    
-    this.npcImages = {};
-    npcImages.forEach(imageName => {
-        const img = new Image();
-        img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${imageName}`;
-        this.npcImages[imageName] = img;
-    });
-}
+                const npcImages = [
+                    'cgmonty.PNG', 'cgcat.PNG', 'cg1race.PNG', 'cgmemory.PNG', 
+                    'cgrock.PNG', 'cglottery.PNG', 'cgsimon.png', 'cgslot.PNG', 'cggreet.PNG'
+                ];
+                
+                this.npcImages = {};
+                npcImages.forEach(imageName => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${imageName}`;
+                    this.npcImages[imageName] = img;
+                });
+            }
 
             bindEvents() {
                 this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
@@ -658,7 +813,7 @@ this.currentNPC = null;
             }
 
             handleStart(e) {
-               if (!this.gameStarted || this.popupOpen) return;
+                if (!this.gameStarted || this.popupOpen) return;
                 e.preventDefault();
                 
                 const point = e.touches ? e.touches[0] : e;
@@ -813,11 +968,11 @@ this.currentNPC = null;
                         circle.style.height = circleSize + 'px';
                         
                         // More efficient animation assignment
-const animationIndex = Math.floor(Math.random() * 3);
-const animationNames = ['colorCycle1', 'colorCycle2', 'colorCycle3'];
-circle.style.animationName = animationNames[animationIndex];
-circle.style.animationDelay = (Math.random() * 1) + 's'; // Shorter delay range
-circle.style.animationDuration = '3s'; // Fixed duration for consistency
+                        const animationIndex = Math.floor(Math.random() * 3);
+                        const animationNames = ['colorCycle1', 'colorCycle2', 'colorCycle3'];
+                        circle.style.animationName = animationNames[animationIndex];
+                        circle.style.animationDelay = (Math.random() * 1) + 's';
+                        circle.style.animationDuration = '3s';
                         
                         wallElement.appendChild(circle);
                     }
@@ -936,104 +1091,104 @@ circle.style.animationDuration = '3s'; // Fixed duration for consistency
                 });
 
                 // Slot machine decoration
-const slotMachine = document.createElement('div');
-slotMachine.textContent = '🎰';
-slotMachine.style.position = 'absolute';
-slotMachine.style.left = '535px';
-slotMachine.style.top = '385px';
-slotMachine.style.fontSize = '20px';
-slotMachine.style.zIndex = '15';
-this.gameWorld.appendChild(slotMachine);
+                const slotMachine = document.createElement('div');
+                slotMachine.textContent = '🎰';
+                slotMachine.style.position = 'absolute';
+                slotMachine.style.left = '535px';
+                slotMachine.style.top = '385px';
+                slotMachine.style.fontSize = '20px';
+                slotMachine.style.zIndex = '15';
+                this.gameWorld.appendChild(slotMachine);
             }
 
             createNPCs() {
-    const npcData = [
-        {x: 240, y: 60, image: 'cgmonty.PNG', name: 'Monty Hall Host'},
-        {x: 80, y: 100, image: 'cgcat.PNG', name: 'Lucky Cat'},
-        {x: 420, y: 100, image: 'cg1race.PNG', name: 'Race Master'},
-        {x: 30, y: 240, image: 'cgmemory.PNG', name: 'Memory Master'},
-        {x: 240, y: 240, image: 'cgrock.PNG', name: 'Rock Paper Scissors'},
-        {x: 260, y: 140, image: 'cglottery.PNG', name: 'Lottery Seller'},
-        {x: 380, y: 240, image: 'cgsimon.png', name: 'Simon Says'},
-        {x: 500, y: 380, image: 'cgslot.PNG', name: 'Slot Machine'},
-        {x: 180, y: 358, image: 'cggreet.PNG', name: 'Casino Greeter'}
-    ];
+                const npcData = [
+                    {x: 240, y: 60, image: 'cgmonty.PNG', name: 'Monty Hall Host'},
+                    {x: 80, y: 100, image: 'cgcat.PNG', name: 'Lucky Cat'},
+                    {x: 420, y: 100, image: 'cg1race.PNG', name: 'Race Master'},
+                    {x: 30, y: 240, image: 'cgmemory.PNG', name: 'Memory Master'},
+                    {x: 240, y: 240, image: 'cgrock.PNG', name: 'Rock Paper Scissors'},
+                    {x: 260, y: 140, image: 'cglottery.PNG', name: 'Lottery Seller'},
+                    {x: 380, y: 240, image: 'cgsimon.png', name: 'Simon Says'},
+                    {x: 500, y: 380, image: 'cgslot.PNG', name: 'Slot Machine'},
+                    {x: 180, y: 358, image: 'cggreet.PNG', name: 'Casino Greeter'}
+                ];
 
-    npcData.forEach(npc => {
-        const npcEl = document.createElement('div');
-        npcEl.className = 'casino-npc';
-        npcEl.style.left = npc.x + 'px';
-        npcEl.style.top = npc.y + 'px';
-        npcEl.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.image}")`;
-        npcEl.dataset.name = npc.name;
-        const npcInfo = this.getNPCData(npc.name);
-        npcEl.dataset.message = npcInfo.message;
-        npcEl.dataset.price = npcInfo.price;
-        npcEl.dataset.url = npcInfo.url;
-        npcEl.dataset.image = npcInfo.image;
-        this.gameWorld.appendChild(npcEl);
-    });
-}
+                npcData.forEach(npc => {
+                    const npcEl = document.createElement('div');
+                    npcEl.className = 'casino-npc';
+                    npcEl.style.left = npc.x + 'px';
+                    npcEl.style.top = npc.y + 'px';
+                    npcEl.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.image}")`;
+                    npcEl.dataset.name = npc.name;
+                    const npcInfo = this.getNPCData(npc.name);
+                    npcEl.dataset.message = npcInfo.message;
+                    npcEl.dataset.price = npcInfo.price;
+                    npcEl.dataset.url = npcInfo.url;
+                    npcEl.dataset.image = npcInfo.image;
+                    this.gameWorld.appendChild(npcEl);
+                });
+            }
 
             getNPCData(name) {
-    const npcData = {
-        'Monty Hall Host': {
-            message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
-            price: 400,
-            url: 'games/minimaze/casinogames/monty',
-            image: 'cgmonty.PNG'
-        },
-        'Lucky Cat': {
-            message: '🐱 Meow! I bring good luck to gamblers! Pet me and test your fortune!',
-            price: 100,
-            url: 'games/minimaze/casinogames/cat',
-            image: 'cgcat.PNG'
-        },
-        'Race Master': {
-            message: '🏃 Ready to race? Bet on the fastest runner and win big prizes!',
-            price: 100,
-            url: 'games/minimaze/casinogames/race',
-            image: 'cg1race.PNG'
-        },
-        'Memory Master': {
-            message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
-            price: 400,
-            url: 'games/minimaze/casinogames/memory',
-            image: 'cgmemory.PNG'
-        },
-        'Rock Paper Scissors': {
-            message: '✂️ Classic game of chance! Best 2 out of 3 rounds wins!',
-            price: 100,
-            url: 'games/minimaze/casinogames/rps',
-            image: 'cgrock.PNG'
-        },
-        'Lottery Seller': {
-            message: '🎫 Try your luck with our lottery! You could win hundreds of yen!',
-            price: 100,
-            url: 'games/minimaze/casinogames/lottery',
-            image: 'cglottery.PNG'
-        },
-        'Simon Says': {
-            message: '🎵 Follow the pattern perfectly and win the musical jackpot!',
-            price: 100,
-            url: 'games/minimaze/casinogames/simon',
-            image: 'cgsimon.png'
-        },
-        'Slot Machine': {
-            message: '🎰 Pull the lever and try your luck! Line up the symbols to win!',
-            price: 100,
-            url: 'games/minimaze/casinogames/slot',
-            image: 'cgslot.PNG'
-        },
-        'Casino Greeter': {
-            message: '🎰 Welcome to our casino! Try all the games and win big!',
-            price: 0,
-            url: null,
-            image: 'cggreet.PNG'
-        }
-    };
-    return npcData[name] || {message: 'Hello there!', price: 0, url: null, image: null};
-}
+                const npcData = {
+                    'Monty Hall Host': {
+                        message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
+                        price: 400,
+                        url: 'games/minimaze/casinogames/monty',
+                        image: 'cgmonty.PNG'
+                    },
+                    'Lucky Cat': {
+                        message: '🐱 Meow! I bring good luck to gamblers! Pet me and test your fortune!',
+                        price: 100,
+                        url: 'games/minimaze/casinogames/cat',
+                        image: 'cgcat.PNG'
+                    },
+                    'Race Master': {
+                        message: '🏃 Ready to race? Bet on the fastest runner and win big prizes!',
+                        price: 100,
+                        url: 'games/minimaze/casinogames/race',
+                        image: 'cg1race.PNG'
+                    },
+                    'Memory Master': {
+                        message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
+                        price: 400,
+                        url: 'games/minimaze/casinogames/memory',
+                        image: 'cgmemory.PNG'
+                    },
+                    'Rock Paper Scissors': {
+                        message: '✂️ Classic game of chance! Best 2 out of 3 rounds wins!',
+                        price: 100,
+                        url: 'spa', // Special marker for SPA game
+                        image: 'cgrock.PNG'
+                    },
+                    'Lottery Seller': {
+                        message: '🎫 Try your luck with our lottery! You could win hundreds of yen!',
+                        price: 100,
+                        url: 'games/minimaze/casinogames/lottery',
+                        image: 'cglottery.PNG'
+                    },
+                    'Simon Says': {
+                        message: '🎵 Follow the pattern perfectly and win the musical jackpot!',
+                        price: 100,
+                        url: 'games/minimaze/casinogames/simon',
+                        image: 'cgsimon.png'
+                    },
+                    'Slot Machine': {
+                        message: '🎰 Pull the lever and try your luck! Line up the symbols to win!',
+                        price: 100,
+                        url: 'games/minimaze/casinogames/slot',
+                        image: 'cgslot.PNG'
+                    },
+                    'Casino Greeter': {
+                        message: '🎰 Welcome to our casino! Try all the games and win big!',
+                        price: 0,
+                        url: null,
+                        image: 'cggreet.PNG'
+                    }
+                };
+                return npcData[name] || {message: 'Hello there!', price: 0, url: null, image: null};
+            }
 
             createInteractables() {
                 // Exit ladder
@@ -1044,7 +1199,6 @@ this.gameWorld.appendChild(slotMachine);
                 ladder.style.top = '382px';
                 ladder.dataset.type = 'exit';
                 this.gameWorld.appendChild(ladder);
-
 
                 // Toilet
                 const toilet = document.createElement('div');
@@ -1078,7 +1232,7 @@ this.gameWorld.appendChild(slotMachine);
             }
 
             updatePlayer() {
-               if (!this.popupOpen && (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1)) {
+                if (!this.popupOpen && (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1)) {
                     const newX = this.playerX + this.playerVelocityX;
                     const newY = this.playerY + this.playerVelocityY;
                     
@@ -1107,274 +1261,161 @@ this.gameWorld.appendChild(slotMachine);
             }
 
             updateDog() {
-    const dogEl = this.gameWorld.querySelector('.casino-dog');
-    if (!dogEl) return;
+                const dogEl = this.gameWorld.querySelector('.casino-dog');
+                if (!dogEl) return;
 
-    const playerDistance = Math.sqrt(
-        Math.pow(this.playerX - this.dogX, 2) + 
-        Math.pow(this.playerY - this.dogY, 2)
-    );
+                const playerDistance = Math.sqrt(
+                    Math.pow(this.playerX - this.dogX, 2) + 
+                    Math.pow(this.playerY - this.dogY, 2)
+                );
 
-    if (playerDistance < 110) {
-        // Dog runs away with smart pathfinding
-        this.dogRunning = true;
-        
-        // Calculate primary escape direction (away from player)
-        const deltaX = this.dogX - this.playerX;
-        const deltaY = this.dogY - this.playerY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        if (distance > 0) {
-           // Dynamic escape speed based on proximity
-const escapeSpeed = playerDistance < 80 ? this.dogSpeed * 3 : this.dogSpeed * 0.9;
-let moveX = (deltaX / distance) * escapeSpeed;
-let moveY = (deltaY / distance) * escapeSpeed;
-            
-            // Check if primary escape direction is blocked by boundaries
-            const newX = this.dogX + moveX;
-            const newY = this.dogY + moveY;
-            
-            // If blocked, try alternative directions
-            if (newX <= 25 || newX >= 535 || newY <= 25 || newY >= 395) {
-                // Try perpendicular directions
-                const perpMoveX = (deltaY / distance) * this.dogSpeed;
-                const perpMoveY = -(deltaX / distance) * this.dogSpeed;
-                
-                // Test both perpendicular directions
-                const alt1X = this.dogX + perpMoveX;
-                const alt1Y = this.dogY + perpMoveY;
-                const alt2X = this.dogX - perpMoveX;
-                const alt2Y = this.dogY - perpMoveY;
-                
-                // Choose the perpendicular direction that's not blocked
-                if (alt1X > 25 && alt1X < 535 && alt1Y > 25 && alt1Y < 395) {
-                    moveX = perpMoveX;
-                    moveY = perpMoveY;
-                } else if (alt2X > 25 && alt2X < 535 && alt2Y > 25 && alt2Y < 395) {
-                    moveX = -perpMoveX;
-                    moveY = -perpMoveY;
-                } else {
-                    // If both perpendicular blocked, try moving toward center
-                    const centerX = 280;
-                    const centerY = 210;
-                    const toCenterX = centerX - this.dogX;
-                    const toCenterY = centerY - this.dogY;
-                    const toCenterDist = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+                if (playerDistance < 70) {
+                    // Dog runs away with smart pathfinding
+                    this.dogRunning = true;
                     
-                    if (toCenterDist > 0) {
-                        moveX = (toCenterX / toCenterDist) * this.dogSpeed;
-                        moveY = (toCenterY / toCenterDist) * this.dogSpeed;
-                    }
-                }
-            }
-            
-            // Apply movement with bounds checking
-            this.dogX = Math.max(25, Math.min(535, this.dogX + moveX));
-            this.dogY = Math.max(25, Math.min(395, this.dogY + moveY));
-        }
-    } else if (playerDistance > 110) {
-        if (this.dogRunning) {
-            // Just stopped running, initialize wandering
-            this.dogRunning = false;
-            this.dogWanderTime = 0;
-            this.dogWanderDirection = Math.random() * Math.PI * 2;
-        }
-        
-        // Initialize wander properties if they don't exist
-        if (this.dogWanderTime === undefined) {
-            this.dogWanderTime = 0;
-            this.dogWanderDirection = Math.random() * Math.PI * 2;
-        }
-        
-        // Wander freely when not being chased
-        this.dogWanderTime += 1;
-        
-        // Change direction every 60-120 frames
-        if (this.dogWanderTime > 60 + Math.random() * 60) {
-            this.dogWanderDirection = Math.random() * Math.PI * 2;
-            this.dogWanderTime = 0;
-        }
-        
-        // Move in wander direction at slower speed
-        const wanderSpeed = this.dogSpeed * 0.4;
-        let wanderX = Math.cos(this.dogWanderDirection) * wanderSpeed;
-        let wanderY = Math.sin(this.dogWanderDirection) * wanderSpeed;
-        
-        // Check bounds and bounce off walls
-        const nextX = this.dogX + wanderX;
-        const nextY = this.dogY + wanderY;
-        
-        if (nextX <= 25 || nextX >= 535) {
-            this.dogWanderDirection = Math.PI - this.dogWanderDirection;
-            wanderX = -wanderX;
-        }
-        if (nextY <= 25 || nextY >= 395) {
-            this.dogWanderDirection = -this.dogWanderDirection;
-            wanderY = -wanderY;
-        }
-        
-        this.dogX = Math.max(25, Math.min(535, this.dogX + wanderX));
-        this.dogY = Math.max(25, Math.min(395, this.dogY + wanderY));
-    }
-
-    dogEl.style.left = this.dogX + 'px';
-    dogEl.style.top = this.dogY + 'px';
-}updateDog() {
-    const dogEl = this.gameWorld.querySelector('.casino-dog');
-    if (!dogEl) return;
-
-    const playerDistance = Math.sqrt(
-        Math.pow(this.playerX - this.dogX, 2) + 
-        Math.pow(this.playerY - this.dogY, 2)
-    );
-
-    if (playerDistance < 70) {
-        // Dog runs away with smart pathfinding
-        this.dogRunning = true;
-        
-        // Calculate primary escape direction (away from player)
-        const deltaX = this.dogX - this.playerX;
-        const deltaY = this.dogY - this.playerY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        if (distance > 0) {
-            let moveX = (deltaX / distance) * this.dogSpeed;
-            let moveY = (deltaY / distance) * this.dogSpeed;
-            
-            // Check if primary escape direction is blocked by boundaries
-            const newX = this.dogX + moveX;
-            const newY = this.dogY + moveY;
-            
-            // If blocked, try alternative directions
-            if (newX <= 25 || newX >= 535 || newY <= 25 || newY >= 395) {
-                // Try perpendicular directions
-                const perpMoveX = (deltaY / distance) * this.dogSpeed;
-                const perpMoveY = -(deltaX / distance) * this.dogSpeed;
-                
-                // Test both perpendicular directions
-                const alt1X = this.dogX + perpMoveX;
-                const alt1Y = this.dogY + perpMoveY;
-                const alt2X = this.dogX - perpMoveX;
-                const alt2Y = this.dogY - perpMoveY;
-                
-                // Choose the perpendicular direction that's not blocked
-                if (alt1X > 25 && alt1X < 535 && alt1Y > 25 && alt1Y < 395) {
-                    moveX = perpMoveX;
-                    moveY = perpMoveY;
-                } else if (alt2X > 25 && alt2X < 535 && alt2Y > 25 && alt2Y < 395) {
-                    moveX = -perpMoveX;
-                    moveY = -perpMoveY;
-                } else {
-                    // If both perpendicular blocked, try moving toward center
-                    const centerX = 280;
-                    const centerY = 210;
-                    const toCenterX = centerX - this.dogX;
-                    const toCenterY = centerY - this.dogY;
-                    const toCenterDist = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+                    // Calculate primary escape direction (away from player)
+                    const deltaX = this.dogX - this.playerX;
+                    const deltaY = this.dogY - this.playerY;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                     
-                    if (toCenterDist > 0) {
-                        moveX = (toCenterX / toCenterDist) * this.dogSpeed;
-                        moveY = (toCenterY / toCenterDist) * this.dogSpeed;
+                    if (distance > 0) {
+                        let moveX = (deltaX / distance) * this.dogSpeed;
+                        let moveY = (deltaY / distance) * this.dogSpeed;
+                        
+                        // Check if primary escape direction is blocked by boundaries
+                        const newX = this.dogX + moveX;
+                        const newY = this.dogY + moveY;
+                        
+                        // If blocked, try alternative directions
+                        if (newX <= 25 || newX >= 535 || newY <= 25 || newY >= 395) {
+                            // Try perpendicular directions
+                            const perpMoveX = (deltaY / distance) * this.dogSpeed;
+                            const perpMoveY = -(deltaX / distance) * this.dogSpeed;
+                            
+                            // Test both perpendicular directions
+                            const alt1X = this.dogX + perpMoveX;
+                            const alt1Y = this.dogY + perpMoveY;
+                            const alt2X = this.dogX - perpMoveX;
+                            const alt2Y = this.dogY - perpMoveY;
+                            
+                            // Choose the perpendicular direction that's not blocked
+                            if (alt1X > 25 && alt1X < 535 && alt1Y > 25 && alt1Y < 395) {
+                                moveX = perpMoveX;
+                                moveY = perpMoveY;
+                            } else if (alt2X > 25 && alt2X < 535 && alt2Y > 25 && alt2Y < 395) {
+                                moveX = -perpMoveX;
+                                moveY = -perpMoveY;
+                            } else {
+                                // If both perpendicular blocked, try moving toward center
+                                const centerX = 280;
+                                const centerY = 210;
+                                const toCenterX = centerX - this.dogX;
+                                const toCenterY = centerY - this.dogY;
+                                const toCenterDist = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+                                
+                                if (toCenterDist > 0) {
+                                    moveX = (toCenterX / toCenterDist) * this.dogSpeed;
+                                    moveY = (toCenterY / toCenterDist) * this.dogSpeed;
+                                }
+                            }
+                        }
+                        
+                        // Apply movement with bounds checking
+                        this.dogX = Math.max(25, Math.min(535, this.dogX + moveX));
+                        this.dogY = Math.max(25, Math.min(395, this.dogY + moveY));
                     }
+                } else if (playerDistance > 80) {
+                    if (this.dogRunning) {
+                        // Just stopped running, initialize wandering
+                        this.dogRunning = false;
+                        this.dogWanderTime = 0;
+                        this.dogWanderDirection = Math.random() * Math.PI * 2;
+                    }
+                    
+                    // Initialize wander properties if they don't exist
+                    if (this.dogWanderTime === undefined) {
+                        this.dogWanderTime = 0;
+                        this.dogWanderDirection = Math.random() * Math.PI * 2;
+                    }
+                    
+                    // Wander freely when not being chased
+                    this.dogWanderTime += 1;
+                    
+                    // Change direction every 60-120 frames
+                    if (this.dogWanderTime > 60 + Math.random() * 60) {
+                        this.dogWanderDirection = Math.random() * Math.PI * 2;
+                        this.dogWanderTime = 0;
+                    }
+                    
+                    // Move in wander direction at slower speed
+                    const wanderSpeed = this.dogSpeed * 0.4;
+                    let wanderX = Math.cos(this.dogWanderDirection) * wanderSpeed;
+                    let wanderY = Math.sin(this.dogWanderDirection) * wanderSpeed;
+                    
+                    // Check bounds and bounce off walls
+                    const nextX = this.dogX + wanderX;
+                    const nextY = this.dogY + wanderY;
+                    
+                    if (nextX <= 25 || nextX >= 535) {
+                        this.dogWanderDirection = Math.PI - this.dogWanderDirection;
+                        wanderX = -wanderX;
+                    }
+                    if (nextY <= 25 || nextY >= 395) {
+                        this.dogWanderDirection = -this.dogWanderDirection;
+                        wanderY = -wanderY;
+                    }
+                    
+                    this.dogX = Math.max(25, Math.min(535, this.dogX + wanderX));
+                    this.dogY = Math.max(25, Math.min(395, this.dogY + wanderY));
                 }
-            }
-            
-            // Apply movement with bounds checking
-            this.dogX = Math.max(25, Math.min(535, this.dogX + moveX));
-            this.dogY = Math.max(25, Math.min(395, this.dogY + moveY));
-        }
-    } else if (playerDistance > 80) {
-        if (this.dogRunning) {
-            // Just stopped running, initialize wandering
-            this.dogRunning = false;
-            this.dogWanderTime = 0;
-            this.dogWanderDirection = Math.random() * Math.PI * 2;
-        }
-        
-        // Initialize wander properties if they don't exist
-        if (this.dogWanderTime === undefined) {
-            this.dogWanderTime = 0;
-            this.dogWanderDirection = Math.random() * Math.PI * 2;
-        }
-        
-        // Wander freely when not being chased
-        this.dogWanderTime += 1;
-        
-        // Change direction every 60-120 frames
-        if (this.dogWanderTime > 60 + Math.random() * 60) {
-            this.dogWanderDirection = Math.random() * Math.PI * 2;
-            this.dogWanderTime = 0;
-        }
-        
-        // Move in wander direction at slower speed
-        const wanderSpeed = this.dogSpeed * 0.4;
-        let wanderX = Math.cos(this.dogWanderDirection) * wanderSpeed;
-        let wanderY = Math.sin(this.dogWanderDirection) * wanderSpeed;
-        
-        // Check bounds and bounce off walls
-        const nextX = this.dogX + wanderX;
-        const nextY = this.dogY + wanderY;
-        
-        if (nextX <= 25 || nextX >= 535) {
-            this.dogWanderDirection = Math.PI - this.dogWanderDirection;
-            wanderX = -wanderX;
-        }
-        if (nextY <= 25 || nextY >= 395) {
-            this.dogWanderDirection = -this.dogWanderDirection;
-            wanderY = -wanderY;
-        }
-        
-        this.dogX = Math.max(25, Math.min(535, this.dogX + wanderX));
-        this.dogY = Math.max(25, Math.min(395, this.dogY + wanderY));
-    }
 
-    dogEl.style.left = this.dogX + 'px';
-    dogEl.style.top = this.dogY + 'px';
-}
+                dogEl.style.left = this.dogX + 'px';
+                dogEl.style.top = this.dogY + 'px';
+            }
 
             canMoveTo(x, y) {
-    const playerSize = 32;
-    const padding = 1; // Reduced padding for tighter collision
-    
-    // More comprehensive collision detection with edge sampling
-    const points = [];
-    
-    // Sample more points along each edge for thin wall detection
-    for (let i = 0; i <= 4; i++) {
-        const ratio = i / 4;
-        const edgeX = x + padding + (playerSize - 2 * padding) * ratio;
-        const edgeY = y + padding + (playerSize - 2 * padding) * ratio;
-        
-        // Top edge
-        points.push({x: edgeX, y: y + padding});
-        // Bottom edge  
-        points.push({x: edgeX, y: y + playerSize - padding});
-        // Left edge
-        points.push({x: x + padding, y: edgeY});
-        // Right edge
-        points.push({x: x + playerSize - padding, y: edgeY});
-    }
-    
-    const walls = this.gameWorld.querySelectorAll('.funky-wall, .black-wall');
-    
-    for (let wall of walls) {
-        const wallRect = {
-            left: parseInt(wall.style.left),
-            top: parseInt(wall.style.top),
-            right: parseInt(wall.style.left) + parseInt(wall.style.width),
-            bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-        };
-        
-        for (let point of points) {
-            if (point.x >= wallRect.left && point.x <= wallRect.right &&
-                point.y >= wallRect.top && point.y <= wallRect.bottom) {
-                return false;
+                const playerSize = 32;
+                const padding = 1;
+                
+                // More comprehensive collision detection with edge sampling
+                const points = [];
+                
+                // Sample more points along each edge for thin wall detection
+                for (let i = 0; i <= 4; i++) {
+                    const ratio = i / 4;
+                    const edgeX = x + padding + (playerSize - 2 * padding) * ratio;
+                    const edgeY = y + padding + (playerSize - 2 * padding) * ratio;
+                    
+                    // Top edge
+                    points.push({x: edgeX, y: y + padding});
+                    // Bottom edge  
+                    points.push({x: edgeX, y: y + playerSize - padding});
+                    // Left edge
+                    points.push({x: x + padding, y: edgeY});
+                    // Right edge
+                    points.push({x: x + playerSize - padding, y: edgeY});
+                }
+                
+                const walls = this.gameWorld.querySelectorAll('.funky-wall, .black-wall');
+                
+                for (let wall of walls) {
+                    const wallRect = {
+                        left: parseInt(wall.style.left),
+                        top: parseInt(wall.style.top),
+                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+                    };
+                    
+                    for (let point of points) {
+                        if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                            point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
             }
-        }
-    }
-    
-    return true;
-}
 
             checkCollisions() {
                 const playerRect = {
@@ -1385,31 +1426,31 @@ let moveY = (deltaY / distance) * escapeSpeed;
                 };
                 
                 // Check NPCs
-const npcs = this.gameWorld.querySelectorAll('.casino-npc');
-npcs.forEach(npc => {
-    const npcX = parseInt(npc.style.left);
-    const npcY = parseInt(npc.style.top);
-    const npcRect = {
-        left: npcX + 5,
-        top: npcY + 5,
-        right: npcX + 27,
-        bottom: npcY + 27
-    };
-    
-    if (this.rectsOverlap(playerRect, npcRect)) {
-        // Check if this NPC is on cooldown
-        const cooldownTime = this.npcCooldowns[npc.dataset.name];
-        if (cooldownTime && Date.now() < cooldownTime) {
-            return; // Skip this NPC if still on cooldown
-        }
-        
-        if (npc.dataset.name === 'Casino Greeter') {
-            this.showMessage(npc.dataset.message);
-        } else {
-            this.showNPCPopup(npc);
-        }
-    }
-});
+                const npcs = this.gameWorld.querySelectorAll('.casino-npc');
+                npcs.forEach(npc => {
+                    const npcX = parseInt(npc.style.left);
+                    const npcY = parseInt(npc.style.top);
+                    const npcRect = {
+                        left: npcX + 5,
+                        top: npcY + 5,
+                        right: npcX + 27,
+                        bottom: npcY + 27
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, npcRect)) {
+                        // Check if this NPC is on cooldown
+                        const cooldownTime = this.npcCooldowns[npc.dataset.name];
+                        if (cooldownTime && Date.now() < cooldownTime) {
+                            return; // Skip this NPC if still on cooldown
+                        }
+                        
+                        if (npc.dataset.name === 'Casino Greeter') {
+                            this.showMessage(npc.dataset.message);
+                        } else {
+                            this.showNPCPopup(npc);
+                        }
+                    }
+                });
                 
                 // Check exit ladder
                 const ladder = this.gameWorld.querySelector('.ladder-exit');
@@ -1496,76 +1537,412 @@ npcs.forEach(npc => {
                 }, 3000);
             }
 
-
             showNPCPopup(npc) {
-    if (this.popupOpen) return; // Prevent multiple popups
-    
-    this.popupOpen = true;
-    this.currentNPC = npc;
-    
-    const popup = document.getElementById('npcPopup');
-    const image = document.getElementById('npcImage');
-    const name = document.getElementById('npcName');
-    const message = document.getElementById('npcMessage');
-    
-    image.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.dataset.image}`;
-    name.textContent = npc.dataset.name;
-    message.textContent = `${npc.dataset.message}\n\nCost: ${npc.dataset.price}¥`;
-    
-    popup.style.display = 'block';
-}
+                if (this.popupOpen) return; // Prevent multiple popups
+                
+                this.popupOpen = true;
+                this.currentNPC = npc;
+                
+                const popup = document.getElementById('npcPopup');
+                const image = document.getElementById('npcImage');
+                const name = document.getElementById('npcName');
+                const message = document.getElementById('npcMessage');
+                
+                image.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${npc.dataset.image}`;
+                name.textContent = npc.dataset.name;
+                message.textContent = `${npc.dataset.message}\n\nCost: ${npc.dataset.price}¥`;
+                
+                popup.style.display = 'block';
+            }
 
-acceptGame() {
-    if (!this.currentNPC) return;
-    
-    const price = parseInt(this.currentNPC.dataset.price);
-    const url = this.currentNPC.dataset.url;
-    
-    if (this.money < price) {
-        document.getElementById('npcMessage').textContent = `I'm sorry, you don't seem to have enough money to play. You need ${price}¥ but only have ${this.money}¥.`;
-        // Change buttons temporarily
-        const popup = document.getElementById('npcPopup');
-        popup.querySelector('.popup-buttons').innerHTML = '<button class="decline-button" onclick="game.declineGame()">Okay</button>';
-        return;
-    }
-    
-    // Deduct money and save
-    this.money -= price;
-    this.updateUI();
-    this.saveGameState();
-    
-    // Close popup
-    this.closePopup();
-    
-    // Navigate to game
-    if (url) {
-        this.showMessage(`Starting game... Good luck!`);
-        setTimeout(() => {
-            window.location.href = `https://thedepression.github.io/${url}`;
-        }, 1000);
-    }
-}
+            acceptGame() {
+                if (!this.currentNPC) return;
+                
+                const price = parseInt(this.currentNPC.dataset.price);
+                const url = this.currentNPC.dataset.url;
+                
+                if (this.money < price) {
+                    document.getElementById('npcMessage').textContent = `I'm sorry, you don't seem to have enough money to play. You need ${price}¥ but only have ${this.money}¥.`;
+                    // Change buttons temporarily
+                    const popup = document.getElementById('npcPopup');
+                    popup.querySelector('.popup-buttons').innerHTML = '<button class="decline-button" onclick="game.declineGame()">Okay</button>';
+                    return;
+                }
+                
+                // Deduct money and save
+                this.money -= price;
+                this.updateUI();
+                this.saveGameState();
+                
+                // Close popup
+                this.closePopup();
+                
+                // Check if this is the RPS SPA game
+                if (url === 'spa') {
+                    this.startRPSGame();
+                } else if (url) {
+                    // Navigate to external game
+                    this.showMessage(`Starting game... Good luck!`);
+                    setTimeout(() => {
+                        window.location.href = `https://thedepression.github.io/${url}`;
+                    }, 1000);
+                }
+            }
 
-declineGame() {
-    if (this.currentNPC) {
-        // Set a cooldown for this specific NPC
-        this.npcCooldowns[this.currentNPC.dataset.name] = Date.now() + 2000; // 2 second cooldown
-    }
-    this.closePopup();
-}
+            declineGame() {
+                if (this.currentNPC) {
+                    // Set a cooldown for this specific NPC
+                    this.npcCooldowns[this.currentNPC.dataset.name] = Date.now() + 2000; // 2 second cooldown
+                }
+                this.closePopup();
+            }
 
-closePopup() {
-    document.getElementById('npcPopup').style.display = 'none';
-    this.popupOpen = false;
-    this.currentNPC = null;
-    
-    // Reset buttons in case they were changed
-    const popup = document.getElementById('npcPopup');
-    popup.querySelector('.popup-buttons').innerHTML = `
-        <button class="play-button" onclick="game.acceptGame()">Play Game</button>
-        <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
-    `;
-}
+            closePopup() {
+                document.getElementById('npcPopup').style.display = 'none';
+                this.popupOpen = false;
+                this.currentNPC = null;
+                
+                // Reset buttons in case they were changed
+                const popup = document.getElementById('npcPopup');
+                popup.querySelector('.popup-buttons').innerHTML = `
+                    <button class="play-button" onclick="game.acceptGame()">Play Game</button>
+                    <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
+                `;
+            }
+
+            // Rock Paper Scissors SPA Game Methods
+            startRPSGame() {
+                this.popupOpen = true; // Keep movement locked
+                this.rpsGameState = {
+                    gameStarted: false,
+                    rulesExplained: false,
+                    countdownActive: false,
+                    playerChoice: null,
+                    npcChoice: null,
+                    gameStartTime: 0,
+                    clickTime: 0,
+                    playerWins: 0,
+                    npcWins: 0,
+                    round: 1
+                };
+                
+                this.showRPSOverlay();
+                this.showRPSWelcome();
+            }
+
+            showRPSOverlay() {
+                document.getElementById('rpsGameOverlay').style.display = 'flex';
+            }
+
+            hideRPSOverlay() {
+                document.getElementById('rpsGameOverlay').style.display = 'none';
+                this.popupOpen = false;
+            }
+
+            showRPSWelcome() {
+                const content = document.getElementById('rpsContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 16px; margin-bottom: 15px;">
+                            Hey there, challenger! Ready for a classic game of Rock Paper Scissors?
+                        </div>
+                        <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                            This isn't just any ordinary game - timing is everything!
+                        </div>
+                    </div>
+                    <div class="rps-buttons">
+                        <button class="rps-btn rps-btn-info" onclick="game.showRPSRules()">Explain Rules</button>
+                        <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Let's Play!</button>
+                    </div>
+                `;
+            }
+
+            showRPSRules() {
+                const content = document.getElementById('rpsContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px; text-align: left;">
+                        <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                            📋 Game Rules
+                        </div>
+                        <div style="font-size: 14px; line-height: 1.4;">
+                            • I'll count "Rock, Paper, Scissors, 1, 2, 3!"<br>
+                            • Choose your move exactly when I say "3"<br>
+                            • Too early or too late = automatic loss!<br>
+                            • Paper beats Rock, Rock beats Scissors, Scissors beats Paper<br>
+                            • Best 2 out of 3 rounds wins!<br>
+                            • Winner takes 200¥, loser gets nothing
+                        </div>
+                    </div>
+                    <div class="rps-buttons">
+                        <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Got It!</button>
+                        <button class="rps-btn rps-btn-info" onclick="game.showRPSRules()">Read Again</button>
+                    </div>
+                `;
+            }
+
+            startRPSRound() {
+                this.rpsGameState.gameStarted = true;
+                this.rpsGameState.playerChoice = null;
+                this.rpsGameState.npcChoice = null;
+                this.rpsGameState.clickTime = 0;
+                
+                const content = document.getElementById('rpsContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 18px; color: #ffd700;">Round ${this.rpsGameState.round}</div>
+                        <div style="font-size: 14px;">You: ${this.rpsGameState.playerWins} | NPC: ${this.rpsGameState.npcWins}</div>
+                    </div>
+                    <div class="rps-countdown-display" id="rpsCountdown">Get Ready...</div>
+                    <div class="rps-choices">
+                        <div class="rps-choice" data-choice="rock" onclick="game.makeRPSChoice('rock')">👊🏼</div>
+                        <div class="rps-choice" data-choice="paper" onclick="game.makeRPSChoice('paper')">✋🏼</div>
+                        <div class="rps-choice" data-choice="scissors" onclick="game.makeRPSChoice('scissors')">✌🏼</div>
+                    </div>
+                    <div class="rps-result" id="rpsResult"></div>
+                `;
+                
+                setTimeout(() => this.startRPSCountdown(), 1500);
+            }
+
+            startRPSCountdown() {
+                const countdown = document.getElementById('rpsCountdown');
+                const choices = document.querySelectorAll('.rps-choice');
+                
+                // Enable choices
+                choices.forEach(choice => choice.classList.remove('disabled'));
+                
+                this.rpsGameState.countdownActive = true;
+                this.rpsGameState.gameStartTime = Date.now();
+                
+                const sequence = ['Rock', 'Paper', 'Scissors', '1', '2', '3'];
+                let index = 0;
+                
+                const showNext = () => {
+                    if (index < sequence.length) {
+                        countdown.textContent = sequence[index];
+                        
+                        if (sequence[index] === '3') {
+                            // Mark the exact moment "3" appears for timing bonus
+                            this.rpsGameState.perfectTimingStart = Date.now();
+                        }
+                        
+                        index++;
+                        
+                        if (index < sequence.length) {
+                            setTimeout(() => {
+                                countdown.textContent = ''; // Half second gap
+                                setTimeout(showNext, 500);
+                            }, 500);
+                        } else {
+                            // Game ends after "3" is shown
+                            setTimeout(() => {
+                                this.endRPSRound();
+                            }, 1000);
+                        }
+                    }
+                };
+                
+                showNext();
+            }
+
+            makeRPSChoice(choice) {
+                if (!this.rpsGameState.countdownActive || this.rpsGameState.playerChoice) return;
+                
+                this.rpsGameState.playerChoice = choice;
+                this.rpsGameState.clickTime = Date.now();
+                
+                // Highlight selected choice
+                document.querySelectorAll('.rps-choice').forEach(el => {
+                    el.classList.remove('selected');
+                    if (el.dataset.choice === choice) {
+                        el.classList.add('selected');
+                    }
+                });
+            }
+
+            endRPSRound() {
+                this.rpsGameState.countdownActive = false;
+                
+                const result = document.getElementById('rpsResult');
+                const choices = document.querySelectorAll('.rps-choice');
+                choices.forEach(choice => choice.classList.add('disabled'));
+                
+                // Check if player made a choice
+                if (!this.rpsGameState.playerChoice) {
+                    result.innerHTML = `
+                        <div style="color: #f44336;">❌ Too slow! You didn't choose in time.</div>
+                        <div style="margin-top: 10px;">
+                            <button class="rps-btn rps-btn-primary" onclick="game.processRPSLoss()">Continue</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Check timing (must be within 1 second before or after "3")
+                const timeSince3 = this.rpsGameState.clickTime - this.rpsGameState.perfectTimingStart;
+                const perfectTiming = Math.abs(timeSince3) <= 100; // Within 0.1 seconds
+                const validTiming = Math.abs(timeSince3) <= 1000; // Within 1 second
+                
+                if (!validTiming) {
+                    result.innerHTML = `
+                        <div style="color: #f44336;">❌ Wrong timing! You must choose within 1 second of "3".</div>
+                        <div style="margin-top: 10px;">
+                            <button class="rps-btn rps-btn-primary" onclick="game.processRPSLoss()">Continue</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Generate NPC choice with timing bonus
+                this.generateNPCChoice(perfectTiming);
+                
+                // Determine winner
+                const winner = this.determineRPSWinner();
+                this.displayRPSResult(winner, perfectTiming);
+            }
+
+            generateNPCChoice(perfectTiming) {
+                const choices = ['rock', 'paper', 'scissors'];
+                
+                if (perfectTiming) {
+                    // 70% chance of NPC choosing what loses to player
+                    const playerChoice = this.rpsGameState.playerChoice;
+                    let losingChoice;
+                    
+                    if (playerChoice === 'rock') losingChoice = 'scissors';
+                    else if (playerChoice === 'paper') losingChoice = 'rock';
+                    else losingChoice = 'paper';
+                    
+                    if (Math.random() < 0.7) {
+                        this.rpsGameState.npcChoice = losingChoice;
+                    } else {
+                        // 30% chance of other choices
+                        const otherChoices = choices.filter(c => c !== losingChoice);
+                        this.rpsGameState.npcChoice = otherChoices[Math.floor(Math.random() * otherChoices.length)];
+                    }
+                } else {
+                    // Normal 50/50 random choice
+                    this.rpsGameState.npcChoice = choices[Math.floor(Math.random() * choices.length)];
+                }
+            }
+
+            determineRPSWinner() {
+                const player = this.rpsGameState.playerChoice;
+                const npc = this.rpsGameState.npcChoice;
+                
+                if (player === npc) return 'tie';
+                
+                if ((player === 'rock' && npc === 'scissors') ||
+                    (player === 'paper' && npc === 'rock') ||
+                    (player === 'scissors' && npc === 'paper')) {
+                    return 'player';
+                }
+                
+                return 'npc';
+            }
+
+            displayRPSResult(winner, perfectTiming) {
+                const result = document.getElementById('rpsResult');
+                const playerEmoji = this.getChoiceEmoji(this.rpsGameState.playerChoice);
+                const npcEmoji = this.getChoiceEmoji(this.rpsGameState.npcChoice);
+                
+                let resultText = `
+                    <div style="margin-bottom: 15px;">
+                        <div>You: ${playerEmoji} | NPC: ${npcEmoji}</div>
+                `;
+                
+                if (perfectTiming) {
+                    resultText += `<div style="color: #ffd700; font-size: 12px;">✨ Perfect timing!</div>`;
+                }
+                
+                resultText += `</div>`;
+                
+                if (winner === 'tie') {
+                    resultText += `<div style="color: #ffeb3b;">🤝 It's a tie! Let's try again.</div>`;
+                    result.innerHTML = resultText + `
+                        <div style="margin-top: 15px;">
+                            <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Next Round</button>
+                        </div>
+                    `;
+                } else if (winner === 'player') {
+                    this.rpsGameState.playerWins++;
+                    resultText += `<div style="color: #4CAF50;">🎉 You win this round!</div>`;
+                    
+                    if (this.rpsGameState.playerWins === 2) {
+                        result.innerHTML = resultText + `
+                            <div style="margin-top: 15px;">
+                                <button class="rps-btn rps-btn-primary" onclick="game.processRPSWin()">Claim Victory!</button>
+                            </div>
+                        `;
+                    } else {
+                        this.rpsGameState.round++;
+                        result.innerHTML = resultText + `
+                            <div style="margin-top: 15px;">
+                                <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Next Round</button>
+                            </div>
+                        `;
+                    }
+                } else {
+                    this.rpsGameState.npcWins++;
+                    resultText += `<div style="color: #f44336;">😞 NPC wins this round!</div>`;
+                    
+                    if (this.rpsGameState.npcWins === 2) {
+                        result.innerHTML = resultText + `
+                            <div style="margin-top: 15px;">
+                                <button class="rps-btn rps-btn-secondary" onclick="game.processRPSLoss()">Accept Defeat</button>
+                            </div>
+                        `;
+                    } else {
+                        this.rpsGameState.round++;
+                        result.innerHTML = resultText + `
+                            <div style="margin-top: 15px;">
+                                <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Next Round</button>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            getChoiceEmoji(choice) {
+                if (choice === 'rock') return '👊🏼';
+                if (choice === 'paper') return '✋🏼';
+                if (choice === 'scissors') return '✌🏼';
+                return '❓';
+            }
+
+            processRPSWin() {
+                this.money += 200;
+                this.updateUI();
+                this.saveGameState();
+                
+                const content = document.getElementById('rpsContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 20px; color: #4CAF50; margin-bottom: 10px;">🎉 Congratulations!</div>
+                        <div style="font-size: 16px;">You defeated me fair and square!</div>
+                        <div style="font-size: 14px; color: #ffd700; margin-top: 10px;">+200¥ earned!</div>
+                    </div>
+                    <div class="rps-buttons">
+                        <button class="rps-btn rps-btn-primary" onclick="game.hideRPSOverlay()">Return to Casino</button>
+                        <button class="rps-btn rps-btn-info" onclick="game.startRPSGame()">Play Again</button>
+                    </div>
+                `;
+            }
+
+            processRPSLoss() {
+                const content = document.getElementById('rpsContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 20px; color: #f44336; margin-bottom: 10px;">😞 Better luck next time!</div>
+                        <div style="font-size: 16px;">The house always has an edge, but you played well!</div>
+                        <div style="font-size: 14px; color: #888; margin-top: 10px;">No winnings this time.</div>
+                    </div>
+                    <div class="rps-buttons">
+                        <button class="rps-btn rps-btn-primary" onclick="game.hideRPSOverlay()">Return to Casino</button>
+                        <button class="rps-btn rps-btn-info" onclick="game.startRPSGame()">Try Again</button>
+                    </div>
+                `;
+            }
 
             updateUI() {
                 document.getElementById('money').textContent = this.money;
@@ -1580,6 +1957,6 @@ closePopup() {
             game.initLevel();
             game.startGameTimer();
         }
-                    </script>
+    </script>
 </body>
 </html>
