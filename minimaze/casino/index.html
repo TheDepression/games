@@ -3149,7 +3149,6 @@ memoryGameLost() {
     // Reset buttons to default format first
     popup.querySelector('.popup-buttons').innerHTML = `
         <button class="play-button" onclick="game.acceptDogMoney()">Accept Money</button>
-        <button class="decline-button" onclick="game.closePopup()">Cancel</button>
     `;
     
     popup.style.display = 'block';
@@ -3165,12 +3164,15 @@ dogAlreadyCaught() {
     const name = document.getElementById('npcName');
     const message = document.getElementById('npcMessage');
     
-    image.src = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><text y="50" font-size="60">🐕</text></svg>');
+    // Use same fallback image as first catch
+    image.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cggreet.PNG';
     name.textContent = 'Playful Casino Dog';
     message.textContent = 'Woof... no more money for you! 🐾';
     
-    // Change buttons
-    popup.querySelector('.popup-buttons').innerHTML = '<button class="decline-button" onclick="game.closePopup()">OK</button>';
+    // Use proper button format
+    popup.querySelector('.popup-buttons').innerHTML = `
+        <button class="decline-button" onclick="game.closePopup()">OK</button>
+    `;
     
     popup.style.display = 'block';
 }
