@@ -1531,6 +1531,11 @@ this.animationTimers = {};
                 // Check dog catch
 const dog = this.gameWorld.querySelector('.casino-dog');
 if (dog && !this.dogCaught) {
+    // Check cooldown first
+    const cooldownTime = this.npcCooldowns['Casino Dog'];
+    if (cooldownTime && Date.now() < cooldownTime) {
+        return; // Skip if still on cooldown
+    }
     // Create a small 4x4 hitbox at dog center
     const dogCenterX = this.dogX + 12.5; // Dog is 25px wide, so center is +12.5
     const dogCenterY = this.dogY + 12.5;
@@ -1545,6 +1550,11 @@ if (dog && !this.dogCaught) {
         this.catchDog();
     }
 } else if (dog && this.dogCaught) {
+    // Check cooldown for already caught dog too
+    const cooldownTime = this.npcCooldowns['Casino Dog'];
+    if (cooldownTime && Date.now() < cooldownTime) {
+        return; // Skip if still on cooldown
+    }
     // Check for already caught dog
     const dogCenterX = this.dogX + 12.5;
     const dogCenterY = this.dogY + 12.5;
@@ -3124,10 +3134,13 @@ memoryGameLost() {
 }
 
             catchDog() {
-    if (this.popupOpen) return; // Prevent during other interactions
+    if (this.popupOpen) return;
     
     this.dogCaught = true;
     this.popupOpen = true;
+    
+    // Add dog to cooldown system
+    this.npcCooldowns['Casino Dog'] = Date.now() + 2000; // 2 second cooldown
     
     // Stop the dog from moving
     const dog = this.gameWorld.querySelector('.casino-dog');
@@ -3141,14 +3154,13 @@ memoryGameLost() {
     const name = document.getElementById('npcName');
     const message = document.getElementById('npcMessage');
     
-    // Simple approach - use existing image or fallback
-    image.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/Generated%20Image.png'; // Use an existing image as fallback
+    image.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/Generated%20Image.png';
     name.textContent = 'Playful Casino Dog';
     message.textContent = 'Woof! You got me! Here is 100 yen! 🎾';
     
-    // Reset buttons to default format first
     popup.querySelector('.popup-buttons').innerHTML = `
         <button class="play-button" onclick="game.acceptDogMoney()">Accept Money</button>
+        <button class="decline-button" onclick="game.closePopup()">Cancel</button>
     `;
     
     popup.style.display = 'block';
@@ -3157,19 +3169,26 @@ memoryGameLost() {
 dogAlreadyCaught() {
     if (this.popupOpen) return;
     
+    // Add cooldown check
+    const cooldownTime = this.npcCooldowns['Casino Dog'];
+    if (cooldownTime && Date.now() < cooldownTime) {
+        return; // Skip if still on cooldown
+    }
+    
     this.popupOpen = true;
+    
+    // Set new cooldown
+    this.npcCooldowns['Casino Dog'] = Date.now() + 2000;
     
     const popup = document.getElementById('npcPopup');
     const image = document.getElementById('npcImage');
     const name = document.getElementById('npcName');
     const message = document.getElementById('npcMessage');
     
-    // Use same fallback image as first catch
     image.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/Generated%20Image.png';
     name.textContent = 'Playful Casino Dog';
     message.textContent = 'Woof... no more money for you! 🐾';
     
-    // Use proper button format
     popup.querySelector('.popup-buttons').innerHTML = `
         <button class="decline-button" onclick="game.closePopup()">OK</button>
     `;
