@@ -201,6 +201,18 @@
             height: 25px;
             cursor: pointer;
         }
+
+        .slot {
+            position: absolute;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 25;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
         
         .casino-dog {
             position: absolute;
@@ -884,6 +896,15 @@
                 ladder.style.top = '382px';
                 ladder.dataset.type = 'exit';
                 this.gameWorld.appendChild(ladder);
+
+                // Slot Machine
+                const toilet = document.createElement('div');
+                toilet.className = 'slot';
+                toilet.textContent = '🎰';
+                toilet.style.left = '535px';
+                toilet.style.top = '380px';
+                toilet.dataset.type = 'slot';
+                this.gameWorld.appendChild(slot);
 
                 // Toilet
                 const toilet = document.createElement('div');
