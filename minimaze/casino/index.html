@@ -2115,21 +2115,21 @@ revealNextNumber() {
     if (this.revealSequence === 0) {
         reveal.innerHTML = `
             <div style="font-size: 18px;">🎲 The first digit is...</div>
-            <div style="font-size: 48px; color: #ffd700; margin: 10px 0;">${winningNum}</div>
+            <div style="font-size: 32px; color: #ffd700; margin: 5px 0;">${winningNum}</div>
         `;
         this.revealSequence++;
         setTimeout(() => this.revealNextNumber(), 2000);
     } else if (this.revealSequence === 1) {
         reveal.innerHTML += `
-            <div style="font-size: 18px; margin-top: 15px;">🎲 The second digit is...</div>
-            <div style="font-size: 48px; color: #ffd700; margin: 10px 0;">${winningNum}</div>
+            <div style="font-size: 18px; margin-top: 8px;">🎲 The second digit is...</div>
+            <div style="font-size: 32px; color: #ffd700; margin: 5px 0;">${winningNum}</div>
         `;
         this.revealSequence++;
         setTimeout(() => this.revealNextNumber(), 2000);
     } else {
         reveal.innerHTML += `
-            <div style="font-size: 18px; margin-top: 15px;">🎲 The third digit is...</div>
-            <div style="font-size: 48px; color: #ffd700; margin: 10px 0;">${winningNum}</div>
+            <div style="font-size: 18px; margin-top: 8px;">🎲 The third digit is...</div>
+            <div style="font-size: 32px; color: #ffd700; margin: 5px 0;">${winningNum}</div>
         `;
         setTimeout(() => this.calculateLotteryWinnings(), 2000);
     }
