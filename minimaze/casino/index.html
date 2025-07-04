@@ -976,8 +976,10 @@ this.gameWorld.appendChild(slotMachine);
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
         if (distance > 0) {
-            let moveX = (deltaX / distance) * this.dogSpeed;
-            let moveY = (deltaY / distance) * this.dogSpeed;
+           // Dynamic escape speed based on proximity
+const escapeSpeed = playerDistance < 50 ? this.dogSpeed * 2 : this.dogSpeed * 0.7;
+let moveX = (deltaX / distance) * escapeSpeed;
+let moveY = (deltaY / distance) * escapeSpeed;
             
             // Check if primary escape direction is blocked by boundaries
             const newX = this.dogX + moveX;
@@ -1183,7 +1185,7 @@ this.gameWorld.appendChild(slotMachine);
 
             canMoveTo(x, y) {
     const playerSize = 32;
-    const padding = 2;
+    const padding = 1;
     
     // 8-point collision detection for better wall collision
     const points = [
