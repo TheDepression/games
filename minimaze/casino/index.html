@@ -1020,10 +1020,10 @@
                     {x: 200, y: 0, w: 10, h: 60},
                     {x: 300, y: 0, w: 10, h: 60},
                     {x: 460, y: 340, w: 100, h: 10},
-                    {x: 58, y: 200, w: 1, h: 102},
-                    {x: 58, y: 199, w: 40, h: 1},
-                    {x: 99, y: 200, w: 1, h: 102},
-                    {x: 57, y: 301, w: 41, h: 1},
+                    {x: 58, y: 200, w: 10, h: 102},
+                    {x: 58, y: 199, w: 40, h: 10},
+                    {x: 91, y: 199, w: 11, h: 101},
+                    {x: 58, y: 290, w: 40, h: 10},
                     {x: 510, y: 10, w: 10, h: 50}
                 ];
 
@@ -1170,7 +1170,7 @@
                 const npcData = {
                     'Monty Hall Host': {
     message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
-    price: 400,
+    price: 300,
     url: 'spa-monty', // Change this from the external URL
     image: 'cgmonty.PNG'
 },
@@ -2263,7 +2263,7 @@ showSimonRules() {
                 • Round 1: 3x3 grid, repeat 5 flashes<br>
                 • Round 2: 5x5 grid, repeat 6 flashes<br>
                 • Round 3: 7x7 grid, repeat 7 flashes<br>
-                • You have 4 seconds to complete each round<br><br>
+                • You have 6 seconds to complete each round<br><br>
                 <strong>Prizes:</strong><br>
                 • Fail Round 1: 0¥ (200¥ loss)<br>
                 • Fail Round 2: 200¥ (0¥ profit)<br>
@@ -2374,12 +2374,12 @@ startSimonPlayerTurn() {
     this.simonGameState.playerTurn = true;
     this.simonGameState.playerSequence = [];
     
-    document.getElementById('simonStatus').textContent = 'Your turn! You have 4 seconds...';
+    document.getElementById('simonStatus').textContent = 'Your turn! You have 6 seconds...';
     
     // Start 4-second timer
     this.simonGameState.timer = setTimeout(() => {
         this.simonTimeUp();
-    }, 4000);
+    }, 6000);
 }
 
 simonCellClick(cellIndex) {
@@ -2548,11 +2548,11 @@ showMontyRules() {
             </div>
             <div style="font-size: 14px; line-height: 1.6;">
                 • 3 doors: Behind 2 are zombies 🧟‍♂️ (no prize)<br>
-                • Behind 1 door is 800¥ 💰<br>
+                • Behind 1 door is 500¥ 💰<br>
                 • Pick your door first<br>
                 • I'll remove a zombie door<br>
                 • You can switch or stay with your choice<br>
-                • Win: 800¥ | Lose: Nothing (400¥ loss)
+                • Win: 500¥ | Lose: Nothing (300¥ loss)
             </div>
         </div>
         <div class="rps-buttons">
@@ -2694,7 +2694,7 @@ revealFinalResult() {
     
     if (won) {
         // Win: Show money and confetti effect
-        this.money += 800;
+        this.money += 500;
         this.updateUI();
         this.saveGameState();
         
@@ -2702,7 +2702,7 @@ revealFinalResult() {
             <div style="margin-bottom: 20px;">
                 <div style="font-size: 24px; color: #4CAF50;">🎉 WINNER! 🎉</div>
                 <div style="font-size: 80px; margin: 20px 0;">💰</div>
-                <div style="font-size: 18px; color: #ffd700;">You won 800¥!</div>
+                <div style="font-size: 18px; color: #ffd700;">You won 500¥!</div>
             </div>
             <div class="rps-buttons">
                 <button class="rps-btn rps-btn-primary" onclick="game.hideMontyOverlay()">Collect Prize!</button>
