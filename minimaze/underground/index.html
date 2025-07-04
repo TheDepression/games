@@ -1051,26 +1051,28 @@ if (queen) {
     document.getElementById('money').textContent = this.money;
     this.updateDeathCounter();
     
-    const ui = document.getElementById('ui');
-    let itemsHTML = '';
-    if (this.hasKey) itemsHTML += ' 🔑';
-    if (this.hasBoat && !this.boatIsBroken) itemsHTML += ' ⛵';
-    if (this.hasBoat && this.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
-    if (this.hasHammer) itemsHTML += ' 🔨';
-    if (this.hasFlashlight) itemsHTML += ' 🔦';
-    if (this.hasPencil) itemsHTML += ' ✏️';
-    if (this.hasWeapon && this.hasHammerPower) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
-    else if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-    else if (this.hasWeapon) itemsHTML += ' 🔫';
-    if (this.hasLavaShoes) itemsHTML += ' 🥾';
+    // Load current state to get actual item values
+    const savedState = localStorage.getItem('mfGameState');
+    const gameState = savedState ? JSON.parse(savedState) : {};
     
+    let items = [];
+    if (gameState.hasKey) items.push('🔑');
+    if (gameState.hasBoat && !gameState.boatIsBroken) items.push('⛵');
+    if (gameState.hasBoat && gameState.boatIsBroken) items.push('<span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>');
+    if (gameState.hasHammer) items.push('🔨');
+    if (gameState.hasFlashlight) items.push('🔦');
+    if (gameState.hasPencil) items.push('✏️');
+    if (gameState.hasWeapon && gameState.hasHammerPower) items.push('<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>');
+    else if (gameState.hasWeapon && gameState.hasOrangePower) items.push('<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>');
+    else if (gameState.hasWeapon) items.push('🔫');
+    if (gameState.hasLavaShoes) items.push('🥾');
+    
+    const ui = document.getElementById('ui');
+    const itemsDiv = document.getElementById('items') || document.createElement('div');
+    itemsDiv.id = 'items';
+    itemsDiv.innerHTML = '+' + items.join('');
     if (!document.getElementById('items')) {
-        const itemsDiv = document.createElement('div');
-        itemsDiv.id = 'items';
-        itemsDiv.innerHTML = '+' + itemsHTML;
         ui.appendChild(itemsDiv);
-    } else {
-        document.getElementById('items').innerHTML = '+' + itemsHTML;
     }
 }
             
