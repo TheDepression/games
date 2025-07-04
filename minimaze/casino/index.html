@@ -1192,12 +1192,12 @@
     url: 'spa-lottery', // New marker for lottery SPA
     image: 'cglottery.PNG'
 },
-                    'Simon Says': {
-                        message: '🎵 Follow the pattern perfectly and win the musical jackpot!',
-                        price: 100,
-                        url: 'games/minimaze/casinogames/simon',
-                        image: 'cgsimon.png'
-                    },
+                   'Simon Says': {
+    message: '🎵 Follow the pattern perfectly and win the musical jackpot!',
+    price: 200, // Changed from 100 to 200
+    url: 'spa-simon', // New marker for Simon SPA
+    image: 'cgsimon.png'
+},
                     'Slot Machine': {
                         message: '🎰 Pull the lever and try your luck! Line up the symbols to win!',
                         price: 100,
@@ -1606,6 +1606,8 @@ if (url === 'spa') {
     this.startRPSGame();
 } else if (url === 'spa-lottery') {
     this.startLotteryGame();
+} else if (url === 'spa-simon') {
+    this.startSimonGame();
 } else if (url) {
                     // Navigate to external game
                     this.showMessage(`Starting game... Good luck!`);
@@ -2183,6 +2185,294 @@ showLotteryFinalResult(matches, winnings) {
         </div>
         <div class="rps-buttons">
             <button class="rps-btn rps-btn-primary" onclick="game.hideLotteryOverlay()">Return to Casino</button>
+        </div>
+    `;
+}
+
+
+            // Simon SPA Game Methods
+startSimonGame() {
+    this.popupOpen = true;
+    this.simonGameState = {
+        round: 1,
+        gridSize: 3,
+        sequence: [],
+        playerSequence: [],
+        showingSequence: false,
+        playerTurn: false,
+        timeLimit: 4000,
+        timer: null
+    };
+    
+    this.showSimonOverlay();
+    this.showSimonWelcome();
+}
+
+showSimonOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cgsimon.png';
+    document.querySelector('.rps-title').textContent = 'Simon Says!';
+}
+
+hideSimonOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+    if (this.simonGameState.timer) {
+        clearTimeout(this.simonGameState.timer);
+    }
+}
+
+showSimonWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to Simon Says! Watch the pattern and repeat it perfectly!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                Memory and speed are key to winning big!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showSimonRules()">View Rules</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.startSimonRound()">Start Game!</button>
+        </div>
+    `;
+}
+
+showSimonRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🎵 Game Rules
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • Round 1: 3x3 grid, repeat 5 flashes<br>
+                • Round 2: 5x5 grid, repeat 6 flashes<br>
+                • Round 3: 7x7 grid, repeat 7 flashes<br>
+                • You have 4 seconds to complete each round<br><br>
+                <strong>Prizes:</strong><br>
+                • Fail Round 1: 0¥ (200¥ loss)<br>
+                • Fail Round 2: 200¥ (0¥ profit)<br>
+                • Fail Round 3: 400¥ (200¥ profit)<br>
+                • Complete All: 600¥ (400¥ profit)
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.startSimonRound()">Got It!</button>
+        </div>
+    `;
+}
+
+startSimonRound() {
+    const round = this.simonGameState.round;
+    let gridSize, sequenceLength;
+    
+    if (round === 1) {
+        gridSize = 3;
+        sequenceLength = 5;
+    } else if (round === 2) {
+        gridSize = 5;
+        sequenceLength = 6;
+    } else {
+        gridSize = 7;
+        sequenceLength = 7;
+    }
+    
+    this.simonGameState.gridSize = gridSize;
+    this.simonGameState.sequence = [];
+    this.simonGameState.playerSequence = [];
+    
+    // Generate random sequence
+    for (let i = 0; i < sequenceLength; i++) {
+        const randomCell = Math.floor(Math.random() * (gridSize * gridSize));
+        this.simonGameState.sequence.push(randomCell);
+    }
+    
+    this.showSimonGrid();
+    setTimeout(() => this.playSimonSequence(), 1000);
+}
+
+showSimonGrid() {
+    const content = document.getElementById('rpsContent');
+    const gridSize = this.simonGameState.gridSize;
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 18px; color: #ffd700;">Round ${this.simonGameState.round}</div>
+            <div style="font-size: 14px;">Watch the pattern...</div>
+        </div>
+        <div id="simonGrid" style="display: grid; grid-template-columns: repeat(${gridSize}, 1fr); gap: 4px; margin: 20px auto; max-width: 280px;">
+            ${this.generateSimonGridHTML(gridSize)}
+        </div>
+        <div id="simonStatus" style="margin: 15px 0; min-height: 30px; font-size: 14px;"></div>
+    `;
+}
+
+generateSimonGridHTML(gridSize) {
+    let html = '';
+    for (let i = 0; i < gridSize * gridSize; i++) {
+        const size = gridSize <= 5 ? '40px' : '30px';
+        html += `
+            <div class="simon-cell" data-index="${i}" onclick="game.simonCellClick(${i})" 
+                 style="width: ${size}; height: ${size}; background: #333; border: 1px solid #555; 
+                        border-radius: 5px; cursor: pointer; transition: all 0.2s;">
+            </div>
+        `;
+    }
+    return html;
+}
+
+playSimonSequence() {
+    this.simonGameState.showingSequence = true;
+    this.simonGameState.playerTurn = false;
+    
+    document.getElementById('simonStatus').textContent = 'Watch carefully...';
+    
+    let index = 0;
+    const showNext = () => {
+        if (index < this.simonGameState.sequence.length) {
+            const cellIndex = this.simonGameState.sequence[index];
+            const cell = document.querySelector(`[data-index="${cellIndex}"]`);
+            
+            // Flash the cell
+            cell.style.background = '#ffd700';
+            cell.style.boxShadow = '0 0 15px #ffd700';
+            
+            setTimeout(() => {
+                cell.style.background = '#333';
+                cell.style.boxShadow = 'none';
+                
+                index++;
+                if (index < this.simonGameState.sequence.length) {
+                    setTimeout(showNext, 600);
+                } else {
+                    setTimeout(() => this.startSimonPlayerTurn(), 800);
+                }
+            }, 400);
+        }
+    };
+    
+    showNext();
+}
+
+startSimonPlayerTurn() {
+    this.simonGameState.showingSequence = false;
+    this.simonGameState.playerTurn = true;
+    this.simonGameState.playerSequence = [];
+    
+    document.getElementById('simonStatus').textContent = 'Your turn! You have 4 seconds...';
+    
+    // Start 4-second timer
+    this.simonGameState.timer = setTimeout(() => {
+        this.simonTimeUp();
+    }, 4000);
+}
+
+simonCellClick(cellIndex) {
+    if (!this.simonGameState.playerTurn) return;
+    
+    this.simonGameState.playerSequence.push(cellIndex);
+    
+    // Flash the clicked cell
+    const cell = document.querySelector(`[data-index="${cellIndex}"]`);
+    cell.style.background = '#4CAF50';
+    setTimeout(() => {
+        cell.style.background = '#333';
+    }, 200);
+    
+    // Check if sequence matches so far
+    const currentIndex = this.simonGameState.playerSequence.length - 1;
+    if (this.simonGameState.playerSequence[currentIndex] !== this.simonGameState.sequence[currentIndex]) {
+        this.simonFailed();
+        return;
+    }
+    
+    // Check if sequence is complete
+    if (this.simonGameState.playerSequence.length === this.simonGameState.sequence.length) {
+        clearTimeout(this.simonGameState.timer);
+        this.simonRoundSuccess();
+    }
+}
+
+simonTimeUp() {
+    this.simonGameState.playerTurn = false;
+    document.getElementById('simonStatus').textContent = '⏰ Time\'s up!';
+    setTimeout(() => this.simonFailed(), 1000);
+}
+
+simonFailed() {
+    this.simonGameState.playerTurn = false;
+    clearTimeout(this.simonGameState.timer);
+    
+    let prize = 0;
+    if (this.simonGameState.round === 2) prize = 200;
+    else if (this.simonGameState.round === 3) prize = 400;
+    
+    if (prize > 0) {
+        this.money += prize;
+        this.updateUI();
+        this.saveGameState();
+    }
+    
+    this.showSimonResult(false, prize);
+}
+
+simonRoundSuccess() {
+    this.simonGameState.playerTurn = false;
+    
+    if (this.simonGameState.round === 3) {
+        // Game complete!
+        this.money += 600;
+        this.updateUI();
+        this.saveGameState();
+        this.showSimonResult(true, 600);
+    } else {
+        // Next round
+        this.simonGameState.round++;
+        document.getElementById('simonStatus').textContent = '✅ Perfect! Next round...';
+        setTimeout(() => this.startSimonRound(), 2000);
+    }
+}
+
+showSimonResult(success, prize) {
+    const content = document.getElementById('rpsContent');
+    
+    let resultMessage;
+    if (success) {
+        resultMessage = `
+            <div style="color: #ffd700; font-size: 20px; margin-bottom: 15px;">
+                🎊 PERFECT SCORE! 🎊
+            </div>
+            <div style="color: #4CAF50; font-size: 16px;">
+                You completed all 3 rounds! Amazing memory!
+            </div>
+            <div style="color: #ffd700; font-size: 18px; margin-top: 10px;">
+                +${prize}¥ earned!
+            </div>
+        `;
+    } else {
+        const roundText = this.simonGameState.round === 1 ? 'first' : 
+                         this.simonGameState.round === 2 ? 'second' : 'final';
+        resultMessage = `
+            <div style="color: #f44336; font-size: 18px; margin-bottom: 15px;">
+                😞 Failed on the ${roundText} round!
+            </div>
+            ${prize > 0 ? 
+                `<div style="color: #4CAF50;">But you still earned ${prize}¥ for your progress!</div>` :
+                `<div style="color: #888;">No prize this time. Try again!</div>`
+            }
+        `;
+    }
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">Game Over</div>
+            ${resultMessage}
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.hideSimonOverlay()">Return to Casino</button>
         </div>
     `;
 }
