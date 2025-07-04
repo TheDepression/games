@@ -1078,7 +1078,7 @@ this.gameWorld.appendChild(slotMachine);
             }
 
             updatePlayer() {
-                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+               if (!this.popupOpen && (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1)) {
                     const newX = this.playerX + this.playerVelocityX;
                     const newY = this.playerY + this.playerVelocityY;
                     
