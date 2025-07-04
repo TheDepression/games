@@ -1182,36 +1182,43 @@ this.gameWorld.appendChild(slotMachine);
 }
 
             canMoveTo(x, y) {
-                const playerSize = 32;
-                const padding = 2;
-                
-                const points = [
-                    {x: x + padding, y: y + padding},
-                    {x: x + playerSize - padding, y: y + padding},
-                    {x: x + padding, y: y + playerSize - padding},
-                    {x: x + playerSize - padding, y: y + playerSize - padding}
-                ];
-                
-                const walls = this.gameWorld.querySelectorAll('.funky-wall, .black-wall');
-                
-                for (let wall of walls) {
-                    const wallRect = {
-                        left: parseInt(wall.style.left),
-                        top: parseInt(wall.style.top),
-                        right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                        bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-                    };
-                    
-                    for (let point of points) {
-                        if (point.x >= wallRect.left && point.x <= wallRect.right &&
-                            point.y >= wallRect.top && point.y <= wallRect.bottom) {
-                            return false;
-                        }
-                    }
-                }
-                
-                return true;
+    const playerSize = 32;
+    const padding = 2;
+    
+    // 8-point collision detection for better wall collision
+    const points = [
+        // 4 corners
+        {x: x + padding, y: y + padding},
+        {x: x + playerSize - padding, y: y + padding},
+        {x: x + padding, y: y + playerSize - padding},
+        {x: x + playerSize - padding, y: y + playerSize - padding},
+        // 4 midpoints of edges
+        {x: x + playerSize/2, y: y + padding}, // top middle
+        {x: x + playerSize/2, y: y + playerSize - padding}, // bottom middle
+        {x: x + padding, y: y + playerSize/2}, // left middle
+        {x: x + playerSize - padding, y: y + playerSize/2} // right middle
+    ];
+    
+    const walls = this.gameWorld.querySelectorAll('.funky-wall, .black-wall');
+    
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + parseInt(wall.style.width),
+            bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+        };
+        
+        for (let point of points) {
+            if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                return false;
             }
+        }
+    }
+    
+    return true;
+}
 
             checkCollisions() {
                 const playerRect = {
