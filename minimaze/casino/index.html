@@ -1187,11 +1187,11 @@
                         image: 'cg1race.PNG'
                     },
                     'Memory Master': {
-                        message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
-                        price: 400,
-                        url: 'games/minimaze/casinogames/memory',
-                        image: 'cgmemory.PNG'
-                    },
+    message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
+    price: 400,
+    url: 'spa-memory', // Changed from external URL
+    image: 'cgmemory.PNG'
+},
                     'Rock Paper Scissors': {
                         message: '✂️ Classic game of chance! Best 2 out of 3 rounds wins!',
                         price: 100,
@@ -1622,6 +1622,8 @@ if (url === 'spa') {
     this.startSimonGame();
 } else if (url === 'spa-monty') {
     this.startMontyGame();
+} else if (url === 'spa-memory') {
+    this.startMemoryGame();
 } else if (url) {
                     // Navigate to external game
                     this.showMessage(`Starting game... Good luck!`);
@@ -2770,6 +2772,303 @@ showSkulls() {
     }
 }
 
+
+            // Memory SPA Game Methods
+startMemoryGame() {
+    this.popupOpen = true;
+    this.memoryGameState = {
+        cards: [],
+        flippedCards: [],
+        matchedPairs: [],
+        strikes: 0,
+        gamePhase: 'welcome',
+        canFlip: true,
+        matches: 0
+    };
+    
+    this.generateMemoryCards();
+    this.showMemoryOverlay();
+    this.showMemoryWelcome();
+}
+
+showMemoryOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cgmemory.PNG';
+    document.querySelector('.rps-title').textContent = 'Memory Challenge!';
+}
+
+hideMemoryOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+}
+
+generateMemoryCards() {
+    const emojis = ['🦍', '🐸', '🔫', '👩🏻', '💩', '✏️', '😺', '🥋'];
+    const cardPairs = [];
+    
+    // Create pairs
+    emojis.forEach(emoji => {
+        cardPairs.push(emoji, emoji);
+    });
+    
+    // Shuffle the cards
+    for (let i = cardPairs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cardPairs[i], cardPairs[j]] = [cardPairs[j], cardPairs[i]];
+    }
+    
+    // Create card objects
+    this.memoryGameState.cards = cardPairs.map((emoji, index) => ({
+        id: index,
+        emoji: emoji,
+        flipped: false,
+        matched: false
+    }));
+}
+
+
+            showMemoryWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to the Memory Challenge! Test your recall skills!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                Match all the pairs before getting 3 strikes!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showMemoryRules()">View Rules</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.startMemoryPlaying()">Start Game!</button>
+        </div>
+    `;
+}
+
+showMemoryRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🧠 Game Rules
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • 4x4 grid of face-down cards<br>
+                • Flip any 2 cards to reveal them<br>
+                • If they match, you earn 300¥<br>
+                • If they don't match, you get a strike ❌<br>
+                • 3 strikes = game over<br>
+                • Match all 8 pairs to win maximum prize!<br><br>
+                <strong>Maximum Earnings:</strong> 2400¥ (2000¥ profit)
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.startMemoryPlaying()">Got It!</button>
+        </div>
+    `;
+}
+
+            startMemoryPlaying() {
+    this.memoryGameState.gamePhase = 'playing';
+    this.showMemoryBoard();
+}
+
+showMemoryBoard() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 16px; color: #ffd700;">Memory Challenge</div>
+            <div style="font-size: 14px;">
+                Matches: ${this.memoryGameState.matches}/8 | 
+                Strikes: ${this.memoryGameState.strikes}/3
+            </div>
+        </div>
+        <div id="memoryGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 20px auto; max-width: 280px;">
+            ${this.generateMemoryGridHTML()}
+        </div>
+        <div id="memoryStatus" style="margin: 15px 0; min-height: 30px; font-size: 14px;">
+            Flip 2 cards to find a match!
+        </div>
+    `;
+}
+
+generateMemoryGridHTML() {
+    return this.memoryGameState.cards.map((card, index) => {
+        const isFlipped = card.flipped || card.matched;
+        const content = isFlipped ? card.emoji : '';
+        const bgColor = card.matched ? '#4CAF50' : isFlipped ? '#ffd700' : '#f8f8f8';
+        const borderColor = card.matched ? '#388E3C' : isFlipped ? '#FFA000' : '#ddd';
+        
+        return `
+            <div class="memory-card" data-index="${index}" onclick="game.flipMemoryCard(${index})" 
+                 style="width: 60px; height: 60px; background: ${bgColor}; 
+                        border: 2px solid ${borderColor}; border-radius: 8px; 
+                        display: flex; align-items: center; justify-content: center; 
+                        cursor: ${card.matched ? 'default' : 'pointer'}; 
+                        font-size: 32px; transition: all 0.3s ease;
+                        box-shadow: ${isFlipped ? '0 4px 8px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.1)'};">
+                ${content}
+            </div>
+        `;
+    }).join('');
+}
+
+            flipMemoryCard(cardIndex) {
+    const card = this.memoryGameState.cards[cardIndex];
+    
+    // Prevent flipping if card is matched, already flipped, or game is processing
+    if (!this.memoryGameState.canFlip || card.matched || card.flipped) return;
+    
+    // Flip the card
+    card.flipped = true;
+    this.memoryGameState.flippedCards.push(cardIndex);
+    
+    // Update the display
+    this.updateMemoryCard(cardIndex);
+    
+    // Check if we have 2 flipped cards
+    if (this.memoryGameState.flippedCards.length === 2) {
+        this.memoryGameState.canFlip = false;
+        setTimeout(() => this.checkMemoryMatch(), 1000);
+    }
+}
+
+updateMemoryCard(cardIndex) {
+    const card = this.memoryGameState.cards[cardIndex];
+    const cardElement = document.querySelector(`[data-index="${cardIndex}"]`);
+    
+    cardElement.innerHTML = card.emoji;
+    cardElement.style.background = card.matched ? '#4CAF50' : '#ffd700';
+    cardElement.style.borderColor = card.matched ? '#388E3C' : '#FFA000';
+    cardElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+}
+
+checkMemoryMatch() {
+    const [firstIndex, secondIndex] = this.memoryGameState.flippedCards;
+    const firstCard = this.memoryGameState.cards[firstIndex];
+    const secondCard = this.memoryGameState.cards[secondIndex];
+    
+    if (firstCard.emoji === secondCard.emoji) {
+        // Match found!
+        firstCard.matched = true;
+        secondCard.matched = true;
+        this.memoryGameState.matches++;
+        
+        // Award money
+        this.money += 300;
+        this.updateUI();
+        this.saveGameState();
+        
+        // Update card display
+        this.updateMemoryCard(firstIndex);
+        this.updateMemoryCard(secondIndex);
+        
+        document.getElementById('memoryStatus').innerHTML = `
+            <span style="color: #4CAF50;">✅ Match found! +300¥</span>
+        `;
+        
+        // Check if game is won
+        if (this.memoryGameState.matches === 8) {
+            setTimeout(() => this.memoryGameWon(), 1000);
+            return;
+        }
+        
+    } else {
+        // No match - strike
+        this.memoryGameState.strikes++;
+        
+        document.getElementById('memoryStatus').innerHTML = `
+            <span style="color: #f44336;">❌ No match! Strike ${this.memoryGameState.strikes}/3</span>
+        `;
+        
+        // Flip cards back after showing them
+        setTimeout(() => {
+            firstCard.flipped = false;
+            secondCard.flipped = false;
+            this.resetMemoryCards(firstIndex, secondIndex);
+            
+            // Check if game is lost
+            if (this.memoryGameState.strikes >= 3) {
+                this.memoryGameLost();
+                return;
+            }
+        }, 1000);
+    }
+    
+    // Reset for next turn
+    setTimeout(() => {
+        this.memoryGameState.flippedCards = [];
+        this.memoryGameState.canFlip = true;
+        this.showMemoryBoard(); // Refresh the board
+    }, 1500);
+}
+
+resetMemoryCards(firstIndex, secondIndex) {
+    [firstIndex, secondIndex].forEach(index => {
+        const cardElement = document.querySelector(`[data-index="${index}"]`);
+        cardElement.innerHTML = '';
+        cardElement.style.background = '#f8f8f8';
+        cardElement.style.borderColor = '#ddd';
+        cardElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    });
+}
+
+            memoryGameWon() {
+    const content = document.getElementById('rpsContent');
+    const totalEarned = this.memoryGameState.matches * 300;
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 24px; color: #4CAF50; margin-bottom: 15px;">
+                🧠 PERFECT MEMORY! 🧠
+            </div>
+            <div style="font-size: 16px; margin-bottom: 10px;">
+                You matched all 8 pairs without getting 3 strikes!
+            </div>
+            <div style="font-size: 18px; color: #ffd700;">
+                Total earned: ${totalEarned}¥!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.hideMemoryOverlay()">Collect Winnings!</button>
+        </div>
+    `;
+    
+    // Add some celebration effect
+    this.showConfetti();
+}
+
+memoryGameLost() {
+    const content = document.getElementById('rpsContent');
+    const totalEarned = this.memoryGameState.matches * 300;
+    const profit = totalEarned - 400;
+    
+    let message;
+    if (profit > 0) {
+        message = `You still earned ${totalEarned}¥ (${profit}¥ profit)!`;
+    } else if (profit === 0) {
+        message = `You broke even with ${totalEarned}¥!`;
+    } else {
+        message = `You earned ${totalEarned}¥ but lost ${Math.abs(profit)}¥ overall.`;
+    }
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 20px; color: #f44336; margin-bottom: 15px;">
+                💀 3 STRIKES - GAME OVER! 💀
+            </div>
+            <div style="font-size: 16px; margin-bottom: 10px;">
+                You matched ${this.memoryGameState.matches}/8 pairs.
+            </div>
+            <div style="font-size: 14px; color: ${profit >= 0 ? '#4CAF50' : '#f44336'};">
+                ${message}
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-secondary" onclick="game.hideMemoryOverlay()">Better Luck Next Time</button>
+        </div>
+    `;
+}
             
 
             updateUI() {
