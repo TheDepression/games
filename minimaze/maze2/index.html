@@ -1366,6 +1366,7 @@ this.playerVelocityY = deltaY * sensitivity;
                 if (savedState) {
                     const gameState = JSON.parse(savedState);
                     this.collectedBanana = gameState.collectedBanana || false;
+                    this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
                     this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
 this.hasOrangePower = gameState.hasOrangePower || false;
                     if (this.hasOrangePower) {
@@ -1422,6 +1423,7 @@ collectedPurpleHearts: this.collectedPurpleHearts,
                     gorillaEncounterComplete: this.gorillaEncounterComplete,
 hasOrangePower: this.hasOrangePower,
                     attackDamage: this.attackDamage,
+                    hasSuperGunTicket: this.hasSuperGunTicket,
                     pinkBossDefeated: this.pinkBossDefeated,
                     // Add these lines in saveGameState() after existing properties
 hasHammerPower: this.hasHammerPower,
