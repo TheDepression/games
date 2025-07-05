@@ -3097,6 +3097,46 @@ if (!playerOnNPC) {
     this.clearNPCMessage();
 }
 
+
+
+                // Check RPG House collision
+const rpgHouse = this.gameWorld.querySelector('[data-type="rpgHouse"]');
+if (rpgHouse) {
+    const houseX = parseInt(rpgHouse.style.left);
+    const houseY = parseInt(rpgHouse.style.top);
+    const houseRect = {
+        left: houseX + 5, // Slightly smaller hitbox
+        top: houseY + 5,
+        right: houseX + 55,
+        bottom: houseY + 55
+    };
+    
+    if (this.rectsOverlap(playerRect, houseRect)) {
+        this.transferToShop();
+    }
+}
+
+// Check battle NPC with cooldown
+const battleNPC = Array.from(friendlies).find(npc => 
+    npc.dataset.specialType === 'battleNPC' || 
+    (parseInt(npc.style.left) === 1940 && parseInt(npc.style.top) === 2020)
+);
+
+if (battleNPC) {
+    const npcX = parseInt(battleNPC.style.left);
+    const npcY = parseInt(battleNPC.style.top);
+    const npcRect = {
+        left: npcX,
+        top: npcY,
+        right: npcX + 22,
+        bottom: npcY + 22
+    };
+    
+    if (this.rectsOverlap(playerRect, npcRect)) {
+        this.handleBattleNPC();
+    }
+}
+
 // Check weak point entrances
 const entrances = this.gameWorld.querySelectorAll('.weak-point-entrance');
 entrances.forEach(entrance => {
