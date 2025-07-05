@@ -3886,6 +3886,11 @@ handleCatHealing() {
 }
 
 transferToWeakPoint(url) {
+
+    this.gameStarted = false; // ADD THIS LINE FIRST
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
     // Save everything in one operation like the working transfers
     this.saveGameState();
     
