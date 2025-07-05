@@ -1589,7 +1589,11 @@ if (dog && !this.dogCaught) {
 
             exitCasino() {
 
-               
+               this.gameStarted = false; // ADD THIS LINE FIRST
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+                
     Object.values(this.animationTimers).forEach(timer => clearInterval(timer));
                 // Save current game state before transfer
                 this.saveGameState();
