@@ -863,6 +863,7 @@ this.collectedPurpleHearts = []; // Track which purple hearts have been collecte
                 this.hasFlashlight = true;
                 this.hasPencil = false;
                 this.hasPyramidKey = true;
+                this.hasTrophy = false;
                 this.hasLavaShoes = true; 
                 this.hasWeapon = true; // ALWAYS have gun
                 this.bullyDefeated = true;
@@ -1383,6 +1384,7 @@ this.weakPointsBlasted = gameState.weakPointsBlasted || [];
 if (this.hasHammerPower) {
     this.attackDamage = 100; // Keep the 100 damage from orange power
 }
+                    this.hasTrophy = gameState.hasTrophy || false;
                     this.kingMoneyReceived = gameState.kingMoneyReceived || false;
                     this.collectedRedHearts = gameState.collectedRedHearts || [];
                     this.collectedMoney = gameState.collectedMoney || [];
@@ -1420,6 +1422,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
 maxHearts: this.maxHearts,
 collectedPurpleHearts: this.collectedPurpleHearts,
                     collectedBanana: this.collectedBanana,
+                    hasTrophy: this.hasTrophy,
                     gorillaEncounterComplete: this.gorillaEncounterComplete,
 hasOrangePower: this.hasOrangePower,
                     attackDamage: this.attackDamage,
@@ -1696,6 +1699,36 @@ quicksandPositions.forEach(pos => {
                 castleZone.style.width = '150px';
                 castleZone.style.height = '240px';
                 this.gameWorld.appendChild(castleZone);
+
+                // RPG House for shop
+const rpgHouse = document.createElement('div');
+rpgHouse.style.position = 'absolute';
+rpgHouse.style.left = '2280px';
+rpgHouse.style.top = '2300px';
+rpgHouse.style.width = '60px';
+rpgHouse.style.height = '60px';
+rpgHouse.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/rpghouse-min.png")';
+rpgHouse.style.backgroundSize = 'contain';
+rpgHouse.style.backgroundRepeat = 'no-repeat';
+rpgHouse.style.backgroundPosition = 'center';
+rpgHouse.style.zIndex = '35';
+rpgHouse.dataset.type = 'rpgHouse';
+this.gameWorld.appendChild(rpgHouse);
+
+
+                // Battle Coliseum (decorative)
+const coliseum = document.createElement('div');
+coliseum.style.position = 'absolute';
+coliseum.style.left = '1960px';
+coliseum.style.top = '2020px';
+coliseum.style.width = '80px';
+coliseum.style.height = '80px';
+coliseum.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/battlezone.png")';
+coliseum.style.backgroundSize = 'contain';
+coliseum.style.backgroundRepeat = 'no-repeat';
+coliseum.style.backgroundPosition = 'center';
+coliseum.style.zIndex = '35';
+this.gameWorld.appendChild(coliseum);
 
                 // Add fake quicksand with hidden purple heart at the end of createBackgroundZones()
 
@@ -2390,7 +2423,8 @@ refreshGorilla() {
                     {x: 980, y: 400, message: "You can escape the forest here. GET OUT NOW!", customEmoji: "🪧"},
                     {x: 1080, y: 1120, message: "The bees will kill you. GO BACK NOW!", customEmoji: "🪧"},
                     {x: 780, y: 560, message: "WHY ARE YOU NOT LISTENING!?!", customEmoji: "🪧"},
-                    {x: 880, y: 720, message: "Private... Do NOT enter!", customEmoji: "🪧"}
+                    {x: 880, y: 720, message: "Private... Do NOT enter!", customEmoji: "🪧"},
+                    {x: 1940, y: 2020, message: "", customEmoji: "🤵🏻‍♂️", specialType: "battleNPC"}
                 ];
                 
                 friendlies.forEach((friendly, index) => {
@@ -3956,6 +3990,7 @@ if (this.hasWeapon && this.hasHammerPower) itemsHTML += ' <span style="filter: g
 else if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
 else if (this.hasWeapon) itemsHTML += ' 🔫';
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
+                if (this.hasTrophy) itemsHTML += ' 🏆';
                if (this.collectedBanana && !this.gorillaEncounterComplete) itemsHTML += ' 🍌';
     
     if (!document.getElementById('items')) {
