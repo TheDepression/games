@@ -1023,7 +1023,10 @@ if (queen) {
             }
 
             returnToSurface() {
-                
+                this.gameStarted = false; // ADD THIS LINE FIRST
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
                 // Save current game state before transfer
                 this.saveGameState();
                 
