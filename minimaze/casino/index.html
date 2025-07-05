@@ -3454,7 +3454,10 @@ startCatChase() {
         </div>
         <div id="catCountdown" style="font-size: 24px; margin: 20px 0;">Get Ready...</div>
     `;
-    
+
+    // Add initial random offset to break symmetry
+this.catGameState.mouseX += (Math.random() - 0.5) * 10; // Random 5px left or right
+this.catGameState.mouseY += (Math.random() - 0.5) * 10; // Random 5px up or down
     this.startCatCountdown();
 }
 
@@ -3546,6 +3549,12 @@ updateCatPositions() {
 updateMousePosition() {
     const mouseSpeed = 2;
     
+    // Initialize mouse wandering properties if they don't exist
+    if (this.catGameState.mouseWanderTime === undefined) {
+        this.catGameState.mouseWanderTime = 0;
+        this.catGameState.mouseWanderDirection = Math.random() * Math.PI * 2;
+    }
+    
     // Find closest cat
     const distToBlack = Math.sqrt(
         Math.pow(this.catGameState.mouseX - this.catGameState.blackCatX, 2) + 
@@ -3556,37 +3565,104 @@ updateMousePosition() {
         Math.pow(this.catGameState.mouseY - this.catGameState.orangeCatY, 2)
     );
     
-    let closestCatX, closestCatY;
-    if (distToBlack < distToOrange) {
-        closestCatX = this.catGameState.blackCatX;
-        closestCatY = this.catGameState.blackCatY;
+    const closestDistance = Math.min(distToBlack, distToOrange);
+    const fleeDistance = 40; // Reduced from ~70 to 40
+    
+    if (closestDistance < fleeDistance) {
+        // FLEE MODE: Run away from closest cat
+        let closestCatX, closestCatY;
+        if (distToBlack < distToOrange) {
+            closestCatX = this.catGameState.blackCatX;
+            closestCatY = this.catGameState.blackCatY;
+        } else {
+            closestCatX = this.catGameState.orangeCatX;
+            closestCatY = this.catGameState.orangeCatY;
+        }
+        
+        // Calculate primary escape direction
+        const deltaX = this.catGameState.mouseX - closestCatX;
+        const deltaY = this.catGameState.mouseY - closestCatY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (distance > 0) {
+            let moveX = (deltaX / distance) * mouseSpeed;
+            let moveY = (deltaY / distance) * mouseSpeed;
+            
+            // Check if primary escape direction is blocked by boundaries
+            const newX = this.catGameState.mouseX + moveX;
+            const newY = this.catGameState.mouseY + moveY;
+            
+            // If blocked, try perpendicular directions (like the dog)
+            if (newX <= 8 || newX >= 192 || newY <= 8 || newY >= 192) {
+                const perpMoveX = (deltaY / distance) * mouseSpeed;
+                const perpMoveY = -(deltaX / distance) * mouseSpeed;
+                
+                // Test both perpendicular directions
+                const alt1X = this.catGameState.mouseX + perpMoveX;
+                const alt1Y = this.catGameState.mouseY + perpMoveY;
+                const alt2X = this.catGameState.mouseX - perpMoveX;
+                const alt2Y = this.catGameState.mouseY - perpMoveY;
+                
+                // Choose the perpendicular direction that's not blocked
+                if (alt1X > 8 && alt1X < 192 && alt1Y > 8 && alt1Y < 192) {
+                    moveX = perpMoveX;
+                    moveY = perpMoveY;
+                } else if (alt2X > 8 && alt2X < 192 && alt2Y > 8 && alt2Y < 192) {
+                    moveX = -perpMoveX;
+                    moveY = -perpMoveY;
+                } else {
+                    // If both perpendicular blocked, try moving toward center
+                    const centerX = 100;
+                    const centerY = 100;
+                    const toCenterX = centerX - this.catGameState.mouseX;
+                    const toCenterY = centerY - this.catGameState.mouseY;
+                    const toCenterDist = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+                    
+                    if (toCenterDist > 0) {
+                        moveX = (toCenterX / toCenterDist) * mouseSpeed;
+                        moveY = (toCenterY / toCenterDist) * mouseSpeed;
+                    }
+                }
+            }
+            
+            // Add small random offset to break symmetry
+            moveX += (Math.random() - 0.5) * 0.5;
+            moveY += (Math.random() - 0.5) * 0.5;
+            
+            // Apply movement with bounds checking
+            this.catGameState.mouseX = Math.max(8, Math.min(192, this.catGameState.mouseX + moveX));
+            this.catGameState.mouseY = Math.max(8, Math.min(192, this.catGameState.mouseY + moveY));
+        }
     } else {
-        closestCatX = this.catGameState.orangeCatX;
-        closestCatY = this.catGameState.orangeCatY;
-    }
-    
-    // Move away from closest cat with some randomness
-    const deltaX = this.catGameState.mouseX - closestCatX;
-    const deltaY = this.catGameState.mouseY - closestCatY;
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-    if (distance > 0) {
-        let moveX = (deltaX / distance) * mouseSpeed;
-        let moveY = (deltaY / distance) * mouseSpeed;
+        // WANDER MODE: Move randomly when not being chased (like the dog)
+        this.catGameState.mouseWanderTime += 1;
         
-        // Add randomness
-        moveX += (Math.random() - 0.5) * 1;
-        moveY += (Math.random() - 0.5) * 1;
+        // Change direction every 40-80 frames
+        if (this.catGameState.mouseWanderTime > 40 + Math.random() * 40) {
+            this.catGameState.mouseWanderDirection = Math.random() * Math.PI * 2;
+            this.catGameState.mouseWanderTime = 0;
+        }
         
-        // Check bounds and bounce
-        const newX = this.catGameState.mouseX + moveX;
-        const newY = this.catGameState.mouseY + moveY;
+        // Move in wander direction at slower speed
+        const wanderSpeed = mouseSpeed * 0.6;
+        let wanderX = Math.cos(this.catGameState.mouseWanderDirection) * wanderSpeed;
+        let wanderY = Math.sin(this.catGameState.mouseWanderDirection) * wanderSpeed;
         
-        if (newX <= 5 || newX >= 195) moveX = -moveX;
-        if (newY <= 5 || newY >= 195) moveY = -moveY;
+        // Check bounds and bounce off walls
+        const nextX = this.catGameState.mouseX + wanderX;
+        const nextY = this.catGameState.mouseY + wanderY;
         
-        this.catGameState.mouseX = Math.max(5, Math.min(195, this.catGameState.mouseX + moveX));
-        this.catGameState.mouseY = Math.max(5, Math.min(195, this.catGameState.mouseY + moveY));
+        if (nextX <= 8 || nextX >= 192) {
+            this.catGameState.mouseWanderDirection = Math.PI - this.catGameState.mouseWanderDirection;
+            wanderX = -wanderX;
+        }
+        if (nextY <= 8 || nextY >= 192) {
+            this.catGameState.mouseWanderDirection = -this.catGameState.mouseWanderDirection;
+            wanderY = -wanderY;
+        }
+        
+        this.catGameState.mouseX = Math.max(8, Math.min(192, this.catGameState.mouseX + wanderX));
+        this.catGameState.mouseY = Math.max(8, Math.min(192, this.catGameState.mouseY + wanderY));
     }
 }
 
