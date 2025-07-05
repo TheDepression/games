@@ -1181,11 +1181,11 @@ this.animationTimers = {};
     image: 'cgmonty.PNG'
 },
                     'Lucky Cat': {
-                        message: '🐱 Meow! I bring good luck to gamblers! Pet me and test your fortune!',
-                        price: 100,
-                        url: 'games/minimaze/casinogames/cat',
-                        image: 'cgcat.PNG'
-                    },
+    message: '🐱 Meow! Choose your champion cat and watch them chase the mouse! Will your cat be faster?',
+    price: 200,
+    url: 'spa-cat', // Change this to spa-cat
+    image: 'cgcat.PNG'
+},
                     'Race Master': {
                         message: '🏃 Ready to race? Bet on the fastest runner and win big prizes!',
                         price: 100,
@@ -1667,7 +1667,9 @@ if (dog && !this.dogCaught) {
                 // Check if this is the RPS SPA game
 if (url === 'spa') {
     this.startRPSGame();
-} else if (url === 'spa-lottery') {
+} else if (url === 'spa-cat') {
+    this.startCatGame();
+}else if (url === 'spa-lottery') {
     this.startLotteryGame();
 } else if (url === 'spa-simon') {
     this.startSimonGame();
@@ -3307,6 +3309,387 @@ startNPCBounce(npcName) {
             }
         }
     }, 50);
+}
+
+            // Cat Chase Game Methods
+startCatGame() {
+    this.popupOpen = true;
+    this.catGameState = {
+        gamePhase: 'welcome',
+        playerChoice: null, // 'black' or 'orange'
+        blackCatX: 10,
+        blackCatY: 10,
+        orangeCatX: 190,
+        orangeCatY: 190,
+        mouseX: 100,
+        mouseY: 100,
+        gameStarted: false,
+        gameEnded: false,
+        winner: null,
+        gameStartTime: 0
+    };
+    
+    this.showCatOverlay();
+    this.showCatWelcome();
+}
+
+showCatOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cgcat.PNG';
+    document.querySelector('.rps-title').textContent = 'Lucky Cat Chase!';
+}
+
+hideCatOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+    // Resume casino music
+    if (this.bgMusic) {
+        this.bgMusic.currentTime = 0;
+        this.bgMusic.play();
+    }
+}
+
+showCatWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to the Cat Chase! Choose your champion and watch them hunt!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                Two cats, one mouse, and only one winner!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showCatRules()">View Rules</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.startCatChoosing()">Choose Your Cat!</button>
+        </div>
+    `;
+}
+
+showCatRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🐱 Game Rules
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • Choose between Orange Cat 🐈 or Black Cat 🐈‍⬛<br>
+                • Both cats chase a mouse 🐁 in a small arena<br>
+                • Whichever cat catches the mouse first wins<br>
+                • If your cat wins: 400¥ (200¥ profit)<br>
+                • If the other cat wins: 0¥ (200¥ loss)<br>
+                • If no cat catches mouse in 1 minute: refund 200¥
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.startCatChoosing()">Got It!</button>
+        </div>
+    `;
+}
+
+startCatChoosing() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 18px; color: #ffd700;">Choose Your Champion</div>
+            <div style="font-size: 14px;">Select which cat you think will catch the mouse!</div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0;">
+            <div onclick="game.chooseCat('orange')" style="cursor: pointer; text-align: center; padding: 20px; border: 2px solid #555; border-radius: 15px; transition: all 0.3s;">
+                <div style="font-size: 60px;">🐈</div>
+                <div style="font-size: 16px; margin-top: 10px;">Orange Cat</div>
+            </div>
+            <div onclick="game.chooseCat('black')" style="cursor: pointer; text-align: center; padding: 20px; border: 2px solid #555; border-radius: 15px; transition: all 0.3s;">
+                <div style="font-size: 60px;">🐈‍⬛</div>
+                <div style="font-size: 16px; margin-top: 10px;">Black Cat</div>
+            </div>
+        </div>
+        <div style="margin: 15px 0; font-size: 14px;">Click on your chosen cat!</div>
+    `;
+    
+    // Add hover effects
+    const style = document.createElement('style');
+    style.textContent = `
+        .cat-choice:hover { 
+            border-color: #ffd700 !important; 
+            background: rgba(255, 215, 0, 0.1) !important; 
+            transform: scale(1.05) !important; 
+        }
+    `;
+    if (!document.getElementById('catChoiceStyle')) {
+        style.id = 'catChoiceStyle';
+        document.head.appendChild(style);
+    }
+}
+
+chooseCat(choice) {
+    this.catGameState.playerChoice = choice;
+    this.startCatChase();
+}
+
+startCatChase() {
+    // Pause casino music and start chase music
+    if (this.bgMusic) {
+        this.bgMusic.pause();
+    }
+    
+    const chaseMusic = new Audio('https://raw.githubusercontent.com/TheDepression/Sounds/main/musicalchairsloop.m4a');
+    chaseMusic.loop = true;
+    chaseMusic.play().catch(e => console.log('Chase music failed:', e));
+    this.chaseMusic = chaseMusic;
+    
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 16px; color: #ffd700;">
+                You chose: ${this.catGameState.playerChoice === 'orange' ? '🐈 Orange Cat' : '🐈‍⬛ Black Cat'}
+            </div>
+        </div>
+        <div id="catArena" style="position: relative; width: 200px; height: 200px; border: 3px solid #444; margin: 20px auto; background: #f8f8f8;">
+            <div id="orangeCat" style="position: absolute; font-size: 20px; left: 180px; top: 180px;">🐈</div>
+            <div id="blackCat" style="position: absolute; font-size: 20px; left: 0px; top: 0px;">🐈‍⬛</div>
+            <div id="mouse" style="position: absolute; font-size: 16px; left: 92px; top: 92px;">🐁</div>
+        </div>
+        <div id="catCountdown" style="font-size: 24px; margin: 20px 0;">Get Ready...</div>
+    `;
+    
+    this.startCatCountdown();
+}
+
+startCatCountdown() {
+    const countdown = document.getElementById('catCountdown');
+    const sequence = ['3', '2', '1', 'GO!'];
+    let index = 0;
+    
+    const showNext = () => {
+        if (index < sequence.length) {
+            countdown.textContent = sequence[index];
+            index++;
+            
+            if (index < sequence.length) {
+                setTimeout(showNext, 1000);
+            } else {
+                setTimeout(() => {
+                    countdown.textContent = '';
+                    this.startCatGameLoop();
+                }, 500);
+            }
+        }
+    };
+    
+    showNext();
+}
+
+startCatGameLoop() {
+    this.catGameState.gameStarted = true;
+    this.catGameState.gameStartTime = Date.now();
+    
+    const gameLoop = () => {
+        if (!this.catGameState.gameStarted || this.catGameState.gameEnded) return;
+        
+        // Check for 1-minute timeout
+        if (Date.now() - this.catGameState.gameStartTime > 60000) {
+            this.endCatGame('timeout');
+            return;
+        }
+        
+        this.updateCatPositions();
+        this.checkCatCatch();
+        
+        requestAnimationFrame(gameLoop);
+    };
+    
+    gameLoop();
+}
+
+updateCatPositions() {
+    const mouseX = this.catGameState.mouseX;
+    const mouseY = this.catGameState.mouseY;
+    
+    // Move cats toward mouse
+    const catSpeed = 1.5;
+    
+    // Black cat movement
+    const blackDeltaX = mouseX - this.catGameState.blackCatX;
+    const blackDeltaY = mouseY - this.catGameState.blackCatY;
+    const blackDistance = Math.sqrt(blackDeltaX * blackDeltaX + blackDeltaY * blackDeltaY);
+    
+    if (blackDistance > 0) {
+        this.catGameState.blackCatX += (blackDeltaX / blackDistance) * catSpeed;
+        this.catGameState.blackCatY += (blackDeltaY / blackDistance) * catSpeed;
+    }
+    
+    // Orange cat movement
+    const orangeDeltaX = mouseX - this.catGameState.orangeCatX;
+    const orangeDeltaY = mouseY - this.catGameState.orangeCatY;
+    const orangeDistance = Math.sqrt(orangeDeltaX * orangeDeltaX + orangeDeltaY * orangeDeltaY);
+    
+    if (orangeDistance > 0) {
+        this.catGameState.orangeCatX += (orangeDeltaX / orangeDistance) * catSpeed;
+        this.catGameState.orangeCatY += (orangeDeltaY / orangeDistance) * catSpeed;
+    }
+    
+    // Mouse movement (escape logic similar to casino dog)
+    this.updateMousePosition();
+    
+    // Update visual positions
+    document.getElementById('blackCat').style.left = this.catGameState.blackCatX + 'px';
+    document.getElementById('blackCat').style.top = this.catGameState.blackCatY + 'px';
+    document.getElementById('orangeCat').style.left = this.catGameState.orangeCatX + 'px';
+    document.getElementById('orangeCat').style.top = this.catGameState.orangeCatY + 'px';
+    document.getElementById('mouse').style.left = this.catGameState.mouseX + 'px';
+    document.getElementById('mouse').style.top = this.catGameState.mouseY + 'px';
+}
+
+updateMousePosition() {
+    const mouseSpeed = 2;
+    
+    // Find closest cat
+    const distToBlack = Math.sqrt(
+        Math.pow(this.catGameState.mouseX - this.catGameState.blackCatX, 2) + 
+        Math.pow(this.catGameState.mouseY - this.catGameState.blackCatY, 2)
+    );
+    const distToOrange = Math.sqrt(
+        Math.pow(this.catGameState.mouseX - this.catGameState.orangeCatX, 2) + 
+        Math.pow(this.catGameState.mouseY - this.catGameState.orangeCatY, 2)
+    );
+    
+    let closestCatX, closestCatY;
+    if (distToBlack < distToOrange) {
+        closestCatX = this.catGameState.blackCatX;
+        closestCatY = this.catGameState.blackCatY;
+    } else {
+        closestCatX = this.catGameState.orangeCatX;
+        closestCatY = this.catGameState.orangeCatY;
+    }
+    
+    // Move away from closest cat with some randomness
+    const deltaX = this.catGameState.mouseX - closestCatX;
+    const deltaY = this.catGameState.mouseY - closestCatY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 0) {
+        let moveX = (deltaX / distance) * mouseSpeed;
+        let moveY = (deltaY / distance) * mouseSpeed;
+        
+        // Add randomness
+        moveX += (Math.random() - 0.5) * 1;
+        moveY += (Math.random() - 0.5) * 1;
+        
+        // Check bounds and bounce
+        const newX = this.catGameState.mouseX + moveX;
+        const newY = this.catGameState.mouseY + moveY;
+        
+        if (newX <= 5 || newX >= 195) moveX = -moveX;
+        if (newY <= 5 || newY >= 195) moveY = -moveY;
+        
+        this.catGameState.mouseX = Math.max(5, Math.min(195, this.catGameState.mouseX + moveX));
+        this.catGameState.mouseY = Math.max(5, Math.min(195, this.catGameState.mouseY + moveY));
+    }
+}
+
+checkCatCatch() {
+    const catchDistance = 15;
+    
+    // Check black cat catch
+    const blackDistance = Math.sqrt(
+        Math.pow(this.catGameState.mouseX - this.catGameState.blackCatX, 2) + 
+        Math.pow(this.catGameState.mouseY - this.catGameState.blackCatY, 2)
+    );
+    
+    // Check orange cat catch
+    const orangeDistance = Math.sqrt(
+        Math.pow(this.catGameState.mouseX - this.catGameState.orangeCatX, 2) + 
+        Math.pow(this.catGameState.mouseY - this.catGameState.orangeCatY, 2)
+    );
+    
+    if (blackDistance < catchDistance) {
+        this.endCatGame('black');
+    } else if (orangeDistance < catchDistance) {
+        this.endCatGame('orange');
+    }
+}
+
+endCatGame(winner) {
+    this.catGameState.gameStarted = false;
+    this.catGameState.gameEnded = true;
+    this.catGameState.winner = winner;
+    
+    // Stop chase music
+    if (this.chaseMusic) {
+        this.chaseMusic.pause();
+        this.chaseMusic = null;
+    }
+    
+    setTimeout(() => this.showCatResult(), 1000);
+}
+
+showCatResult() {
+    const content = document.getElementById('rpsContent');
+    let resultMessage;
+    let prize = 0;
+    
+    if (this.catGameState.winner === 'timeout') {
+        // Refund money
+        this.money += 200;
+        this.updateUI();
+        this.saveGameState();
+        
+        resultMessage = `
+            <div style="color: #ffeb3b; font-size: 20px;">⏱️ No Contest!</div>
+            <div style="font-size: 16px; margin: 15px 0;">
+                Time ran out! The mouse was too clever.
+            </div>
+            <div style="color: #4CAF50; font-size: 14px;">
+                Your 200¥ has been refunded.
+            </div>
+        `;
+    } else if (this.catGameState.winner === this.catGameState.playerChoice) {
+        // Player wins
+        prize = 400;
+        this.money += prize;
+        this.updateUI();
+        this.saveGameState();
+        
+        const catEmoji = this.catGameState.winner === 'orange' ? '🐈' : '🐈‍⬛';
+        resultMessage = `
+            <div style="color: #4CAF50; font-size: 24px;">🎉 Your Cat Won! 🎉</div>
+            <div style="font-size: 18px; margin: 15px 0;">
+                ${catEmoji} caught the mouse!
+            </div>
+            <div style="color: #ffd700; font-size: 18px;">
+                +400¥ earned!
+            </div>
+        `;
+        
+        this.showConfetti();
+    } else {
+        // Player loses
+        const winnerEmoji = this.catGameState.winner === 'orange' ? '🐈' : '🐈‍⬛';
+        const loserEmoji = this.catGameState.playerChoice === 'orange' ? '🐈' : '🐈‍⬛';
+        
+        resultMessage = `
+            <div style="color: #f44336; font-size: 20px;">😿 Your Cat Lost!</div>
+            <div style="font-size: 16px; margin: 15px 0;">
+                ${winnerEmoji} caught the mouse before ${loserEmoji}
+            </div>
+            <div style="color: #888; font-size: 14px;">
+                No prize this time.
+            </div>
+        `;
+    }
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">Game Over</div>
+            ${resultMessage}
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.hideCatOverlay()">Return to Casino</button>
+        </div>
+    `;
 }
 
 
