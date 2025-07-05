@@ -745,6 +745,7 @@ this.animationTimers = {};
                     this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
                     this.weakPointsBlasted = gameState.weakPointsBlasted || [];
                     this.kingMoneyReceived = gameState.kingMoneyReceived || false;
+                    this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
                     
                     // Items
                     this.hasKey = gameState.hasKey || false;
@@ -789,6 +790,8 @@ this.animationTimers = {};
                     catFirstDialogComplete: this.catFirstDialogComplete,
                     weakPointsBlasted: this.weakPointsBlasted,
                     kingMoneyReceived: this.kingMoneyReceived,
+                    hasSuperGunTicket: this.hasSuperGunTicket,
+                    
                     
                     // Player position will be overridden when exiting
                     playerX: this.playerX,
@@ -1217,11 +1220,11 @@ this.animationTimers = {};
     image: 'cgsimon.png'
 },
                     'Slot Machine': {
-                        message: '🎰 Pull the lever and try your luck! Line up the symbols to win!',
-                        price: 100,
-                        url: 'games/minimaze/casinogames/slot',
-                        image: 'cgslot.PNG'
-                    },
+    message: '🎰 Pull the lever and try your luck! Line up the symbols to win big!',
+    price: 200,
+    url: 'spa-slot', // Change this to spa-slot
+    image: 'cgslot.PNG'
+},
                     'Casino Greeter': {
                         message: '🎰 Welcome to our casino! Try all the games and win big!',
                         price: 0,
@@ -1675,7 +1678,9 @@ if (url === 'spa') {
     this.startSimonGame();
 } else if (url === 'spa-monty') {
     this.startMontyGame();
-} else if (url === 'spa-memory') {
+} else if (url === 'spa-slot') {
+    this.startSlotGame();
+}else if (url === 'spa-memory') {
     this.startMemoryGame();
 } else if (url) {
                     // Navigate to external game
@@ -3837,6 +3842,281 @@ showCatResult() {
         </div>
         <div class="rps-buttons">
             <button class="rps-btn rps-btn-primary" onclick="game.hideCatOverlay()">Return to Casino</button>
+        </div>
+    `;
+}
+
+
+        // Slot Machine Game Methods
+startSlotGame() {
+    this.popupOpen = true;
+    this.slotGameState = {
+        gamePhase: 'welcome',
+        symbols: ['👩🏼‍⚕️', '🍕', '🤖', '🐷', '🍒', '🐚', '⚔️'],
+        reels: [
+            { spinning: false, currentSymbol: 0, speed: 0.3, position: 0 },
+            { spinning: false, currentSymbol: 1, speed: 0.25, position: 0 },
+            { spinning: false, currentSymbol: 2, speed: 0.35, position: 0 }
+        ],
+        stoppedReels: 0,
+        finalSymbols: [null, null, null],
+        canStop: false
+    };
+    
+    this.showSlotOverlay();
+    this.showSlotWelcome();
+}
+
+showSlotOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cgslot.PNG';
+    document.querySelector('.rps-title').textContent = 'Lucky Slots!';
+}
+
+hideSlotOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+}
+
+showSlotWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to the Lucky Slots! Test your timing and luck!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                Line up 3 matching symbols to win big!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showSlotRules()">View Rules</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.startSlotSpinning()">Pull the Lever!</button>
+        </div>
+    `;
+}
+
+showSlotRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🎰 Game Rules
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • 3 spinning reels with 7 different symbols<br>
+                • Tap to stop each reel one by one<br>
+                • Reels slow down before stopping<br>
+                • Match 3 identical symbols to win 500¥<br>
+                • Special: 3 swords ⚔️ = 500¥ + Super Gun Ticket!<br>
+                • No match: 0¥ (200¥ loss)
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.startSlotSpinning()">Got It!</button>
+        </div>
+    `;
+}
+
+startSlotSpinning() {
+    this.slotGameState.gamePhase = 'spinning';
+    
+    // Start all reels spinning
+    this.slotGameState.reels.forEach(reel => {
+        reel.spinning = true;
+        reel.position = 0;
+    });
+    this.slotGameState.stoppedReels = 0;
+    this.slotGameState.canStop = false;
+    
+    this.showSlotMachine();
+    
+    // Allow stopping after 1 second
+    setTimeout(() => {
+        this.slotGameState.canStop = true;
+        document.getElementById('slotInstruction').textContent = 'Tap to stop the first reel!';
+    }, 1000);
+    
+    this.startSlotAnimation();
+}
+
+showSlotMachine() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 16px; color: #ffd700;">Lucky Slots</div>
+            <div id="slotInstruction" style="font-size: 14px;">Reels are spinning...</div>
+        </div>
+        <div id="slotMachine" style="background: #333; border: 3px solid #ffd700; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 280px;">
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <div class="slot-reel" onclick="game.stopReel(0)" style="width: 70px; height: 100px; background: #222; border: 2px solid #555; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer;">
+                    <div id="reel0" style="position: absolute; width: 100%; text-align: center; font-size: 32px; transition: none;"></div>
+                </div>
+                <div class="slot-reel" onclick="game.stopReel(1)" style="width: 70px; height: 100px; background: #222; border: 2px solid #555; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer;">
+                    <div id="reel1" style="position: absolute; width: 100%; text-align: center; font-size: 32px; transition: none;"></div>
+                </div>
+                <div class="slot-reel" onclick="game.stopReel(2)" style="width: 70px; height: 100px; background: #222; border: 2px solid #555; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer;">
+                    <div id="reel2" style="position: absolute; width: 100%; text-align: center; font-size: 32px; transition: none;"></div>
+                </div>
+            </div>
+        </div>
+        <div id="slotResult" style="margin: 15px 0; min-height: 30px; font-size: 14px;"></div>
+    `;
+}
+
+startSlotAnimation() {
+    const animateReels = () => {
+        if (this.slotGameState.gamePhase !== 'spinning') return;
+        
+        this.slotGameState.reels.forEach((reel, index) => {
+            if (reel.spinning) {
+                reel.position += reel.speed;
+                
+                // Create continuous scrolling effect
+                const symbolHeight = 40;
+                const totalSymbols = this.slotGameState.symbols.length;
+                const currentSymbolIndex = Math.floor(reel.position) % totalSymbols;
+                const nextSymbolIndex = (currentSymbolIndex + 1) % totalSymbols;
+                const offset = (reel.position % 1) * symbolHeight;
+                
+                const reelElement = document.getElementById(`reel${index}`);
+                reelElement.innerHTML = `
+                    <div style="position: absolute; top: ${35 - offset}px; line-height: 40px;">${this.slotGameState.symbols[currentSymbolIndex]}</div>
+                    <div style="position: absolute; top: ${75 - offset}px; line-height: 40px;">${this.slotGameState.symbols[nextSymbolIndex]}</div>
+                `;
+                
+                reel.currentSymbol = currentSymbolIndex;
+            }
+        });
+        
+        requestAnimationFrame(animateReels);
+    };
+    
+    animateReels();
+}
+
+stopReel(reelIndex) {
+    if (!this.slotGameState.canStop || !this.slotGameState.reels[reelIndex].spinning) return;
+    
+    const reel = this.slotGameState.reels[reelIndex];
+    
+    // Start slowdown
+    reel.speed *= 0.3; // Dramatically slow down
+    
+    // Stop after slowdown period
+    setTimeout(() => {
+        reel.spinning = false;
+        this.slotGameState.finalSymbols[reelIndex] = this.slotGameState.symbols[reel.currentSymbol];
+        this.slotGameState.stoppedReels++;
+        
+        // Update reel display to show final symbol
+        const reelElement = document.getElementById(`reel${reelIndex}`);
+        reelElement.innerHTML = `
+            <div style="position: absolute; top: 35px; line-height: 40px; font-weight: bold; text-shadow: 0 0 10px #ffd700;">
+                ${this.slotGameState.finalSymbols[reelIndex]}
+            </div>
+        `;
+        reelElement.parentElement.style.borderColor = '#4CAF50';
+        reelElement.parentElement.style.cursor = 'default';
+        
+        // Update instruction
+        if (this.slotGameState.stoppedReels === 1) {
+            document.getElementById('slotInstruction').textContent = 'Tap to stop the second reel!';
+        } else if (this.slotGameState.stoppedReels === 2) {
+            document.getElementById('slotInstruction').textContent = 'Tap to stop the final reel!';
+        } else if (this.slotGameState.stoppedReels === 3) {
+            document.getElementById('slotInstruction').textContent = 'All reels stopped!';
+            setTimeout(() => this.checkSlotResult(), 1000);
+        }
+    }, 800 + Math.random() * 400); // Random slowdown time (0.8-1.2 seconds)
+}
+
+checkSlotResult() {
+    const [symbol1, symbol2, symbol3] = this.slotGameState.finalSymbols;
+    
+    if (symbol1 === symbol2 && symbol2 === symbol3) {
+        // Winner!
+        this.money += 500;
+        this.updateUI();
+        
+        // Special bonus for swords
+        if (symbol1 === '⚔️') {
+            this.hasSuperGunTicket = true;
+            this.saveGameState();
+            this.showSlotWin(true);
+        } else {
+            this.saveGameState();
+            this.showSlotWin(false);
+        }
+    } else {
+        // No match
+        this.showSlotLose();
+    }
+}
+
+showSlotWin(isSwordBonus) {
+    const content = document.getElementById('rpsContent');
+    
+    if (isSwordBonus) {
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 24px; color: #ffd700; margin-bottom: 15px;">
+                    ⚔️ JACKPOT BONUS! ⚔️
+                </div>
+                <div style="font-size: 18px; margin-bottom: 10px;">
+                    Triple swords! You won 500¥ PLUS a Super Gun Ticket!
+                </div>
+                <div style="font-size: 16px; color: #4CAF50; margin-bottom: 10px;">
+                    +500¥ earned!
+                </div>
+                <div style="font-size: 14px; background: rgba(255,215,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid #ffd700;">
+                    🎫 Super Gun Ticket: 2000¥ discount on weapon upgrade!
+                </div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-primary" onclick="game.hideSlotOverlay()">Collect Prize!</button>
+            </div>
+        `;
+        
+        this.showConfetti();
+    } else {
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 24px; color: #4CAF50; margin-bottom: 15px;">
+                    🎰 WINNER! 🎰
+                </div>
+                <div style="font-size: 18px; margin-bottom: 10px;">
+                    Triple ${this.slotGameState.finalSymbols[0]}! Perfect match!
+                </div>
+                <div style="font-size: 16px; color: #4CAF50;">
+                    +500¥ earned!
+                </div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-primary" onclick="game.hideSlotOverlay()">Collect Prize!</button>
+            </div>
+        `;
+        
+        this.showConfetti();
+    }
+}
+
+showSlotLose() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 20px; color: #f44336; margin-bottom: 15px;">
+                😞 No Match!
+            </div>
+            <div style="font-size: 16px; margin-bottom: 10px;">
+                ${this.slotGameState.finalSymbols.join(' - ')}
+            </div>
+            <div style="font-size: 14px; color: #888;">
+                Better luck next time!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-secondary" onclick="game.hideSlotOverlay()">Try Again Later</button>
         </div>
     `;
 }
