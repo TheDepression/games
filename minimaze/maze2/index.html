@@ -4088,6 +4088,202 @@ else if (this.hasWeapon) itemsHTML += ' 🔫';
                 document.getElementById('levelCompleteText').textContent = text;
                 document.getElementById('levelComplete').style.display = 'flex';
             }
+
+
+            transferToShop() {
+    this.gameStarted = false;
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    
+    this.saveGameState();
+    
+    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+    gameState.currentUrl = 'shop';
+    gameState.timeElapsed = this.timeElapsed;
+    gameState.lastSaveTime = Date.now();
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    this.showMessage('🏪 Entering the shop...');
+    setTimeout(() => {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/shop';
+    }, 500);
+}
+
+handleBattleNPC() {
+    const now = Date.now();
+    const npcKey = 'battleNPC_1940_2020';
+    
+    // Prevent spam (5 second cooldown)
+    if (this.lastInteractionTime[npcKey] && 
+        now - this.lastInteractionTime[npcKey] < 5000) {
+        return;
+    }
+    
+    this.lastInteractionTime[npcKey] = now;
+    
+    if (this.hasTrophy) {
+        this.showBattleDialogWithTrophy();
+    } else {
+        this.showBattleDialogNoTrophy();
+    }
+}
+
+showBattleDialogNoTrophy() {
+    this.gameStarted = false;
+    
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'battleDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = "🤵🏻‍♂️ Fight and defeat 3 monsters in a row and I will give you a trophy 🏆... give it a try?";
+    
+    const yesButton = document.createElement('button');
+    yesButton.style.background = '#4CAF50';
+    yesButton.style.color = 'white';
+    yesButton.style.border = 'none';
+    yesButton.style.padding = '10px 15px';
+    yesButton.style.borderRadius = '5px';
+    yesButton.style.cursor = 'pointer';
+    yesButton.style.fontSize = '14px';
+    yesButton.style.margin = '5px';
+    yesButton.textContent = 'Yes';
+    yesButton.onclick = () => {
+        dialogOverlay.remove();
+        this.transferToBattlezone();
+    };
+    
+    const noButton = document.createElement('button');
+    noButton.style.background = '#f44336';
+    noButton.style.color = 'white';
+    noButton.style.border = 'none';
+    noButton.style.padding = '10px 15px';
+    noButton.style.borderRadius = '5px';
+    noButton.style.cursor = 'pointer';
+    noButton.style.fontSize = '14px';
+    noButton.style.margin = '5px';
+    noButton.textContent = 'No';
+    noButton.onclick = () => {
+        dialogOverlay.remove();
+        this.gameStarted = true;
+        this.showMessage('🤵🏻‍♂️ Come back when you have courage!');
+    };
+    
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(yesButton);
+    dialogBox.appendChild(noButton);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+showBattleDialogWithTrophy() {
+    this.gameStarted = false;
+    
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'battleDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = "🤵🏻‍♂️ You were fantastic! Would you like to try again, just for fun?";
+    
+    const yesButton = document.createElement('button');
+    yesButton.style.background = '#4CAF50';
+    yesButton.style.color = 'white';
+    yesButton.style.border = 'none';
+    yesButton.style.padding = '10px 15px';
+    yesButton.style.borderRadius = '5px';
+    yesButton.style.cursor = 'pointer';
+    yesButton.style.fontSize = '14px';
+    yesButton.style.margin = '5px';
+    yesButton.textContent = 'Yes';
+    yesButton.onclick = () => {
+        dialogOverlay.remove();
+        this.transferToBattlezone();
+    };
+    
+    const noButton = document.createElement('button');
+    noButton.style.background = '#f44336';
+    noButton.style.color = 'white';
+    noButton.style.border = 'none';
+    yesButton.style.padding = '10px 15px';
+    noButton.style.borderRadius = '5px';
+    noButton.style.cursor = 'pointer';
+    noButton.style.fontSize = '14px';
+    noButton.style.margin = '5px';
+    noButton.textContent = 'No';
+    noButton.onclick = () => {
+        dialogOverlay.remove();
+        this.gameStarted = true;
+        this.showMessage('🤵🏻‍♂️ Thanks for visiting the arena!');
+    };
+    
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(yesButton);
+    dialogBox.appendChild(noButton);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+transferToBattlezone() {
+    this.gameStarted = false;
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    
+    this.saveGameState();
+    
+    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+    gameState.currentUrl = 'battlezone';
+    gameState.timeElapsed = this.timeElapsed;
+    gameState.lastSaveTime = Date.now();
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    this.showMessage('⚔️ Entering the battle arena...');
+    setTimeout(() => {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/battlezone';
+    }, 500);
+}
         }
 
         let game;
