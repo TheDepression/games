@@ -1190,11 +1190,11 @@ this.animationTimers = {};
     image: 'cgcat.PNG'
 },
                     'Race Master': {
-                        message: '🏃 Ready to race? Bet on the fastest runner and win big prizes!',
-                        price: 100,
-                        url: 'games/minimaze/casinogames/race',
-                        image: 'cg1race.PNG'
-                    },
+    message: '🏃 Ready to race? Pick your champion and watch them compete for glory!',
+    price: 100,
+    url: 'spa-race', // Change this to spa-race
+    image: 'cg1race.PNG'
+},
                     'Memory Master': {
     message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
     price: 400,
@@ -1670,7 +1670,9 @@ if (dog && !this.dogCaught) {
                 // Check if this is the RPS SPA game
 if (url === 'spa') {
     this.startRPSGame();
-} else if (url === 'spa-cat') {
+} else if (url === 'spa-race') {
+    this.startRaceGame();
+}else if (url === 'spa-cat') {
     this.startCatGame();
 }else if (url === 'spa-lottery') {
     this.startLotteryGame();
@@ -4119,6 +4121,304 @@ showSlotLose() {
             <button class="rps-btn rps-btn-secondary" onclick="game.hideSlotOverlay()">Try Again Later</button>
         </div>
     `;
+}
+
+            // Race Game Methods
+startRaceGame() {
+    this.popupOpen = true;
+    this.raceGameState = {
+        gamePhase: 'welcome',
+        racers: [
+            {emoji: '🐎', name: 'Thunder Horse', position: 0, speed: 0},
+            {emoji: '🏎️', name: 'Speed Demon', position: 0, speed: 0},
+            {emoji: '🐕', name: 'Fast Dog', position: 0, speed: 0},
+            {emoji: '🚀', name: 'Rocket', position: 0, speed: 0},
+            {emoji: '🦌', name: 'Wild Deer', position: 0, speed: 0},
+            {emoji: '🏃‍♂️', name: 'Marathon Man', position: 0, speed: 0},
+            {emoji: '🐆', name: 'Cheetah', position: 0, speed: 0},
+            {emoji: '🚲', name: 'Bike Rider', position: 0, speed: 0},
+            {emoji: '🛹', name: 'Skate Kid', position: 0, speed: 0},
+            {emoji: '🦅', name: 'Eagle', position: 0, speed: 0}
+        ],
+        playerChoice: null,
+        raceFinished: false,
+        winner: null,
+        raceStarted: false
+    };
+    
+    this.showRaceOverlay();
+    this.showRaceWelcome();
+}
+
+showRaceOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'flex';
+    document.querySelector('.rps-npc-image').src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/cg1race.PNG';
+    document.querySelector('.rps-title').textContent = 'Championship Race!';
+}
+
+hideRaceOverlay() {
+    document.getElementById('rpsGameOverlay').style.display = 'none';
+    this.popupOpen = false;
+}
+
+showRaceWelcome() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 16px; margin-bottom: 15px;">
+                Welcome to the Championship Race! Pick your champion!
+            </div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                10 racers, 1 winner, big rewards!
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-info" onclick="game.showRaceRules()">View Rules</button>
+            <button class="rps-btn rps-btn-primary" onclick="game.showRaceSelection()">Pick Your Racer!</button>
+        </div>
+    `;
+}
+
+showRaceRules() {
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 16px; margin-bottom: 15px; text-align: center; color: #ffd700;">
+                🏁 Race Rules
+            </div>
+            <div style="font-size: 14px; line-height: 1.6;">
+                • Choose 1 racer out of 10 competitors<br>
+                • Watch the live race simulation<br>
+                • If your racer wins: 1000¥ (900¥ profit)<br>
+                • If your racer loses: 0¥ (100¥ loss)<br>
+                • Each racer has equal chance to win<br>
+                • Race results are completely random
+            </div>
+        </div>
+        <div class="rps-buttons">
+            <button class="rps-btn rps-btn-primary" onclick="game.showRaceSelection()">Got It!</button>
+        </div>
+    `;
+}
+
+showRaceSelection() {
+    const content = document.getElementById('rpsContent');
+    const racerButtons = this.raceGameState.racers.map((racer, index) => `
+        <div onclick="game.selectRacer(${index})" style="cursor: pointer; padding: 8px; margin: 4px; background: #333; border: 1px solid #555; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: all 0.3s;">
+            <span style="font-size: 24px;">${racer.emoji}</span>
+            <span style="font-size: 14px;">${racer.name}</span>
+        </div>
+    `).join('');
+    
+    content.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 18px; color: #ffd700;">Choose Your Champion</div>
+            <div style="font-size: 14px;">Pick the racer you think will win!</div>
+        </div>
+        <div style="max-height: 200px; overflow-y: auto; margin: 15px 0;">
+            ${racerButtons}
+        </div>
+        <div style="margin: 15px 0; font-size: 12px; color: #888;">
+            Tap any racer to select them
+        </div>
+    `;
+    
+    // Add hover effects
+    const style = document.createElement('style');
+    style.textContent = `
+        .race-selection div:hover { 
+            background: #444 !important; 
+            border-color: #ffd700 !important; 
+            transform: scale(1.02) !important; 
+        }
+    `;
+    if (!document.getElementById('raceSelectionStyle')) {
+        style.id = 'raceSelectionStyle';
+        document.head.appendChild(style);
+    }
+}
+
+selectRacer(racerIndex) {
+    this.raceGameState.playerChoice = racerIndex;
+    const chosenRacer = this.raceGameState.racers[racerIndex];
+    
+    // Highlight selection
+    document.querySelectorAll('#rpsContent > div:last-child > div').forEach((div, index) => {
+        if (index === racerIndex) {
+            div.style.background = '#ffd700';
+            div.style.color = '#000';
+            div.style.fontWeight = 'bold';
+        }
+    });
+    
+    setTimeout(() => this.startRaceCountdown(), 1000);
+}
+
+startRaceCountdown() {
+    const chosenRacer = this.raceGameState.racers[this.raceGameState.playerChoice];
+    
+    const content = document.getElementById('rpsContent');
+    content.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 16px; color: #ffd700;">
+                You chose: ${chosenRacer.emoji} ${chosenRacer.name}
+            </div>
+        </div>
+        <div id="raceTrack" style="background: #228B22; border: 2px solid #32CD32; border-radius: 10px; padding: 15px; margin: 20px 0; position: relative; height: 250px; overflow: hidden;">
+            <div style="position: absolute; right: 10px; top: 10px; font-size: 24px;">🏁</div>
+            ${this.generateRaceTrackHTML()}
+        </div>
+        <div id="raceCountdown" style="font-size: 24px; margin: 20px 0;">Get Ready...</div>
+    `;
+    
+    this.startRaceCountdownSequence();
+}
+
+generateRaceTrackHTML() {
+    return this.raceGameState.racers.map((racer, index) => {
+        const isPlayerChoice = index === this.raceGameState.playerChoice;
+        const topPosition = 10 + (index * 22);
+        
+        return `
+            <div style="position: absolute; left: 10px; top: ${topPosition}px; display: flex; align-items: center; gap: 5px;">
+                <span id="racer${index}" style="font-size: 20px; transition: left 0.1s ease; position: relative; left: 0px; ${isPlayerChoice ? 'filter: drop-shadow(0 0 8px #ffd700);' : ''}">${racer.emoji}</span>
+                <span style="font-size: 12px; ${isPlayerChoice ? 'color: #ffd700; font-weight: bold;' : 'color: #fff;'}">${racer.name}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+startRaceCountdownSequence() {
+    const countdown = document.getElementById('raceCountdown');
+    const sequence = ['3', '2', '1', 'GO!'];
+    let index = 0;
+    
+    const showNext = () => {
+        if (index < sequence.length) {
+            countdown.textContent = sequence[index];
+            index++;
+            
+            if (index < sequence.length) {
+                setTimeout(showNext, 1000);
+            } else {
+                setTimeout(() => {
+                    countdown.textContent = 'Racing...';
+                    this.startRaceAnimation();
+                }, 500);
+            }
+        }
+    };
+    
+    showNext();
+}
+
+startRaceAnimation() {
+    this.raceGameState.raceStarted = true;
+    const finishLine = 200; // pixels to travel
+    
+    // Initialize racers with random speeds
+    this.raceGameState.racers.forEach((racer, index) => {
+        racer.position = 0;
+        racer.speed = 0.8 + Math.random() * 0.4; // Random speed between 0.8-1.2
+    });
+    
+    // Give player's choice a slight disadvantage (10% win rate)
+    if (this.raceGameState.playerChoice !== null) {
+        this.raceGameState.racers[this.raceGameState.playerChoice].speed *= 0.85; // 15% slower
+    }
+    
+    const raceLoop = () => {
+        if (this.raceGameState.raceFinished) return;
+        
+        let winner = null;
+        
+        // Update all racer positions
+        this.raceGameState.racers.forEach((racer, index) => {
+            if (!this.raceGameState.raceFinished) {
+                // Add small random variation each frame
+                const speedVariation = racer.speed + (Math.random() - 0.5) * 0.1;
+                racer.position += speedVariation;
+                
+                // Update visual position
+                const racerElement = document.getElementById(`racer${index}`);
+                if (racerElement) {
+                    racerElement.style.left = racer.position + 'px';
+                }
+                
+                // Check for winner
+                if (racer.position >= finishLine && !winner) {
+                    winner = index;
+                }
+            }
+        });
+        
+        if (winner !== null) {
+            this.raceGameState.raceFinished = true;
+            this.raceGameState.winner = winner;
+            setTimeout(() => this.showRaceResult(), 1000);
+        } else {
+            requestAnimationFrame(raceLoop);
+        }
+    };
+    
+    raceLoop();
+}
+
+showRaceResult() {
+    const winner = this.raceGameState.racers[this.raceGameState.winner];
+    const playerWon = this.raceGameState.winner === this.raceGameState.playerChoice;
+    
+    const content = document.getElementById('rpsContent');
+    
+    if (playerWon) {
+        this.money += 1000;
+        this.updateUI();
+        this.saveGameState();
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 24px; color: #4CAF50; margin-bottom: 15px;">
+                    🏆 WINNER! 🏆
+                </div>
+                <div style="font-size: 18px; margin-bottom: 10px;">
+                    ${winner.emoji} ${winner.name} won the race!
+                </div>
+                <div style="font-size: 16px; color: #ffd700; margin-bottom: 10px;">
+                    Perfect prediction! +1000¥ earned!
+                </div>
+                <div style="font-size: 14px; color: #4CAF50;">
+                    (900¥ profit!)
+                </div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-primary" onclick="game.hideRaceOverlay()">Collect Winnings!</button>
+            </div>
+        `;
+        
+        this.showConfetti();
+    } else {
+        const playerRacer = this.raceGameState.racers[this.raceGameState.playerChoice];
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 20px; color: #f44336; margin-bottom: 15px;">
+                    😞 Your Racer Lost!
+                </div>
+                <div style="font-size: 16px; margin-bottom: 10px;">
+                    Winner: ${winner.emoji} ${winner.name}
+                </div>
+                <div style="font-size: 14px; margin-bottom: 10px;">
+                    Your pick: ${playerRacer.emoji} ${playerRacer.name}
+                </div>
+                <div style="font-size: 14px; color: #888;">
+                    Better luck next time!
+                </div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-secondary" onclick="game.hideRaceOverlay()">Try Again Later</button>
+            </div>
+        `;
+    }
 }
 
 
