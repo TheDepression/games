@@ -726,41 +726,25 @@
             }
 
             saveGameState() {
-                const gameState = {
-                    hearts: this.hearts,
-                    maxHearts: this.maxHearts,
-                    money: this.money,
-                    timeElapsed: this.timeElapsed,
-                    deathCount: this.deathCount,
-                    hasTrophy: this.hasTrophy,
-                    hasSuperGunTicket: this.hasSuperGunTicket,
-                    hasOrangePower: this.hasOrangePower,
-                    hasHammerPower: this.hasHammerPower,
-                    attackDamage: this.attackDamage,
-                    
-                    // Shop specific
-                    purpleHeartsSold: this.purpleHeartsSold,
-                    hasSuperGun: this.hasSuperGun,
-                    hasEnhancedRange: this.hasEnhancedRange,
-                    
-                    playerX: this.playerX,
-                    playerY: this.playerY,
-                    
-                    hasBoat: true,
-                    boatIsBroken: this.boatIsBroken,
-                    hasFlashlight: true,
-                    hasPyramidKey: true,
-                    hasLavaShoes: true,
-                    hasWeapon: true,
-                    bullyDefeated: true,
-                    motherPaid: true,
-                    caveBossDefeated: true,
-                    pyramidBossDefeated: true,
-                    currentUrl: 'shop',
-                    lastSaveTime: Date.now()
-                };
-                localStorage.setItem('mfGameState', JSON.stringify(gameState));
-            }
+    const existingState = JSON.parse(localStorage.getItem('mfGameState'));
+    
+    const gameState = {
+        ...existingState,
+        hearts: this.hearts,
+        money: this.money,
+        timeElapsed: this.timeElapsed,
+        deathCount: this.deathCount,
+        
+        hasTrophy: this.hasTrophy,
+        purpleHeartsSold: this.purpleHeartsSold || existingState.purpleHeartsSold,
+        hasSuperGun: this.hasSuperGun || existingState.hasSuperGun,
+        hasEnhancedRange: this.hasEnhancedRange || existingState.hasEnhancedRange,
+        
+        currentUrl: 'shop',
+        lastSaveTime: Date.now()
+    };
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+}
 
             startGameTimer() {
                 this.gameStarted = true;
