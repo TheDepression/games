@@ -3511,30 +3511,103 @@ updateCatPositions() {
     const mouseX = this.catGameState.mouseX;
     const mouseY = this.catGameState.mouseY;
     
-    // Move cats toward mouse
+    // Initialize juke timers if they don't exist
+    if (this.catGameState.blackCatJukeTimer === undefined) {
+        this.catGameState.blackCatJukeTimer = 0;
+        this.catGameState.orangeCatJukeTimer = 120; // Start 2 seconds offset (120 frames)
+        this.catGameState.blackCatJukeDirection = null;
+        this.catGameState.orangeCatJukeDirection = null;
+        this.catGameState.blackCatJukeDuration = 0;
+        this.catGameState.orangeCatJukeDuration = 0;
+    }
+    
     const catSpeed = 0.5;
+    const jukeSpeed = 1.5; // Faster movement during juke
+    const jukeDuration = 20; // Juke for 20 frames (about 0.3 seconds)
     
-    // Black cat movement
-    const blackDeltaX = mouseX - this.catGameState.blackCatX;
-    const blackDeltaY = mouseY - this.catGameState.blackCatY;
-    const blackDistance = Math.sqrt(blackDeltaX * blackDeltaX + blackDeltaY * blackDeltaY);
+    // Update juke timers
+    this.catGameState.blackCatJukeTimer++;
+    this.catGameState.orangeCatJukeTimer++;
     
-    if (blackDistance > 0) {
-        this.catGameState.blackCatX += (blackDeltaX / blackDistance) * catSpeed;
-        this.catGameState.blackCatY += (blackDeltaY / blackDistance) * catSpeed;
+    // BLACK CAT MOVEMENT
+    let blackMoveX = 0, blackMoveY = 0;
+    
+    // Check if black cat should start juking (every 4 seconds = 240 frames)
+    if (this.catGameState.blackCatJukeTimer >= 240) {
+        this.catGameState.blackCatJukeTimer = 0;
+        this.catGameState.blackCatJukeDuration = jukeDuration;
+        
+        // Pick random juke direction: 0=up, 1=right, 2=down, 3=left
+        const jukeDir = Math.floor(Math.random() * 4);
+        this.catGameState.blackCatJukeDirection = jukeDir;
     }
     
-    // Orange cat movement
-    const orangeDeltaX = mouseX - this.catGameState.orangeCatX;
-    const orangeDeltaY = mouseY - this.catGameState.orangeCatY;
-    const orangeDistance = Math.sqrt(orangeDeltaX * orangeDeltaX + orangeDeltaY * orangeDeltaY);
-    
-    if (orangeDistance > 0) {
-        this.catGameState.orangeCatX += (orangeDeltaX / orangeDistance) * catSpeed;
-        this.catGameState.orangeCatY += (orangeDeltaY / orangeDistance) * catSpeed;
+    // Apply black cat juke or normal movement
+    if (this.catGameState.blackCatJukeDuration > 0) {
+        // JUKE MODE: Move in random direction
+        this.catGameState.blackCatJukeDuration--;
+        
+        switch(this.catGameState.blackCatJukeDirection) {
+            case 0: blackMoveY = -jukeSpeed; break; // up
+            case 1: blackMoveX = jukeSpeed; break;  // right
+            case 2: blackMoveY = jukeSpeed; break;  // down
+            case 3: blackMoveX = -jukeSpeed; break; // left
+        }
+    } else {
+        // NORMAL MODE: Chase mouse
+        const blackDeltaX = mouseX - this.catGameState.blackCatX;
+        const blackDeltaY = mouseY - this.catGameState.blackCatY;
+        const blackDistance = Math.sqrt(blackDeltaX * blackDeltaX + blackDeltaY * blackDeltaY);
+        
+        if (blackDistance > 0) {
+            blackMoveX = (blackDeltaX / blackDistance) * catSpeed;
+            blackMoveY = (blackDeltaY / blackDistance) * catSpeed;
+        }
     }
     
-    // Mouse movement (escape logic similar to casino dog)
+    // ORANGE CAT MOVEMENT
+    let orangeMoveX = 0, orangeMoveY = 0;
+    
+    // Check if orange cat should start juking (every 4 seconds = 240 frames)
+    if (this.catGameState.orangeCatJukeTimer >= 240) {
+        this.catGameState.orangeCatJukeTimer = 0;
+        this.catGameState.orangeCatJukeDuration = jukeDuration;
+        
+        // Pick random juke direction: 0=up, 1=right, 2=down, 3=left
+        const jukeDir = Math.floor(Math.random() * 4);
+        this.catGameState.orangeCatJukeDirection = jukeDir;
+    }
+    
+    // Apply orange cat juke or normal movement
+    if (this.catGameState.orangeCatJukeDuration > 0) {
+        // JUKE MODE: Move in random direction
+        this.catGameState.orangeCatJukeDuration--;
+        
+        switch(this.catGameState.orangeCatJukeDirection) {
+            case 0: orangeMoveY = -jukeSpeed; break; // up
+            case 1: orangeMoveX = jukeSpeed; break;  // right
+            case 2: orangeMoveY = jukeSpeed; break;  // down
+            case 3: orangeMoveX = -jukeSpeed; break; // left
+        }
+    } else {
+        // NORMAL MODE: Chase mouse
+        const orangeDeltaX = mouseX - this.catGameState.orangeCatX;
+        const orangeDeltaY = mouseY - this.catGameState.orangeCatY;
+        const orangeDistance = Math.sqrt(orangeDeltaX * orangeDeltaX + orangeDeltaY * orangeDeltaY);
+        
+        if (orangeDistance > 0) {
+            orangeMoveX = (orangeDeltaX / orangeDistance) * catSpeed;
+            orangeMoveY = (orangeDeltaY / orangeDistance) * catSpeed;
+        }
+    }
+    
+    // Apply movements with boundary checking
+    this.catGameState.blackCatX = Math.max(5, Math.min(195, this.catGameState.blackCatX + blackMoveX));
+    this.catGameState.blackCatY = Math.max(5, Math.min(195, this.catGameState.blackCatY + blackMoveY));
+    this.catGameState.orangeCatX = Math.max(5, Math.min(195, this.catGameState.orangeCatX + orangeMoveX));
+    this.catGameState.orangeCatY = Math.max(5, Math.min(195, this.catGameState.orangeCatY + orangeMoveY));
+    
+    // Mouse movement (keep existing)
     this.updateMousePosition();
     
     // Update visual positions
