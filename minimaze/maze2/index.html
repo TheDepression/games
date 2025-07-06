@@ -1224,14 +1224,14 @@ this.playerVelocityY = deltaY * sensitivity;
     attackEl.style.borderRadius = '50%';
     
     const directionOffsets = {
-        'n': {x: 0, y: -25},
-        'ne': {x: 20, y: -20},
-        'e': {x: 25, y: 0},
-        'se': {x: 20, y: 20},
-        's': {x: 0, y: 25},
-        'sw': {x: -20, y: 20},
-        'w': {x: -25, y: 0},
-        'nw': {x: -20, y: -20}
+        'n': {x: 0, y: -50},
+        'ne': {x: 20, y: -40},
+        'e': {x: 50, y: 0},
+        'se': {x: 40, y: 40},
+        's': {x: 0, y: 50},
+        'sw': {x: -40, y: 40},
+        'w': {x: -50, y: 0},
+        'nw': {x: -40, y: -40}
     };
     
     const offset = directionOffsets[this.currentDirection];
