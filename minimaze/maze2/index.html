@@ -1210,19 +1210,19 @@ attackEl.style.borderRadius = '50%';
 
 // Enhanced range: stretch the circle into an oval in shooting direction
 if (this.hasEnhancedRange) {
-    const directionStretch = {
-        'n': 'scaleY(2)',      // Stretch up
-        's': 'scaleY(2)',      // Stretch down  
-        'e': 'scaleX(2)',      // Stretch right
-        'w': 'scaleX(2)',      // Stretch left
-        'ne': 'scale(1.4, 1.4)', // Diagonal stretch
-        'nw': 'scale(1.4, 1.4)',
-        'se': 'scale(1.4, 1.4)', 
-        'sw': 'scale(1.4, 1.4)'
-    };
-    
-    attackEl.style.transform = directionStretch[this.currentDirection];
-    attackEl.style.transformOrigin = 'center';
+    // Make it an oval that extends in the shooting direction
+    if (this.currentDirection === 'n' || this.currentDirection === 's') {
+        attackEl.style.width = '40px';
+        attackEl.style.height = '80px'; // Double height for vertical
+    } else if (this.currentDirection === 'e' || this.currentDirection === 'w') {
+        attackEl.style.width = '80px'; // Double width for horizontal
+        attackEl.style.height = '40px';
+    } else {
+        // Diagonal directions
+        attackEl.style.width = '60px';
+        attackEl.style.height = '60px';
+    }
+    attackEl.style.borderRadius = '50%';
 }
     
     const directionOffsets = {
@@ -1358,36 +1358,34 @@ if (this.hasEnhancedRange) {
     }
 }
 
-            isInAttackRange(attackX, attackY, targetX, targetY) {
-    if (!this.hasEnhancedRange) {
-        // Normal circular range
-        const distance = Math.sqrt(
-            Math.pow(attackX - targetX, 2) + 
-            Math.pow(attackY - targetY, 2)
-        );
-        return distance <= this.attackRange;
-    }
-    
-    // Enhanced range: oval shaped in shooting direction
-    const deltaX = targetX - attackX;
-    const deltaY = targetY - attackY;
-    
-    const baseRange = this.attackRange;
-    const extendedRange = this.attackRange * 1.5;
-    
-    // Create oval hit detection based on shooting direction
-    const directionChecks = {
-        'n': (deltaY * deltaY) / (extendedRange * extendedRange) + (deltaX * deltaX) / (baseRange * baseRange) <= 1,
-        's': (deltaY * deltaY) / (extendedRange * extendedRange) + (deltaX * deltaX) / (baseRange * baseRange) <= 1,
-        'e': (deltaX * deltaX) / (extendedRange * extendedRange) + (deltaY * deltaY) / (baseRange * baseRange) <= 1,
-        'w': (deltaX * deltaX) / (extendedRange * extendedRange) + (deltaY * deltaY) / (baseRange * baseRange) <= 1,
-        'ne': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange,
-        'nw': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange,
-        'se': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange,
-        'sw': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange
-    };
-    
-    return directionChecks[this.currentDirection] || false;
+            // Enhanced range: extend reach in shooting direction only
+const baseRange = this.attackRange;
+const extendedRange = this.attackRange * 2; // Double range in shooting direction
+
+// Calculate if target is in extended range in the shooting direction
+const directionVector = {
+    'n': {x: 0, y: -1},
+    'ne': {x: 0.7, y: -0.7},
+    'e': {x: 1, y: 0},
+    'se': {x: 0.7, y: 0.7},
+    's': {x: 0, y: 1},
+    'sw': {x: -0.7, y: 0.7},
+    'w': {x: -1, y: 0},
+    'nw': {x: -0.7, y: -0.7}
+};
+
+const dir = directionVector[this.currentDirection];
+const dotProduct = deltaX * dir.x + deltaY * dir.y;
+
+// Check if target is in front of player and within extended range
+if (dotProduct > 0) {
+    // Target is in shooting direction - use extended range
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    return distance <= extendedRange;
+} else {
+    // Target is behind - use normal range
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    return distance <= baseRange;
 }
 
             createMoneyDrop(x, y) {
