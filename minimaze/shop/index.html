@@ -789,6 +789,7 @@
             generateShop() {
                 this.createShopLayout();
                 this.createShopkeepers();
+                this.createCounterDisplays();
                 this.createTestEnemy();
                 this.createExit();
                 
@@ -869,6 +870,52 @@
                 rangeSeller.dataset.type = 'rangeSeller';
                 this.gameWorld.appendChild(rangeSeller);
             }
+
+
+            createCounterDisplays() {
+    // Purple heart counter display (3 hearts minus sold)
+    const heartsToShow = 3 - this.purpleHeartsSold;
+    for (let i = 0; i < heartsToShow; i++) {
+        const heartDisplay = document.createElement('div');
+        heartDisplay.style.position = 'absolute';
+        heartDisplay.style.left = (55 + i * 15) + 'px'; // Spread across counter
+        heartDisplay.style.top = '55px';
+        heartDisplay.style.fontSize = '12px';
+        heartDisplay.style.pointerEvents = 'none';
+        heartDisplay.style.zIndex = '45';
+        heartDisplay.textContent = '💜';
+        this.gameWorld.appendChild(heartDisplay);
+    }
+
+    // Super gun counter display (only if not purchased)
+    if (!this.hasSuperGun) {
+        const gunDisplay = document.createElement('div');
+        gunDisplay.style.position = 'absolute';
+        gunDisplay.style.left = '175px';
+        gunDisplay.style.top = '55px';
+        gunDisplay.style.fontSize = '16px';
+        gunDisplay.style.pointerEvents = 'none';
+        gunDisplay.style.zIndex = '45';
+        gunDisplay.style.filter = 'brightness(0.3)'; // Black gun
+        gunDisplay.textContent = '🔫';
+        this.gameWorld.appendChild(gunDisplay);
+    }
+
+    // Enhanced range counter display (only if not purchased)
+    if (!this.hasEnhancedRange) {
+        const rangeDisplay = document.createElement('div');
+        rangeDisplay.style.position = 'absolute';
+        rangeDisplay.style.left = '275px';
+        rangeDisplay.style.top = '55px';
+        rangeDisplay.style.fontSize = '20px'; // Enlarged
+        rangeDisplay.style.pointerEvents = 'none';
+        rangeDisplay.style.zIndex = '45';
+        rangeDisplay.style.filter = 'brightness(0.6)'; // Dark grey
+        rangeDisplay.style.animation = 'gunPulsate 2s infinite';
+        rangeDisplay.textContent = '🔫';
+        this.gameWorld.appendChild(rangeDisplay);
+    }
+}
 
             createTestEnemy() {
                 const enemyEl = document.createElement('div');
