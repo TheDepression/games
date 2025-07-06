@@ -1719,10 +1719,13 @@ showVictoryDialog() {
     this.showMessage('💀 You died! Returning to main world...');
     
     setTimeout(() => {
-        // Save state and return to main world
-        this.saveGameState();
-        
-        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+    // Reset hearts before saving (like main world does)
+    this.hearts = 3;
+    
+    // Save state and return to main world
+    this.saveGameState();
+    
+    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
         gameState.currentUrl = 'maze2';
         gameState.playerX = 2000;
         gameState.playerY = 2020;
