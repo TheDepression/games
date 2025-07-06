@@ -3179,6 +3179,9 @@ entrances.forEach(entrance => {
                 // Check purple heart pickup
 const purpleHearts = this.gameWorld.querySelectorAll('.purple-heart-pickup');
 purpleHearts.forEach(purpleHeart => {
+    // Skip if already being collected
+    if (purpleHeart.dataset.collecting === 'true') return;
+    
     const heartX = parseInt(purpleHeart.style.left);
     const heartY = parseInt(purpleHeart.style.top);
     const heartRect = {
@@ -3187,6 +3190,9 @@ purpleHearts.forEach(purpleHeart => {
     };
     
     if (this.rectsOverlap(playerRect, heartRect)) {
+        // Mark as being collected to prevent double-collection
+        purpleHeart.dataset.collecting = 'true';
+        
         // Increase max hearts permanently
         this.maxHearts++;
         this.hearts = this.maxHearts; // Fill to new max
