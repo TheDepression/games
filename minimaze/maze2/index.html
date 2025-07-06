@@ -681,6 +681,16 @@
             #8b6914 100%);
     }
 }
+
+
+        @keyframes gunPulsate {
+    0%, 100% { 
+        filter: brightness(1) drop-shadow(0 0 3px gold);
+    }
+    50% { 
+        filter: brightness(1.3) drop-shadow(0 0 8px gold);
+    }
+}
     </style>
 </head>
 <body>
@@ -4055,13 +4065,24 @@ transferToWeakPoint(url) {
     if (this.hasKey) itemsHTML += ' 🔑';
     if (this.hasBoat && !this.boatIsBroken) itemsHTML += ' ⛵';
     if (this.hasBoat && this.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
-    if (this.hasHammer) itemsHTML += ' 🔨';
     if (this.hasFlashlight) itemsHTML += ' 🔦';
-    if (this.hasPencil) itemsHTML += ' ✏️';
     // Replace the gun section in updateUI() with this:
-if (this.hasWeapon && this.hasHammerPower) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
-else if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-else if (this.hasWeapon) itemsHTML += ' 🔫';
+if (this.hasWeapon) {
+    let gunStyle = '';
+    if (this.hasSuperGun) {
+        gunStyle = 'filter: brightness(0.3);'; // Deep black for super gun
+    } else if (this.hasHammerPower) {
+        gunStyle = 'filter: grayscale(0.9) brightness(0.8);';
+    } else if (this.hasOrangePower) {
+        gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);';
+    }
+    
+    if (this.hasEnhancedRange) {
+        gunStyle += ' animation: gunPulsate 2s infinite;';
+    }
+    
+    itemsHTML += ` <span style="${gunStyle}">🔫</span>`;
+}
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
                 if (this.hasTrophy) itemsHTML += ' 🏆';
                if (this.collectedBanana && !this.gorillaEncounterComplete) itemsHTML += ' 🍌';
