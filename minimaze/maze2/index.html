@@ -1388,68 +1388,62 @@ if (this.hasEnhancedRange) {
             }
 
             loadGameState() {
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    this.collectedBanana = gameState.collectedBanana || false;
-                    this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
-                    // Load shop purchases
-this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
-this.hasSuperGun = gameState.hasSuperGun || false;
-this.hasEnhancedRange = gameState.hasEnhancedRange || false;
-
-// Apply shop upgrades immediately after loading
-if (this.hasSuperGun) {
-    this.attackDamage = 150; // Super gun damage
-} else if (this.hasOrangePower) {
-    this.attackDamage = 100; // Keep orange power if no super gun
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        this.collectedBanana = gameState.collectedBanana || false;
+        this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
+        
+        // Load shop purchases
+        this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
+        this.hasSuperGun = gameState.hasSuperGun || false;
+        this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+        
+        this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
+        this.hasOrangePower = gameState.hasOrangePower || false;
+        this.pinkBossDefeated = gameState.pinkBossDefeated || false;
+        this.hasHammerPower = gameState.hasHammerPower || false;
+        this.gorillaHammerDialogComplete = gameState.gorillaHammerDialogComplete || false;
+        this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
+        this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+        this.hasTrophy = gameState.hasTrophy || false;
+        this.kingMoneyReceived = gameState.kingMoneyReceived || false;
+        this.collectedRedHearts = gameState.collectedRedHearts || [];
+        this.collectedMoney = gameState.collectedMoney || [];
+        this.hearts = gameState.hearts || 3;
+        this.money = gameState.money || 0;
+        this.timeElapsed = gameState.timeElapsed || 0;
+        this.deathCount = gameState.deathCount || 0;
+        this.updateDeathCounter();
+        this.playerX = gameState.playerX || 400;
+        this.playerY = gameState.playerY || 1760;
+        this.maxHearts = gameState.maxHearts || 3;
+        this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+        this.hasBoat = true;
+        this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true;
+        
+        // Apply ALL damage upgrades in the correct priority order (ONLY ONCE, AT THE END)
+        if (this.hasSuperGun) {
+            this.attackDamage = 150; // Super gun has highest priority
+        } else if (this.hasOrangePower || this.hasHammerPower) {
+            this.attackDamage = 100; // Orange power OR hammer power
+        } else {
+            this.attackDamage = 50; // Base damage
+        }
+        
+        // Apply range upgrade
+        if (this.hasEnhancedRange) {
+            this.attackRange = 90; // Double the range from 45 to 90
+        }
+        
+        // Apply max hearts from shop purple hearts
+        this.maxHearts += this.purpleHeartsSold;
+        
+        this.updateTimer();
+        return true;
+    }
+    return false;
 }
-
-if (this.hasEnhancedRange) {
-    this.attackRange = 90; // Double the range from 45 to 90
-}
-
-// Apply max hearts from shop purple hearts
-this.maxHearts += this.purpleHeartsSold;
-                    this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
-this.hasOrangePower = gameState.hasOrangePower || false;
-                    if (this.hasOrangePower) {
-    this.attackDamage = 100; // Restore the power upgrade
-}
-                    this.pinkBossDefeated = gameState.pinkBossDefeated || false;
-                    // Add these lines in loadGameState() after existing gameState properties
-this.hasHammerPower = gameState.hasHammerPower || false;
-this.gorillaHammerDialogComplete = gameState.gorillaHammerDialogComplete || false;
-this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
-this.weakPointsBlasted = gameState.weakPointsBlasted || [];
-
-// Apply hammer power gun damage if loaded
-if (this.hasHammerPower) {
-    this.attackDamage = 100; // Keep the 100 damage from orange power
-}
-                    this.hasTrophy = gameState.hasTrophy || false;
-                    this.kingMoneyReceived = gameState.kingMoneyReceived || false;
-                    this.collectedRedHearts = gameState.collectedRedHearts || [];
-                    this.collectedMoney = gameState.collectedMoney || [];
-                    this.hearts = gameState.hearts || 3;
-                    this.money = gameState.money || 0;
-                    this.timeElapsed = gameState.timeElapsed || 0; // Continue from where left off
-                    this.deathCount = gameState.deathCount || 0;
-this.updateDeathCounter();
-                    this.playerX = gameState.playerX || 400;
-                    this.playerY = gameState.playerY || 1760;
-                    this.maxHearts = gameState.maxHearts || 3;
-this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
-
-                    this.hasBoat = true; // Always have boat in maze 2
-                    this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true; // Default broken
-                    
-                    this.updateTimer();
-                    return true;
-
-                }
-                return false;
-            }
 
             saveGameState() {
                 const gameState = {
