@@ -864,6 +864,11 @@ this.collectedPurpleHearts = []; // Track which purple hearts have been collecte
                 this.hasPencil = false;
                 this.hasPyramidKey = true;
                 this.hasTrophy = false;
+                // Shop purchases from shop
+this.purpleHeartsSold = 0; // Track how many purple hearts were sold in shop
+this.hasSuperGun = false;
+this.hasEnhancedRange = false;
+this.hasSuperGunTicket = false; // You already have this one
                 this.hasLavaShoes = true; 
                 this.hasWeapon = true; // ALWAYS have gun
                 this.bullyDefeated = true;
@@ -1368,6 +1373,24 @@ this.playerVelocityY = deltaY * sensitivity;
                     const gameState = JSON.parse(savedState);
                     this.collectedBanana = gameState.collectedBanana || false;
                     this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
+                    // Load shop purchases
+this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
+this.hasSuperGun = gameState.hasSuperGun || false;
+this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+
+// Apply shop upgrades immediately after loading
+if (this.hasSuperGun) {
+    this.attackDamage = 150; // Super gun damage
+} else if (this.hasOrangePower) {
+    this.attackDamage = 100; // Keep orange power if no super gun
+}
+
+if (this.hasEnhancedRange) {
+    this.attackRange = 90; // Double the range from 45 to 90
+}
+
+// Apply max hearts from shop purple hearts
+this.maxHearts += this.purpleHeartsSold;
                     this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
 this.hasOrangePower = gameState.hasOrangePower || false;
                     if (this.hasOrangePower) {
@@ -1427,6 +1450,10 @@ collectedPurpleHearts: this.collectedPurpleHearts,
 hasOrangePower: this.hasOrangePower,
                     attackDamage: this.attackDamage,
                     hasSuperGunTicket: this.hasSuperGunTicket,
+                    // Add these lines in saveGameState() after existing properties
+purpleHeartsSold: this.purpleHeartsSold,
+hasSuperGun: this.hasSuperGun,
+hasEnhancedRange: this.hasEnhancedRange,
                     pinkBossDefeated: this.pinkBossDefeated,
                     // Add these lines in saveGameState() after existing properties
 hasHammerPower: this.hasHammerPower,
