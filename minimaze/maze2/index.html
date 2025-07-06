@@ -1201,37 +1201,27 @@ this.playerVelocityY = deltaY * sensitivity;
     attackEl.style.zIndex = '400';
     attackEl.style.animation = 'slashEffect 0.3s ease-out';
     
-    // Enhanced range: make it longer in shooting direction
+    // Enhanced range: make everything 50% bigger
     if (this.hasEnhancedRange) {
-        if (this.currentDirection === 'n' || this.currentDirection === 's') {
-            attackEl.style.width = '40px';
-            attackEl.style.height = '80px'; // Extended vertically
-        } else if (this.currentDirection === 'e' || this.currentDirection === 'w') {
-            attackEl.style.width = '80px'; // Extended horizontally
-            attackEl.style.height = '40px';
-        } else {
-            // Diagonals - extend both dimensions slightly
-            attackEl.style.width = '60px';
-            attackEl.style.height = '60px';
-        }
+        attackEl.style.width = '60px';  // 40px * 1.5
+        attackEl.style.height = '60px'; // 40px * 1.5
     } else {
-        // Normal size
         attackEl.style.width = '40px';
         attackEl.style.height = '40px';
     }
     
-    attackEl.style.background = 'radial-gradient(ellipse, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+    attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
     attackEl.style.borderRadius = '50%';
     
     const directionOffsets = {
-        'n': {x: 0, y: -50},
-        'ne': {x: 20, y: -40},
-        'e': {x: 50, y: 0},
-        'se': {x: 40, y: 40},
-        's': {x: 0, y: 50},
-        'sw': {x: -40, y: 40},
-        'w': {x: -50, y: 0},
-        'nw': {x: -40, y: -40}
+        'n': {x: 0, y: -25},
+        'ne': {x: 20, y: -20},
+        'e': {x: 25, y: 0},
+        'se': {x: 20, y: 20},
+        's': {x: 0, y: 25},
+        'sw': {x: -20, y: 20},
+        'w': {x: -25, y: 0},
+        'nw': {x: -20, y: -20}
     };
     
     const offset = directionOffsets[this.currentDirection];
@@ -1256,6 +1246,9 @@ this.playerVelocityY = deltaY * sensitivity;
 
 
            checkAttackHits(attackX, attackY) {
+    // Set range based on enhanced range
+    const effectiveRange = this.hasEnhancedRange ? this.attackRange * 1.5 : this.attackRange;
+    
     // Check weak points (only if has hammer power)
     if (this.hasHammerPower) {
         const weakPoints = this.gameWorld.querySelectorAll('.weak-point');
@@ -1263,37 +1256,12 @@ this.playerVelocityY = deltaY * sensitivity;
             const weakX = parseInt(weakPoint.style.left) + 10;
             const weakY = parseInt(weakPoint.style.top) + 10;
             
-            let hitDetected = false;
-
-            if (this.hasEnhancedRange) {
-                // Extended hit detection in shooting direction
-                const deltaX = weakX - attackX;
-                const deltaY = weakY - attackY;
-                
-                if (this.currentDirection === 'n') {
-                    hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -65 && deltaY <= 20;
-                } else if (this.currentDirection === 's') {
-                    hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -20 && deltaY <= 65;
-                } else if (this.currentDirection === 'e') {
-                    hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -20 && deltaX <= 65;
-                } else if (this.currentDirection === 'w') {
-                    hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -65 && deltaX <= 20;
-                } else {
-                    // Diagonals - slightly extended circle
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    hitDetected = distance <= 55;
-                }
-            } else {
-                // Normal circular hit detection
-                const distance = Math.sqrt(
-                    Math.pow(attackX - weakX, 2) +
-                    Math.pow(attackY - weakY, 2)
-                );
-                hitDetected = distance <= this.attackRange;
-            }
+            const distance = Math.sqrt(
+                Math.pow(attackX - weakX, 2) +
+                Math.pow(attackY - weakY, 2)
+            );
             
-            if (hitDetected) {
-                // Blast open the weak point
+            if (distance <= effectiveRange) {
                 const weakId = weakPoint.dataset.id;
                 const weakUrl = weakPoint.dataset.url;
                 
@@ -1302,7 +1270,6 @@ this.playerVelocityY = deltaY * sensitivity;
                 
                 weakPoint.remove();
                 
-                // Create black square entrance
                 const entrance = document.createElement('div');
                 entrance.className = 'weak-point-entrance';
                 entrance.style.position = 'absolute';
@@ -1329,36 +1296,12 @@ this.playerVelocityY = deltaY * sensitivity;
             const wallX = parseInt(wall.style.left) + parseInt(wall.style.width)/2;
             const wallY = parseInt(wall.style.top) + parseInt(wall.style.height)/2;
             
-            let hitDetected = false;
-
-            if (this.hasEnhancedRange) {
-                // Extended hit detection in shooting direction
-                const deltaX = wallX - attackX;
-                const deltaY = wallY - attackY;
-                
-                if (this.currentDirection === 'n') {
-                    hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -65 && deltaY <= 20;
-                } else if (this.currentDirection === 's') {
-                    hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -20 && deltaY <= 65;
-                } else if (this.currentDirection === 'e') {
-                    hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -20 && deltaX <= 65;
-                } else if (this.currentDirection === 'w') {
-                    hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -65 && deltaX <= 20;
-                } else {
-                    // Diagonals - slightly extended circle
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    hitDetected = distance <= 55;
-                }
-            } else {
-                // Normal circular hit detection
-                const distance = Math.sqrt(
-                    Math.pow(attackX - wallX, 2) +
-                    Math.pow(attackY - wallY, 2)
-                );
-                hitDetected = distance <= this.attackRange;
-            }
+            const distance = Math.sqrt(
+                Math.pow(attackX - wallX, 2) +
+                Math.pow(attackY - wallY, 2)
+            );
             
-            if (hitDetected) {
+            if (distance <= effectiveRange) {
                 this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
                 wall.remove();
             }
@@ -1369,39 +1312,14 @@ this.playerVelocityY = deltaY * sensitivity;
     this.movingEnemies.forEach(enemy => {
         if (!enemy.alive || enemy.type === 'gorilla') return;
         
-        let hitDetected = false;
-
-        if (this.hasEnhancedRange) {
-            // Extended hit detection in shooting direction
-            const deltaX = enemy.currentX - attackX;
-            const deltaY = enemy.currentY - attackY;
-            
-            if (this.currentDirection === 'n') {
-                hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -65 && deltaY <= 20;
-            } else if (this.currentDirection === 's') {
-                hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -20 && deltaY <= 65;
-            } else if (this.currentDirection === 'e') {
-                hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -20 && deltaX <= 65;
-            } else if (this.currentDirection === 'w') {
-                hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -65 && deltaX <= 20;
-            } else {
-                // Diagonals - slightly extended circle
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                hitDetected = distance <= 55;
-            }
-        } else {
-            // Normal circular hit detection
-            const distance = Math.sqrt(
-                Math.pow(attackX - enemy.currentX, 2) +
-                Math.pow(attackY - enemy.currentY, 2)
-            );
-            hitDetected = distance <= this.attackRange;
-        }
+        const distance = Math.sqrt(
+            Math.pow(attackX - enemy.currentX, 2) +
+            Math.pow(attackY - enemy.currentY, 2)
+        );
         
-        if (hitDetected) {
+        if (distance <= effectiveRange) {
             enemy.hp -= this.attackDamage;
             
-            // Show damage number
             const damageText = document.createElement('div');
             damageText.style.position = 'absolute';
             damageText.style.color = '#ff4444';
@@ -1425,7 +1343,6 @@ this.playerVelocityY = deltaY * sensitivity;
                 enemy.alive = false;
                 enemy.element.classList.add('defeated');
                 
-                // Drop rewards
                 if (Math.random() < 0.15) {
                     this.createMoneyDrop(enemy.currentX, enemy.currentY);
                 }
@@ -1438,36 +1355,12 @@ this.playerVelocityY = deltaY * sensitivity;
 
     // Check gorilla collision for attack (but don't damage)
     if (this.gorilla && this.gorilla.alive) {
-        let hitDetected = false;
-
-        if (this.hasEnhancedRange) {
-            // Extended hit detection in shooting direction
-            const deltaX = this.gorilla.currentX - attackX;
-            const deltaY = this.gorilla.currentY - attackY;
-            
-            if (this.currentDirection === 'n') {
-                hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -65 && deltaY <= 20;
-            } else if (this.currentDirection === 's') {
-                hitDetected = Math.abs(deltaX) <= 20 && deltaY >= -20 && deltaY <= 65;
-            } else if (this.currentDirection === 'e') {
-                hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -20 && deltaX <= 65;
-            } else if (this.currentDirection === 'w') {
-                hitDetected = Math.abs(deltaY) <= 20 && deltaX >= -65 && deltaX <= 20;
-            } else {
-                // Diagonals - slightly extended circle
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                hitDetected = distance <= 55;
-            }
-        } else {
-            // Normal circular hit detection
-            const distance = Math.sqrt(
-                Math.pow(attackX - this.gorilla.currentX, 2) +
-                Math.pow(attackY - this.gorilla.currentY, 2)
-            );
-            hitDetected = distance <= this.attackRange;
-        }
+        const distance = Math.sqrt(
+            Math.pow(attackX - this.gorilla.currentX, 2) +
+            Math.pow(attackY - this.gorilla.currentY, 2)
+        );
         
-        if (hitDetected) {
+        if (distance <= effectiveRange) {
             this.showMessage('🦍 The gorilla seems friendly now...');
         }
     }
