@@ -617,12 +617,23 @@ this.battleMusic = document.getElementById('battleMusic');
     if (!this.enemy || !this.enemy.alive || this.battlePhase !== 'fighting') return;
     
     const effectiveRange = this.hasEnhancedRange ? 90 : 45;
-    const distance = Math.sqrt(
-        Math.pow(attackX - this.enemy.currentX, 2) + 
-        Math.pow(attackY - this.enemy.currentY, 2)
-    );
     
-    if (distance <= effectiveRange) {
+    // Check if attack is within range of enemy body (expanded hitbox)
+    const enemyHitRect = {
+        left: this.enemy.currentX,
+        top: this.enemy.currentY,
+        right: this.enemy.currentX + 60,
+        bottom: this.enemy.currentY + 180 // Extended 60px down from 120 to 180
+    };
+    
+    const attackRect = {
+        left: attackX - effectiveRange/2,
+        top: attackY - effectiveRange/2,
+        right: attackX + effectiveRange/2,
+        bottom: attackY + effectiveRange/2
+    };
+    
+    if (this.rectsOverlap(attackRect, enemyHitRect)) {
         this.enemy.hp -= this.attackDamage;
         
         // Show damage number
@@ -1690,27 +1701,38 @@ showVictoryDialog() {
 }
             
             gameOver() {
-                this.deathCount++;
-                this.updateDeathCounter();
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                
-                const timeAtDeath = this.timeElapsed;
-                
-                this.showMessage('💀 You died! Returning to spawn point...');
-                setTimeout(() => {
-                    this.playerX = 400;
-                    this.playerY = 400;
-                    this.timeElapsed = timeAtDeath;
-                    this.hearts = 3;
-                    
-                    this.initLevel();
-                    this.startGameTimer();
-                    this.saveGameState();
-                    
-                    this.showMessage('🔄 Respawned in the arena!');
-                }, 3000);
+    this.deathCount++;
+    this.updateDeathCounter();
+    clearInterval(this.timerInterval);
+    this.gameStarted = false;
+    this.battleMusic.pause();
+    
+    // Clean up projectiles
+    if (this.enemy && this.enemy.projectiles) {
+        this.enemy.projectiles.forEach(projectile => {
+            if (projectile.element) {
+                projectile.element.remove();
             }
+        });
+    }
+    
+    this.showMessage('💀 You died! Returning to main world...');
+    
+    setTimeout(() => {
+        // Save state and return to main world
+        this.saveGameState();
+        
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.currentUrl = 'maze2';
+        gameState.playerX = 2000;
+        gameState.playerY = 2020;
+        gameState.timeElapsed = this.timeElapsed;
+        gameState.lastSaveTime = Date.now();
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+    }, 3000);
+}
             
             showLevelComplete(title, text) {
                 document.getElementById('levelCompleteTitle').textContent = title;
