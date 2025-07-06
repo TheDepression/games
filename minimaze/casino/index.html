@@ -2106,8 +2106,8 @@ showLotteryRules() {
                 • Numbers must match in exact position<br><br>
                 <strong>Prizes:</strong><br>
                 • 1 match: 200¥ (100¥ profit)<br>
-                • 2 matches: 1000¥ (900¥ profit)<br>
-                • 3 matches: 6000¥ (5900¥ profit)<br>
+                • 2 matches: 1500¥ (1400¥ profit)<br>
+                • 3 matches: 10000¥ (9900¥ profit)<br>
                 • 0 matches: Nothing (100¥ loss)
             </div>
         </div>
@@ -2225,8 +2225,8 @@ calculateLotteryWinnings() {
     
     let winnings = 0;
     if (matches === 1) winnings = 200;
-    else if (matches === 2) winnings = 1000;
-    else if (matches === 3) winnings = 6000;
+    else if (matches === 2) winnings = 1500;
+    else if (matches === 3) winnings = 10000;
     
     if (winnings > 0) {
         this.money += winnings;
@@ -2326,9 +2326,9 @@ showSimonRules() {
                 🎵 Game Rules
             </div>
             <div style="font-size: 14px; line-height: 1.6;">
-                • Round 1: 3x3 grid, repeat 5 flashes<br>
-                • Round 2: 5x5 grid, repeat 6 flashes<br>
-                • Round 3: 7x7 grid, repeat 7 flashes<br>
+                • Round 1: 3x3 grid, repeat 4 flashes<br>
+                • Round 2: 4x4 grid, repeat 5 flashes<br>
+                • Round 3: 5x5 grid, repeat 6 flashes<br>
                 • You have 6 seconds to complete each round<br><br>
                 <strong>Prizes:</strong><br>
                 • Fail Round 1: 0¥ (200¥ loss)<br>
@@ -2349,13 +2349,13 @@ startSimonRound() {
     
     if (round === 1) {
         gridSize = 3;
-        sequenceLength = 5;
+        sequenceLength = 4;
     } else if (round === 2) {
+        gridSize = 4;
+        sequenceLength = 5;
+    } else {
         gridSize = 5;
         sequenceLength = 6;
-    } else {
-        gridSize = 7;
-        sequenceLength = 7;
     }
     
     this.simonGameState.gridSize = gridSize;
