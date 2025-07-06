@@ -1255,6 +1255,11 @@ if (this.hasEnhancedRange) {
 }
 
             checkAttackHits(attackX, attackY) {
+    // Calculate effective range ONCE at the top
+    const effectiveRange = this.hasEnhancedRange ? 
+        (this.attackRange * 1.5) : 
+        this.attackRange;
+
     // Check weak points (only if has hammer power)
     if (this.hasHammerPower) {
         const weakPoints = this.gameWorld.querySelectorAll('.weak-point');
@@ -1266,13 +1271,7 @@ if (this.hasEnhancedRange) {
                 Math.pow(attackY - weakY, 2)
             );
             
-            // Calculate effective range first (add this once at the top of checkAttackHits)
-const effectiveRange = this.hasEnhancedRange ? 
-    (this.attackRange * 1.5) : 
-    this.attackRange;
-
-// Then replace each distance check:
-if (distance <= effectiveRange) {
+            if (distance <= effectiveRange) {
                 // Blast open the weak point
                 const weakId = weakPoint.dataset.id;
                 const weakUrl = weakPoint.dataset.url;
@@ -1313,13 +1312,7 @@ if (distance <= effectiveRange) {
                 Math.pow(attackY - wallY, 2)
             );
             
-            // Calculate effective range first (add this once at the top of checkAttackHits)
-const effectiveRange = this.hasEnhancedRange ? 
-    (this.attackRange * 1.5) : 
-    this.attackRange;
-
-// Then replace each distance check:
-if (distance <= effectiveRange) {
+            if (distance <= effectiveRange) {
                 this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
                 wall.remove();
             }
@@ -1335,13 +1328,7 @@ if (distance <= effectiveRange) {
             Math.pow(attackY - enemy.currentY, 2)
         );
         
-      // Calculate effective range first (add this once at the top of checkAttackHits)
-const effectiveRange = this.hasEnhancedRange ? 
-    (this.attackRange * 1.5) : 
-    this.attackRange;
-
-// Then replace each distance check:
-if (distance <= effectiveRange) {
+        if (distance <= effectiveRange) {
             enemy.hp -= this.attackDamage;
             
             // Show damage number
@@ -1386,13 +1373,7 @@ if (distance <= effectiveRange) {
             Math.pow(attackY - this.gorilla.currentY, 2)
         );
         
-        // Calculate effective range first (add this once at the top of checkAttackHits)
-const effectiveRange = this.hasEnhancedRange ? 
-    (this.attackRange * 1.5) : 
-    this.attackRange;
-
-// Then replace each distance check:
-if (distance <= effectiveRange) {
+        if (distance <= effectiveRange) {
             this.showMessage('🦍 The gorilla seems friendly now...');
         }
     }
