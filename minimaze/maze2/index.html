@@ -1202,27 +1202,27 @@ attackEl.style.pointerEvents = 'none';
 attackEl.style.zIndex = '400';
 attackEl.style.animation = 'slashEffect 0.3s ease-out';
 
-// Set base size first
+// Set base circle (keep original positioning)
 attackEl.style.width = '40px';
 attackEl.style.height = '40px';
 attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
 attackEl.style.borderRadius = '50%';
 
-// Enhanced range stretches in shooting direction only
+// Enhanced range: stretch the circle into an oval in shooting direction
 if (this.hasEnhancedRange) {
     const directionStretch = {
-        'n': { scaleX: 1, scaleY: 2 },
-        'ne': { scaleX: 1.4, scaleY: 1.4 },
-        'e': { scaleX: 2, scaleY: 1 },
-        'se': { scaleX: 1.4, scaleY: 1.4 },
-        's': { scaleX: 1, scaleY: 2 },
-        'sw': { scaleX: 1.4, scaleY: 1.4 },
-        'w': { scaleX: 2, scaleY: 1 },
-        'nw': { scaleX: 1.4, scaleY: 1.4 }
+        'n': 'scaleY(2)',      // Stretch up
+        's': 'scaleY(2)',      // Stretch down  
+        'e': 'scaleX(2)',      // Stretch right
+        'w': 'scaleX(2)',      // Stretch left
+        'ne': 'scale(1.4, 1.4)', // Diagonal stretch
+        'nw': 'scale(1.4, 1.4)',
+        'se': 'scale(1.4, 1.4)', 
+        'sw': 'scale(1.4, 1.4)'
     };
     
-    const stretch = directionStretch[this.currentDirection];
-    attackEl.style.transform = `scale(${stretch.scaleX}, ${stretch.scaleY})`;
+    attackEl.style.transform = directionStretch[this.currentDirection];
+    attackEl.style.transformOrigin = 'center';
 }
     
     const directionOffsets = {
@@ -1257,23 +1257,14 @@ if (this.hasEnhancedRange) {
 }
 
            checkAttackHits(attackX, attackY) {
-    // Calculate effective range once
-    const effectiveRange = this.hasEnhancedRange ? 
-        (this.attackRange * 1.5) : 
-        this.attackRange;
-
     // Check weak points (only if has hammer power)
     if (this.hasHammerPower) {
         const weakPoints = this.gameWorld.querySelectorAll('.weak-point');
         weakPoints.forEach(weakPoint => {
             const weakX = parseInt(weakPoint.style.left) + 10;
             const weakY = parseInt(weakPoint.style.top) + 10;
-            const distance = Math.sqrt(
-                Math.pow(attackX - weakX, 2) + 
-                Math.pow(attackY - weakY, 2)
-            );
             
-            if (distance <= effectiveRange) {
+            if (this.isInAttackRange(attackX, attackY, weakX, weakY)) {
                 // Blast open the weak point
                 const weakId = weakPoint.dataset.id;
                 const weakUrl = weakPoint.dataset.url;
@@ -1309,28 +1300,19 @@ if (this.hasEnhancedRange) {
         breakableWalls.forEach(wall => {
             const wallX = parseInt(wall.style.left) + parseInt(wall.style.width)/2;
             const wallY = parseInt(wall.style.top) + parseInt(wall.style.height)/2;
-            const distance = Math.sqrt(
-                Math.pow(attackX - wallX, 2) + 
-                Math.pow(attackY - wallY, 2)
-            );
             
-            if (distance <= effectiveRange) {
+            if (this.isInAttackRange(attackX, attackY, wallX, wallY)) {
                 this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
                 wall.remove();
             }
         });
     }
     
-    // Existing enemy hit detection code
+    // Check enemies
     this.movingEnemies.forEach(enemy => {
         if (!enemy.alive || enemy.type === 'gorilla') return;
         
-        const distance = Math.sqrt(
-            Math.pow(attackX - enemy.currentX, 2) + 
-            Math.pow(attackY - enemy.currentY, 2)
-        );
-        
-        if (distance <= effectiveRange) {
+        if (this.isInAttackRange(attackX, attackY, enemy.currentX, enemy.currentY)) {
             enemy.hp -= this.attackDamage;
             
             // Show damage number
@@ -1370,15 +1352,42 @@ if (this.hasEnhancedRange) {
 
     // Check gorilla collision for attack (but don't damage)
     if (this.gorilla && this.gorilla.alive) {
-        const distance = Math.sqrt(
-            Math.pow(attackX - this.gorilla.currentX, 2) + 
-            Math.pow(attackY - this.gorilla.currentY, 2)
-        );
-        
-        if (distance <= effectiveRange) {
+        if (this.isInAttackRange(attackX, attackY, this.gorilla.currentX, this.gorilla.currentY)) {
             this.showMessage('🦍 The gorilla seems friendly now...');
         }
     }
+}
+
+            isInAttackRange(attackX, attackY, targetX, targetY) {
+    if (!this.hasEnhancedRange) {
+        // Normal circular range
+        const distance = Math.sqrt(
+            Math.pow(attackX - targetX, 2) + 
+            Math.pow(attackY - targetY, 2)
+        );
+        return distance <= this.attackRange;
+    }
+    
+    // Enhanced range: oval shaped in shooting direction
+    const deltaX = targetX - attackX;
+    const deltaY = targetY - attackY;
+    
+    const baseRange = this.attackRange;
+    const extendedRange = this.attackRange * 1.5;
+    
+    // Create oval hit detection based on shooting direction
+    const directionChecks = {
+        'n': (deltaY * deltaY) / (extendedRange * extendedRange) + (deltaX * deltaX) / (baseRange * baseRange) <= 1,
+        's': (deltaY * deltaY) / (extendedRange * extendedRange) + (deltaX * deltaX) / (baseRange * baseRange) <= 1,
+        'e': (deltaX * deltaX) / (extendedRange * extendedRange) + (deltaY * deltaY) / (baseRange * baseRange) <= 1,
+        'w': (deltaX * deltaX) / (extendedRange * extendedRange) + (deltaY * deltaY) / (baseRange * baseRange) <= 1,
+        'ne': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange,
+        'nw': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange,
+        'se': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange,
+        'sw': Math.sqrt(deltaX * deltaX + deltaY * deltaY) <= extendedRange && Math.abs(deltaX) <= extendedRange && Math.abs(deltaY) <= extendedRange
+    };
+    
+    return directionChecks[this.currentDirection] || false;
 }
 
             createMoneyDrop(x, y) {
