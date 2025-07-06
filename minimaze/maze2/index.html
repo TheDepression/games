@@ -1470,8 +1470,8 @@ weakPointsBlasted: this.weakPointsBlasted,
                             this.saveGameState();
                         }
 
-                        // Respawn enemies every 3 minutes (if not recently died)
-                        if (this.timeElapsed % 180 === 0 && !this.recentlyDied) {
+                        // Respawn enemies every 5 minutes (if not recently died)
+                        if (this.timeElapsed % 300 === 0 && !this.recentlyDied) {
                             this.respawnEnemies();
                         }
                     }
@@ -1487,7 +1487,7 @@ weakPointsBlasted: this.weakPointsBlasted,
                         enemy.element.classList.remove('defeated');
                     }
                 });
-                this.showMessage('🔄 Enemies have respawned...');
+                this.showMessage('👺てきが 戻って来た🔄 ');
             }
             
             updateTimer() {
