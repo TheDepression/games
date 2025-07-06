@@ -1195,15 +1195,25 @@ this.playerVelocityY = deltaY * sensitivity;
     
     this.attackCooldown = true;
     
-    const attackEl = document.createElement('div');
-    attackEl.style.position = 'absolute';
+    // In the attack() method, update the attack element creation:
+const attackEl = document.createElement('div');
+attackEl.style.position = 'absolute';
+attackEl.style.pointerEvents = 'none';
+attackEl.style.zIndex = '400';
+attackEl.style.animation = 'slashEffect 0.3s ease-out';
+
+// Enhanced range creates oval shape
+if (this.hasEnhancedRange) {
+    attackEl.style.width = '60px';
+    attackEl.style.height = '30px';
+    attackEl.style.background = 'radial-gradient(ellipse, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+    attackEl.style.borderRadius = '50%';
+} else {
     attackEl.style.width = '40px';
     attackEl.style.height = '40px';
     attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
     attackEl.style.borderRadius = '50%';
-    attackEl.style.pointerEvents = 'none';
-    attackEl.style.zIndex = '400';
-    attackEl.style.animation = 'slashEffect 0.3s ease-out';
+}
     
     const directionOffsets = {
         'n': {x: 0, y: -25},
