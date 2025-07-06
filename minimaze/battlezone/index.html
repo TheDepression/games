@@ -1146,12 +1146,23 @@ setupBattle() {
         forwardEnemy.remove();
     }
     
-    // Move player to battle position
+    // Move player to better battle position
     this.playerX = 400;
-    this.playerY = 400;
+    this.playerY = 300; // Changed from 400 to 300
     const visualOffset = (32 - 24) / 2;
     this.player.style.left = (this.playerX - visualOffset) + 'px';
     this.player.style.top = (this.playerY - visualOffset) + 'px';
+    
+    // Center camera on player immediately
+    const gameAreaWidth = this.gameArea.offsetWidth;
+    const gameAreaHeight = this.gameArea.offsetHeight;
+    const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+    const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+    this.gameArea.scrollTo({
+        left: scrollX,
+        top: scrollY,
+        behavior: 'auto'
+    });
     
     // Create battle enemy
     this.createBattleEnemy();
@@ -1190,7 +1201,8 @@ createBattleEnemy() {
         targetX: 370,
         targetY: 200,
         jukeTimer: 0,
-        attackTimer: 0
+        attackTimer: 120, // Start with 2 seconds before first attack
+        projectiles: []
     };
 }
 
@@ -1237,6 +1249,123 @@ updateBattleEnemy() {
     
     this.enemy.element.style.left = this.enemy.currentX + 'px';
     this.enemy.element.style.top = this.enemy.currentY + 'px';
+    
+    // Handle projectile attacks
+    this.enemy.attackTimer--;
+    if (this.enemy.attackTimer <= 0) {
+        this.throwScissors();
+        this.enemy.attackTimer = 90 + Math.random() * 60; // 1.5-2.5 seconds
+    }
+    
+    // Update projectiles
+    this.updateProjectiles();
+    
+    // Check direct contact damage
+    this.checkEnemyContact();
+}
+
+            throwScissors() {
+    const scissorsEl = document.createElement('div');
+    scissorsEl.className = 'enemy-projectile';
+    scissorsEl.style.position = 'absolute';
+    scissorsEl.style.left = (this.enemy.currentX + 30) + 'px'; // Center of enemy
+    scissorsEl.style.top = (this.enemy.currentY + 60) + 'px';
+    scissorsEl.style.width = '20px';
+    scissorsEl.style.height = '20px';
+    scissorsEl.style.fontSize = '16px';
+    scissorsEl.style.display = 'flex';
+    scissorsEl.style.alignItems = 'center';
+    scissorsEl.style.justifyContent = 'center';
+    scissorsEl.style.zIndex = '90';
+    scissorsEl.textContent = '✂️';
+    
+    this.gameWorld.appendChild(scissorsEl);
+    
+    // Calculate direction to player
+    const deltaX = this.playerX - (this.enemy.currentX + 30);
+    const deltaY = this.playerY - (this.enemy.currentY + 60);
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    const projectile = {
+        element: scissorsEl,
+        x: this.enemy.currentX + 30,
+        y: this.enemy.currentY + 60,
+        velocityX: (deltaX / distance) * 4, // Speed of 4
+        velocityY: (deltaY / distance) * 4,
+        alive: true
+    };
+    
+    this.enemy.projectiles.push(projectile);
+}
+
+updateProjectiles() {
+    if (!this.enemy || !this.enemy.projectiles) return;
+    
+    for (let i = this.enemy.projectiles.length - 1; i >= 0; i--) {
+        const projectile = this.enemy.projectiles[i];
+        if (!projectile.alive) continue;
+        
+        // Move projectile
+        projectile.x += projectile.velocityX;
+        projectile.y += projectile.velocityY;
+        
+        projectile.element.style.left = projectile.x + 'px';
+        projectile.element.style.top = projectile.y + 'px';
+        
+        // Check collision with player
+        const playerRect = {
+            left: this.playerX,
+            top: this.playerY,
+            right: this.playerX + 24,
+            bottom: this.playerY + 24
+        };
+        
+        const projectileRect = {
+            left: projectile.x,
+            top: projectile.y,
+            right: projectile.x + 20,
+            bottom: projectile.y + 20
+        };
+        
+        if (this.rectsOverlap(playerRect, projectileRect)) {
+            // Hit player
+            this.takeDamage(1);
+            projectile.alive = false;
+            projectile.element.remove();
+            this.enemy.projectiles.splice(i, 1);
+            continue;
+        }
+        
+        // Remove if out of bounds
+        if (projectile.x < -50 || projectile.x > 850 || 
+            projectile.y < -50 || projectile.y > 850) {
+            projectile.alive = false;
+            projectile.element.remove();
+            this.enemy.projectiles.splice(i, 1);
+        }
+    }
+}
+
+checkEnemyContact() {
+    if (!this.enemy || !this.enemy.alive || this.isInvulnerable) return;
+    
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    const enemyRect = {
+        left: this.enemy.currentX,
+        top: this.enemy.currentY,
+        right: this.enemy.currentX + 60,
+        bottom: this.enemy.currentY + 120
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage(2); // 2 hearts damage from direct contact
+    }
 }
 
 handleEnemyDeath() {
