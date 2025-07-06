@@ -414,6 +414,13 @@ this.hasEnhancedRange = false;
                 this.lastDragY = 0;
                 this.currentDirection = 'n';
                 this.lastMoveDirection = 'n';
+
+                // Battle sequence properties
+this.battlePhase = 'waiting'; // 'waiting', 'instructions', 'animation', 'fighting', 'victory'
+this.canMove = false;
+this.currentBattle = 1;
+this.enemy = null;
+this.battleMusic = null;
                 
                 // DOM elements
                 this.player = document.getElementById('player');
@@ -1116,6 +1123,7 @@ this.hasEnhancedRange = false;
             window.location.reload();
         }
     </script>
+    
 </body>
 </html>
                     
