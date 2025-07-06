@@ -595,18 +595,26 @@
                 attackEl.style.zIndex = '400';
                 attackEl.style.animation = 'slashEffect 0.3s ease-out';
                 
-                // Enhanced range creates oval shape
-                if (this.hasEnhancedRange) {
-                    attackEl.style.width = '60px';
-                    attackEl.style.height = '30px';
-                    attackEl.style.background = 'radial-gradient(ellipse, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
-                    attackEl.style.borderRadius = '50%';
-                } else {
-                    attackEl.style.width = '40px';
-                    attackEl.style.height = '40px';
-                    attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
-                    attackEl.style.borderRadius = '50%';
-                }
+                // Enhanced range creates oval shape extending in shooting direction
+if (this.hasEnhancedRange) {
+    if (this.currentDirection === 'n' || this.currentDirection === 's') {
+        attackEl.style.width = '40px';
+        attackEl.style.height = '80px';
+    } else if (this.currentDirection === 'e' || this.currentDirection === 'w') {
+        attackEl.style.width = '80px';
+        attackEl.style.height = '40px';
+    } else {
+        attackEl.style.width = '60px';
+        attackEl.style.height = '60px';
+    }
+    attackEl.style.background = 'radial-gradient(ellipse, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+    attackEl.style.borderRadius = '50%';
+} else {
+    attackEl.style.width = '40px';
+    attackEl.style.height = '40px';
+    attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+    attackEl.style.borderRadius = '50%';
+}
                 
                 const directionOffsets = {
                     'n': {x: 0, y: -25},
@@ -646,7 +654,8 @@
                         Math.pow(attackY - this.testEnemy.currentY, 2)
                     );
                     
-                    if (distance <= this.attackRange) {
+                   const effectiveRange = this.hasEnhancedRange ? this.attackRange * 2 : this.attackRange;
+if (distance <= effectiveRange) {
                         this.testEnemy.hp -= this.attackDamage;
                         
                         // Show damage number
