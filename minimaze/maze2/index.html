@@ -1318,10 +1318,10 @@ this.playerVelocityY = deltaY * sensitivity;
                 enemy.element.classList.add('defeated');
                 
                 // Drop rewards
-                if (Math.random() < 0.10) {
+                if (Math.random() < 0.15) {
                     this.createMoneyDrop(enemy.currentX, enemy.currentY);
                 }
-                if (Math.random() < 0.05) {
+                if (Math.random() < 0.10) {
                     this.createHeartDrop(enemy.currentX, enemy.currentY);
                 }
             }
