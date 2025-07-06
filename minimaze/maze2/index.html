@@ -783,11 +783,11 @@
             const gameState = JSON.parse(savedState);
             
             // Check if they defeated the pyramid boss
-         //   if (!gameState.pyramidBossDefeated) {
-        //        alert('You must defeat the pyramid boss first!');
-      //          window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
-   //             return;
- //           }
+            if (!gameState.pyramidBossDefeated) {
+                alert('You must defeat the pyramid boss first!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
             
             // Check if they're coming from cutscene1
             //if (gameState.currentUrl !== 'cutscene1') {
@@ -2517,7 +2517,7 @@ refreshGorilla() {
                     {x: 780, y: 560, message: "WHY ARE YOU NOT LISTENING!?!", customEmoji: "🪧"},
                     {x: 880, y: 720, message: "Private... Do NOT enter!", customEmoji: "🪧"},
                     {x: 1940, y: 2020, message: "", customEmoji: "🤵🏻‍♂️", specialType: "battleNPC"},
-                    {x: 2240, y: 2240, message: "The bully cannot keep my down! I have rebuilt my shop even better. Take a look inside.", customEmoji: "🥸"}
+                    {x: 2220, y: 2280, message: "The bully cannot keep my down! I have rebuilt my shop even better. Take a look inside.", customEmoji: "🥸"}
                 ];
                 
                 friendlies.forEach((friendly, index) => {
