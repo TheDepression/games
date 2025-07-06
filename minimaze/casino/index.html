@@ -1543,10 +1543,10 @@ if (dog && !this.dogCaught) {
     const dogCenterX = this.dogX + 12.5; // Dog is 25px wide, so center is +12.5
     const dogCenterY = this.dogY + 12.5;
     const dogHitbox = {
-        left: dogCenterX - 8,
-        top: dogCenterY - 8,
-        right: dogCenterX + 8,
-        bottom: dogCenterY + 8
+        left: dogCenterX - 10,
+        top: dogCenterY - 10,
+        right: dogCenterX + 10,
+        bottom: dogCenterY + 10
     };
     
     if (this.rectsOverlap(playerRect, dogHitbox)) {
