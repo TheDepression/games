@@ -604,10 +604,52 @@ this.battleMusic = document.getElementById('battleMusic');
             attackEl.remove();
         }
     }, 300);
+
+                this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
     
     setTimeout(() => {
         this.attackCooldown = false;
     }, 500);
+}
+
+
+            checkAttackHits(attackX, attackY) {
+    if (!this.enemy || !this.enemy.alive || this.battlePhase !== 'fighting') return;
+    
+    const effectiveRange = this.hasEnhancedRange ? 90 : 45;
+    const distance = Math.sqrt(
+        Math.pow(attackX - this.enemy.currentX, 2) + 
+        Math.pow(attackY - this.enemy.currentY, 2)
+    );
+    
+    if (distance <= effectiveRange) {
+        this.enemy.hp -= this.attackDamage;
+        
+        // Show damage number
+        const damageText = document.createElement('div');
+        damageText.style.position = 'absolute';
+        damageText.style.color = '#ff4444';
+        damageText.style.fontWeight = 'bold';
+        damageText.style.fontSize = '14px';
+        damageText.style.pointerEvents = 'none';
+        damageText.style.zIndex = '500';
+        damageText.style.animation = 'damageFloat 1s ease-out';
+        damageText.textContent = `-${this.attackDamage}`;
+        damageText.style.left = this.enemy.currentX + 'px';
+        damageText.style.top = this.enemy.currentY + 'px';
+        this.gameWorld.appendChild(damageText);
+        
+        setTimeout(() => {
+            if (damageText.parentNode) {
+                damageText.remove();
+            }
+        }, 1000);
+        
+        if (this.enemy.hp <= 0) {
+            this.enemy.alive = false;
+            this.handleEnemyDeath();
+        }
+    }
 }
 
             loadGameState() {
