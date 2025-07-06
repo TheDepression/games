@@ -4095,7 +4095,6 @@ transferToWeakPoint(url) {
     // Replace the gun section in updateUI() with this:
 if (this.hasWeapon) {
     let gunStyle = '';
-    let pulseStyle = '';
     
     // Determine base gun color/style
     if (this.hasSuperGun) {
@@ -4103,17 +4102,17 @@ if (this.hasWeapon) {
     } else if (this.hasHammerPower) {
         gunStyle = 'filter: grayscale(0.9) brightness(0.8);'; // Grey for hammer
     } else if (this.hasOrangePower) {
-        gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);'; // Blue for orange
+        gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2);'; // Blue for orange
     } else {
         gunStyle = ''; // Default green
     }
     
     // Add pulse animation if enhanced range (preserving base color)
     if (this.hasEnhancedRange) {
-        pulseStyle = ' animation: gunPulsate 2s infinite;';
+        gunStyle += ' animation: gunPulsate 2s infinite; filter: ' + gunStyle.replace('filter: ', '') + ' drop-shadow(0 0 8px gold);';
     }
     
-    itemsHTML += ` <span style="${gunStyle}${pulseStyle}"">🔫</span>`;
+    itemsHTML += ` <span style="${gunStyle}">🔫</span>`;
 }
     if (this.hasLavaShoes) itemsHTML += ' 🥾';
                 if (this.hasTrophy) itemsHTML += ' 🏆';
