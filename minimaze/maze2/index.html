@@ -1250,8 +1250,8 @@ this.playerVelocityY = deltaY * sensitivity;
 
 
            checkAttackHits(attackX, attackY) {
-    // Smaller range that only hits in front of player
-    const effectiveRange = this.hasEnhancedRange ? this.attackRange * 1.3 : this.attackRange;
+    // Set range from PLAYER position, not attack position
+    const effectiveRange = this.hasEnhancedRange ? 90 : 45;
     
     // Check weak points (only if has hammer power)
     if (this.hasHammerPower) {
@@ -1266,9 +1266,10 @@ this.playerVelocityY = deltaY * sensitivity;
             const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
             
             if (directionCheck) {
+                // Calculate distance from PLAYER, not attack point
                 const distance = Math.sqrt(
-                    Math.pow(attackX - weakX, 2) +
-                    Math.pow(attackY - weakY, 2)
+                    Math.pow(this.playerX - weakX, 2) +
+                    Math.pow(this.playerY - weakY, 2)
                 );
                 
                 if (distance <= effectiveRange) {
