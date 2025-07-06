@@ -1266,7 +1266,13 @@ if (this.hasEnhancedRange) {
                 Math.pow(attackY - weakY, 2)
             );
             
-            if (distance <= this.attackRange) {
+            // Calculate effective range first (add this once at the top of checkAttackHits)
+const effectiveRange = this.hasEnhancedRange ? 
+    (this.attackRange * 1.5) : 
+    this.attackRange;
+
+// Then replace each distance check:
+if (distance <= effectiveRange) {
                 // Blast open the weak point
                 const weakId = weakPoint.dataset.id;
                 const weakUrl = weakPoint.dataset.url;
@@ -1307,7 +1313,13 @@ if (this.hasEnhancedRange) {
                 Math.pow(attackY - wallY, 2)
             );
             
-            if (distance <= this.attackRange) {
+            // Calculate effective range first (add this once at the top of checkAttackHits)
+const effectiveRange = this.hasEnhancedRange ? 
+    (this.attackRange * 1.5) : 
+    this.attackRange;
+
+// Then replace each distance check:
+if (distance <= effectiveRange) {
                 this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
                 wall.remove();
             }
@@ -1323,7 +1335,13 @@ if (this.hasEnhancedRange) {
             Math.pow(attackY - enemy.currentY, 2)
         );
         
-        if (distance <= this.attackRange) {
+      // Calculate effective range first (add this once at the top of checkAttackHits)
+const effectiveRange = this.hasEnhancedRange ? 
+    (this.attackRange * 1.5) : 
+    this.attackRange;
+
+// Then replace each distance check:
+if (distance <= effectiveRange) {
             enemy.hp -= this.attackDamage;
             
             // Show damage number
@@ -1368,7 +1386,13 @@ if (this.hasEnhancedRange) {
             Math.pow(attackY - this.gorilla.currentY, 2)
         );
         
-        if (distance <= this.attackRange) {
+        // Calculate effective range first (add this once at the top of checkAttackHits)
+const effectiveRange = this.hasEnhancedRange ? 
+    (this.attackRange * 1.5) : 
+    this.attackRange;
+
+// Then replace each distance check:
+if (distance <= effectiveRange) {
             this.showMessage('🦍 The gorilla seems friendly now...');
         }
     }
