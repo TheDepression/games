@@ -1214,19 +1214,23 @@ this.playerVelocityY = deltaY * sensitivity;
     attackEl.style.borderRadius = '50%';
     
     const directionOffsets = {
-        'n': {x: 0, y: -25},
-        'ne': {x: 20, y: -20},
-        'e': {x: 25, y: 0},
-        'se': {x: 20, y: 20},
-        's': {x: 0, y: 25},
-        'sw': {x: -20, y: 20},
-        'w': {x: -25, y: 0},
-        'nw': {x: -20, y: -20}
+        'n': {x: 0, y: -35},    // Further away from player
+        'ne': {x: 25, y: -25},
+        'e': {x: 35, y: 0},
+        'se': {x: 25, y: 25},
+        's': {x: 0, y: 35},
+        'sw': {x: -25, y: 25},
+        'w': {x: -35, y: 0},
+        'nw': {x: -25, y: -25}
     };
     
     const offset = directionOffsets[this.currentDirection];
-    attackEl.style.left = (this.playerX + offset.x - 20 + 15) + 'px';
-    attackEl.style.top = (this.playerY + offset.y - 20 + 15) + 'px';
+    // Better centering - adjust for circle size
+    const visualCenterX = this.hasEnhancedRange ? 30 : 20;
+    const visualCenterY = this.hasEnhancedRange ? 30 : 20;
+    
+    attackEl.style.left = (this.playerX + offset.x - visualCenterX + 12) + 'px';
+    attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
     
     this.gameWorld.appendChild(attackEl);
     
@@ -1246,8 +1250,8 @@ this.playerVelocityY = deltaY * sensitivity;
 
 
            checkAttackHits(attackX, attackY) {
-    // Set range based on enhanced range
-    const effectiveRange = this.hasEnhancedRange ? this.attackRange * 1.5 : this.attackRange;
+    // Smaller range that only hits in front of player
+    const effectiveRange = this.hasEnhancedRange ? this.attackRange * 1.3 : this.attackRange;
     
     // Check weak points (only if has hammer power)
     if (this.hasHammerPower) {
@@ -1256,35 +1260,42 @@ this.playerVelocityY = deltaY * sensitivity;
             const weakX = parseInt(weakPoint.style.left) + 10;
             const weakY = parseInt(weakPoint.style.top) + 10;
             
-            const distance = Math.sqrt(
-                Math.pow(attackX - weakX, 2) +
-                Math.pow(attackY - weakY, 2)
-            );
+            // Check if target is in front of player
+            const deltaX = weakX - this.playerX;
+            const deltaY = weakY - this.playerY;
+            const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
             
-            if (distance <= effectiveRange) {
-                const weakId = weakPoint.dataset.id;
-                const weakUrl = weakPoint.dataset.url;
+            if (directionCheck) {
+                const distance = Math.sqrt(
+                    Math.pow(attackX - weakX, 2) +
+                    Math.pow(attackY - weakY, 2)
+                );
                 
-                this.weakPointsBlasted.push(weakId);
-                this.saveGameState();
-                
-                weakPoint.remove();
-                
-                const entrance = document.createElement('div');
-                entrance.className = 'weak-point-entrance';
-                entrance.style.position = 'absolute';
-                entrance.style.left = (weakX - 10) + 'px';
-                entrance.style.top = (weakY - 10) + 'px';
-                entrance.style.width = '20px';
-                entrance.style.height = '20px';
-                entrance.style.background = 'black';
-                entrance.style.border = '1px solid #333';
-                entrance.style.zIndex = '200';
-                entrance.dataset.url = weakUrl;
-                entrance.dataset.type = 'weakPointEntrance';
-                this.gameWorld.appendChild(entrance);
-                
-                this.showMessage('💥 Weak point blasted open!');
+                if (distance <= effectiveRange) {
+                    const weakId = weakPoint.dataset.id;
+                    const weakUrl = weakPoint.dataset.url;
+                    
+                    this.weakPointsBlasted.push(weakId);
+                    this.saveGameState();
+                    
+                    weakPoint.remove();
+                    
+                    const entrance = document.createElement('div');
+                    entrance.className = 'weak-point-entrance';
+                    entrance.style.position = 'absolute';
+                    entrance.style.left = (weakX - 10) + 'px';
+                    entrance.style.top = (weakY - 10) + 'px';
+                    entrance.style.width = '20px';
+                    entrance.style.height = '20px';
+                    entrance.style.background = 'black';
+                    entrance.style.border = '1px solid #333';
+                    entrance.style.zIndex = '200';
+                    entrance.dataset.url = weakUrl;
+                    entrance.dataset.type = 'weakPointEntrance';
+                    this.gameWorld.appendChild(entrance);
+                    
+                    this.showMessage('💥 Weak point blasted open!');
+                }
             }
         });
     }
@@ -1296,14 +1307,21 @@ this.playerVelocityY = deltaY * sensitivity;
             const wallX = parseInt(wall.style.left) + parseInt(wall.style.width)/2;
             const wallY = parseInt(wall.style.top) + parseInt(wall.style.height)/2;
             
-            const distance = Math.sqrt(
-                Math.pow(attackX - wallX, 2) +
-                Math.pow(attackY - wallY, 2)
-            );
+            // Check if target is in front of player
+            const deltaX = wallX - this.playerX;
+            const deltaY = wallY - this.playerY;
+            const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
             
-            if (distance <= effectiveRange) {
-                this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
-                wall.remove();
+            if (directionCheck) {
+                const distance = Math.sqrt(
+                    Math.pow(attackX - wallX, 2) +
+                    Math.pow(attackY - wallY, 2)
+                );
+                
+                if (distance <= effectiveRange) {
+                    this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
+                    wall.remove();
+                }
             }
         });
     }
@@ -1312,42 +1330,49 @@ this.playerVelocityY = deltaY * sensitivity;
     this.movingEnemies.forEach(enemy => {
         if (!enemy.alive || enemy.type === 'gorilla') return;
         
-        const distance = Math.sqrt(
-            Math.pow(attackX - enemy.currentX, 2) +
-            Math.pow(attackY - enemy.currentY, 2)
-        );
+        // Check if target is in front of player
+        const deltaX = enemy.currentX - this.playerX;
+        const deltaY = enemy.currentY - this.playerY;
+        const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
         
-        if (distance <= effectiveRange) {
-            enemy.hp -= this.attackDamage;
+        if (directionCheck) {
+            const distance = Math.sqrt(
+                Math.pow(attackX - enemy.currentX, 2) +
+                Math.pow(attackY - enemy.currentY, 2)
+            );
             
-            const damageText = document.createElement('div');
-            damageText.style.position = 'absolute';
-            damageText.style.color = '#ff4444';
-            damageText.style.fontWeight = 'bold';
-            damageText.style.fontSize = '14px';
-            damageText.style.pointerEvents = 'none';
-            damageText.style.zIndex = '500';
-            damageText.style.animation = 'damageFloat 1s ease-out';
-            damageText.textContent = `-${this.attackDamage}`;
-            damageText.style.left = enemy.currentX + 'px';
-            damageText.style.top = enemy.currentY + 'px';
-            this.gameWorld.appendChild(damageText);
-            
-            setTimeout(() => {
-                if (damageText.parentNode) {
-                    damageText.remove();
-                }
-            }, 1000);
-            
-            if (enemy.hp <= 0) {
-                enemy.alive = false;
-                enemy.element.classList.add('defeated');
+            if (distance <= effectiveRange) {
+                enemy.hp -= this.attackDamage;
                 
-                if (Math.random() < 0.15) {
-                    this.createMoneyDrop(enemy.currentX, enemy.currentY);
-                }
-                if (Math.random() < 0.10) {
-                    this.createHeartDrop(enemy.currentX, enemy.currentY);
+                const damageText = document.createElement('div');
+                damageText.style.position = 'absolute';
+                damageText.style.color = '#ff4444';
+                damageText.style.fontWeight = 'bold';
+                damageText.style.fontSize = '14px';
+                damageText.style.pointerEvents = 'none';
+                damageText.style.zIndex = '500';
+                damageText.style.animation = 'damageFloat 1s ease-out';
+                damageText.textContent = `-${this.attackDamage}`;
+                damageText.style.left = enemy.currentX + 'px';
+                damageText.style.top = enemy.currentY + 'px';
+                this.gameWorld.appendChild(damageText);
+                
+                setTimeout(() => {
+                    if (damageText.parentNode) {
+                        damageText.remove();
+                    }
+                }, 1000);
+                
+                if (enemy.hp <= 0) {
+                    enemy.alive = false;
+                    enemy.element.classList.add('defeated');
+                    
+                    if (Math.random() < 0.15) {
+                        this.createMoneyDrop(enemy.currentX, enemy.currentY);
+                    }
+                    if (Math.random() < 0.10) {
+                        this.createHeartDrop(enemy.currentX, enemy.currentY);
+                    }
                 }
             }
         }
@@ -1355,14 +1380,37 @@ this.playerVelocityY = deltaY * sensitivity;
 
     // Check gorilla collision for attack (but don't damage)
     if (this.gorilla && this.gorilla.alive) {
-        const distance = Math.sqrt(
-            Math.pow(attackX - this.gorilla.currentX, 2) +
-            Math.pow(attackY - this.gorilla.currentY, 2)
-        );
+        // Check if target is in front of player
+        const deltaX = this.gorilla.currentX - this.playerX;
+        const deltaY = this.gorilla.currentY - this.playerY;
+        const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
         
-        if (distance <= effectiveRange) {
-            this.showMessage('🦍 The gorilla seems friendly now...');
+        if (directionCheck) {
+            const distance = Math.sqrt(
+                Math.pow(attackX - this.gorilla.currentX, 2) +
+                Math.pow(attackY - this.gorilla.currentY, 2)
+            );
+            
+            if (distance <= effectiveRange) {
+                this.showMessage('🦍 The gorilla seems friendly now...');
+            }
         }
+    }
+}
+
+
+            isInFrontOfPlayer(deltaX, deltaY) {
+    // Only hit targets in the front 180 degrees based on facing direction
+    switch(this.currentDirection) {
+        case 'n': return deltaY < 0;
+        case 'ne': return deltaX > 0 && deltaY < 0;
+        case 'e': return deltaX > 0;
+        case 'se': return deltaX > 0 && deltaY > 0;
+        case 's': return deltaY > 0;
+        case 'sw': return deltaX < 0 && deltaY > 0;
+        case 'w': return deltaX < 0;
+        case 'nw': return deltaX < 0 && deltaY < 0;
+        default: return true;
     }
 }
 
