@@ -1208,21 +1208,20 @@ attackEl.style.height = '40px';
 attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
 attackEl.style.borderRadius = '50%';
 
-// Enhanced range: stretch the circle into an oval in shooting direction
+// Enhanced range: make oval extending in shooting direction
 if (this.hasEnhancedRange) {
-    // Make it an oval that extends in the shooting direction
     if (this.currentDirection === 'n' || this.currentDirection === 's') {
         attackEl.style.width = '40px';
-        attackEl.style.height = '80px'; // Double height for vertical
+        attackEl.style.height = '80px';
     } else if (this.currentDirection === 'e' || this.currentDirection === 'w') {
-        attackEl.style.width = '80px'; // Double width for horizontal
+        attackEl.style.width = '80px';
         attackEl.style.height = '40px';
     } else {
-        // Diagonal directions
+        // Diagonals - use larger square
         attackEl.style.width = '60px';
         attackEl.style.height = '60px';
     }
-    attackEl.style.borderRadius = '50%';
+    // NO transform property at all
 }
     
     const directionOffsets = {
@@ -1359,44 +1358,17 @@ if (this.hasEnhancedRange) {
 }
 
             isInAttackRange(attackX, attackY, targetX, targetY) {
-    const deltaX = targetX - attackX;
-    const deltaY = targetY - attackY;
+    const distance = Math.sqrt(
+        Math.pow(attackX - targetX, 2) + 
+        Math.pow(attackY - targetY, 2)
+    );
     
     if (!this.hasEnhancedRange) {
-        // Normal circular range
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         return distance <= this.attackRange;
     }
     
-    // Enhanced range: extend reach in shooting direction only
-    const baseRange = this.attackRange;
-    const extendedRange = this.attackRange * 2; // Double range in shooting direction
-
-    // Calculate if target is in extended range in the shooting direction
-    const directionVector = {
-        'n': {x: 0, y: -1},
-        'ne': {x: 0.7, y: -0.7},
-        'e': {x: 1, y: 0},
-        'se': {x: 0.7, y: 0.7},
-        's': {x: 0, y: 1},
-        'sw': {x: -0.7, y: 0.7},
-        'w': {x: -1, y: 0},
-        'nw': {x: -0.7, y: -0.7}
-    };
-
-    const dir = directionVector[this.currentDirection];
-    const dotProduct = deltaX * dir.x + deltaY * dir.y;
-
-    // Check if target is in front of player and within extended range
-    if (dotProduct > 0) {
-        // Target is in shooting direction - use extended range
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        return distance <= extendedRange;
-    } else {
-        // Target is behind - use normal range
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        return distance <= baseRange;
-    }
+    // Enhanced range: just double the distance, keep it simple
+    return distance <= (this.attackRange * 2);
 }
 
             createMoneyDrop(x, y) {
