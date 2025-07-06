@@ -320,7 +320,12 @@
             <button id="retryButton" onclick="restartGame()">Try Again</button>
         </div>
     </div>
-
+<audio id="battleMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/battlezone.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+</body>
+</html>
     <script>
         // CHECK ACCESS AND VALIDATE ENTRY - CRITICAL FIRST
         window.addEventListener('DOMContentLoaded', function() {
@@ -403,6 +408,7 @@ this.boatIsBroken = true;
 this.purpleHeartsSold = 0;
 this.hasSuperGun = false;
 this.hasEnhancedRange = false;
+
                 
                 // Movement properties - spawn in center
                 this.playerX = 400;
@@ -427,6 +433,9 @@ this.battleMusic = null;
                 this.gameWorld = document.getElementById('gameWorld');
                 this.gameArea = document.getElementById('gameArea');
                 this.controlArea = document.getElementById('controlArea');
+
+                // Add this after the existing DOM elements in constructor
+this.battleMusic = document.getElementById('battleMusic');
                 
                 // Initialize
                 this.preloadPlayerImages();
@@ -718,15 +727,22 @@ this.battleMusic = null;
             }
             
             generateMaze() {
-                this.createBattlezoneWalls();
-                
-                const visualOffset = (32 - 24) / 2;
-                this.player.style.left = (this.playerX - visualOffset) + 'px';
-                this.player.style.top = (this.playerY - visualOffset) + 'px';
-                this.updatePlayerImage('s');
-                
-                this.createTemporaryExit();
-            }
+    this.createBattlezoneWalls();
+    
+    // Set spawn position facing north
+    this.playerX = 400;
+    this.playerY = 160;
+    
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+    this.updatePlayerImage('n'); // Face north
+    
+    // Don't create exit yet - will be created after victory
+    
+    // Start battle sequence
+    this.startBattleSequence();
+}
 
             createBattlezoneWalls() {
                 // Black border walls
@@ -867,19 +883,441 @@ this.battleMusic = null;
                 this.gameWorld.appendChild(exitEl);
             }
 
-            startGameLoop() {
-                const gameLoop = () => {
-                    if (this.gameStarted) {
-                        this.updatePlayer();
-                        this.checkCollisions();
-                    }
-                    requestAnimationFrame(gameLoop);
-                };
-                gameLoop();
+
+
+            startBattleSequence() {
+    this.battlePhase = 'waiting';
+    this.canMove = false;
+    
+    // Show instructions after 1 second
+    setTimeout(() => {
+        this.showInstructionsDialog();
+    }, 1000);
+}
+
+showInstructionsDialog() {
+    this.battlePhase = 'instructions';
+    
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'instructionsDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = "To win the trophy, you must win all 5 battles. There is no pause during a battle, so get ready to fight!";
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '10px 20px';
+    button.style.borderRadius = '5px';
+    button.style.cursor = 'pointer';
+    button.style.fontSize = '14px';
+    button.textContent = 'I AM READY';
+    button.onclick = () => {
+        dialogOverlay.remove();
+        this.startBattleAnimation();
+    };
+    
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(button);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+startBattleAnimation() {
+    this.battlePhase = 'animation';
+    this.battleMusic.play().catch(e => console.log('Battle music play failed:', e));
+    
+    // Create enemy behind the cage (fade in)
+    this.createCagedEnemy();
+    
+    // Open gate after 2 seconds
+    setTimeout(() => {
+        this.openGate();
+    }, 2000);
+}
+
+createCagedEnemy() {
+    const enemy = document.createElement('div');
+    enemy.id = 'cagedEnemy';
+    enemy.style.position = 'absolute';
+    enemy.style.left = '360px';
+    enemy.style.top = '30px';
+    enemy.style.width = '50px';
+    enemy.style.height = '100px';
+    enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
+    enemy.style.backgroundSize = 'contain';
+    enemy.style.backgroundRepeat = 'no-repeat';
+    enemy.style.backgroundPosition = 'center';
+    enemy.style.zIndex = '50'; // Above black surface, below white walls
+    enemy.style.opacity = '0';
+    enemy.style.transition = 'opacity 2s ease-in';
+    
+    this.gameWorld.appendChild(enemy);
+    
+    // Fade in
+    setTimeout(() => {
+        enemy.style.opacity = '1';
+    }, 100);
+}
+
+openGate() {
+    // Lift all white walls up by 80px
+    const whiteWalls = this.gameWorld.querySelectorAll('.special-white-wall');
+    whiteWalls.forEach(wall => {
+        wall.style.transition = 'transform 2s ease-out';
+        wall.style.transform = 'translateY(-80px)';
+    });
+    
+    // After gate opens, enemy steps forward
+    setTimeout(() => {
+        this.enemyStepsForward();
+    }, 2000);
+}
+
+enemyStepsForward() {
+    // Remove caged enemy
+    const cagedEnemy = document.getElementById('cagedEnemy');
+    if (cagedEnemy) {
+        cagedEnemy.remove();
+    }
+    
+    // Create larger enemy in front
+    const forwardEnemy = document.createElement('div');
+    forwardEnemy.id = 'forwardEnemy';
+    forwardEnemy.style.position = 'absolute';
+    forwardEnemy.style.left = '350px';
+    forwardEnemy.style.top = '50px';
+    forwardEnemy.style.width = '60px';
+    forwardEnemy.style.height = '120px';
+    forwardEnemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
+    forwardEnemy.style.backgroundSize = 'contain';
+    forwardEnemy.style.backgroundRepeat = 'no-repeat';
+    forwardEnemy.style.backgroundPosition = 'center';
+    forwardEnemy.style.zIndex = '200'; // Above everything
+    
+    this.gameWorld.appendChild(forwardEnemy);
+    
+    // Close gate
+    setTimeout(() => {
+        this.closeGate();
+    }, 500);
+}
+
+closeGate() {
+    // Lower white walls back down
+    const whiteWalls = this.gameWorld.querySelectorAll('.special-white-wall');
+    whiteWalls.forEach(wall => {
+        wall.style.transition = 'transform 1.2s ease-in';
+        wall.style.transform = 'translateY(0)';
+    });
+    
+    // Shiver effect and taunt
+    setTimeout(() => {
+        this.enemyTaunt();
+    }, 1200);
+}
+
+enemyTaunt() {
+    const forwardEnemy = document.getElementById('forwardEnemy');
+    if (forwardEnemy) {
+        // Shiver animation
+        forwardEnemy.style.animation = 'shiver 0.1s infinite';
+        
+        // Add shiver CSS if not exists
+        if (!document.querySelector('#shiverStyle')) {
+            const style = document.createElement('style');
+            style.id = 'shiverStyle';
+            style.textContent = `
+                @keyframes shiver {
+                    0% { transform: translateX(0); }
+                    25% { transform: translateX(-2px); }
+                    75% { transform: translateX(2px); }
+                    100% { transform: translateX(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    // Show taunt message
+    this.showMessage('GAME OVER, FROG!');
+    
+    // Black flash and start battle
+    setTimeout(() => {
+        this.blackFlashAndStartBattle();
+    }, 2000);
+}
+
+blackFlashAndStartBattle() {
+    // Create black flash
+    const flash = document.createElement('div');
+    flash.style.position = 'fixed';
+    flash.style.top = '0';
+    flash.style.left = '0';
+    flash.style.width = '100%';
+    flash.style.height = '100%';
+    flash.style.background = 'black';
+    flash.style.zIndex = '500';
+    flash.style.opacity = '0';
+    flash.style.transition = 'opacity 0.1s';
+    
+    document.body.appendChild(flash);
+    
+    // Flash on
+    setTimeout(() => {
+        flash.style.opacity = '1';
+    }, 50);
+    
+    // Flash off and setup battle
+    setTimeout(() => {
+        flash.remove();
+        this.setupBattle();
+    }, 200);
+}
+
+setupBattle() {
+    // Remove animation enemy
+    const forwardEnemy = document.getElementById('forwardEnemy');
+    if (forwardEnemy) {
+        forwardEnemy.remove();
+    }
+    
+    // Move player to battle position
+    this.playerX = 400;
+    this.playerY = 400;
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+    
+    // Create battle enemy
+    this.createBattleEnemy();
+    
+    // Start battle
+    this.battlePhase = 'fighting';
+    this.canMove = true;
+    
+    this.showMessage('Battle begins!');
+}
+
+createBattleEnemy() {
+    const enemyEl = document.createElement('div');
+    enemyEl.className = 'enemy battle-enemy';
+    enemyEl.style.position = 'absolute';
+    enemyEl.style.left = '370px';
+    enemyEl.style.top = '200px';
+    enemyEl.style.width = '60px';
+    enemyEl.style.height = '120px';
+    enemyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
+    enemyEl.style.backgroundSize = 'contain';
+    enemyEl.style.backgroundRepeat = 'no-repeat';
+    enemyEl.style.backgroundPosition = 'center';
+    enemyEl.style.zIndex = '80';
+    
+    this.gameWorld.appendChild(enemyEl);
+    
+    this.enemy = {
+        element: enemyEl,
+        currentX: 370,
+        currentY: 200,
+        hp: 700,
+        maxHp: 700,
+        alive: true,
+        speed: 2.5,
+        targetX: 370,
+        targetY: 200,
+        jukeTimer: 0,
+        attackTimer: 0
+    };
+}
+
+updateBattleEnemy() {
+    if (!this.enemy || !this.enemy.alive || this.battlePhase !== 'fighting') return;
+    
+    // Juke movement - not directly at player
+    this.enemy.jukeTimer--;
+    if (this.enemy.jukeTimer <= 0) {
+        const playerDistance = Math.sqrt(
+            Math.pow(this.playerX - this.enemy.currentX, 2) + 
+            Math.pow(this.playerY - this.enemy.currentY, 2)
+        );
+        
+        if (playerDistance > 100) {
+            // Move towards player with juke
+            const angle = Math.atan2(this.playerY - this.enemy.currentY, this.playerX - this.enemy.currentX);
+            const jukeAngle = angle + (Math.random() - 0.5) * Math.PI * 0.5; // Random juke
+            
+            this.enemy.targetX = this.enemy.currentX + Math.cos(jukeAngle) * 80;
+            this.enemy.targetY = this.enemy.currentY + Math.sin(jukeAngle) * 80;
+        } else {
+            // Random movement when close
+            this.enemy.targetX = this.enemy.currentX + (Math.random() - 0.5) * 120;
+            this.enemy.targetY = this.enemy.currentY + (Math.random() - 0.5) * 120;
+        }
+        
+        this.enemy.jukeTimer = 60 + Math.random() * 60; // 1-2 seconds
+    }
+    
+    // Move towards target
+    const deltaX = this.enemy.targetX - this.enemy.currentX;
+    const deltaY = this.enemy.targetY - this.enemy.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        this.enemy.currentX += (deltaX / distance) * this.enemy.speed;
+        this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
+    }
+    
+    // Keep in bounds
+    this.enemy.currentX = Math.max(50, Math.min(750, this.enemy.currentX));
+    this.enemy.currentY = Math.max(50, Math.min(750, this.enemy.currentY));
+    
+    this.enemy.element.style.left = this.enemy.currentX + 'px';
+    this.enemy.element.style.top = this.enemy.currentY + 'px';
+}
+
+handleEnemyDeath() {
+    if (!this.enemy) return;
+    
+    // Create explosion effect
+    const explosion = document.createElement('div');
+    explosion.style.position = 'absolute';
+    explosion.style.left = this.enemy.currentX + 'px';
+    explosion.style.top = this.enemy.currentY + 'px';
+    explosion.style.width = '80px';
+    explosion.style.height = '80px';
+    explosion.style.background = 'radial-gradient(circle, yellow 0%, orange 50%, red 100%)';
+    explosion.style.borderRadius = '50%';
+    explosion.style.zIndex = '300';
+    explosion.style.animation = 'explode 1s ease-out';
+    
+    // Add explosion CSS if not exists
+    if (!document.querySelector('#explosionStyle')) {
+        const style = document.createElement('style');
+        style.id = 'explosionStyle';
+        style.textContent = `
+            @keyframes explode {
+                0% { transform: scale(0); opacity: 1; }
+                50% { transform: scale(1.5); opacity: 0.8; }
+                100% { transform: scale(3); opacity: 0; }
             }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    this.gameWorld.appendChild(explosion);
+    
+    // Remove enemy
+    this.enemy.element.remove();
+    this.enemy = null;
+    
+    // Pause music
+    this.battleMusic.pause();
+    
+    // Remove explosion after animation
+    setTimeout(() => {
+        explosion.remove();
+        this.showVictoryDialog();
+    }, 1000);
+}
+
+showVictoryDialog() {
+    // Return to spawn
+    this.playerX = 400;
+    this.playerY = 160;
+    this.canMove = false;
+    this.battlePhase = 'victory';
+    
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+    
+    setTimeout(() => {
+        const dialogOverlay = document.createElement('div');
+        dialogOverlay.id = 'victoryDialog';
+        dialogOverlay.style.position = 'fixed';
+        dialogOverlay.style.top = '0';
+        dialogOverlay.style.left = '0';
+        dialogOverlay.style.width = '100%';
+        dialogOverlay.style.height = '100%';
+        dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+        dialogOverlay.style.display = 'flex';
+        dialogOverlay.style.justifyContent = 'center';
+        dialogOverlay.style.alignItems = 'center';
+        dialogOverlay.style.zIndex = '400';
+        
+        const dialogBox = document.createElement('div');
+        dialogBox.style.background = 'rgba(0,0,0,0.9)';
+        dialogBox.style.color = 'white';
+        dialogBox.style.padding = '20px';
+        dialogBox.style.borderRadius = '10px';
+        dialogBox.style.textAlign = 'center';
+        dialogBox.style.maxWidth = '300px';
+        dialogBox.style.border = '2px solid #555';
+        
+        const text = document.createElement('p');
+        text.style.margin = '10px 0';
+        text.style.fontSize = '14px';
+        text.textContent = "Good job! (This is just a test of the first battle)";
+        
+        const button = document.createElement('button');
+        button.style.background = '#4CAF50';
+        button.style.color = 'white';
+        button.style.border = 'none';
+        button.style.padding = '10px 20px';
+        button.style.borderRadius = '5px';
+        button.style.cursor = 'pointer';
+        button.style.fontSize = '14px';
+        button.textContent = 'OK';
+        button.onclick = () => {
+            dialogOverlay.remove();
+            this.canMove = true;
+            this.createTemporaryExit();
+        };
+        
+        dialogBox.appendChild(text);
+        dialogBox.appendChild(button);
+        dialogOverlay.appendChild(dialogBox);
+        document.body.appendChild(dialogOverlay);
+    }, 2000);
+}
+
+            
+            startGameLoop() {
+    const gameLoop = () => {
+        if (this.gameStarted) {
+            this.updatePlayer();
+            this.updateBattleEnemy();
+            this.checkCollisions();
+        }
+        requestAnimationFrame(gameLoop);
+    };
+    gameLoop();
+}
 
             updatePlayer() {
-                if (this.isPaused) return;
+               if (this.isPaused || !this.canMove) return;
                 if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
                     const newX = this.playerX + this.playerVelocityX;
                     const newY = this.playerY + this.playerVelocityY;
