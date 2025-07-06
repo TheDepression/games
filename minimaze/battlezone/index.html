@@ -65,7 +65,42 @@
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0.3; }
         }
-        
+
+
+        @keyframes slashEffect {
+    0% { 
+        transform: scale(0.5) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: scale(2) rotate(0deg);
+        opacity: 0;
+    }
+}
+
+@keyframes damageFloat {
+    0% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+}
+
+@keyframes gunPulsate {
+    0%, 100% { 
+        transform: scale(1);
+    }
+    50% { 
+        transform: scale(1.2);
+    }
+}
         #controlArea {
             width: 100%;
             height: 35%;
@@ -240,6 +275,8 @@
             margin-top: 10px;
             font-size: 12px;
         }
+
+        
     </style>
 </head>
 <body>
@@ -357,6 +394,15 @@
                 this.attackDamage = 50;
                 this.lastTap = 0;
                 this.tapDelay = 300;
+
+                // Add these after existing properties in constructor
+this.maxHearts = 3;
+this.hasOrangePower = false;
+this.hasHammerPower = false;
+this.boatIsBroken = true;
+this.purpleHeartsSold = 0;
+this.hasSuperGun = false;
+this.hasEnhancedRange = false;
                 
                 // Movement properties - spawn in center
                 this.playerX = 400;
@@ -494,69 +540,101 @@
             }
 
             attack() {
-                if (!this.hasWeapon) return;
-                
-                this.attackCooldown = true;
-                
-                const attackEl = document.createElement('div');
-                attackEl.style.position = 'absolute';
-                attackEl.style.width = '40px';
-                attackEl.style.height = '40px';
-                attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
-                attackEl.style.borderRadius = '50%';
-                attackEl.style.pointerEvents = 'none';
-                attackEl.style.zIndex = '400';
-                attackEl.style.animation = 'slashEffect 0.3s ease-out';
-                
-                const directionOffsets = {
-                    'n': {x: 0, y: -25},
-                    'ne': {x: 20, y: -20},
-                    'e': {x: 25, y: 0},
-                    'se': {x: 20, y: 20},
-                    's': {x: 0, y: 25},
-                    'sw': {x: -20, y: 20},
-                    'w': {x: -25, y: 0},
-                    'nw': {x: -20, y: -20}
-                };
-                
-                const offset = directionOffsets[this.currentDirection];
-                attackEl.style.left = (this.playerX + offset.x - 20 + 15) + 'px';
-                attackEl.style.top = (this.playerY + offset.y - 20 + 15) + 'px';
-                
-                this.gameWorld.appendChild(attackEl);
-                
-                setTimeout(() => {
-                    if (attackEl.parentNode) {
-                        attackEl.remove();
-                    }
-                }, 300);
-                
-                setTimeout(() => {
-                    this.attackCooldown = false;
-                }, 500);
-            }
+    if (!this.hasWeapon) return;
+    
+    this.attackCooldown = true;
+    
+    const attackEl = document.createElement('div');
+    attackEl.style.position = 'absolute';
+    attackEl.style.pointerEvents = 'none';
+    attackEl.style.zIndex = '400';
+    attackEl.style.animation = 'slashEffect 0.3s ease-out';
+    
+    // Enhanced range: make everything 50% bigger
+    if (this.hasEnhancedRange) {
+        attackEl.style.width = '60px';  // 40px * 1.5
+        attackEl.style.height = '60px'; // 40px * 1.5
+    } else {
+        attackEl.style.width = '40px';
+        attackEl.style.height = '40px';
+    }
+    
+    attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+    attackEl.style.borderRadius = '50%';
+    
+    const directionOffsets = {
+        'n': {x: 0, y: -35},    // Further away from player
+        'ne': {x: 25, y: -25},
+        'e': {x: 35, y: 0},
+        'se': {x: 25, y: 25},
+        's': {x: 0, y: 35},
+        'sw': {x: -25, y: 25},
+        'w': {x: -35, y: 0},
+        'nw': {x: -25, y: -25}
+    };
+    
+    const offset = directionOffsets[this.currentDirection];
+    // Better centering - adjust for circle size
+    const visualCenterX = this.hasEnhancedRange ? 30 : 20;
+    const visualCenterY = this.hasEnhancedRange ? 30 : 20;
+    
+    attackEl.style.left = (this.playerX + offset.x - visualCenterX + 12) + 'px';
+    attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
+    
+    this.gameWorld.appendChild(attackEl);
+    
+    setTimeout(() => {
+        if (attackEl.parentNode) {
+            attackEl.remove();
+        }
+    }, 300);
+    
+    setTimeout(() => {
+        this.attackCooldown = false;
+    }, 500);
+}
 
             loadGameState() {
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    this.hearts = gameState.hearts || 3;
-                    this.money = gameState.money || 0;
-                    this.timeElapsed = gameState.timeElapsed || 0;
-                    this.deathCount = gameState.deathCount || 0;
-                    this.hasTrophy = gameState.hasTrophy || false;
-                    this.hasOrangePower = gameState.hasOrangePower || false;
-                    this.hasHammerPower = gameState.hasHammerPower || false;
-                    
-                    if (this.hasOrangePower) {
-                        this.attackDamage = 100;
-                    }
-                    
-                    this.updateTimer();
-                    return true;
-                }
-                return false;
-            }
+    const savedState = localStorage.getItem('mfGameState');
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        this.hearts = gameState.hearts || 3;
+        this.maxHearts = gameState.maxHearts || 3;
+        this.money = gameState.money || 0;
+        this.timeElapsed = gameState.timeElapsed || 0;
+        this.deathCount = gameState.deathCount || 0;
+        this.hasTrophy = gameState.hasTrophy || false;
+        this.hasOrangePower = gameState.hasOrangePower || false;
+        this.hasHammerPower = gameState.hasHammerPower || false;
+        this.boatIsBroken = gameState.boatIsBroken !== undefined ? gameState.boatIsBroken : true;
+        
+        // Shop specific items
+        this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
+        this.hasSuperGun = gameState.hasSuperGun || false;
+        this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+        
+        // Apply ALL damage upgrades in the correct priority order
+        if (this.hasSuperGun) {
+            this.attackDamage = 150; // Super gun has highest priority
+        } else if (this.hasOrangePower || this.hasHammerPower) {
+            this.attackDamage = 100; // Orange power OR hammer power
+        } else {
+            this.attackDamage = 50; // Base damage
+        }
+        
+        // Apply range upgrade
+        if (this.hasEnhancedRange) {
+            this.attackRange = 90; // Double the range from 45 to 90
+        }
+        
+        // Apply max hearts from shop purple hearts
+        this.maxHearts += this.purpleHeartsSold;
+        
+        this.updateTimer();
+        return true;
+    }
+    return false;
+}
 
             saveGameState() {
     const existingState = JSON.parse(localStorage.getItem('mfGameState'));
@@ -948,33 +1026,52 @@
             }
             
             updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('money').textContent = this.money;
-                this.updateDeathCounter();
-                
-                const ui = document.getElementById('ui');
-                let itemsHTML = '';
-                if (this.hasKey) itemsHTML += ' 🔑';
-                if (this.hasBoat && !this.boatIsBroken) itemsHTML += ' ⛵';
-                if (this.hasBoat && this.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
-                if (this.hasHammer) itemsHTML += ' 🔨';
-                if (this.hasFlashlight) itemsHTML += ' 🔦';
-                if (this.hasPencil) itemsHTML += ' ✏️';
-                if (this.hasWeapon && this.hasHammerPower) itemsHTML += ' <span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
-                else if (this.hasWeapon && this.hasOrangePower) itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-                else if (this.hasWeapon) itemsHTML += ' 🔫';
-                if (this.hasLavaShoes) itemsHTML += ' 🥾';
-                if (this.hasTrophy) itemsHTML += ' 🏆';
-                
-                if (!document.getElementById('items')) {
-                    const itemsDiv = document.createElement('div');
-                    itemsDiv.id = 'items';
-                    itemsDiv.innerHTML = '+' + itemsHTML;
-                    ui.appendChild(itemsDiv);
-                } else {
-                    document.getElementById('items').innerHTML = '+' + itemsHTML;
-                }
-            }
+    document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money;
+    this.updateDeathCounter();
+    
+    const ui = document.getElementById('ui');
+    let itemsHTML = '';
+    if (this.hasKey) itemsHTML += ' 🔑';
+    if (this.hasBoat && !this.boatIsBroken) itemsHTML += ' ⛵';
+    if (this.hasBoat && this.boatIsBroken) itemsHTML += ' <span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>';
+    if (this.hasFlashlight) itemsHTML += ' 🔦';
+    
+    // Replace the gun section with this:
+    if (this.hasWeapon) {
+        let gunStyle = '';
+        
+        // Determine base gun color/style
+        if (this.hasSuperGun) {
+            gunStyle = 'filter: brightness(0.3);'; // Deep black for super gun
+        } else if (this.hasHammerPower) {
+            gunStyle = 'filter: grayscale(0.9) brightness(0.8);'; // Grey for hammer
+        } else if (this.hasOrangePower) {
+            gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2);'; // Blue for orange
+        } else {
+            gunStyle = ''; // Default green
+        }
+        
+        // Add pulse animation if enhanced range (preserving base color)
+        if (this.hasEnhancedRange) {
+            gunStyle += ' animation: gunPulsate 2s infinite; filter: ' + gunStyle.replace('filter: ', '') + ' drop-shadow(0 0 8px gold);';
+        }
+        
+        itemsHTML += ` <span style="${gunStyle}">🔫</span>`;
+    }
+    
+    if (this.hasLavaShoes) itemsHTML += ' 🥾';
+    if (this.hasTrophy) itemsHTML += ' 🏆';
+    
+    if (!document.getElementById('items')) {
+        const itemsDiv = document.createElement('div');
+        itemsDiv.id = 'items';
+        itemsDiv.innerHTML = '+' + itemsHTML;
+        ui.appendChild(itemsDiv);
+    } else {
+        document.getElementById('items').innerHTML = '+' + itemsHTML;
+    }
+}
             
             gameOver() {
                 this.deathCount++;
