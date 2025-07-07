@@ -1038,6 +1038,19 @@ startBattleAnimation() {
     this.battlePhase = 'animation';
     this.battleMusic.play().catch(e => console.log('Battle music play failed:', e));
     
+    // Center camera on gate area for all battles
+    const gameAreaWidth = this.gameArea.offsetWidth;
+    const gameAreaHeight = this.gameArea.offsetHeight;
+    const gateX = 400; // Center of gate
+    const gateY = 60;  // Gate area
+    const scrollX = gateX - gameAreaWidth / 2;
+    const scrollY = gateY - gameAreaHeight / 2;
+    this.gameArea.scrollTo({
+        left: scrollX,
+        top: scrollY,
+        behavior: 'smooth'
+    });
+    
     // Create enemy behind the cage (fade in)
     this.createCagedEnemy();
     
