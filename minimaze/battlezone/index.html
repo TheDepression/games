@@ -292,6 +292,23 @@
     display: none;
 }
 
+        @keyframes hammerSwingLeft {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-45deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes hammerSwingRight {
+    0% { transform: rotate(0deg) scaleX(-1); }
+    50% { transform: rotate(45deg) scaleX(-1); }
+    100% { transform: rotate(0deg) scaleX(-1); }
+}
+
+@keyframes knifeRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
         
     </style>
 </head>
@@ -1251,10 +1268,17 @@ blackFlashAndStartBattle() {
 }
 
 setupBattle() {
-    // Remove animation enemy
-    const forwardEnemy = document.getElementById('forwardEnemy');
-    if (forwardEnemy) {
-        forwardEnemy.remove();
+    // Remove animation enemies
+    if (this.currentBattle === 1) {
+        const forwardEnemy = document.getElementById('forwardEnemy');
+        if (forwardEnemy) {
+            forwardEnemy.remove();
+        }
+    } else if (this.currentBattle === 2) {
+        const forwardEnemy1 = document.getElementById('forwardEnemy1');
+        const forwardEnemy2 = document.getElementById('forwardEnemy2');
+        if (forwardEnemy1) forwardEnemy1.remove();
+        if (forwardEnemy2) forwardEnemy2.remove();
     }
     
     // Move player to better battle position
@@ -1275,7 +1299,7 @@ setupBattle() {
         behavior: 'auto'
     });
     
-    // Create battle enemy
+    // Create battle enemy/enemies
     this.createBattleEnemy();
     
     // Start battle
@@ -1286,42 +1310,145 @@ setupBattle() {
 }
 
 createBattleEnemy() {
-    const enemyEl = document.createElement('div');
-    enemyEl.className = 'enemy battle-enemy';
-    enemyEl.style.position = 'absolute';
-    enemyEl.style.left = '370px';
-    enemyEl.style.top = '200px';
-    enemyEl.style.width = '60px';
-    enemyEl.style.height = '120px';
-    enemyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
-    enemyEl.style.backgroundSize = 'contain';
-    enemyEl.style.backgroundRepeat = 'no-repeat';
-    enemyEl.style.backgroundPosition = 'center';
-    enemyEl.style.zIndex = '80';
-    
-    this.gameWorld.appendChild(enemyEl);
-    
-    this.enemy = {
-        element: enemyEl,
-        currentX: 370,
-        currentY: 200,
-        hp: 700,
-        maxHp: 700,
-        alive: true,
-        speed: 2.5,
-        targetX: 370,
-        targetY: 200,
-        jukeTimer: 0,
-        attackTimer: 120, // Start with 2 seconds before first attack
-        projectiles: []
-    };
-    // Show HP display
-document.getElementById('bossHP').style.display = 'block';
-document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+    if (this.currentBattle === 1) {
+        // Single bird enemy
+        const enemyEl = document.createElement('div');
+        enemyEl.className = 'enemy battle-enemy';
+        enemyEl.style.position = 'absolute';
+        enemyEl.style.left = '370px';
+        enemyEl.style.top = '200px';
+        enemyEl.style.width = '60px';
+        enemyEl.style.height = '120px';
+        enemyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
+        enemyEl.style.backgroundSize = 'contain';
+        enemyEl.style.backgroundRepeat = 'no-repeat';
+        enemyEl.style.backgroundPosition = 'center';
+        enemyEl.style.zIndex = '80';
+        
+        this.gameWorld.appendChild(enemyEl);
+        
+        this.enemy = {
+            element: enemyEl,
+            currentX: 370,
+            currentY: 200,
+            hp: 700,
+            maxHp: 700,
+            alive: true,
+            speed: 2.5,
+            targetX: 370,
+            targetY: 200,
+            jukeTimer: 0,
+            attackTimer: 120,
+            projectiles: []
+        };
+        
+        // Show HP display
+        document.getElementById('bossHP').style.display = 'block';
+        document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+        
+    } else if (this.currentBattle === 2) {
+        // Dual enemies
+        const enemy1El = document.createElement('div');
+        enemy1El.className = 'enemy battle-enemy';
+        enemy1El.id = 'yamato';
+        enemy1El.style.position = 'absolute';
+        enemy1El.style.left = '340px';
+        enemy1El.style.top = '200px';
+        enemy1El.style.width = '60px';
+        enemy1El.style.height = '120px';
+        enemy1El.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/yamato-min.png")';
+        enemy1El.style.backgroundSize = 'contain';
+        enemy1El.style.backgroundRepeat = 'no-repeat';
+        enemy1El.style.backgroundPosition = 'center';
+        enemy1El.style.zIndex = '80';
+        
+        const enemy2El = document.createElement('div');
+        enemy2El.className = 'enemy battle-enemy';
+        enemy2El.id = 'psycho';
+        enemy2El.style.position = 'absolute';
+        enemy2El.style.left = '420px';
+        enemy2El.style.top = '200px';
+        enemy2El.style.width = '60px';
+        enemy2El.style.height = '120px';
+        enemy2El.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/psycho-min.png")';
+        enemy2El.style.backgroundSize = 'contain';
+        enemy2El.style.backgroundRepeat = 'no-repeat';
+        enemy2El.style.backgroundPosition = 'center';
+        enemy2El.style.zIndex = '80';
+        
+        this.gameWorld.appendChild(enemy1El);
+        this.gameWorld.appendChild(enemy2El);
+        
+        // Create hammer for psycho
+        const hammerEl = document.createElement('div');
+        hammerEl.id = 'psychoHammer';
+        hammerEl.style.position = 'absolute';
+        hammerEl.style.left = '390px'; // Left side of psycho
+        hammerEl.style.top = '230px';
+        hammerEl.style.width = '50px';
+        hammerEl.style.height = '50px';
+        hammerEl.style.fontSize = '40px';
+        hammerEl.style.display = 'flex';
+        hammerEl.style.alignItems = 'center';
+        hammerEl.style.justifyContent = 'center';
+        hammerEl.style.zIndex = '85';
+        hammerEl.style.transformOrigin = 'center';
+        hammerEl.textContent = '🔨';
+        
+        this.gameWorld.appendChild(hammerEl);
+        
+        this.enemy1 = {
+            element: enemy1El,
+            name: 'Yama',
+            currentX: 340,
+            currentY: 200,
+            hp: 500,
+            maxHp: 500,
+            alive: true,
+            speed: 2.0,
+            targetX: 340,
+            targetY: 200,
+            jukeTimer: 0,
+            attackTimer: 120,
+            projectiles: []
+        };
+        
+        this.enemy2 = {
+            element: enemy2El,
+            name: 'Ibu',
+            currentX: 420,
+            currentY: 200,
+            hp: 500,
+            maxHp: 500,
+            alive: true,
+            speed: 1.8,
+            targetX: 420,
+            targetY: 200,
+            jukeTimer: 0,
+            hammerTimer: 0,
+            hammerSwinging: false,
+            hammerSide: 'left', // 'left' or 'right'
+            hammer: hammerEl
+        };
+        
+        // Show dual HP display
+        document.getElementById('bossHP').style.display = 'block';
+        document.getElementById('bossHP').innerHTML = `Yama: ${this.enemy1.hp}/${this.enemy1.maxHp}<br>Ibu: ${this.enemy2.hp}/${this.enemy2.maxHp}`;
+    }
 }
 
 updateBattleEnemy() {
-    if (!this.enemy || !this.enemy.alive || this.battlePhase !== 'fighting') return;
+    if (this.battlePhase !== 'fighting') return;
+    
+    if (this.currentBattle === 1) {
+        this.updateSingleEnemy();
+    } else if (this.currentBattle === 2) {
+        this.updateDualEnemies();
+    }
+}
+
+updateSingleEnemy() {
+    if (!this.enemy || !this.enemy.alive) return;
     
     // Juke movement - not directly at player
     this.enemy.jukeTimer--;
@@ -1376,6 +1503,186 @@ updateBattleEnemy() {
     
     // Check direct contact damage
     this.checkEnemyContact();
+}
+
+updateDualEnemies() {
+    // Update Yamato (knife thrower)
+    if (this.enemy1 && this.enemy1.alive) {
+        this.updateYamato();
+    }
+    
+    // Update Psycho (hammer swinger)
+    if (this.enemy2 && this.enemy2.alive) {
+        this.updatePsycho();
+    }
+    
+    // Update projectiles from both enemies
+    this.updateDualProjectiles();
+    
+    // Check contact damage
+    this.checkDualEnemyContact();
+}
+
+updateYamato() {
+    // Similar juke movement as bird but slower
+    this.enemy1.jukeTimer--;
+    if (this.enemy1.jukeTimer <= 0) {
+        const playerDistance = Math.sqrt(
+            Math.pow(this.playerX - this.enemy1.currentX, 2) + 
+            Math.pow(this.playerY - this.enemy1.currentY, 2)
+        );
+        
+        if (playerDistance > 100) {
+            const angle = Math.atan2(this.playerY - this.enemy1.currentY, this.playerX - this.enemy1.currentX);
+            const jukeAngle = angle + (Math.random() - 0.5) * Math.PI * 0.5;
+            
+            this.enemy1.targetX = this.enemy1.currentX + Math.cos(jukeAngle) * 80;
+            this.enemy1.targetY = this.enemy1.currentY + Math.sin(jukeAngle) * 80;
+        } else {
+            this.enemy1.targetX = this.enemy1.currentX + (Math.random() - 0.5) * 120;
+            this.enemy1.targetY = this.enemy1.currentY + (Math.random() - 0.5) * 120;
+        }
+        
+        this.enemy1.jukeTimer = 80 + Math.random() * 80; // Slower than bird
+    }
+    
+    // Move towards target
+    const deltaX = this.enemy1.targetX - this.enemy1.currentX;
+    const deltaY = this.enemy1.targetY - this.enemy1.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        this.enemy1.currentX += (deltaX / distance) * this.enemy1.speed;
+        this.enemy1.currentY += (deltaY / distance) * this.enemy1.speed;
+    }
+    
+    // Keep in bounds
+    this.enemy1.currentX = Math.max(50, Math.min(750, this.enemy1.currentX));
+    this.enemy1.currentY = Math.max(50, Math.min(750, this.enemy1.currentY));
+    
+    this.enemy1.element.style.left = this.enemy1.currentX + 'px';
+    this.enemy1.element.style.top = this.enemy1.currentY + 'px';
+    
+    // Throw knives
+    this.enemy1.attackTimer--;
+    if (this.enemy1.attackTimer <= 0) {
+        this.throwKnife();
+        this.enemy1.attackTimer = 120 + Math.random() * 80; // Slower than bird
+    }
+}
+
+updatePsycho() {
+    // Constant random movement (no pauses)
+    this.enemy2.jukeTimer--;
+    if (this.enemy2.jukeTimer <= 0) {
+        // Always random movement
+        this.enemy2.targetX = this.enemy2.currentX + (Math.random() - 0.5) * 150;
+        this.enemy2.targetY = this.enemy2.currentY + (Math.random() - 0.5) * 150;
+        this.enemy2.jukeTimer = 30 + Math.random() * 30; // Very frequent direction changes
+    }
+    
+    // Move towards target
+    const deltaX = this.enemy2.targetX - this.enemy2.currentX;
+    const deltaY = this.enemy2.targetY - this.enemy2.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        this.enemy2.currentX += (deltaX / distance) * this.enemy2.speed;
+        this.enemy2.currentY += (deltaY / distance) * this.enemy2.speed;
+    }
+    
+    // Keep in bounds
+    this.enemy2.currentX = Math.max(50, Math.min(750, this.enemy2.currentX));
+    this.enemy2.currentY = Math.max(50, Math.min(750, this.enemy2.currentY));
+    
+    this.enemy2.element.style.left = this.enemy2.currentX + 'px';
+    this.enemy2.element.style.top = this.enemy2.currentY + 'px';
+    
+    // Update hammer position and side
+    this.updateHammer();
+    
+    // Handle hammer swinging
+    this.enemy2.hammerTimer--;
+    if (this.enemy2.hammerTimer <= 0 && !this.enemy2.hammerSwinging) {
+        this.startHammerSwing();
+        this.enemy2.hammerTimer = 90 + Math.random() * 60; // Swing frequency
+    }
+}
+
+updateHammer() {
+    if (!this.enemy2.hammer) return;
+    
+    // Check which side player is on
+    const playerOnRight = this.playerX > this.enemy2.currentX + 30;
+    const newSide = playerOnRight ? 'right' : 'left';
+    
+    if (newSide !== this.enemy2.hammerSide) {
+        this.enemy2.hammerSide = newSide;
+    }
+    
+    // Position hammer
+    if (this.enemy2.hammerSide === 'left') {
+        this.enemy2.hammer.style.left = (this.enemy2.currentX - 25) + 'px';
+        this.enemy2.hammer.style.top = (this.enemy2.currentY + 30) + 'px';
+    } else {
+        this.enemy2.hammer.style.left = (this.enemy2.currentX + 35) + 'px';
+        this.enemy2.hammer.style.top = (this.enemy2.currentY + 30) + 'px';
+    }
+}
+
+startHammerSwing() {
+    if (!this.enemy2.hammer) return;
+    
+    this.enemy2.hammerSwinging = true;
+    
+    if (this.enemy2.hammerSide === 'left') {
+        this.enemy2.hammer.style.animation = 'hammerSwingLeft 0.6s ease-in-out';
+    } else {
+        this.enemy2.hammer.style.animation = 'hammerSwingRight 0.6s ease-in-out';
+    }
+    
+    setTimeout(() => {
+        this.enemy2.hammerSwinging = false;
+        if (this.enemy2.hammer) {
+            this.enemy2.hammer.style.animation = '';
+        }
+    }, 600);
+}
+
+throwKnife() {
+    const knifeEl = document.createElement('div');
+    knifeEl.className = 'enemy-projectile knife';
+    knifeEl.style.position = 'absolute';
+    knifeEl.style.left = (this.enemy1.currentX + 30) + 'px';
+    knifeEl.style.top = (this.enemy1.currentY + 60) + 'px';
+    knifeEl.style.width = '20px';
+    knifeEl.style.height = '20px';
+    knifeEl.style.fontSize = '16px';
+    knifeEl.style.display = 'flex';
+    knifeEl.style.alignItems = 'center';
+    knifeEl.style.justifyContent = 'center';
+    knifeEl.style.zIndex = '90';
+    knifeEl.style.animation = 'knifeRotate 0.5s linear infinite';
+    knifeEl.textContent = '🔪';
+    
+    this.gameWorld.appendChild(knifeEl);
+    
+    // Calculate direction to player
+    const deltaX = this.playerX - (this.enemy1.currentX + 30);
+    const deltaY = this.playerY - (this.enemy1.currentY + 60);
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    const projectile = {
+        element: knifeEl,
+        x: this.enemy1.currentX + 30,
+        y: this.enemy1.currentY + 60,
+        velocityX: (deltaX / distance) * 3.5, // Slightly slower than scissors
+        velocityY: (deltaY / distance) * 3.5,
+        alive: true,
+        owner: 'yamato'
+    };
+    
+    this.enemy1.projectiles.push(projectile);
 }
 
             throwScissors() {
