@@ -883,6 +883,21 @@ handleDualEnemyDeath(deadEnemy) {
         this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
         this.hasSuperGun = gameState.hasSuperGun || false;
         this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+
+
+
+        // Apply max hearts from shop purple hearts
+this.maxHearts += this.purpleHeartsSold;
+
+// Apply max hearts from discovered purple hearts (3 available in main world)
+if (gameState.collectedPurpleHearts) {
+    this.maxHearts += gameState.collectedPurpleHearts.length;
+}
+
+// Fill hearts to max potential on entering battlezone
+this.hearts = this.maxHearts;
+
+
         
         // Apply ALL damage upgrades in the correct priority order
         if (this.hasSuperGun) {
