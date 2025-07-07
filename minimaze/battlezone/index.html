@@ -1031,27 +1031,69 @@ startBattleAnimation() {
 }
 
 createCagedEnemy() {
-    const enemy = document.createElement('div');
-    enemy.id = 'cagedEnemy';
-    enemy.style.position = 'absolute';
-    enemy.style.left = '360px';
-    enemy.style.top = '30px';
-    enemy.style.width = '50px';
-    enemy.style.height = '100px';
-    enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
-    enemy.style.backgroundSize = 'contain';
-    enemy.style.backgroundRepeat = 'no-repeat';
-    enemy.style.backgroundPosition = 'center';
-    enemy.style.zIndex = '50'; // Above black surface, below white walls
-    enemy.style.opacity = '0';
-    enemy.style.transition = 'opacity 2s ease-in';
-    
-    this.gameWorld.appendChild(enemy);
-    
-    // Fade in
-    setTimeout(() => {
-        enemy.style.opacity = '1';
-    }, 100);
+    if (this.currentBattle === 1) {
+        // Single bird enemy
+        const enemy = document.createElement('div');
+        enemy.id = 'cagedEnemy';
+        enemy.style.position = 'absolute';
+        enemy.style.left = '360px';
+        enemy.style.top = '30px';
+        enemy.style.width = '50px';
+        enemy.style.height = '100px';
+        enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
+        enemy.style.backgroundSize = 'contain';
+        enemy.style.backgroundRepeat = 'no-repeat';
+        enemy.style.backgroundPosition = 'center';
+        enemy.style.zIndex = '50';
+        enemy.style.opacity = '0';
+        enemy.style.transition = 'opacity 2s ease-in';
+        
+        this.gameWorld.appendChild(enemy);
+        
+        setTimeout(() => {
+            enemy.style.opacity = '1';
+        }, 100);
+        
+    } else if (this.currentBattle === 2) {
+        // Two enemies side by side
+        const enemy1 = document.createElement('div');
+        enemy1.id = 'cagedEnemy1';
+        enemy1.style.position = 'absolute';
+        enemy1.style.left = '340px';
+        enemy1.style.top = '30px';
+        enemy1.style.width = '50px';
+        enemy1.style.height = '100px';
+        enemy1.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/yamato-min.png")';
+        enemy1.style.backgroundSize = 'contain';
+        enemy1.style.backgroundRepeat = 'no-repeat';
+        enemy1.style.backgroundPosition = 'center';
+        enemy1.style.zIndex = '50';
+        enemy1.style.opacity = '0';
+        enemy1.style.transition = 'opacity 2s ease-in';
+        
+        const enemy2 = document.createElement('div');
+        enemy2.id = 'cagedEnemy2';
+        enemy2.style.position = 'absolute';
+        enemy2.style.left = '410px';
+        enemy2.style.top = '30px';
+        enemy2.style.width = '50px';
+        enemy2.style.height = '100px';
+        enemy2.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/psycho-min.png")';
+        enemy2.style.backgroundSize = 'contain';
+        enemy2.style.backgroundRepeat = 'no-repeat';
+        enemy2.style.backgroundPosition = 'center';
+        enemy2.style.zIndex = '50';
+        enemy2.style.opacity = '0';
+        enemy2.style.transition = 'opacity 2s ease-in';
+        
+        this.gameWorld.appendChild(enemy1);
+        this.gameWorld.appendChild(enemy2);
+        
+        setTimeout(() => {
+            enemy1.style.opacity = '1';
+            enemy2.style.opacity = '1';
+        }, 100);
+    }
 }
 
 openGate() {
@@ -1069,27 +1111,66 @@ openGate() {
 }
 
 enemyStepsForward() {
-    // Remove caged enemy
-    const cagedEnemy = document.getElementById('cagedEnemy');
-    if (cagedEnemy) {
-        cagedEnemy.remove();
+    if (this.currentBattle === 1) {
+        // Remove caged enemy
+        const cagedEnemy = document.getElementById('cagedEnemy');
+        if (cagedEnemy) {
+            cagedEnemy.remove();
+        }
+        
+        // Create larger enemy in front
+        const forwardEnemy = document.createElement('div');
+        forwardEnemy.id = 'forwardEnemy';
+        forwardEnemy.style.position = 'absolute';
+        forwardEnemy.style.left = '350px';
+        forwardEnemy.style.top = '50px';
+        forwardEnemy.style.width = '60px';
+        forwardEnemy.style.height = '120px';
+        forwardEnemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
+        forwardEnemy.style.backgroundSize = 'contain';
+        forwardEnemy.style.backgroundRepeat = 'no-repeat';
+        forwardEnemy.style.backgroundPosition = 'center';
+        forwardEnemy.style.zIndex = '200';
+        
+        this.gameWorld.appendChild(forwardEnemy);
+        
+    } else if (this.currentBattle === 2) {
+        // Remove caged enemies
+        const cagedEnemy1 = document.getElementById('cagedEnemy1');
+        const cagedEnemy2 = document.getElementById('cagedEnemy2');
+        if (cagedEnemy1) cagedEnemy1.remove();
+        if (cagedEnemy2) cagedEnemy2.remove();
+        
+        // Create larger enemies in front
+        const forwardEnemy1 = document.createElement('div');
+        forwardEnemy1.id = 'forwardEnemy1';
+        forwardEnemy1.style.position = 'absolute';
+        forwardEnemy1.style.left = '330px';
+        forwardEnemy1.style.top = '50px';
+        forwardEnemy1.style.width = '60px';
+        forwardEnemy1.style.height = '120px';
+        forwardEnemy1.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/yamato-min.png")';
+        forwardEnemy1.style.backgroundSize = 'contain';
+        forwardEnemy1.style.backgroundRepeat = 'no-repeat';
+        forwardEnemy1.style.backgroundPosition = 'center';
+        forwardEnemy1.style.zIndex = '200';
+        
+        const forwardEnemy2 = document.createElement('div');
+        forwardEnemy2.id = 'forwardEnemy2';
+        forwardEnemy2.style.position = 'absolute';
+        forwardEnemy2.style.left = '410px';
+        forwardEnemy2.style.top = '50px';
+        forwardEnemy2.style.width = '60px';
+        forwardEnemy2.style.height = '120px';
+        forwardEnemy2.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/psycho-min.png")';
+        forwardEnemy2.style.backgroundSize = 'contain';
+        forwardEnemy2.style.backgroundRepeat = 'no-repeat';
+        forwardEnemy2.style.backgroundPosition = 'center';
+        forwardEnemy2.style.zIndex = '200';
+        
+        this.gameWorld.appendChild(forwardEnemy1);
+        this.gameWorld.appendChild(forwardEnemy2);
     }
-    
-    // Create larger enemy in front
-    const forwardEnemy = document.createElement('div');
-    forwardEnemy.id = 'forwardEnemy';
-    forwardEnemy.style.position = 'absolute';
-    forwardEnemy.style.left = '350px';
-    forwardEnemy.style.top = '50px';
-    forwardEnemy.style.width = '60px';
-    forwardEnemy.style.height = '120px';
-    forwardEnemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bird-min.png")';
-    forwardEnemy.style.backgroundSize = 'contain';
-    forwardEnemy.style.backgroundRepeat = 'no-repeat';
-    forwardEnemy.style.backgroundPosition = 'center';
-    forwardEnemy.style.zIndex = '200'; // Above everything
-    
-    this.gameWorld.appendChild(forwardEnemy);
     
     // Close gate
     setTimeout(() => {
