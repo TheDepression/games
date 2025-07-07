@@ -1822,12 +1822,18 @@ lightsBackOnDim(blackOverlay) {
     // Show BRAINS message
     this.showMessage('BRAINS!!');
     
-    // Enable movement after message (music already playing)
-    setTimeout(() => {
-        this.battlePhase = 'fighting';
-        this.canMove = true;
-        this.gameStarted = true; 
-    }, 3000);
+    // Enable movement immediately - don't wait!
+    this.gameStarted = true;  // Set this FIRST
+    this.battlePhase = 'fighting';
+    this.canMove = true;
+    this.isPaused = false;  // Explicitly set this too
+    
+    console.log('Battle 4 flags:', {
+        gameStarted: this.gameStarted,
+        canMove: this.canMove,
+        battlePhase: this.battlePhase,
+        isPaused: this.isPaused
+    });
 }
 
 createForestMusic() {
