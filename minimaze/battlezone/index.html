@@ -1511,6 +1511,11 @@ setupBattle() {
     // Clean up any explosion projectiles
     const explosionProjectiles = this.gameWorld.querySelectorAll('[class*="explosion-projectile"]');
     explosionProjectiles.forEach(proj => proj.remove());    
+} else if (this.currentBattle === 4) {
+    const forwardEnemy = document.getElementById('forwardEnemy');
+    if (forwardEnemy) {
+        forwardEnemy.remove();
+    }
 }
     
     // Move player to better battle position
