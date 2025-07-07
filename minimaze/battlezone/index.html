@@ -1237,7 +1237,29 @@ createCagedEnemy() {
             enemy1.style.opacity = '1';
             enemy2.style.opacity = '1';
         }, 100);
-    }
+    } else if (this.currentBattle === 3) {
+    // Single bear enemy
+    const enemy = document.createElement('div');
+    enemy.id = 'cagedEnemy';
+    enemy.style.position = 'absolute';
+    enemy.style.left = '360px';
+    enemy.style.top = '30px';
+    enemy.style.width = '50px';
+    enemy.style.height = '100px';
+    enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/drbearfight.png")';
+    enemy.style.backgroundSize = 'contain';
+    enemy.style.backgroundRepeat = 'no-repeat';
+    enemy.style.backgroundPosition = 'center';
+    enemy.style.zIndex = '50';
+    enemy.style.opacity = '0';
+    enemy.style.transition = 'opacity 2s ease-in';
+    
+    this.gameWorld.appendChild(enemy);
+    
+    setTimeout(() => {
+        enemy.style.opacity = '1';
+    }, 100);
+}
 }
 
 openGate() {
@@ -1314,8 +1336,29 @@ enemyStepsForward() {
         
         this.gameWorld.appendChild(forwardEnemy1);
         this.gameWorld.appendChild(forwardEnemy2);
+    } else if (this.currentBattle === 3) {
+    // Remove caged enemy
+    const cagedEnemy = document.getElementById('cagedEnemy');
+    if (cagedEnemy) {
+        cagedEnemy.remove();
     }
     
+    // Create larger enemy in front
+    const forwardEnemy = document.createElement('div');
+    forwardEnemy.id = 'forwardEnemy';
+    forwardEnemy.style.position = 'absolute';
+    forwardEnemy.style.left = '350px';
+    forwardEnemy.style.top = '50px';
+    forwardEnemy.style.width = '60px';
+    forwardEnemy.style.height = '120px';
+    forwardEnemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/drbearfight.png")';
+    forwardEnemy.style.backgroundSize = 'contain';
+    forwardEnemy.style.backgroundRepeat = 'no-repeat';
+    forwardEnemy.style.backgroundPosition = 'center';
+    forwardEnemy.style.zIndex = '200';
+    
+    this.gameWorld.appendChild(forwardEnemy);
+}
     // Close gate
     setTimeout(() => {
         this.closeGate();
@@ -1368,8 +1411,8 @@ switch (this.currentBattle) {
         tauntMessage = 'We are going to make frog soup for dinner tonight!';
         break;
     case 3:
-        tauntMessage = 'Your third battle taunt here!';
-        break;
+    tauntMessage = 'Im a bear🐻';
+    break;
     case 4:
         tauntMessage = 'Your fourth battle taunt here!';
         break;
@@ -1426,7 +1469,12 @@ setupBattle() {
         const forwardEnemy2 = document.getElementById('forwardEnemy2');
         if (forwardEnemy1) forwardEnemy1.remove();
         if (forwardEnemy2) forwardEnemy2.remove();
+   } else if (this.currentBattle === 3) {
+    const forwardEnemy = document.getElementById('forwardEnemy');
+    if (forwardEnemy) {
+        forwardEnemy.remove();
     }
+}
     
     // Move player to better battle position
     this.playerX = 400;
@@ -1581,7 +1629,46 @@ createBattleEnemy() {
         // Show dual HP display
         document.getElementById('bossHP').style.display = 'block';
         document.getElementById('bossHP').innerHTML = `Yama: ${this.enemy1.hp}/${this.enemy1.maxHp}<br>Ibu: ${this.enemy2.hp}/${this.enemy2.maxHp}`;
-    }
+   } else if (this.currentBattle === 3) {
+    // Dr. Bear enemy
+    const enemyEl = document.createElement('div');
+    enemyEl.className = 'enemy battle-enemy';
+    enemyEl.style.position = 'absolute';
+    enemyEl.style.left = '370px';
+    enemyEl.style.top = '200px';
+    enemyEl.style.width = '60px';
+    enemyEl.style.height = '120px';
+    enemyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/drbearfight.png")';
+    enemyEl.style.backgroundSize = 'contain';
+    enemyEl.style.backgroundRepeat = 'no-repeat';
+    enemyEl.style.backgroundPosition = 'center';
+    enemyEl.style.zIndex = '150';
+    
+    this.gameWorld.appendChild(enemyEl);
+    
+    this.enemy = {
+        element: enemyEl,
+        currentX: 370,
+        currentY: 200,
+        hp: 10000,
+        maxHp: 10000,
+        alive: true,
+        speed: 2.2, // Slightly slower than player
+        targetX: 370,
+        targetY: 200,
+        mode: 'vulnerable', // 'vulnerable' or 'attack'
+        modeTimer: 0,
+        syringes: [],
+        syringeCount: 8 // Number of syringes in the ring
+    };
+    
+    // Show HP display
+    document.getElementById('bossHP').style.display = 'block';
+    document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+    
+    // Start in vulnerable mode for 10 seconds
+    this.enemy.modeTimer = 600; // 10 seconds at 60fps
+}
 }
 
 updateBattleEnemy() {
