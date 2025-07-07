@@ -1696,7 +1696,7 @@ createBattleEnemy() {
     
     // New properties for chase-and-explode
     syringeAngle: 0,
-    syringeRadius: 70,
+    syringeRadius: 50,
     syringe: null,
     phaseTimer: 600, // 10 seconds at 60fps
     isShivering: false,
@@ -2113,11 +2113,11 @@ updateSingleSyringe() {
         return;
     }
     
-    // Rotate syringe around bear at high speed
-    this.enemy.syringeAngle += 0.035; //  rotation speed
+    // Rotate syringe around bear at slower speed
+    this.enemy.syringeAngle += 0.015; //  rotation speed
     
-    const x = this.enemy.currentX + 25 + Math.cos(this.enemy.syringeAngle) * this.enemy.syringeRadius;
-    const y = this.enemy.currentY + 50 + Math.sin(this.enemy.syringeAngle) * this.enemy.syringeRadius;
+    const x = this.enemy.currentX + 15 + Math.cos(this.enemy.syringeAngle) * this.enemy.syringeRadius;
+    const y = this.enemy.currentY + 40 + Math.sin(this.enemy.syringeAngle) * this.enemy.syringeRadius;
     
     this.enemy.syringe.style.left = x + 'px';
     this.enemy.syringe.style.top = y + 'px';
@@ -2258,8 +2258,8 @@ checkBearContact() {
     const bearRect = {
         left: this.enemy.currentX,
         top: this.enemy.currentY,
-        right: this.enemy.currentX + 50,
-        bottom: this.enemy.currentY + 100
+        right: this.enemy.currentX + 45,
+        bottom: this.enemy.currentY + 90
     };
     
     if (this.rectsOverlap(playerRect, bearRect)) {
