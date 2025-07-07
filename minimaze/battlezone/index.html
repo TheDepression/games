@@ -293,15 +293,15 @@
 }
 
         @keyframes hammerSwingLeft {
-    0% { transform: rotate(0deg); }
-    50% { transform: rotate(-45deg); }
-    100% { transform: rotate(0deg); }
+    0% { transform: scaleX(1) rotate(0deg); }
+    50% { transform: scaleX(1) rotate(-45deg); }
+    100% { transform: scaleX(1) rotate(0deg); }
 }
 
 @keyframes hammerSwingRight {
-    0% { transform: rotate(0deg) scaleX(-1); }
-    50% { transform: rotate(45deg) scaleX(-1); }
-    100% { transform: rotate(0deg) scaleX(-1); }
+    0% { transform: scaleX(-1) rotate(0deg); }
+    50% { transform: scaleX(-1) rotate(45deg); }
+    100% { transform: scaleX(-1) rotate(0deg); }
 }
 
 @keyframes knifeRotate {
@@ -1611,12 +1611,27 @@ updateSingleEnemy() {
         this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
     }
     
-    // Keep in bounds
-    this.enemy.currentX = Math.max(50, Math.min(750, this.enemy.currentX));
-    this.enemy.currentY = Math.max(50, Math.min(750, this.enemy.currentY));
-    
-    this.enemy.element.style.left = this.enemy.currentX + 'px';
-    this.enemy.element.style.top = this.enemy.currentY + 'px';
+    // Keep in arena bounds (avoid tiled walls)
+this.enemy.currentX = Math.max(120, Math.min(680, this.enemy.currentX));
+this.enemy.currentY = Math.max(120, Math.min(680, this.enemy.currentY));
+
+// Additional check to avoid specific wall areas
+if (this.enemy.currentX < 200 && this.enemy.currentY < 200) {
+    this.enemy.currentX = 220;
+    this.enemy.currentY = 220;
+}
+if (this.enemy.currentX > 600 && this.enemy.currentY < 200) {
+    this.enemy.currentX = 580;
+    this.enemy.currentY = 220;
+}
+if (this.enemy.currentX < 200 && this.enemy.currentY > 600) {
+    this.enemy.currentX = 220;
+    this.enemy.currentY = 580;
+}
+if (this.enemy.currentX > 600 && this.enemy.currentY > 600) {
+    this.enemy.currentX = 580;
+    this.enemy.currentY = 580;
+}
     
     // Handle projectile attacks
     this.enemy.attackTimer--;
@@ -1785,12 +1800,27 @@ updateYamato() {
         this.enemy1.currentY += (deltaY / distance) * this.enemy1.speed;
     }
     
-    // Keep in bounds
-    this.enemy1.currentX = Math.max(50, Math.min(750, this.enemy1.currentX));
-    this.enemy1.currentY = Math.max(50, Math.min(750, this.enemy1.currentY));
-    
-    this.enemy1.element.style.left = this.enemy1.currentX + 'px';
-    this.enemy1.element.style.top = this.enemy1.currentY + 'px';
+    // Keep in arena bounds (avoid tiled walls)
+this.enemy1.currentX = Math.max(120, Math.min(680, this.enemy1.currentX));
+this.enemy1.currentY = Math.max(120, Math.min(680, this.enemy1.currentY));
+
+// Additional check to avoid specific wall areas
+if (this.enemy1.currentX < 200 && this.enemy1.currentY < 200) {
+    this.enemy1.currentX = 220;
+    this.enemy1.currentY = 220;
+}
+if (this.enemy1.currentX > 600 && this.enemy1.currentY < 200) {
+    this.enemy1.currentX = 580;
+    this.enemy1.currentY = 220;
+}
+if (this.enemy1.currentX < 200 && this.enemy1.currentY > 600) {
+    this.enemy1.currentX = 220;
+    this.enemy1.currentY = 580;
+}
+if (this.enemy1.currentX > 600 && this.enemy1.currentY > 600) {
+    this.enemy1.currentX = 580;
+    this.enemy1.currentY = 580;
+}
     
     // Throw knives
     this.enemy1.attackTimer--;
@@ -1820,12 +1850,27 @@ updatePsycho() {
         this.enemy2.currentY += (deltaY / distance) * this.enemy2.speed;
     }
     
-    // Keep in bounds
-    this.enemy2.currentX = Math.max(50, Math.min(750, this.enemy2.currentX));
-    this.enemy2.currentY = Math.max(50, Math.min(750, this.enemy2.currentY));
-    
-    this.enemy2.element.style.left = this.enemy2.currentX + 'px';
-    this.enemy2.element.style.top = this.enemy2.currentY + 'px';
+    // Keep in arena bounds (avoid tiled walls)
+this.enemy2.currentX = Math.max(120, Math.min(680, this.enemy2.currentX));
+this.enemy2.currentY = Math.max(120, Math.min(680, this.enemy2.currentY));
+
+// Additional check to avoid specific wall areas
+if (this.enemy2.currentX < 200 && this.enemy2.currentY < 200) {
+    this.enemy2.currentX = 220;
+    this.enemy2.currentY = 220;
+}
+if (this.enemy2.currentX > 600 && this.enemy2.currentY < 200) {
+    this.enemy2.currentX = 580;
+    this.enemy2.currentY = 220;
+}
+if (this.enemy2.currentX < 200 && this.enemy2.currentY > 600) {
+    this.enemy2.currentX = 220;
+    this.enemy2.currentY = 580;
+}
+if (this.enemy2.currentX > 600 && this.enemy2.currentY > 600) {
+    this.enemy2.currentX = 580;
+    this.enemy2.currentY = 580;
+}
     
     // Update hammer position and side
     this.updateHammer();
