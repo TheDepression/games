@@ -1715,9 +1715,197 @@ createBattleEnemy() {
     
     // Start in vulnerable mode for 10 seconds
     this.enemy.modeTimer = 600; // 10 seconds at 60fps
+} else if (this.currentBattle === 4) {
+    // Battle 4 - Zombie apocalypse (no enemy created initially)
+    this.zombieKillCount = 0;
+    this.totalZombies = 20;
+    this.zombies = [];
+    
+    // Don't show HP display for this battle
+    document.getElementById('bossHP').style.display = 'none';
+    
+    // Start the lights out sequence after a brief delay
+    setTimeout(() => {
+        this.startLightsOutSequence();
+    }, 2000);
 }
 }
 
+
+            startLightsOutSequence() {
+    // Pause music
+    this.battleMusic.pause();
+    
+    // Show confused message
+    this.showMessage('Huh?? 🐸');
+    
+    // After message, lights out
+    setTimeout(() => {
+        this.lightsOut();
+    }, 2000);
+}
+
+lightsOut() {
+    // Create black overlay
+    const blackOverlay = document.createElement('div');
+    blackOverlay.id = 'blackOverlay';
+    blackOverlay.style.position = 'fixed';
+    blackOverlay.style.top = '0';
+    blackOverlay.style.left = '0';
+    blackOverlay.style.width = '100%';
+    blackOverlay.style.height = '100%';
+    blackOverlay.style.background = 'black';
+    blackOverlay.style.zIndex = '600';
+    blackOverlay.style.opacity = '0';
+    blackOverlay.style.transition = 'opacity 0.5s ease';
+    
+    document.body.appendChild(blackOverlay);
+    
+    // Fade to black
+    setTimeout(() => {
+        blackOverlay.style.opacity = '1';
+    }, 100);
+    
+    // After 1.5 seconds, fade to dim and spawn zombies
+    setTimeout(() => {
+        this.lightsBackOnDim(blackOverlay);
+    }, 1500);
+}
+
+lightsBackOnDim(blackOverlay) {
+    // Fade to 50% opacity (dim lighting)
+    blackOverlay.style.opacity = '0.5';
+    
+    // Spawn zombies
+    this.spawnZombies();
+    
+    // Show BRAINS message
+    this.showMessage('BRAINS!!');
+    
+    // Start forest music and enable movement after message
+    setTimeout(() => {
+        this.forestMusic = document.getElementById('forestMusic') || this.createForestMusic();
+        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+        this.canMove = true;
+        this.battlePhase = 'fighting';
+    }, 2000);
+}
+
+createForestMusic() {
+    const audio = document.createElement('audio');
+    audio.id = 'forestMusic';
+    audio.loop = true;
+    audio.innerHTML = '<source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">';
+    document.body.appendChild(audio);
+    return audio;
+}
+
+            spawnZombies() {
+    // Clear any existing zombies
+    this.zombies = [];
+    
+    // Define spawn positions (avoid center where player is)
+    const spawnPositions = [
+        // Follower zombies (5)
+        {x: 200, y: 200}, {x: 600, y: 200}, {x: 200, y: 600}, {x: 600, y: 600}, {x: 300, y: 300},
+        // Circular zombies (5) 
+        {x: 500, y: 300}, {x: 300, y: 500}, {x: 500, y: 500}, {x: 250, y: 400}, {x: 550, y: 400},
+        // Back-and-forth zombies (5)
+        {x: 150, y: 300}, {x: 650, y: 300}, {x: 400, y: 150}, {x: 400, y: 650}, {x: 300, y: 200},
+        // Wanderer zombies (5)
+        {x: 180, y: 500}, {x: 520, y: 180}, {x: 450, y: 580}, {x: 220, y: 250}, {x: 580, y: 450}
+    ];
+    
+    // Create follower zombies (0-4)
+    for (let i = 0; i < 5; i++) {
+        this.createZombie(spawnPositions[i], 'follower', i);
+    }
+    
+    // Create circular zombies (5-9)
+    for (let i = 5; i < 10; i++) {
+        this.createZombie(spawnPositions[i], 'circular', i);
+    }
+    
+    // Create back-and-forth zombies (10-14)
+    for (let i = 10; i < 15; i++) {
+        this.createZombie(spawnPositions[i], 'backforth', i);
+    }
+    
+    // Create wanderer zombies (15-19)
+    for (let i = 15; i < 20; i++) {
+        this.createZombie(spawnPositions[i], 'wanderer', i);
+    }
+    
+    // Show zombie counter
+    this.updateZombieCounter();
+}
+
+createZombie(pos, type, index) {
+    const zombieEl = document.createElement('div');
+    zombieEl.className = 'enemy zombie';
+    zombieEl.style.position = 'absolute';
+    zombieEl.style.left = pos.x + 'px';
+    zombieEl.style.top = pos.y + 'px';
+    zombieEl.style.width = '40px';
+    zombieEl.style.height = '40px';
+    zombieEl.style.fontSize = '32px';
+    zombieEl.style.display = 'flex';
+    zombieEl.style.alignItems = 'center';
+    zombieEl.style.justifyContent = 'center';
+    zombieEl.style.zIndex = '150';
+    zombieEl.textContent = '🧟‍♂️';
+    
+    this.gameWorld.appendChild(zombieEl);
+    
+    const zombie = {
+        element: zombieEl,
+        currentX: pos.x,
+        currentY: pos.y,
+        hp: 600,
+        maxHp: 600,
+        alive: true,
+        type: type,
+        index: index
+    };
+    
+    // Add type-specific properties
+    if (type === 'follower') {
+        zombie.speed = 1.5 + (Math.random() * 0.8); // 1.5-2.3 speed
+        zombie.jukeTimer = 0;
+        zombie.targetX = pos.x;
+        zombie.targetY = pos.y;
+    } else if (type === 'circular') {
+        zombie.centerX = pos.x;
+        zombie.centerY = pos.y;
+        zombie.radius = 60 + Math.random() * 40; // 60-100px radius
+        zombie.angle = Math.random() * Math.PI * 2;
+        zombie.speed = 0.02 + Math.random() * 0.03; // Angular speed
+        zombie.clockwise = Math.random() < 0.5;
+    } else if (type === 'backforth') {
+        zombie.startX = pos.x;
+        zombie.startY = pos.y;
+        zombie.isHorizontal = Math.random() < 0.5;
+        zombie.range = 120 + Math.random() * 100; // 120-220px range
+        zombie.speed = 1.0 + Math.random() * 0.5; // 1.0-1.5 speed
+        zombie.direction = 1;
+    } else if (type === 'wanderer') {
+        zombie.speed = 2.0 + Math.random() * 1.0; // 2.0-3.0 speed (faster)
+        zombie.targetX = pos.x + (Math.random() - 0.5) * 200;
+        zombie.targetY = pos.y + (Math.random() - 0.5) * 200;
+        zombie.changeTimer = 0;
+    }
+    
+    this.zombies.push(zombie);
+}
+
+updateZombieCounter() {
+    const aliveZombies = this.zombies.filter(z => z.alive).length;
+    const counter = document.getElementById('bossHP');
+    counter.style.display = 'block';
+    counter.textContent = `Zombies: ${aliveZombies}/${this.totalZombies}`;
+}
+
+            
             createSingleSyringe() {
     if (this.enemy.syringe) return; // Already exists
     
@@ -1746,7 +1934,123 @@ updateBattleEnemy() {
         this.updateDualEnemies();
  } else if (this.currentBattle === 3) {
     this.updateDrBear();
+} else if (this.currentBattle === 4) {
+    this.updateZombies();
 }
+}
+
+            updateZombies() {
+    if (this.battlePhase !== 'fighting') return;
+    
+    this.zombies.forEach(zombie => {
+        if (!zombie.alive) return;
+        
+        if (zombie.type === 'follower') {
+            this.updateFollowerZombie(zombie);
+        } else if (zombie.type === 'circular') {
+            this.updateCircularZombie(zombie);
+        } else if (zombie.type === 'backforth') {
+            this.updateBackForthZombie(zombie);
+        } else if (zombie.type === 'wanderer') {
+            this.updateWandererZombie(zombie);
+        }
+        
+        // Keep in arena bounds
+        zombie.currentX = Math.max(120, Math.min(680, zombie.currentX));
+        zombie.currentY = Math.max(120, Math.min(680, zombie.currentY));
+        
+        zombie.element.style.left = zombie.currentX + 'px';
+        zombie.element.style.top = zombie.currentY + 'px';
+    });
+    
+    // Check if all zombies are dead
+    const aliveZombies = this.zombies.filter(z => z.alive).length;
+    if (aliveZombies === 0) {
+        this.handleZombieVictory();
+    }
+}
+
+updateFollowerZombie(zombie) {
+    // Juke movement
+    zombie.jukeTimer--;
+    if (zombie.jukeTimer <= 0) {
+        const angle = Math.atan2(this.playerY - zombie.currentY, this.playerX - zombie.currentX);
+        const jukeAngle = angle + (Math.random() - 0.5) * Math.PI * 0.3;
+        
+        zombie.targetX = zombie.currentX + Math.cos(jukeAngle) * 60;
+        zombie.targetY = zombie.currentY + Math.sin(jukeAngle) * 60;
+        zombie.jukeTimer = 120 + Math.random() * 60;
+    }
+    
+    const deltaX = zombie.targetX - zombie.currentX;
+    const deltaY = zombie.targetY - zombie.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        zombie.currentX += (deltaX / distance) * zombie.speed;
+        zombie.currentY += (deltaY / distance) * zombie.speed;
+    }
+}
+
+updateCircularZombie(zombie) {
+    zombie.angle += zombie.speed * (zombie.clockwise ? 1 : -1);
+    zombie.currentX = zombie.centerX + Math.cos(zombie.angle) * zombie.radius;
+    zombie.currentY = zombie.centerY + Math.sin(zombie.angle) * zombie.radius;
+}
+
+updateBackForthZombie(zombie) {
+    if (zombie.isHorizontal) {
+        zombie.currentX += zombie.direction * zombie.speed;
+        if (zombie.currentX <= zombie.startX || zombie.currentX >= zombie.startX + zombie.range) {
+            zombie.direction *= -1;
+        }
+    } else {
+        zombie.currentY += zombie.direction * zombie.speed;
+        if (zombie.currentY <= zombie.startY || zombie.currentY >= zombie.startY + zombie.range) {
+            zombie.direction *= -1;
+        }
+    }
+}
+
+updateWandererZombie(zombie) {
+    zombie.changeTimer--;
+    if (zombie.changeTimer <= 0) {
+        zombie.targetX = zombie.currentX + (Math.random() - 0.5) * 300;
+        zombie.targetY = zombie.currentY + (Math.random() - 0.5) * 300;
+        zombie.changeTimer = 60 + Math.random() * 120;
+    }
+    
+    const deltaX = zombie.targetX - zombie.currentX;
+    const deltaY = zombie.targetY - zombie.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 5) {
+        zombie.currentX += (deltaX / distance) * zombie.speed;
+        zombie.currentY += (deltaY / distance) * zombie.speed;
+    }
+}
+
+handleZombieVictory() {
+    // Remove black overlay (turn lights back on)
+    const blackOverlay = document.getElementById('blackOverlay');
+    if (blackOverlay) {
+        blackOverlay.style.opacity = '0';
+        setTimeout(() => {
+            blackOverlay.remove();
+        }, 500);
+    }
+    
+    // Stop forest music
+    if (this.forestMusic) {
+        this.forestMusic.pause();
+    }
+    
+    // Hide zombie counter
+    document.getElementById('bossHP').style.display = 'none';
+    
+    setTimeout(() => {
+        this.showVictoryDialog();
+    }, 1500);
 }
 
 updateSingleEnemy() {
