@@ -3123,6 +3123,24 @@ showFinalVictory() {
                 }
             }
 
+            // Check zombie collisions (Battle 4)
+if (this.currentBattle === 4 && this.zombies) {
+    this.zombies.forEach(zombie => {
+        if (!zombie.alive) return;
+        
+        const zombieRect = {
+            left: zombie.currentX,
+            top: zombie.currentY,
+            right: zombie.currentX + 40,
+            bottom: zombie.currentY + 40
+        };
+        
+        if (this.rectsOverlap(playerRect, zombieRect)) {
+            this.takeDamage(1); // 1 hearts damage from zombie contact
+        }
+    });
+}
+
             rectsOverlap(rect1, rect2) {
                 return rect1.left < rect2.right &&
                        rect1.right > rect2.left &&
