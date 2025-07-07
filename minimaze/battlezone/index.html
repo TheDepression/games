@@ -1756,18 +1756,32 @@ createBattleEnemy() {
     // Start in vulnerable mode for 10 seconds
     this.enemy.modeTimer = 600; // 10 seconds at 60fps
 } else if (this.currentBattle === 4) {
-    // Battle 4 - Zombie apocalypse setup
-    this.zombieKillCount = 0;
-    this.totalZombies = 20;
-    this.zombies = [];
+    // Battle 4 - Create a dummy "enemy" that will trigger the special sequence
+    const dummyEl = document.createElement('div');
+    dummyEl.style.position = 'absolute';
+    dummyEl.style.left = '400px';
+    dummyEl.style.top = '200px';
+    dummyEl.style.width = '1px';
+    dummyEl.style.height = '1px';
+    dummyEl.style.opacity = '0';
+    this.gameWorld.appendChild(dummyEl);
     
-    // Don't show HP display initially
+    this.enemy = {
+        element: dummyEl,
+        currentX: 400,
+        currentY: 200,
+        hp: 1,
+        maxHp: 1,
+        alive: true,
+        isSpecialBattle4: true
+    };
+    
+    // Hide HP display
     document.getElementById('bossHP').style.display = 'none';
     
-    // Start the lights out sequence immediately after setup
-    setTimeout(() => {
-        this.startLightsOutSequence();
-    }, 1000); // Shorter delay since setupBattle already happened
+    // Initialize zombie arrays
+    this.zombies = [];
+    this.totalZombies = 20;
 }
 }
 
@@ -1965,6 +1979,16 @@ updateZombieCounter() {
 }
 
 updateBattleEnemy() {
+    if (this.battlePhase !== 'fighting') return;
+    
+    // Special handling for Battle 4
+    if (this.currentBattle === 4 && this.enemy && this.enemy.isSpecialBattle4) {
+        // Kill the dummy enemy to trigger lights-out sequence
+        this.enemy.alive = false;
+        this.enemy.hp = 0;
+        this.handleEnemyDeath();
+        return;
+    }
     if (this.battlePhase !== 'fighting') return;
     
     if (this.currentBattle === 1) {
