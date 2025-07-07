@@ -3030,7 +3030,7 @@ showFinalVictory() {
 }
 
             updatePlayer() {
-               if (this.isPaused || !this.canMove) return;
+              if (this.isPaused || (!this.canMove && !(this.currentBattle === 4 && this.battlePhase === 'fighting'))) return;
                 if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
                     const newX = this.playerX + this.playerVelocityX;
                     const newY = this.playerY + this.playerVelocityY;
