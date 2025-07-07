@@ -2846,6 +2846,14 @@ checkEnemyContact() {
 
 handleEnemyDeath() {
     if (!this.enemy) return;
+    // Special handling for Battle 4
+    if (this.currentBattle === 4 && this.enemy.isSpecialBattle4) {
+        this.enemy.element.remove();
+        this.enemy = null;
+        // Start lights-out sequence instead of normal victory
+        this.startLightsOutSequence();
+        return;
+    }
     
     // Create explosion effect
     const explosion = document.createElement('div');
