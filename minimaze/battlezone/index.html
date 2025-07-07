@@ -1358,8 +1358,28 @@ enemyTaunt() {
         }
     }
     
-    // Show taunt message
-    this.showMessage('GAME OVER, FROG!');
+   // Show taunt message based on battle number
+let tauntMessage;
+switch (this.currentBattle) {
+    case 1:
+        tauntMessage = 'GAME OVER, FROG!';
+        break;
+    case 2:
+        tauntMessage = 'We are going to make frog soup for dinner tonight!';
+        break;
+    case 3:
+        tauntMessage = 'Your third battle taunt here!';
+        break;
+    case 4:
+        tauntMessage = 'Your fourth battle taunt here!';
+        break;
+    case 5:
+        tauntMessage = 'Your final battle taunt here!';
+        break;
+    default:
+        tauntMessage = 'GAME OVER, FROG!';
+}
+this.showMessage(tauntMessage);
     
     // Black flash and start battle
     setTimeout(() => {
