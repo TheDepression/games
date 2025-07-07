@@ -1813,8 +1813,8 @@ lightsOut() {
 }
 
 lightsBackOnDim(blackOverlay) {
-    // Fade to 50% opacity (dim lighting)
-    blackOverlay.style.opacity = '0.5';
+    // Fade to 60% opacity (dim lighting)
+    blackOverlay.style.opacity = '0.6';
     
     // Spawn zombies
     this.spawnZombies();
@@ -1822,10 +1822,7 @@ lightsBackOnDim(blackOverlay) {
     // Show BRAINS message
     this.showMessage('BRAINS!!');
     
-    // Start forest music and enable movement after message
-    setTimeout(() => {
-        this.forestMusic = document.getElementById('forestMusic') || this.createForestMusic();
-        this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+    
         
         // IMPORTANT: Set both battlePhase AND canMove
         this.battlePhase = 'fighting';
