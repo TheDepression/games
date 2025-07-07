@@ -734,55 +734,25 @@ this.battleMusic = document.getElementById('battleMusic');
             document.getElementById('bossHP').innerHTML = `Yama: ${enemy1HP}<br>Ibu: ${enemy2HP}`;
         }
   } else if (this.currentBattle === 3) {
-    // Dr. Bear battle
+    // Dr. Bear battle - always vulnerable
     if (!this.enemy || !this.enemy.alive) return;
     
-    if (this.enemy.mode === 'vulnerable') {
-        // Can damage bear directly when vulnerable
-        const enemyHitRect = {
-            left: this.enemy.currentX,
-            top: this.enemy.currentY,
-            right: this.enemy.currentX + 60,
-            bottom: this.enemy.currentY + 180
-        };
+    const enemyHitRect = {
+        left: this.enemy.currentX,
+        top: this.enemy.currentY,
+        right: this.enemy.currentX + 50,
+        bottom: this.enemy.currentY + 100
+    };
+    
+    if (this.rectsOverlap(attackRect, enemyHitRect)) {
+        this.enemy.hp -= this.attackDamage;
+        document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+        this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
         
-        if (this.rectsOverlap(attackRect, enemyHitRect)) {
-            this.enemy.hp -= this.attackDamage;
-            document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
-            this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
-            
-            if (this.enemy.hp <= 0) {
-                this.enemy.alive = false;
-                this.destroyAllSyringes();
-                this.handleEnemyDeath();
-            }
-        }
-    } else {
-        // In attack mode, can only hit syringes
-        for (let i = this.enemy.syringes.length - 1; i >= 0; i--) {
-            const syringe = this.enemy.syringes[i];
-            if (!syringe.alive) continue;
-            
-            const syringeRect = {
-                left: parseInt(syringe.element.style.left),
-                top: parseInt(syringe.element.style.top),
-                right: parseInt(syringe.element.style.left) + 20,
-                bottom: parseInt(syringe.element.style.top) + 20
-            };
-            
-            if (this.rectsOverlap(attackRect, syringeRect)) {
-                // Destroy syringe
-                syringe.alive = false;
-                syringe.element.remove();
-                this.enemy.syringes.splice(i, 1);
-                
-                // If all syringes destroyed, switch to vulnerable mode early
-                if (this.enemy.syringes.length === 0) {
-                    this.enemy.mode = 'vulnerable';
-                    this.enemy.modeTimer = 600; // 10 seconds vulnerable
-                }
-                break; // Only hit one syringe per attack
-            }
+        if (this.enemy.hp <= 0) {
+            this.enemy.alive = false;
+            this.destroyAllSyringes();
+            this.handleEnemyDeath();
         }
     }
 }
