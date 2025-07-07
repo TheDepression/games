@@ -1650,6 +1650,108 @@ updateDualEnemies() {
     this.checkDualEnemyContact();
 }
 
+            updateDualProjectiles() {
+    // Update Yamato's projectiles
+    if (this.enemy1 && this.enemy1.projectiles) {
+        for (let i = this.enemy1.projectiles.length - 1; i >= 0; i--) {
+            const projectile = this.enemy1.projectiles[i];
+            if (!projectile.alive) continue;
+            
+            projectile.x += projectile.velocityX;
+            projectile.y += projectile.velocityY;
+            
+            projectile.element.style.left = projectile.x + 'px';
+            projectile.element.style.top = projectile.y + 'px';
+            
+            // Check collision with player
+            const playerRect = {
+                left: this.playerX,
+                top: this.playerY,
+                right: this.playerX + 24,
+                bottom: this.playerY + 24
+            };
+            
+            const projectileRect = {
+                left: projectile.x,
+                top: projectile.y,
+                right: projectile.x + 20,
+                bottom: projectile.y + 20
+            };
+            
+            if (this.rectsOverlap(playerRect, projectileRect)) {
+                this.takeDamage(1);
+                projectile.alive = false;
+                projectile.element.remove();
+                this.enemy1.projectiles.splice(i, 1);
+                continue;
+            }
+            
+            // Remove if out of bounds
+            if (projectile.x < -50 || projectile.x > 850 || 
+                projectile.y < -50 || projectile.y > 850) {
+                projectile.alive = false;
+                projectile.element.remove();
+                this.enemy1.projectiles.splice(i, 1);
+            }
+        }
+    }
+}
+
+checkDualEnemyContact() {
+    if (this.isInvulnerable) return;
+    
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    // Check contact with Yamato
+    if (this.enemy1 && this.enemy1.alive) {
+        const enemy1Rect = {
+            left: this.enemy1.currentX,
+            top: this.enemy1.currentY,
+            right: this.enemy1.currentX + 60,
+            bottom: this.enemy1.currentY + 120
+        };
+        
+        if (this.rectsOverlap(playerRect, enemy1Rect)) {
+            this.takeDamage(2);
+            return; // Only take damage from one enemy per frame
+        }
+    }
+    
+    // Check contact with Psycho
+    if (this.enemy2 && this.enemy2.alive) {
+        const enemy2Rect = {
+            left: this.enemy2.currentX,
+            top: this.enemy2.currentY,
+            right: this.enemy2.currentX + 60,
+            bottom: this.enemy2.currentY + 120
+        };
+        
+        if (this.rectsOverlap(playerRect, enemy2Rect)) {
+            this.takeDamage(2);
+            return;
+        }
+        
+        // Check hammer contact
+        if (this.enemy2.hammer && this.enemy2.hammerSwinging) {
+            const hammerRect = {
+                left: parseInt(this.enemy2.hammer.style.left),
+                top: parseInt(this.enemy2.hammer.style.top),
+                right: parseInt(this.enemy2.hammer.style.left) + 50,
+                bottom: parseInt(this.enemy2.hammer.style.top) + 50
+            };
+            
+            if (this.rectsOverlap(playerRect, hammerRect)) {
+                this.takeDamage(1);
+            }
+        }
+    }
+}
+
 updateYamato() {
     // Similar juke movement as bird but slower
     this.enemy1.jukeTimer--;
