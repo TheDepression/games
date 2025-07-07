@@ -1565,11 +1565,18 @@ setupBattle() {
     // Create battle enemy/enemies
     this.createBattleEnemy();
     
-    // Start battle
+    // Start battle (except for Battle 4 which has special sequence)
+if (this.currentBattle === 4) {
+    // Battle 4 - Don't start normally, wait for lights-out sequence
+    this.battlePhase = 'waiting';
+    this.canMove = false;
+    // Don't show "Battle begins!" message
+} else {
+    // Normal battles
     this.battlePhase = 'fighting';
     this.canMove = true;
-    
     this.showMessage('Battle begins!');
+}
 }
 
 createBattleEnemy() {
@@ -1750,14 +1757,10 @@ createBattleEnemy() {
     // Don't show HP display initially
     document.getElementById('bossHP').style.display = 'none';
     
-    // Keep the battle active and prevent movement until lights-out sequence
-    this.battlePhase = 'fighting';
-    this.canMove = false;
-    
-    // Start the lights out sequence after a brief delay
+    // Start the lights out sequence immediately after setup
     setTimeout(() => {
         this.startLightsOutSequence();
-    }, 2000);
+    }, 1000); // Shorter delay since setupBattle already happened
 }
 }
 
