@@ -652,6 +652,8 @@ this.battleMusic = document.getElementById('battleMusic');
     
     if (this.rectsOverlap(attackRect, enemyHitRect)) {
         this.enemy.hp -= this.attackDamage;
+        // Update HP display
+document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
         
         // Show damage number
         const damageText = document.createElement('div');
