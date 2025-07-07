@@ -670,8 +670,12 @@ this.battleMusic = document.getElementById('battleMusic');
             bottom: this.enemy.currentY + 180
         };
         
-        if (this.rectsOverlap(attackRect, enemyHitRect)) {
-            this.enemy.hp -= this.attackDamage;
+        const deltaX = this.enemy.currentX - this.playerX;
+const deltaY = this.enemy.currentY - this.playerY;
+const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+
+if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
+    this.enemy.hp -= this.attackDamage;
             document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
             
             this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
@@ -695,8 +699,12 @@ this.battleMusic = document.getElementById('battleMusic');
                 bottom: this.enemy1.currentY + 180
             };
             
-            if (this.rectsOverlap(attackRect, enemy1HitRect)) {
-                this.enemy1.hp -= this.attackDamage;
+            const deltaX = this.enemy.currentX - this.playerX;
+const deltaY = this.enemy.currentY - this.playerY;
+const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+
+if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
+    this.enemy.hp -= this.attackDamage;
                 this.showDamageNumber(this.enemy1.currentX, this.enemy1.currentY);
                 enemyHit = true;
                 
@@ -716,8 +724,12 @@ this.battleMusic = document.getElementById('battleMusic');
                 bottom: this.enemy2.currentY + 180
             };
             
-            if (this.rectsOverlap(attackRect, enemy2HitRect)) {
-                this.enemy2.hp -= this.attackDamage;
+            const deltaX = this.enemy.currentX - this.playerX;
+const deltaY = this.enemy.currentY - this.playerY;
+const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+
+if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
+    this.enemy.hp -= this.attackDamage;
                 this.showDamageNumber(this.enemy2.currentX, this.enemy2.currentY);
                 
                 if (this.enemy2.hp <= 0) {
@@ -744,8 +756,12 @@ this.battleMusic = document.getElementById('battleMusic');
         bottom: this.enemy.currentY + 100
     };
     
-    if (this.rectsOverlap(attackRect, enemyHitRect)) {
-        this.enemy.hp -= this.attackDamage;
+    const deltaX = this.enemy.currentX - this.playerX;
+const deltaY = this.enemy.currentY - this.playerY;
+const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+
+if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
+    this.enemy.hp -= this.attackDamage;
         document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
         this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
         
@@ -782,6 +798,21 @@ this.battleMusic = document.getElementById('battleMusic');
         }
     });
 }
+}
+
+              isInFrontOfPlayer(deltaX, deltaY) {
+    // Only hit targets in the front 180 degrees based on facing direction
+    switch(this.currentDirection) {
+        case 'n': return deltaY < 0;
+        case 'ne': return deltaX > 0 && deltaY < 0;
+        case 'e': return deltaX > 0;
+        case 'se': return deltaX > 0 && deltaY > 0;
+        case 's': return deltaY > 0;
+        case 'sw': return deltaX < 0 && deltaY > 0;
+        case 'w': return deltaX < 0;
+        case 'nw': return deltaX < 0 && deltaY < 0;
+        default: return true;
+    }
 }
 
 showDamageNumber(x, y) {
