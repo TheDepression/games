@@ -1450,7 +1450,7 @@ createBattleEnemy() {
         enemyEl.style.backgroundSize = 'contain';
         enemyEl.style.backgroundRepeat = 'no-repeat';
         enemyEl.style.backgroundPosition = 'center';
-        enemyEl.style.zIndex = '80';
+        enemyEl.style.zIndex = '150';
         
         this.gameWorld.appendChild(enemyEl);
         
@@ -1487,7 +1487,7 @@ createBattleEnemy() {
         enemy1El.style.backgroundSize = 'contain';
         enemy1El.style.backgroundRepeat = 'no-repeat';
         enemy1El.style.backgroundPosition = 'center';
-        enemy1El.style.zIndex = '80';
+        enemy1El.style.zIndex = '150';
         
         const enemy2El = document.createElement('div');
         enemy2El.className = 'enemy battle-enemy';
@@ -1495,13 +1495,13 @@ createBattleEnemy() {
         enemy2El.style.position = 'absolute';
         enemy2El.style.left = '420px';
         enemy2El.style.top = '200px';
-        enemy2El.style.width = '60px';
-        enemy2El.style.height = '120px';
+        enemy2El.style.width = '50px';
+        enemy2El.style.height = '100px';
         enemy2El.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/psycho-min.png")';
         enemy2El.style.backgroundSize = 'contain';
         enemy2El.style.backgroundRepeat = 'no-repeat';
         enemy2El.style.backgroundPosition = 'center';
-        enemy2El.style.zIndex = '80';
+        enemy2El.style.zIndex = '150';
         
         this.gameWorld.appendChild(enemy1El);
         this.gameWorld.appendChild(enemy2El);
@@ -1849,13 +1849,15 @@ updateHammer() {
         this.enemy2.hammerSide = newSide;
     }
     
-    // Position hammer
+    // Position hammer and apply flip
     if (this.enemy2.hammerSide === 'left') {
         this.enemy2.hammer.style.left = (this.enemy2.currentX - 25) + 'px';
         this.enemy2.hammer.style.top = (this.enemy2.currentY + 30) + 'px';
+        this.enemy2.hammer.style.transform = 'scaleX(1)'; // Normal orientation
     } else {
         this.enemy2.hammer.style.left = (this.enemy2.currentX + 35) + 'px';
         this.enemy2.hammer.style.top = (this.enemy2.currentY + 30) + 'px';
+        this.enemy2.hammer.style.transform = 'scaleX(-1)'; // Horizontally flipped
     }
 }
 
