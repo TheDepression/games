@@ -885,15 +885,6 @@ handleDualEnemyDeath(deadEnemy) {
         this.hasEnhancedRange = gameState.hasEnhancedRange || false;
 
 
-
-        // Apply max hearts from shop purple hearts
-this.maxHearts += this.purpleHeartsSold;
-
-// Apply max hearts from discovered purple hearts (3 available in main world)
-if (gameState.collectedPurpleHearts) {
-    this.maxHearts += gameState.collectedPurpleHearts.length;
-}
-
 // Fill hearts to max potential on entering battlezone
 this.hearts = this.maxHearts;
 
