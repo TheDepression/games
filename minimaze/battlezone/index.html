@@ -1827,14 +1827,14 @@ lightsBackOnDim(blackOverlay) {
         this.battlePhase = 'fighting';
         this.canMove = true;
         this.gameStarted = true; 
-    }, 2000);
+    }, 3000);
 }
 
 createForestMusic() {
     const audio = document.createElement('audio');
     audio.id = 'forestMusic';
     audio.loop = true;
-    audio.innerHTML = '<source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/m2.m4a" type="audio/mp4">';
+    audio.innerHTML = '<source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/flashzombie.mp3" type="audio/mp3">';
     document.body.appendChild(audio);
     return audio;
 }
