@@ -1526,6 +1526,15 @@ setupBattle() {
     if (forwardEnemy) {
         forwardEnemy.remove();
     }
+      // Clean up any existing rotating syringe
+    const existingSyringe = this.gameWorld.querySelector('.rotating-syringe');
+    if (existingSyringe) {
+        existingSyringe.remove();
+    }
+    
+    // Clean up any explosion projectiles
+    const explosionProjectiles = this.gameWorld.querySelectorAll('[class*="explosion-projectile"]');
+    explosionProjectiles.forEach(proj => proj.remove());    
 }
     
     // Move player to better battle position
