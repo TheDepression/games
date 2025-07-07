@@ -2851,6 +2851,14 @@ if (this.enemy.explosionProjectiles) {
         }
     });
 }
+    // Clean up regular enemy projectiles (scissors, etc.)
+if (this.enemy.projectiles) {
+    this.enemy.projectiles.forEach(projectile => {
+        if (projectile.element) {
+            projectile.element.remove();
+        }
+    });
+}
     this.enemy = null;
     // Hide HP display
 document.getElementById('bossHP').style.display = 'none';
