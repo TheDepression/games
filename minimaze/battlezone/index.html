@@ -1814,20 +1814,20 @@ lightsBackOnDim(blackOverlay) {
    // Remove the full-screen overlay
     blackOverlay.remove();
     
-    // Create a new overlay that only covers the game area
+    // Create a new overlay that covers the full 800x800 game world
     const gameOverlay = document.createElement('div');
     gameOverlay.id = 'gameAreaOverlay';
     gameOverlay.style.position = 'absolute';
     gameOverlay.style.top = '0';
     gameOverlay.style.left = '0';
-    gameOverlay.style.width = '100%';
-    gameOverlay.style.height = '100%';
+    gameOverlay.style.width = '800px';  // Full game world width
+    gameOverlay.style.height = '800px'; // Full game world height
     gameOverlay.style.background = 'rgba(0,0,0,0.6)';
     gameOverlay.style.zIndex = '300';
-    gameOverlay.style.pointerEvents = 'none'; // This is key!
+    gameOverlay.style.pointerEvents = 'none';
     
-    // Add it to gameArea instead of body
-    this.gameArea.appendChild(gameOverlay);
+    // Add it to gameWorld instead of gameArea
+    this.gameWorld.appendChild(gameOverlay);
     
     // Spawn zombies
     this.spawnZombies();
