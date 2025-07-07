@@ -751,7 +751,6 @@ this.battleMusic = document.getElementById('battleMusic');
         
         if (this.enemy.hp <= 0) {
             this.enemy.alive = false;
-            this.destroyAllSyringes();
             this.handleEnemyDeath();
         }
     }
