@@ -1819,8 +1819,14 @@ lightsBackOnDim(blackOverlay) {
     setTimeout(() => {
         this.forestMusic = document.getElementById('forestMusic') || this.createForestMusic();
         this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
-        this.canMove = true;
+        
+        // IMPORTANT: Set both battlePhase AND canMove
         this.battlePhase = 'fighting';
+        this.canMove = true;
+        
+        // Also ensure gameStarted is true for input handling
+        this.gameStarted = true;
+        
     }, 2000);
 }
 
