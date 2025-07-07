@@ -1673,8 +1673,8 @@ createBattleEnemy() {
     enemyEl.style.position = 'absolute';
     enemyEl.style.left = '370px';
     enemyEl.style.top = '200px';
-    enemyEl.style.width = '50px';
-    enemyEl.style.height = '100px';
+    enemyEl.style.width = '47px';
+    enemyEl.style.height = '94px';
     enemyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/drbearfight.png")';
     enemyEl.style.backgroundSize = 'contain';
     enemyEl.style.backgroundRepeat = 'no-repeat';
@@ -1690,13 +1690,13 @@ createBattleEnemy() {
     hp: 1000,
     maxHp: 1000,
     alive: true,
-    speed: 2.2,
+    speed: 1.8,
     targetX: 370,
     targetY: 200,
     
     // New properties for chase-and-explode
     syringeAngle: 0,
-    syringeRadius: 50,
+    syringeRadius: 70,
     syringe: null,
     phaseTimer: 600, // 10 seconds at 60fps
     isShivering: false,
@@ -2114,7 +2114,7 @@ updateSingleSyringe() {
     }
     
     // Rotate syringe around bear at high speed
-    this.enemy.syringeAngle += 0.15; // High rotation speed
+    this.enemy.syringeAngle += 0.035; //  rotation speed
     
     const x = this.enemy.currentX + 25 + Math.cos(this.enemy.syringeAngle) * this.enemy.syringeRadius;
     const y = this.enemy.currentY + 50 + Math.sin(this.enemy.syringeAngle) * this.enemy.syringeRadius;
@@ -2274,8 +2274,8 @@ checkBearContact() {
         const syringeRect = {
             left: syringeX,
             top: syringeY,
-            right: syringeX + 20,
-            bottom: syringeY + 20
+            right: syringeX + 40,
+            bottom: syringeY + 40
         };
         
         if (this.rectsOverlap(playerRect, syringeRect)) {
