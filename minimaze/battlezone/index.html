@@ -1204,7 +1204,14 @@ showInstructionsDialog() {
 
 startBattleAnimation() {
     this.battlePhase = 'animation';
+    if (this.currentBattle === 4) {
+    // For Battle 4, start with forest music instead
+    this.forestMusic = document.getElementById('forestMusic') || this.createForestMusic();
+    this.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
+} else {
+    // Normal battles use battle music
     this.battleMusic.play().catch(e => console.log('Battle music play failed:', e));
+}
     
     // Center camera on gate area for all battles
     const gameAreaWidth = this.gameArea.offsetWidth;
