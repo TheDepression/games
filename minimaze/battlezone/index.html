@@ -3121,9 +3121,7 @@ showFinalVictory() {
                         this.exitToMainWorld();
                     }
                 }
-            }
-
-            // Check zombie collisions (Battle 4)
+                // Check zombie collisions (Battle 4)
 if (this.currentBattle === 4 && this.zombies) {
     this.zombies.forEach(zombie => {
         if (!zombie.alive) return;
@@ -3140,6 +3138,9 @@ if (this.currentBattle === 4 && this.zombies) {
         }
     });
 }
+            }
+
+            
 
             rectsOverlap(rect1, rect2) {
                 return rect1.left < rect2.right &&
