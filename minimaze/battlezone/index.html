@@ -648,17 +648,9 @@ this.battleMusic = document.getElementById('battleMusic');
 
 
             checkAttackHits(attackX, attackY) {
-    if (!this.enemy || !this.enemy.alive || this.battlePhase !== 'fighting') return;
+    if (this.battlePhase !== 'fighting') return;
     
     const effectiveRange = this.hasEnhancedRange ? 90 : 45;
-    
-    // Check if attack is within range of enemy body (expanded hitbox)
-    const enemyHitRect = {
-        left: this.enemy.currentX,
-        top: this.enemy.currentY,
-        right: this.enemy.currentX + 60,
-        bottom: this.enemy.currentY + 180 // Extended 60px down from 120 to 180
-    };
     
     const attackRect = {
         left: attackX - effectiveRange/2,
@@ -667,35 +659,157 @@ this.battleMusic = document.getElementById('battleMusic');
         bottom: attackY + effectiveRange/2
     };
     
-    if (this.rectsOverlap(attackRect, enemyHitRect)) {
-        this.enemy.hp -= this.attackDamage;
-        // Update HP display
-document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+    if (this.currentBattle === 1) {
+        // Single enemy battle
+        if (!this.enemy || !this.enemy.alive) return;
         
-        // Show damage number
-        const damageText = document.createElement('div');
-        damageText.style.position = 'absolute';
-        damageText.style.color = '#ff4444';
-        damageText.style.fontWeight = 'bold';
-        damageText.style.fontSize = '14px';
-        damageText.style.pointerEvents = 'none';
-        damageText.style.zIndex = '500';
-        damageText.style.animation = 'damageFloat 1s ease-out';
-        damageText.textContent = `-${this.attackDamage}`;
-        damageText.style.left = this.enemy.currentX + 'px';
-        damageText.style.top = this.enemy.currentY + 'px';
-        this.gameWorld.appendChild(damageText);
+        const enemyHitRect = {
+            left: this.enemy.currentX,
+            top: this.enemy.currentY,
+            right: this.enemy.currentX + 60,
+            bottom: this.enemy.currentY + 180
+        };
+        
+        if (this.rectsOverlap(attackRect, enemyHitRect)) {
+            this.enemy.hp -= this.attackDamage;
+            document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+            
+            this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
+            
+            if (this.enemy.hp <= 0) {
+                this.enemy.alive = false;
+                this.handleEnemyDeath();
+            }
+        }
+        
+    } else if (this.currentBattle === 2) {
+        // Dual enemy battle
+        let enemyHit = false;
+        
+        // Check hit on Yamato (enemy1)
+        if (this.enemy1 && this.enemy1.alive) {
+            const enemy1HitRect = {
+                left: this.enemy1.currentX,
+                top: this.enemy1.currentY,
+                right: this.enemy1.currentX + 60,
+                bottom: this.enemy1.currentY + 180
+            };
+            
+            if (this.rectsOverlap(attackRect, enemy1HitRect)) {
+                this.enemy1.hp -= this.attackDamage;
+                this.showDamageNumber(this.enemy1.currentX, this.enemy1.currentY);
+                enemyHit = true;
+                
+                if (this.enemy1.hp <= 0) {
+                    this.enemy1.alive = false;
+                    this.handleDualEnemyDeath(this.enemy1);
+                }
+            }
+        }
+        
+        // Check hit on Psycho (enemy2) - only if we didn't hit enemy1
+        if (!enemyHit && this.enemy2 && this.enemy2.alive) {
+            const enemy2HitRect = {
+                left: this.enemy2.currentX,
+                top: this.enemy2.currentY,
+                right: this.enemy2.currentX + 60,
+                bottom: this.enemy2.currentY + 180
+            };
+            
+            if (this.rectsOverlap(attackRect, enemy2HitRect)) {
+                this.enemy2.hp -= this.attackDamage;
+                this.showDamageNumber(this.enemy2.currentX, this.enemy2.currentY);
+                
+                if (this.enemy2.hp <= 0) {
+                    this.enemy2.alive = false;
+                    this.handleDualEnemyDeath(this.enemy2);
+                }
+            }
+        }
+        
+        // Update dual HP display
+        if (this.enemy1 || this.enemy2) {
+            const enemy1HP = this.enemy1 && this.enemy1.alive ? `${this.enemy1.hp}/${this.enemy1.maxHp}` : 'DEAD';
+            const enemy2HP = this.enemy2 && this.enemy2.alive ? `${this.enemy2.hp}/${this.enemy2.maxHp}` : 'DEAD';
+            document.getElementById('bossHP').innerHTML = `Yama: ${enemy1HP}<br>Ibu: ${enemy2HP}`;
+        }
+    }
+}
+
+showDamageNumber(x, y) {
+    const damageText = document.createElement('div');
+    damageText.style.position = 'absolute';
+    damageText.style.color = '#ff4444';
+    damageText.style.fontWeight = 'bold';
+    damageText.style.fontSize = '14px';
+    damageText.style.pointerEvents = 'none';
+    damageText.style.zIndex = '500';
+    damageText.style.animation = 'damageFloat 1s ease-out';
+    damageText.textContent = `-${this.attackDamage}`;
+    damageText.style.left = x + 'px';
+    damageText.style.top = y + 'px';
+    this.gameWorld.appendChild(damageText);
+    
+    setTimeout(() => {
+        if (damageText.parentNode) {
+            damageText.remove();
+        }
+    }, 1000);
+}
+
+handleDualEnemyDeath(deadEnemy) {
+    // Create explosion for the dead enemy
+    const explosion = document.createElement('div');
+    explosion.style.position = 'absolute';
+    explosion.style.left = deadEnemy.currentX + 'px';
+    explosion.style.top = deadEnemy.currentY + 'px';
+    explosion.style.width = '80px';
+    explosion.style.height = '80px';
+    explosion.style.background = 'radial-gradient(circle, yellow 0%, orange 50%, red 100%)';
+    explosion.style.borderRadius = '50%';
+    explosion.style.zIndex = '300';
+    explosion.style.animation = 'explode 1s ease-out';
+    
+    this.gameWorld.appendChild(explosion);
+    
+    // Remove dead enemy element
+    deadEnemy.element.remove();
+    
+    // Remove hammer if it was Psycho
+    if (deadEnemy === this.enemy2 && deadEnemy.hammer) {
+        deadEnemy.hammer.remove();
+    }
+    
+    // Clean up projectiles
+    if (deadEnemy.projectiles) {
+        deadEnemy.projectiles.forEach(projectile => {
+            if (projectile.element) {
+                projectile.element.remove();
+            }
+        });
+        deadEnemy.projectiles = [];
+    }
+    
+    // Remove explosion after animation
+    setTimeout(() => {
+        explosion.remove();
+    }, 1000);
+    
+    // Check if both enemies are dead
+    const bothDead = (!this.enemy1 || !this.enemy1.alive) && (!this.enemy2 || !this.enemy2.alive);
+    
+    if (bothDead) {
+        // Hide HP display and pause music
+        document.getElementById('bossHP').style.display = 'none';
+        this.battleMusic.pause();
+        
+        // Clear remaining enemies
+        this.enemy1 = null;
+        this.enemy2 = null;
         
         setTimeout(() => {
-            if (damageText.parentNode) {
-                damageText.remove();
-            }
-        }, 1000);
-        
-        if (this.enemy.hp <= 0) {
-            this.enemy.alive = false;
-            this.handleEnemyDeath();
-        }
+            this.showVictoryDialog();
+        }, 1500);
     }
 }
 
