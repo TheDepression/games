@@ -2840,6 +2840,17 @@ handleEnemyDeath() {
     
     // Remove enemy
     this.enemy.element.remove();
+    // Clean up bear-specific elements
+if (this.enemy.syringe) {
+    this.enemy.syringe.remove();
+}
+if (this.enemy.explosionProjectiles) {
+    this.enemy.explosionProjectiles.forEach(projectile => {
+        if (projectile.element) {
+            projectile.element.remove();
+        }
+    });
+}
     this.enemy = null;
     // Hide HP display
 document.getElementById('bossHP').style.display = 'none';
