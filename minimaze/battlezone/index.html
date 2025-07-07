@@ -1822,15 +1822,11 @@ lightsBackOnDim(blackOverlay) {
     // Show BRAINS message
     this.showMessage('BRAINS!!');
     
-    
-        
-        // IMPORTANT: Set both battlePhase AND canMove
+    // Enable movement after message (music already playing)
+    setTimeout(() => {
         this.battlePhase = 'fighting';
         this.canMove = true;
-        
-        // Also ensure gameStarted is true for input handling
         this.gameStarted = true;
-        
     }, 2000);
 }
 
