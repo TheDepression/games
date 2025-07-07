@@ -699,12 +699,12 @@ if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
                 bottom: this.enemy1.currentY + 180
             };
             
-            const deltaX = this.enemy.currentX - this.playerX;
-const deltaY = this.enemy.currentY - this.playerY;
+            const deltaX = this.enemy1.currentX - this.playerX;
+const deltaY = this.enemy1.currentY - this.playerY;
 const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
 
-if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
-    this.enemy.hp -= this.attackDamage;
+if (this.rectsOverlap(attackRect, enemy1HitRect) && directionCheck) {
+    this.enemy1.hp -= this.attackDamage;
                 this.showDamageNumber(this.enemy1.currentX, this.enemy1.currentY);
                 enemyHit = true;
                 
@@ -724,12 +724,12 @@ if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
                 bottom: this.enemy2.currentY + 180
             };
             
-            const deltaX = this.enemy.currentX - this.playerX;
-const deltaY = this.enemy.currentY - this.playerY;
+            const deltaX = this.enemy2.currentX - this.playerX;
+const deltaY = this.enemy2.currentY - this.playerY;
 const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
 
-if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
-    this.enemy.hp -= this.attackDamage;
+if (this.rectsOverlap(attackRect, enemy2HitRect) && directionCheck) {
+    this.enemy2.hp -= this.attackDamage;
                 this.showDamageNumber(this.enemy2.currentX, this.enemy2.currentY);
                 
                 if (this.enemy2.hp <= 0) {
