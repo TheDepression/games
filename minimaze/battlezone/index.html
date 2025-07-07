@@ -1811,8 +1811,23 @@ lightsOut() {
 }
 
 lightsBackOnDim(blackOverlay) {
-    // Fade to 60% opacity (dim lighting)
-    blackOverlay.style.opacity = '0.6';
+   // Remove the full-screen overlay
+    blackOverlay.remove();
+    
+    // Create a new overlay that only covers the game area
+    const gameOverlay = document.createElement('div');
+    gameOverlay.id = 'gameAreaOverlay';
+    gameOverlay.style.position = 'absolute';
+    gameOverlay.style.top = '0';
+    gameOverlay.style.left = '0';
+    gameOverlay.style.width = '100%';
+    gameOverlay.style.height = '100%';
+    gameOverlay.style.background = 'rgba(0,0,0,0.6)';
+    gameOverlay.style.zIndex = '300';
+    gameOverlay.style.pointerEvents = 'none'; // This is key!
+    
+    // Add it to gameArea instead of body
+    this.gameArea.appendChild(gameOverlay);
     
     // Spawn zombies
     this.spawnZombies();
