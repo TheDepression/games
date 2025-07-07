@@ -1742,13 +1742,17 @@ createBattleEnemy() {
     // Start in vulnerable mode for 10 seconds
     this.enemy.modeTimer = 600; // 10 seconds at 60fps
 } else if (this.currentBattle === 4) {
-    // Battle 4 - Zombie apocalypse (no enemy created initially)
+    // Battle 4 - Zombie apocalypse setup
     this.zombieKillCount = 0;
     this.totalZombies = 20;
     this.zombies = [];
     
-    // Don't show HP display for this battle
+    // Don't show HP display initially
     document.getElementById('bossHP').style.display = 'none';
+    
+    // Keep the battle active and prevent movement until lights-out sequence
+    this.battlePhase = 'fighting';
+    this.canMove = false;
     
     // Start the lights out sequence after a brief delay
     setTimeout(() => {
@@ -2874,6 +2878,10 @@ document.getElementById('bossHP').style.display = 'none';
 }
 
 showVictoryDialog() {
+    // For Battle 4, make sure we actually completed the zombie battle
+    if (this.currentBattle === 4 && (!this.zombies || this.zombies.filter(z => z.alive).length > 0)) {
+        return; // Don't advance if zombies are still alive
+    }
     // Return to spawn
     this.playerX = 400;
     this.playerY = 160;
