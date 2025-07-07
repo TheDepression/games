@@ -501,7 +501,7 @@ this.battleMusic = document.getElementById('battleMusic');
             }
 
             handleStart(e) {
-                if (!this.gameStarted) return;
+                if (!this.gameStarted && !(this.currentBattle === 4 && this.battlePhase === 'fighting')) return;
                 e.preventDefault();
                 
                 const now = Date.now();
@@ -536,7 +536,7 @@ this.battleMusic = document.getElementById('battleMusic');
             }
             
             handleMove(e) {
-                if (!this.isDragging || !this.gameStarted) return;
+              if (!this.isDragging || (!this.gameStarted && !(this.currentBattle === 4 && this.battlePhase === 'fighting'))) return;
                 e.preventDefault();
                 
                 const point = e.touches ? e.touches[0] : e;
