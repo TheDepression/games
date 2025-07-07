@@ -1435,6 +1435,8 @@ handleEnemyDeath() {
     // Remove enemy
     this.enemy.element.remove();
     this.enemy = null;
+    // Hide HP display
+document.getElementById('bossHP').style.display = 'none';
     
     // Pause music
     this.battleMusic.pause();
@@ -1457,54 +1459,119 @@ showVictoryDialog() {
     this.player.style.left = (this.playerX - visualOffset) + 'px';
     this.player.style.top = (this.playerY - visualOffset) + 'px';
     
+    // Increment battle counter
+    this.currentBattle++;
+    
     setTimeout(() => {
-        const dialogOverlay = document.createElement('div');
-        dialogOverlay.id = 'victoryDialog';
-        dialogOverlay.style.position = 'fixed';
-        dialogOverlay.style.top = '0';
-        dialogOverlay.style.left = '0';
-        dialogOverlay.style.width = '100%';
-        dialogOverlay.style.height = '100%';
-        dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
-        dialogOverlay.style.display = 'flex';
-        dialogOverlay.style.justifyContent = 'center';
-        dialogOverlay.style.alignItems = 'center';
-        dialogOverlay.style.zIndex = '400';
-        
-        const dialogBox = document.createElement('div');
-        dialogBox.style.background = 'rgba(0,0,0,0.9)';
-        dialogBox.style.color = 'white';
-        dialogBox.style.padding = '20px';
-        dialogBox.style.borderRadius = '10px';
-        dialogBox.style.textAlign = 'center';
-        dialogBox.style.maxWidth = '300px';
-        dialogBox.style.border = '2px solid #555';
-        
-        const text = document.createElement('p');
-        text.style.margin = '10px 0';
-        text.style.fontSize = '14px';
-        text.textContent = "Good job! (This is just a test of the first battle)";
-        
-        const button = document.createElement('button');
-        button.style.background = '#4CAF50';
-        button.style.color = 'white';
-        button.style.border = 'none';
-        button.style.padding = '10px 20px';
-        button.style.borderRadius = '5px';
-        button.style.cursor = 'pointer';
-        button.style.fontSize = '14px';
-        button.textContent = 'OK';
-        button.onclick = () => {
-            dialogOverlay.remove();
-            this.canMove = true;
-            this.createTemporaryExit();
-        };
-        
-        dialogBox.appendChild(text);
-        dialogBox.appendChild(button);
-        dialogOverlay.appendChild(dialogBox);
-        document.body.appendChild(dialogOverlay);
+        if (this.currentBattle <= 5) {
+            // Show next battle dialog
+            this.showNextBattleDialog();
+        } else {
+            // Final victory
+            this.showFinalVictory();
+        }
     }, 2000);
+}
+
+showNextBattleDialog() {
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'nextBattleDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = `Are you ready for fight number ${this.currentBattle}?`;
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '10px 20px';
+    button.style.borderRadius = '5px';
+    button.style.cursor = 'pointer';
+    button.style.fontSize = '14px';
+    button.textContent = 'I AM READY';
+    button.onclick = () => {
+        dialogOverlay.remove();
+        this.startBattleAnimation();
+    };
+    
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(button);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+showFinalVictory() {
+    // Award trophy and show final dialog
+    this.hasTrophy = true;
+    this.updateUI();
+    
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'finalVictoryDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = "🏆 CHAMPION! You have earned the trophy! You may now explore freely.";
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '10px 20px';
+    button.style.borderRadius = '5px';
+    button.style.cursor = 'pointer';
+    button.style.fontSize = '14px';
+    button.textContent = 'AWESOME!';
+    button.onclick = () => {
+        dialogOverlay.remove();
+        this.canMove = true;
+        this.createTemporaryExit();
+    };
+    
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(button);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
 }
 
             
