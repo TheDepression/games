@@ -733,7 +733,59 @@ this.battleMusic = document.getElementById('battleMusic');
             const enemy2HP = this.enemy2 && this.enemy2.alive ? `${this.enemy2.hp}/${this.enemy2.maxHp}` : 'DEAD';
             document.getElementById('bossHP').innerHTML = `Yama: ${enemy1HP}<br>Ibu: ${enemy2HP}`;
         }
+  } else if (this.currentBattle === 3) {
+    // Dr. Bear battle
+    if (!this.enemy || !this.enemy.alive) return;
+    
+    if (this.enemy.mode === 'vulnerable') {
+        // Can damage bear directly when vulnerable
+        const enemyHitRect = {
+            left: this.enemy.currentX,
+            top: this.enemy.currentY,
+            right: this.enemy.currentX + 60,
+            bottom: this.enemy.currentY + 180
+        };
+        
+        if (this.rectsOverlap(attackRect, enemyHitRect)) {
+            this.enemy.hp -= this.attackDamage;
+            document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+            this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
+            
+            if (this.enemy.hp <= 0) {
+                this.enemy.alive = false;
+                this.destroyAllSyringes();
+                this.handleEnemyDeath();
+            }
+        }
+    } else {
+        // In attack mode, can only hit syringes
+        for (let i = this.enemy.syringes.length - 1; i >= 0; i--) {
+            const syringe = this.enemy.syringes[i];
+            if (!syringe.alive) continue;
+            
+            const syringeRect = {
+                left: parseInt(syringe.element.style.left),
+                top: parseInt(syringe.element.style.top),
+                right: parseInt(syringe.element.style.left) + 20,
+                bottom: parseInt(syringe.element.style.top) + 20
+            };
+            
+            if (this.rectsOverlap(attackRect, syringeRect)) {
+                // Destroy syringe
+                syringe.alive = false;
+                syringe.element.remove();
+                this.enemy.syringes.splice(i, 1);
+                
+                // If all syringes destroyed, switch to vulnerable mode early
+                if (this.enemy.syringes.length === 0) {
+                    this.enemy.mode = 'vulnerable';
+                    this.enemy.modeTimer = 600; // 10 seconds vulnerable
+                }
+                break; // Only hit one syringe per attack
+            }
+        }
     }
+}
 }
 
 showDamageNumber(x, y) {
@@ -1678,7 +1730,9 @@ updateBattleEnemy() {
         this.updateSingleEnemy();
     } else if (this.currentBattle === 2) {
         this.updateDualEnemies();
-    }
+ } else if (this.currentBattle === 3) {
+    this.updateDrBear();
+}
 }
 
 updateSingleEnemy() {
@@ -1999,6 +2053,130 @@ this.enemy2.element.style.top = this.enemy2.currentY + 'px';
     }
 }
 
+            updateDrBear() {
+    if (!this.enemy || !this.enemy.alive) return;
+    
+    // Handle mode switching
+    this.enemy.modeTimer--;
+    if (this.enemy.modeTimer <= 0) {
+        if (this.enemy.mode === 'vulnerable') {
+            // Switch to attack mode
+            this.enemy.mode = 'attack';
+            this.enemy.modeTimer = 600; // 10 seconds in attack mode
+            this.createSyringeRing();
+        } else {
+            // Switch to vulnerable mode
+            this.enemy.mode = 'vulnerable';
+            this.enemy.modeTimer = 600; // 10 seconds in vulnerable mode
+            this.destroyAllSyringes();
+        }
+    }
+    
+    if (this.enemy.mode === 'vulnerable') {
+        this.updateBearVulnerable();
+    } else {
+        this.updateBearAttack();
+    }
+    
+    // Update syringe positions if in attack mode
+    if (this.enemy.mode === 'attack') {
+        this.updateSyringeRing();
+    }
+    
+    // Keep in arena bounds
+    this.enemy.currentX = Math.max(150, Math.min(650, this.enemy.currentX));
+    this.enemy.currentY = Math.max(150, Math.min(650, this.enemy.currentY));
+    
+    this.enemy.element.style.left = this.enemy.currentX + 'px';
+    this.enemy.element.style.top = this.enemy.currentY + 'px';
+    
+    // Check contact damage
+    this.checkEnemyContact();
+}
+
+updateBearVulnerable() {
+    // Run away from player (slightly slower than player speed)
+    const deltaX = this.enemy.currentX - this.playerX;
+    const deltaY = this.enemy.currentY - this.playerY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 0) {
+        // Normalize and move away from player
+        this.enemy.currentX += (deltaX / distance) * this.enemy.speed;
+        this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
+    }
+}
+
+updateBearAttack() {
+    // Chase the player
+    const deltaX = this.playerX - this.enemy.currentX;
+    const deltaY = this.playerY - this.enemy.currentY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance > 0) {
+        // Normalize and move toward player
+        this.enemy.currentX += (deltaX / distance) * this.enemy.speed;
+        this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
+    }
+}
+
+createSyringeRing() {
+    this.destroyAllSyringes(); // Clear any existing syringes
+    
+    for (let i = 0; i < this.enemy.syringeCount; i++) {
+        const syringeEl = document.createElement('div');
+        syringeEl.className = 'syringe';
+        syringeEl.style.position = 'absolute';
+        syringeEl.style.width = '20px';
+        syringeEl.style.height = '20px';
+        syringeEl.style.fontSize = '16px';
+        syringeEl.style.display = 'flex';
+        syringeEl.style.alignItems = 'center';
+        syringeEl.style.justifyContent = 'center';
+        syringeEl.style.zIndex = '160';
+        syringeEl.textContent = '💉';
+        
+        this.gameWorld.appendChild(syringeEl);
+        
+        this.enemy.syringes.push({
+            element: syringeEl,
+            angle: (i / this.enemy.syringeCount) * Math.PI * 2,
+            radius: 80,
+            alive: true,
+            hp: 1 // Each syringe takes 1 hit to destroy
+        });
+    }
+}
+
+updateSyringeRing() {
+    if (!this.enemy.syringes) return;
+    
+    // Rotate syringes around the bear
+    this.enemy.syringes.forEach((syringe, index) => {
+        if (!syringe.alive) return;
+        
+        // Rotate angle
+        syringe.angle += 0.05; // Rotation speed
+        
+        // Calculate position around bear
+        const x = this.enemy.currentX + 30 + Math.cos(syringe.angle) * syringe.radius;
+        const y = this.enemy.currentY + 60 + Math.sin(syringe.angle) * syringe.radius;
+        
+        syringe.element.style.left = x + 'px';
+        syringe.element.style.top = y + 'px';
+    });
+}
+
+destroyAllSyringes() {
+    if (this.enemy.syringes) {
+        this.enemy.syringes.forEach(syringe => {
+            if (syringe.element) {
+                syringe.element.remove();
+            }
+        });
+        this.enemy.syringes = [];
+    }
+}
 updateHammer() {
     if (!this.enemy2.hammer) return;
     
