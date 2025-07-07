@@ -755,6 +755,33 @@ this.battleMusic = document.getElementById('battleMusic');
             this.handleEnemyDeath();
         }
     }
+  } else if (this.currentBattle === 4) {
+    // Zombie battle
+    this.zombies.forEach(zombie => {
+        if (!zombie.alive) return;
+        
+        const deltaX = zombie.currentX - this.playerX;
+        const deltaY = zombie.currentY - this.playerY;
+        const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+        
+        if (directionCheck) {
+            const distance = Math.sqrt(
+                Math.pow(attackX - zombie.currentX, 2) +
+                Math.pow(attackY - zombie.currentY, 2)
+            );
+            
+            if (distance <= effectiveRange) {
+                zombie.hp -= this.attackDamage;
+                this.showDamageNumber(zombie.currentX, zombie.currentY);
+                
+                if (zombie.hp <= 0) {
+                    zombie.alive = false;
+                    zombie.element.classList.add('defeated');
+                    this.updateZombieCounter();
+                }
+            }
+        }
+    });
 }
 }
 
