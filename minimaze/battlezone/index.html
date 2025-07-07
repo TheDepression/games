@@ -1699,20 +1699,25 @@ createBattleEnemy() {
     this.gameWorld.appendChild(enemyEl);
     
     this.enemy = {
-        element: enemyEl,
-        currentX: 370,
-        currentY: 200,
-        hp: 1000,
-        maxHp: 1000,
-        alive: true,
-        speed: 2.2, // Slightly slower than player
-        targetX: 370,
-        targetY: 200,
-        mode: 'vulnerable', // 'vulnerable' or 'attack'
-        modeTimer: 0,
-        syringes: [],
-        syringeCount: 8 // Number of syringes in the ring
-    };
+    element: enemyEl,
+    currentX: 370,
+    currentY: 200,
+    hp: 1000,
+    maxHp: 1000,
+    alive: true,
+    speed: 2.2,
+    targetX: 370,
+    targetY: 200,
+    
+    // New properties for chase-and-explode
+    syringeAngle: 0,
+    syringeRadius: 50,
+    syringe: null,
+    phaseTimer: 600, // 10 seconds at 60fps
+    isShivering: false,
+    shiverTimer: 0,
+    explosionProjectiles: []
+};
     
     // Show HP display
     document.getElementById('bossHP').style.display = 'block';
@@ -1721,6 +1726,25 @@ createBattleEnemy() {
     // Start in vulnerable mode for 10 seconds
     this.enemy.modeTimer = 600; // 10 seconds at 60fps
 }
+}
+
+            createSingleSyringe() {
+    if (this.enemy.syringe) return; // Already exists
+    
+    const syringeEl = document.createElement('div');
+    syringeEl.className = 'rotating-syringe';
+    syringeEl.style.position = 'absolute';
+    syringeEl.style.width = '20px';
+    syringeEl.style.height = '20px';
+    syringeEl.style.fontSize = '16px';
+    syringeEl.style.display = 'flex';
+    syringeEl.style.alignItems = 'center';
+    syringeEl.style.justifyContent = 'center';
+    syringeEl.style.zIndex = '160';
+    syringeEl.textContent = '💉';
+    
+    this.gameWorld.appendChild(syringeEl);
+    this.enemy.syringe = syringeEl;
 }
 
 updateBattleEnemy() {
@@ -2056,31 +2080,19 @@ this.enemy2.element.style.top = this.enemy2.currentY + 'px';
             updateDrBear() {
     if (!this.enemy || !this.enemy.alive) return;
     
-    // Handle mode switching
-    this.enemy.modeTimer--;
-    if (this.enemy.modeTimer <= 0) {
-        if (this.enemy.mode === 'vulnerable') {
-            // Switch to attack mode
-            this.enemy.mode = 'attack';
-            this.enemy.modeTimer = 600; // 10 seconds in attack mode
-            this.createSyringeRing();
-        } else {
-            // Switch to vulnerable mode
-            this.enemy.mode = 'vulnerable';
-            this.enemy.modeTimer = 600; // 10 seconds in vulnerable mode
-            this.destroyAllSyringes();
-        }
+    // Handle phase timing
+    this.enemy.phaseTimer--;
+    
+    if (!this.enemy.isShivering && this.enemy.phaseTimer <= 0) {
+        // Start shivering phase
+        this.startBearShiver();
     }
     
-    if (this.enemy.mode === 'vulnerable') {
-        this.updateBearVulnerable();
+    if (this.enemy.isShivering) {
+        this.updateBearShiver();
     } else {
-        this.updateBearAttack();
-    }
-    
-    // Update syringe positions if in attack mode
-    if (this.enemy.mode === 'attack') {
-        this.updateSyringeRing();
+        this.updateBearChase();
+        this.updateSingleSyringe();
     }
     
     // Keep in arena bounds
@@ -2090,93 +2102,209 @@ this.enemy2.element.style.top = this.enemy2.currentY + 'px';
     this.enemy.element.style.left = this.enemy.currentX + 'px';
     this.enemy.element.style.top = this.enemy.currentY + 'px';
     
-    // Check contact damage
-    this.checkEnemyContact();
-}
-
-updateBearVulnerable() {
-    // Run away from player (slightly slower than player speed)
-    const deltaX = this.enemy.currentX - this.playerX;
-    const deltaY = this.enemy.currentY - this.playerY;
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    // Update explosion projectiles if any
+    this.updateExplosionProjectiles();
     
-    if (distance > 0) {
-        // Normalize and move away from player
-        this.enemy.currentX += (deltaX / distance) * this.enemy.speed;
-        this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
-    }
+    // Check contact damage
+    this.checkBearContact();
 }
 
-updateBearAttack() {
-    // Chase the player
+            updateBearChase() {
+    // Smooth chase toward player - no juking, no pausing
     const deltaX = this.playerX - this.enemy.currentX;
     const deltaY = this.playerY - this.enemy.currentY;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
     if (distance > 0) {
-        // Normalize and move toward player
+        // Normalize and move toward player smoothly
         this.enemy.currentX += (deltaX / distance) * this.enemy.speed;
         this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
     }
 }
 
-createSyringeRing() {
-    this.destroyAllSyringes(); // Clear any existing syringes
-    
-    for (let i = 0; i < this.enemy.syringeCount; i++) {
-        const syringeEl = document.createElement('div');
-        syringeEl.className = 'syringe';
-        syringeEl.style.position = 'absolute';
-        syringeEl.style.width = '20px';
-        syringeEl.style.height = '20px';
-        syringeEl.style.fontSize = '16px';
-        syringeEl.style.display = 'flex';
-        syringeEl.style.alignItems = 'center';
-        syringeEl.style.justifyContent = 'center';
-        syringeEl.style.zIndex = '160';
-        syringeEl.textContent = '💉';
-        
-        this.gameWorld.appendChild(syringeEl);
-        
-        this.enemy.syringes.push({
-            element: syringeEl,
-            angle: (i / this.enemy.syringeCount) * Math.PI * 2,
-            radius: 80,
-            alive: true,
-            hp: 1 // Each syringe takes 1 hit to destroy
-        });
+updateSingleSyringe() {
+    if (!this.enemy.syringe) {
+        this.createSingleSyringe();
+        return;
     }
-}
-
-updateSyringeRing() {
-    if (!this.enemy.syringes) return;
     
-    // Rotate syringes around the bear
-    this.enemy.syringes.forEach((syringe, index) => {
-        if (!syringe.alive) return;
-        
-        // Rotate angle
-        syringe.angle += 0.05; // Rotation speed
-        
-        // Calculate position around bear
-        const x = this.enemy.currentX + 30 + Math.cos(syringe.angle) * syringe.radius;
-        const y = this.enemy.currentY + 60 + Math.sin(syringe.angle) * syringe.radius;
-        
-        syringe.element.style.left = x + 'px';
-        syringe.element.style.top = y + 'px';
-    });
+    // Rotate syringe around bear at high speed
+    this.enemy.syringeAngle += 0.15; // High rotation speed
+    
+    const x = this.enemy.currentX + 25 + Math.cos(this.enemy.syringeAngle) * this.enemy.syringeRadius;
+    const y = this.enemy.currentY + 50 + Math.sin(this.enemy.syringeAngle) * this.enemy.syringeRadius;
+    
+    this.enemy.syringe.style.left = x + 'px';
+    this.enemy.syringe.style.top = y + 'px';
 }
 
-destroyAllSyringes() {
-    if (this.enemy.syringes) {
-        this.enemy.syringes.forEach(syringe => {
-            if (syringe.element) {
-                syringe.element.remove();
+startBearShiver() {
+    this.enemy.isShivering = true;
+    this.enemy.shiverTimer = 90; // 1.5 seconds
+    
+    // Remove rotating syringe
+    if (this.enemy.syringe) {
+        this.enemy.syringe.remove();
+        this.enemy.syringe = null;
+    }
+    
+    // Add shiver animation
+    this.enemy.element.style.animation = 'shiver 0.1s infinite';
+}
+
+updateBearShiver() {
+    this.enemy.shiverTimer--;
+    
+    if (this.enemy.shiverTimer <= 0) {
+        // Stop shivering and explode
+        this.enemy.element.style.animation = '';
+        this.explodeSyringes();
+        
+        // Reset for next cycle
+        this.enemy.isShivering = false;
+        this.enemy.phaseTimer = 600; // 10 seconds until next explosion
+        
+        // Restore syringe after 1.5 seconds
+        setTimeout(() => {
+            if (this.enemy && this.enemy.alive) {
+                this.createSingleSyringe();
             }
-        });
-        this.enemy.syringes = [];
+        }, 1500);
     }
 }
+
+            explodeSyringes() {
+    const projectileCount = 16; // Number of projectiles in explosion
+    
+    for (let i = 0; i < projectileCount; i++) {
+        const angle = (i / projectileCount) * Math.PI * 2;
+        
+        // Alternate between syringes and rabbit heads
+        const emoji = i % 2 === 0 ? '💉' : '🐰';
+        
+        const projectileEl = document.createElement('div');
+        projectileEl.style.position = 'absolute';
+        projectileEl.style.width = '20px';
+        projectileEl.style.height = '20px';
+        projectileEl.style.fontSize = '16px';
+        projectileEl.style.display = 'flex';
+        projectileEl.style.alignItems = 'center';
+        projectileEl.style.justifyContent = 'center';
+        projectileEl.style.zIndex = '160';
+        projectileEl.textContent = emoji;
+        
+        // Start at bear center
+        projectileEl.style.left = (this.enemy.currentX + 25) + 'px';
+        projectileEl.style.top = (this.enemy.currentY + 50) + 'px';
+        
+        this.gameWorld.appendChild(projectileEl);
+        
+        const projectile = {
+            element: projectileEl,
+            x: this.enemy.currentX + 25,
+            y: this.enemy.currentY + 50,
+            velocityX: Math.cos(angle) * 4,
+            velocityY: Math.sin(angle) * 4,
+            alive: true
+        };
+        
+        this.enemy.explosionProjectiles.push(projectile);
+    }
+}
+
+updateExplosionProjectiles() {
+    if (!this.enemy.explosionProjectiles) return;
+    
+    for (let i = this.enemy.explosionProjectiles.length - 1; i >= 0; i--) {
+        const projectile = this.enemy.explosionProjectiles[i];
+        if (!projectile.alive) continue;
+        
+        // Move projectile
+        projectile.x += projectile.velocityX;
+        projectile.y += projectile.velocityY;
+        
+        projectile.element.style.left = projectile.x + 'px';
+        projectile.element.style.top = projectile.y + 'px';
+        
+        // Check collision with player
+        const playerRect = {
+            left: this.playerX,
+            top: this.playerY,
+            right: this.playerX + 24,
+            bottom: this.playerY + 24
+        };
+        
+        const projectileRect = {
+            left: projectile.x,
+            top: projectile.y,
+            right: projectile.x + 20,
+            bottom: projectile.y + 20
+        };
+        
+        if (this.rectsOverlap(playerRect, projectileRect)) {
+            this.takeDamage(1);
+            projectile.alive = false;
+            projectile.element.remove();
+            this.enemy.explosionProjectiles.splice(i, 1);
+            continue;
+        }
+        
+        // Remove if out of bounds
+        if (projectile.x < -50 || projectile.x > 850 || 
+            projectile.y < -50 || projectile.y > 850) {
+            projectile.alive = false;
+            projectile.element.remove();
+            this.enemy.explosionProjectiles.splice(i, 1);
+        }
+    }
+}
+
+checkBearContact() {
+    if (this.isInvulnerable || !this.enemy || !this.enemy.alive) return;
+    
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    // Check contact with bear
+    const bearRect = {
+        left: this.enemy.currentX,
+        top: this.enemy.currentY,
+        right: this.enemy.currentX + 50,
+        bottom: this.enemy.currentY + 100
+    };
+    
+    if (this.rectsOverlap(playerRect, bearRect)) {
+        this.takeDamage(2); // 2 hearts damage
+        return;
+    }
+    
+    // Check contact with rotating syringe
+    if (this.enemy.syringe) {
+        const syringeX = parseInt(this.enemy.syringe.style.left);
+        const syringeY = parseInt(this.enemy.syringe.style.top);
+        const syringeRect = {
+            left: syringeX,
+            top: syringeY,
+            right: syringeX + 20,
+            bottom: syringeY + 20
+        };
+        
+        if (this.rectsOverlap(playerRect, syringeRect)) {
+            this.takeDamage(1);
+        }
+    }
+}
+
+            
+
+
+
+
+
 updateHammer() {
     if (!this.enemy2.hammer) return;
     
