@@ -2089,13 +2089,10 @@ updateWandererZombie(zombie) {
 }
 
 handleZombieVictory() {
-    // Remove black overlay (turn lights back on)
-    const blackOverlay = document.getElementById('blackOverlay');
-    if (blackOverlay) {
-        blackOverlay.style.opacity = '0';
-        setTimeout(() => {
-            blackOverlay.remove();
-        }, 500);
+   // Remove game area overlay (turn lights back on)
+    const gameOverlay = document.getElementById('gameAreaOverlay');
+    if (gameOverlay) {
+        gameOverlay.remove();
     }
     
     // Stop forest music
