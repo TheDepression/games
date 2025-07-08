@@ -695,20 +695,11 @@
                     '0,0': { // Starting room
                         exits: ['e'], // only east
                         walls: [
-                           {x: 300, y: 60, w: 10, h: 130},
-  {x: 60, y: 50, w: 240, h: 10},
-  {x: 60, y: 160, w: 40, h: 10},
-  {x: 100, y: 170, w: 10, h: 40},
-  {x: 60, y: 210, w: 40, h: 10},
-  {x: 60, y: 220, w: 10, h: 80},
-  {x: 60, y: 270, w: 50, h: 10},
-  {x: 110, y: 270, w: 10, h: 30},
-  {x: 110, y: 110, w: 40, h: 10},
-  {x: 200, y: 50, w: 10, h: 150},
-  {x: 150, y: 110, w: 10, h: 250},
-  {x: 250, y: 120, w: 10, h: 240},
-  {x: 150, y: 290, w: 50, h: 10},
-  {x: 60, y: 50, w: 10, h: 110}
+                            { x: 80, y: 100, w: 20, h: 150 },
+                            { x: 250, y: 200, w: 20, h: 100 }
+                        ],
+                        snakes: [
+                            { x: 120, y: 180, dir: 'horizontal' }
                         ]
                     },
                     '1,0': { // Room 1
@@ -736,10 +727,8 @@
                     '3,0': { // Room 3 - has secret passage south
                         exits: ['w', 'e', 'secret_s'], // west, east, secret south
                         walls: [
-                            { x: 120, y: 200, w: 20, h: 137.5 },
-                            {x: 0, y: 337.5, w: 140, h: 20 },
-                            {x: 210, y: 337.5, w: 140, h: 20 },
-                            { x: 220, y: 280, w: 20, h: 77.5 }
+                            { x: 80, y: 80, w: 20, h: 100 },
+                            { x: 250, y: 150, w: 20, h: 120 }
                         ],
                         snakes: [
                             { x: 150, y: 120, dir: 'horizontal' },
@@ -828,7 +817,7 @@
                     this.createWall(0, 337.5, 350, 20);
                 } else if (exits.includes('secret_s')) {
                     // Secret passage - looks like solid wall but passable
-                    this.createSecretWall(0, 337.5, 210, 20);
+                    this.createSecretWall(0, 337.5, 140, 20);
                     this.createSecretWall(210, 337.5, 140, 20);
                 } else {
                     // Normal gap
@@ -1212,8 +1201,8 @@
                     gameState.hearts = 3;
                     gameState.timeElapsed = this.timeElapsed;
                     gameState.deathCount = this.deathCount;
-                    gameState.playerX = 980;  // Back to weak point entrance in maze2
-                    gameState.playerY = 2300;
+                    gameState.playerX = 960;  // Back to weak point entrance in maze2
+                    gameState.playerY = 2360;
                     gameState.currentUrl = 'maze2';
                     localStorage.setItem('mfGameState', JSON.stringify(gameState));
                     
@@ -1232,8 +1221,8 @@
                     this.saveGameState();
                     
                     const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-                    gameState.playerX = 980;  // Back to weak point entrance in maze2
-                    gameState.playerY = 2220;
+                    gameState.playerX = 960;  // Back to weak point entrance in maze2
+                    gameState.playerY = 2360;
                     gameState.currentUrl = 'maze2';
                     
                     localStorage.setItem('mfGameState', JSON.stringify(gameState));
