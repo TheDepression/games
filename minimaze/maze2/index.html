@@ -4168,6 +4168,9 @@ if (this.hasWeapon) {
             gameOver() {
                 this.deathCount++;
     this.updateDeathCounter();
+              
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
                 this.sinkingInQuicksand = false;
     this.quicksandStrength = 0;
     this.quicksandCenter = null;
