@@ -799,6 +799,32 @@ if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
             }
         }
     });
+} else if (this.currentBattle === 5) {
+    // Shadow boss battle
+    if (!this.enemy || !this.enemy.alive) return;
+    
+    const enemyHitRect = {
+        left: this.enemy.currentX,
+        top: this.enemy.currentY,
+        right: this.enemy.currentX + 64,  // Shadow boss is 64x64
+        bottom: this.enemy.currentY + 64
+    };
+    
+    const deltaX = this.enemy.currentX - this.playerX;
+    const deltaY = this.enemy.currentY - this.playerY;
+    const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+
+    if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
+        this.enemy.hp -= this.attackDamage;
+        document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
+        
+        this.showDamageNumber(this.enemy.currentX, this.enemy.currentY);
+        
+        if (this.enemy.hp <= 0) {
+            this.enemy.alive = false;
+            this.handleEnemyDeath();
+        }
+    }
 }
 }
 
