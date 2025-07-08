@@ -368,6 +368,7 @@
                 this.isPaused = false;
                 this.isTransitioning = false;
                 this.isInvulnerable = false;
+                this.isDying = false;
                 
                 // Player state
                 this.playerX = 175; // Center of room
@@ -407,6 +408,7 @@
                 this.gameArea = document.getElementById('gameArea');
                 this.controlArea = document.getElementById('controlArea');
                 this.caveMusic = document.getElementById('caveMusic');
+                
                 
                 this.preloadPlayerImages();
                 this.setupControls();
@@ -925,10 +927,10 @@ if (layout.electricLines) {
         'line1': {
             id: 'line1',
             path: [
-                {x: 230, y: 30}, {x: 300, y: 30}, // top edge
+                {x: 220, y: 30}, {x: 220, y: 100}, // down
                 {x: 300, y: 100}, // right edge  
-                {x: 230, y: 100}, // bottom edge
-                {x: 230, y: 30}  // back to start
+                {x: 300, y: 30}, // return up
+                {x: 220, y: 30}  // left back to start
             ],
             segmentSize: 20,
             speed: 2,
@@ -1180,9 +1182,13 @@ getPositionOnPath(pathSegments, position) {
                     right: this.playerX + 12,
                     bottom: this.playerY + 12
                 };
+                
                 // In checkCollisions(), replace the electric line collision section:
+                let electricHit = false;
 this.electricLines.forEach(line => {
+    if (electricHit) return; // Stop checking if already hit
     line.segments.forEach(segment => {
+        if (electricHit) return; // Stop checking if already hit
         const segmentRect = {
             left: parseInt(segment.style.left),
             top: parseInt(segment.style.top),
@@ -1196,6 +1202,7 @@ this.electricLines.forEach(line => {
         }
     });
 });
+                if (electricHit) return; // Don't check other collisions if electric death occurred
                 // Check snake collisions
                 this.snakes.forEach(enemy => {
                     if (!enemy.alive) return;
@@ -1232,6 +1239,9 @@ this.electricLines.forEach(line => {
 
 
             instantDeath(message) {
+    if (this.isDying) return; // Prevent multiple death calls
+    this.isDying = true;
+    
     this.showMessage(message);
     setTimeout(() => {
         this.gameOver();
@@ -1359,6 +1369,7 @@ this.electricLines.forEach(line => {
             }
             
             gameOver() {
+                this.isDying = false;
                 this.deathCount++;
                 this.updateDeathCounter();
                 
