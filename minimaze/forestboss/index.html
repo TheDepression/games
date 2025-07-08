@@ -1069,13 +1069,15 @@ this.updateDeathCounter();
             }
 
             gameOver() {
+                this.deathCount++;
+    this.updateDeathCounter();
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
                 clearInterval(this.timerInterval);
                 this.gameStarted = false;
                 this.bgMusic.pause();
                 this.showMessage('💀 Game Over!');
-                // Increment death count immediately
-    this.deathCount++;
-    this.updateDeathCounter();
+             
                 
                 setTimeout(() => {
                     this.showLevelComplete('💀 Game Over', 'The bully was too strong!');
