@@ -436,6 +436,7 @@
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
                     this.deathCount = gameState.deathCount || 0;
+                    this.updateDeathCounter(); // Add this line
                     this.maxHearts = gameState.maxHearts || 3;
                     
                     // Gun upgrades from maze2
