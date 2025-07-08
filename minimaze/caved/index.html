@@ -1005,6 +1005,7 @@ createSingleElectricLine(config) {
                     if (this.gameStarted && !this.isTransitioning) {
                         this.updatePlayer();
                         this.updateSnakes();
+                        this.updateElectricLines(); // Add this line
                         this.checkCollisions();
                         this.checkRoomTransitions();
                     }
@@ -1107,6 +1108,55 @@ createSingleElectricLine(config) {
                     }
                 });
             }
+
+            updateElectricLines() {
+    if (this.isPaused) return;
+    
+    this.electricLines.forEach(line => {
+        // Move along current segment
+        line.progress += line.speed / line.segments[line.currentSegment].length;
+        
+        // Check if we've completed current segment
+        if (line.progress >= 1) {
+            line.progress = 0;
+            line.currentSegment = (line.currentSegment + 1) % line.segments.length;
+        }
+        
+        // Calculate head position
+        this.calculateElectricLineHeadPosition(line);
+    });
+}
+
+calculateElectricLineHeadPosition(line) {
+    // Start from the beginning and trace to current position
+    let currentX = line.startX;
+    let currentY = line.startY;
+    
+    // Complete previous segments
+    for (let i = 0; i < line.currentSegment; i++) {
+        const segment = line.segments[i];
+        switch(segment.direction) {
+            case 'right': currentX += segment.length; break;
+            case 'down': currentY += segment.length; break;
+            case 'left': currentX -= segment.length; break;
+            case 'up': currentY -= segment.length; break;
+        }
+    }
+    
+    // Add progress on current segment
+    const currentSegment = line.segments[line.currentSegment];
+    const progressDistance = currentSegment.length * line.progress;
+    
+    switch(currentSegment.direction) {
+        case 'right': currentX += progressDistance; break;
+        case 'down': currentY += progressDistance; break;
+        case 'left': currentX -= progressDistance; break;
+        case 'up': currentY -= progressDistance; break;
+    }
+    
+    line.headX = currentX;
+    line.headY = currentY;
+}
             
             checkCollisions() {
                 if (this.isInvulnerable) return;
@@ -1117,7 +1167,37 @@ createSingleElectricLine(config) {
                     right: this.playerX + 12,
                     bottom: this.playerY + 12
                 };
-                
+                // Check electric line collisions (add this before snake collisions)
+    this.electricLines.forEach(line => {
+        // Check collision with head (moving part)
+        const headRect = {
+            left: line.headX - line.thickness/2,
+            top: line.headY - line.thickness/2,
+            right: line.headX + line.thickness/2,
+            bottom: line.headY + line.thickness/2
+        };
+        
+        if (this.rectsOverlap(playerRect, headRect)) {
+            this.instantDeath('⚡ Electrocuted!');
+            return;
+        }
+        
+        // Check collision with static segments
+        const segments = this.gameWorld.querySelectorAll(`[data-line-id="${line.id}"]`);
+        segments.forEach(segment => {
+            const segmentRect = {
+                left: parseInt(segment.style.left),
+                top: parseInt(segment.style.top),
+                right: parseInt(segment.style.left) + parseInt(segment.style.width),
+                bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
+            };
+            
+            if (this.rectsOverlap(playerRect, segmentRect)) {
+                this.instantDeath('⚡ Electrocuted!');
+                return;
+            }
+        });
+    });
                 // Check snake collisions
                 this.snakes.forEach(enemy => {
                     if (!enemy.alive) return;
@@ -1151,6 +1231,14 @@ createSingleElectricLine(config) {
                     }
                 });
             }
+
+
+            instantDeath(message) {
+    this.showMessage(message);
+    setTimeout(() => {
+        this.gameOver();
+    }, 1000);
+}
             
             checkRoomTransitions() {
                 if (this.isTransitioning) return;
