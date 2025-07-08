@@ -791,6 +791,8 @@ if (this.rectsOverlap(attackRect, enemyHitRect) && directionCheck) {
                 
                 if (zombie.hp <= 0) {
                     zombie.alive = false;
+                    zombie.element.style.opacity = '0.3';
+    zombie.element.style.filter = 'grayscale(100%)';
                     zombie.element.classList.add('defeated');
                     this.updateZombieCounter();
                 }
