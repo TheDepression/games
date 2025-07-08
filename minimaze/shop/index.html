@@ -1306,23 +1306,28 @@ if (distance <= effectiveRange) {
                 if (this.hasFlashlight) itemsHTML += ' 🔦';
                 if (this.hasPencil) itemsHTML += ' ✏️';
                 
-                // Gun display with all effects
-                if (this.hasWeapon) {
-                    let gunStyle = '';
-                    if (this.hasSuperGun) {
-                        gunStyle = 'filter: brightness(0.3);'; // Deep black
-                    } else if (this.hasHammerPower) {
-                        gunStyle = 'filter: grayscale(0.9) brightness(0.8);';
-                    } else if (this.hasOrangePower) {
-                        gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);';
-                    }
-                    
-                    if (this.hasEnhancedRange) {
-                        gunStyle += ' animation: gunPulsate 2s infinite;';
-                    }
-                    
-                    itemsHTML += ` <span style="${gunStyle}">🔫</span>`;
-                }
+                // Replace the gun section in updateUI() with this:
+if (this.hasWeapon) {
+    let gunStyle = '';
+    
+    // Determine base gun color/style
+    if (this.hasSuperGun) {
+        gunStyle = 'filter: brightness(0.3);'; // Deep black for super gun
+    } else if (this.hasHammerPower) {
+        gunStyle = 'filter: grayscale(0.9) brightness(0.8);'; // Grey for hammer
+    } else if (this.hasOrangePower) {
+        gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2);'; // Blue for orange
+    } else {
+        gunStyle = ''; // Default green
+    }
+    
+    // Add pulse animation if enhanced range (preserving base color)
+    if (this.hasEnhancedRange) {
+        gunStyle += ' animation: gunPulsate 2s infinite; filter: ' + gunStyle.replace('filter: ', '') + ' drop-shadow(0 0 8px gold);';
+    }
+    
+    itemsHTML += ` <span style="${gunStyle}">🔫</span>`;
+}
                 
                 if (this.hasLavaShoes) itemsHTML += ' 🥾';
                 if (this.hasTrophy) itemsHTML += ' 🏆';
