@@ -1296,24 +1296,29 @@
                 
                 let items = [];
                 if (this.hasWeapon) {
-                    let gunStyle = '';
-                    if (this.hasSuperGun) {
-                        items.push('🔫'); // Super gun (black)
-                    } else if (this.hasHammerPower) {
-                        items.push('🔫'); // Hammer gun (grey)
-                    } else if (this.hasOrangePower) {
-                        items.push('🔫'); // Orange gun (blue)
-                    } else {
-                        items.push('🔫'); // Default gun
-                    }
-                }
+    let gunHTML = '';
+    
+    if (this.hasSuperGun) {
+        gunHTML = '<span style="filter: brightness(0.3);">🔫</span>'; // Deep black for super gun
+    } else if (this.hasHammerPower) {
+        gunHTML = '<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>'; // Grey for hammer
+    } else if (this.hasOrangePower) {
+        gunHTML = '<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2);">🔫</span>'; // Blue for orange
+    } else {
+        gunHTML = '🔫'; // Default green
+    }
+    
+    // Add pulse animation if enhanced range
+    if (this.hasEnhancedRange) {
+        gunHTML = gunHTML.replace('🔫', '<span style="animation: gunPulsate 2s infinite; filter: drop-shadow(0 0 8px gold);">🔫</span>');
+    }
+    
+    items.push(gunHTML);
+}
                 if (this.hasFlashlight) items.push('🔦');
                 if (this.hasBoat) items.push('⛵');
                 if (this.hasKey) items.push('🔑');
-                if (this.hasHammer) items.push('🔨');
                 if (this.hasLavaShoes) items.push('🥾');
-                if (this.hasPencil) items.push('✏️');
-                if (this.hasPyramidKey) items.push('🗝️');
                 if (this.hasTrophy) items.push('🏆');
                 
                 if (!document.getElementById('items')) {
