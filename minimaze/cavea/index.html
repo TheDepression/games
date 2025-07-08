@@ -1187,6 +1187,9 @@ hearts.forEach(heart => {
             gameOver() {
                 this.deathCount++;
     this.updateDeathCounter();
+          
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
     this.gameStarted = false;
     this.isPaused = true;
     clearInterval(this.timerInterval);
