@@ -278,6 +278,21 @@
         .start-button:hover {
             background: #ff5722;
         }
+
+        .electric-line-segment {
+    position: absolute;
+    background: linear-gradient(45deg, #ff0000, #ff4444, #ff0000);
+    opacity: 0.9;
+    z-index: 100;
+    box-shadow: 0 0 15px red, inset 0 0 10px rgba(255,255,255,0.3);
+    border-radius: 2px;
+    animation: electricPulse 0.5s infinite alternate;
+}
+
+@keyframes electricPulse {
+    0% { opacity: 0.8; box-shadow: 0 0 15px red; }
+    100% { opacity: 1; box-shadow: 0 0 25px red, 0 0 35px rgba(255,0,0,0.5); }
+}
     </style>
 </head>
 <body>
@@ -383,6 +398,8 @@
                 
                 // Cave enemies
                 this.snakes = [];
+
+                this.electricLines = [];
                 
                 // Timer
                 this.timerInterval = null;
@@ -888,6 +905,77 @@
                 });
             }
 
+            createElectricLine() {
+    // Define electric line configurations
+    const lineConfigs = [
+        {
+            id: 'line1',
+            startX: 230,
+            startY: 30,
+            segments: [
+                { length: 70, direction: 'right' },  // top segment
+                { length: 70, direction: 'down' },   // right segment  
+                { length: 70, direction: 'left' },   // bottom segment
+                { length: 70, direction: 'up' }      // left segment
+            ],
+            thickness: 20,
+            speed: 1.5, // pixels per frame
+            currentSegment: 0,
+            progress: 0 // progress along current segment (0-1)
+        }
+        // Add more line configs here later
+    ];
+    
+    lineConfigs.forEach(config => {
+        this.createSingleElectricLine(config);
+    });
+}
+
+createSingleElectricLine(config) {
+    // Create segments for visualization
+    const segments = [];
+    let currentX = config.startX;
+    let currentY = config.startY;
+    
+    config.segments.forEach((segment, index) => {
+        const segmentEl = document.createElement('div');
+        segmentEl.className = 'electric-line-segment';
+        segmentEl.dataset.lineId = config.id;
+        segmentEl.dataset.segmentIndex = index;
+        
+        // Set segment dimensions based on direction
+        if (segment.direction === 'right' || segment.direction === 'left') {
+            segmentEl.style.width = segment.length + 'px';
+            segmentEl.style.height = config.thickness + 'px';
+        } else {
+            segmentEl.style.width = config.thickness + 'px';
+            segmentEl.style.height = segment.length + 'px';
+        }
+        
+        segmentEl.style.left = currentX + 'px';
+        segmentEl.style.top = currentY + 'px';
+        
+        this.gameWorld.appendChild(segmentEl);
+        segments.push(segmentEl);
+        
+        // Calculate next segment start position
+        switch(segment.direction) {
+            case 'right': currentX += segment.length; break;
+            case 'down': currentY += segment.length; break;
+            case 'left': currentX -= segment.length; break;
+            case 'up': currentY -= segment.length; break;
+        }
+    });
+    
+    // Add to electric lines array
+    this.electricLines.push({
+        ...config,
+        segments: segments,
+        headX: config.startX,
+        headY: config.startY
+    });
+}
+
             positionPlayer() {
                 // Center the 32x32 sprite around playerX, playerY
                 this.player.style.left = (this.playerX - 16) + 'px';
@@ -1322,13 +1410,13 @@
                 if (this.hasTrophy) items.push('🏆');
                 
                 if (!document.getElementById('items')) {
-                    const itemsDiv = document.createElement('div');
-                    itemsDiv.id = 'items';
-                    itemsDiv.textContent = '+' + (items.length > 0 ? items.join(' ') : '');
-                    document.getElementById('ui').appendChild(itemsDiv);
-                } else {
-                    document.getElementById('items').textContent = '+' + (items.length > 0 ? items.join(' ') : '');
-                }
+    const itemsDiv = document.createElement('div');
+    itemsDiv.id = 'items';
+    itemsDiv.innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+    document.getElementById('ui').appendChild(itemsDiv);
+} else {
+    document.getElementById('items').innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+}
             }
             
             showMessage(text) {
