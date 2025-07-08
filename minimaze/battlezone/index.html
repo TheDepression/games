@@ -2122,6 +2122,13 @@ updateWandererZombie(zombie) {
 }
 
 handleZombieVictory() {
+    // Remove all zombie elements
+    this.zombies.forEach(zombie => {
+        if (zombie.element) {
+            zombie.element.remove();
+        }
+    });
+    
    // Remove game area overlay (turn lights back on)
     const gameOverlay = document.getElementById('gameAreaOverlay');
     if (gameOverlay) {
@@ -2137,8 +2144,14 @@ handleZombieVictory() {
     document.getElementById('bossHP').style.display = 'none';
     
     setTimeout(() => {
-        this.showVictoryDialog();
-    }, 1500);
+        if (this.currentBattle <= 5) {
+            // Show next battle dialog
+            this.showNextBattleDialog();
+        } else {
+            // Final victory
+            this.showFinalVictory();
+        }
+    }, 2000);
 }
 
 updateSingleEnemy() {
