@@ -1972,6 +1972,9 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
             gameOver() {
                 this.deathCount++;
     this.updateDeathCounter();
+                
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
                 this.gameStarted = false;
                 this.isPaused = true;
                 if (this.timerInterval) clearInterval(this.timerInterval);
