@@ -3210,15 +3210,16 @@ if (this.hasBaby) itemsText += ' 👶🏻';
     }
     
     gameOver() {
+        this.deathCount++;
+    this.updateDeathCounter();
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
     clearInterval(this.timerInterval);
     this.gameStarted = false;
     this.bgMusic.pause();
     this.forestMusic.pause();
 
 
-        // Increment death count
-    this.deathCount++;
-    this.updateDeathCounter(); // Update display immediately
         
     // Keep timer running through death - it becomes a time penalty
     const timeAtDeath = this.timeElapsed;
