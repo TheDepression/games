@@ -2407,6 +2407,16 @@ handleZombieVictory() {
     // Hide zombie counter
     document.getElementById('bossHP').style.display = 'none';
 
+    // Position player for next battle intro
+    this.playerX = 400;
+    this.playerY = 160;
+    this.canMove = false;
+    this.battlePhase = 'victory';
+    
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+
     // INCREMENT THE BATTLE COUNTER HERE!
     this.currentBattle++;
     
