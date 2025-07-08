@@ -2380,6 +2380,9 @@ handleZombieVictory() {
     
     // Hide zombie counter
     document.getElementById('bossHP').style.display = 'none';
+
+    // INCREMENT THE BATTLE COUNTER HERE!
+    this.currentBattle++;
     
     setTimeout(() => {
         if (this.currentBattle <= 5) {
