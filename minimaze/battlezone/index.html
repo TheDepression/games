@@ -3592,6 +3592,8 @@ if (this.currentBattle === 4 && this.zombies) {
             gameOver() {
     this.deathCount++;
     this.updateDeathCounter();
+                / SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
     clearInterval(this.timerInterval);
     this.gameStarted = false;
     this.battleMusic.pause();
