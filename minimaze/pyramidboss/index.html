@@ -1037,6 +1037,9 @@ if (hitboxHit) {
                 // Increment death count immediately
     this.deathCount++;
     this.updateDeathCounter();
+               
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
                 this.gameStarted = false;
                 this.bossMusic.pause();
                 
