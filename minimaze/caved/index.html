@@ -726,19 +726,20 @@
         {x: 330, y: 210, w: 20, h: 140}
     ],
     snakes: [], // Remove snakes
-    electricLine: true // Add flag for electric line
+    electricLines: ['line1'] // Add this line
 },
                     '1,0': { // Room 1
-                        exits: ['w', 'e'], // west and east
-                        walls: [
-                            { x: 100, y: 80, w: 150, h: 20 },
-                            { x: 170, y: 250, w: 20, h: 80 }
-                        ],
-                        snakes: [
-                            { x: 200, y: 200, dir: 'vertical' },
-                            { x: 80, y: 150, dir: 'horizontal' }
-                        ]
-                    },
+    exits: ['w', 'e'], // west and east
+    walls: [
+        { x: 100, y: 80, w: 150, h: 20 },
+        { x: 170, y: 250, w: 20, h: 80 }
+    ],
+    snakes: [
+        { x: 200, y: 200, dir: 'vertical' },
+        { x: 80, y: 150, dir: 'horizontal' }
+    ],
+    electricLines: ['line2'] // Add this line
+},
                     '2,0': { // Room 2
                         exits: ['w', 'e'], // west and east
                         walls: [
@@ -810,6 +811,11 @@
                 layout.snakes.forEach(snake => {
                     this.createSnake(snake.x, snake.y, snake.dir);
                 });
+
+                // Add electric lines if specified for this room (add this after creating snakes)
+if (layout.electricLines) {
+    this.createElectricLinesForRoom(layout.electricLines);
+}
                 
                 // Add cave entrance/exit
                 if (roomX === 0 && roomY === 0) {
@@ -914,30 +920,47 @@
                 });
             }
 
-            createElectricLine() {
-    // Define electric line configurations
-    const lineConfigs = [
-        {
+            createElectricLinesForRoom(lineIds) {
+    // Define ALL possible electric line configurations
+    const allLineConfigs = {
+        'line1': {
             id: 'line1',
-            startX: 230,
-            startY: 30,
+            startX: 230, startY: 30,
             segments: [
-                { length: 70, direction: 'right' },  // top segment
-                { length: 70, direction: 'down' },   // right segment  
-                { length: 70, direction: 'left' },   // bottom segment
-                { length: 70, direction: 'up' }      // left segment
+                { length: 70, direction: 'right' },
+                { length: 70, direction: 'down' },
+                { length: 70, direction: 'left' },
+                { length: 70, direction: 'up' }
             ],
             thickness: 20,
-            speed: 1.5, // pixels per frame
-            currentSegment: 0,
-            progress: 0 // progress along current segment (0-1)
+            speed: 1.5
+        },
+        'line2': {
+            id: 'line2',
+            startX: 120, startY: 120,
+            segments: [
+                { length: 60, direction: 'down' },
+                { length: 120, direction: 'right' },
+                { length: 60, direction: 'up' },
+                { length: 120, direction: 'left' }
+            ],
+            thickness: 15,
+            speed: 2.0
         }
-        // Add more line configs here later
-    ];
+    };
     
-    lineConfigs.forEach(config => {
-        this.createSingleElectricLine(config);
+    // Create only the lines specified for this room
+    lineIds.forEach(lineId => {
+        const config = allLineConfigs[lineId];
+        if (config) {
+            this.createSingleElectricLine({
+                ...config,
+                currentSegment: 0,
+                progress: 0
+            });
+        }
     });
+}
 }
 
 createSingleElectricLine(config) {
