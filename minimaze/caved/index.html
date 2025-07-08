@@ -279,7 +279,7 @@
             background: #ff5722;
         }
 
-        .electric-line-segment {
+        .electric-snake-segment {
     position: absolute;
     background: linear-gradient(45deg, #ff0000, #ff4444, #ff0000);
     opacity: 0.9;
@@ -287,11 +287,8 @@
     box-shadow: 0 0 15px red, inset 0 0 10px rgba(255,255,255,0.3);
     border-radius: 2px;
     animation: electricPulse 0.5s infinite alternate;
-}
-
-@keyframes electricPulse {
-    0% { opacity: 0.8; box-shadow: 0 0 15px red; }
-    100% { opacity: 1; box-shadow: 0 0 25px red, 0 0 35px rgba(255,0,0,0.5); }
+    width: 20px;
+    height: 20px;
 }
     </style>
 </head>
@@ -922,88 +919,64 @@ if (layout.electricLines) {
             }
 
             createElectricLinesForRoom(lineIds) {
-    // Define ALL possible electric line configurations
     const allLineConfigs = {
         'line1': {
             id: 'line1',
-            startX: 220, startY: 30,
-            segments: [
-                { length: 70, direction: 'down' },
-                { length: 70, direction: 'right' },
-                { length: 70, direction: 'up' },
-                { length: 0, direction: 'left' }
+            path: [
+                {x: 230, y: 30}, {x: 300, y: 30}, // top edge
+                {x: 300, y: 100}, // right edge  
+                {x: 230, y: 100}, // bottom edge
+                {x: 230, y: 30}  // back to start
             ],
-            thickness: 20,
-            speed: 1.5
+            segmentSize: 20,
+            speed: 2,
+            bodyLength: 120, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
         },
         'line2': {
-            id: 'line2',
-            startX: 120, startY: 120,
-            segments: [
-                { length: 60, direction: 'down' },
-                { length: 120, direction: 'right' },
-                { length: 60, direction: 'up' },
-                { length: 120, direction: 'left' }
+            id: 'line2', 
+            path: [
+                {x: 120, y: 120}, {x: 120, y: 180}, // down
+                {x: 240, y: 180}, // right
+                {x: 240, y: 120}, // up  
+                {x: 120, y: 120}  // left back to start
             ],
-            thickness: 15,
-            speed: 2.0
+            segmentSize: 15,
+            speed: 1.5,
+            bodyLength: 100,
+            thickness: 15
         }
     };
     
-    // Create only the lines specified for this room
     lineIds.forEach(lineId => {
         const config = allLineConfigs[lineId];
         if (config) {
-            this.createSingleElectricLine({
-                ...config,
-                currentSegment: 0,
-                progress: 0
-            });
+            this.createMovingElectricSnake(config);
         }
     });
 }
-createSingleElectricLine(config) {
-    // Create segments for visualization
-    const segments = [];
-    let currentX = config.startX;
-    let currentY = config.startY;
+createMovingElectricSnake(config) {
+    // Calculate total path length
+    let totalLength = 0;
+    const pathSegments = [];
     
-    config.segments.forEach((segment, index) => {
-        const segmentEl = document.createElement('div');
-        segmentEl.className = 'electric-line-segment';
-        segmentEl.dataset.lineId = config.id;
-        segmentEl.dataset.segmentIndex = index;
-        
-        // Set segment dimensions based on direction
-        if (segment.direction === 'right' || segment.direction === 'left') {
-            segmentEl.style.width = segment.length + 'px';
-            segmentEl.style.height = config.thickness + 'px';
-        } else {
-            segmentEl.style.width = config.thickness + 'px';
-            segmentEl.style.height = segment.length + 'px';
-        }
-        
-        segmentEl.style.left = currentX + 'px';
-        segmentEl.style.top = currentY + 'px';
-        
-        this.gameWorld.appendChild(segmentEl);
-        segments.push(segmentEl);
-        
-        // Calculate next segment start position
-        switch(segment.direction) {
-            case 'right': currentX += segment.length; break;
-            case 'down': currentY += segment.length; break;
-            case 'left': currentX -= segment.length; break;
-            case 'up': currentY -= segment.length; break;
-        }
-    });
+    for (let i = 0; i < config.path.length - 1; i++) {
+        const start = config.path[i];
+        const end = config.path[i + 1];
+        const length = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+        pathSegments.push({ start, end, length, totalLengthBefore: totalLength });
+        totalLength += length;
+    }
     
-    // Add to electric lines array
     this.electricLines.push({
-        ...config,
-        segments: segments,
-        headX: config.startX,
-        headY: config.startY
+        id: config.id,
+        pathSegments: pathSegments,
+        totalPathLength: totalLength,
+        bodyLength: config.bodyLength,
+        speed: config.speed,
+        thickness: config.thickness,
+        headPosition: 0, // Position along total path (0 to totalLength)
+        segments: [] // Will hold DOM elements
     });
 }
 
@@ -1144,50 +1117,57 @@ createSingleElectricLine(config) {
     if (this.isPaused) return;
     
     this.electricLines.forEach(line => {
-        // Move along current segment
-        line.progress += line.speed / line.segments[line.currentSegment].length;
-        
-        // Check if we've completed current segment
-        if (line.progress >= 1) {
-            line.progress = 0;
-            line.currentSegment = (line.currentSegment + 1) % line.segments.length;
+        // Move head position
+        line.headPosition += line.speed;
+        if (line.headPosition >= line.totalPathLength) {
+            line.headPosition = 0; // Loop back to start
         }
         
-        // Calculate head position
-        this.calculateElectricLineHeadPosition(line);
+        // Clear old segments
+        line.segments.forEach(segment => segment.remove());
+        line.segments = [];
+        
+        // Create body segments behind the head
+        for (let i = 0; i < line.bodyLength; i += 10) { // Every 10 pixels
+            const segmentPosition = line.headPosition - i;
+            let actualPosition = segmentPosition;
+            
+            // Handle wraparound for tail
+            if (actualPosition < 0) {
+                actualPosition = line.totalPathLength + actualPosition;
+            }
+            
+            const coords = this.getPositionOnPath(line.pathSegments, actualPosition);
+            if (coords) {
+                const segment = document.createElement('div');
+                segment.className = 'electric-snake-segment';
+                segment.style.left = (coords.x - line.thickness/2) + 'px';
+                segment.style.top = (coords.y - line.thickness/2) + 'px';
+                segment.style.width = line.thickness + 'px';
+                segment.style.height = line.thickness + 'px';
+                this.gameWorld.appendChild(segment);
+                line.segments.push(segment);
+            }
+        }
     });
 }
-
-calculateElectricLineHeadPosition(line) {
-    // Start from the beginning and trace to current position
-    let currentX = line.startX;
-    let currentY = line.startY;
-    
-    // Complete previous segments
-    for (let i = 0; i < line.currentSegment; i++) {
-        const segment = line.segments[i];
-        switch(segment.direction) {
-            case 'right': currentX += segment.length; break;
-            case 'down': currentY += segment.length; break;
-            case 'left': currentX -= segment.length; break;
-            case 'up': currentY -= segment.length; break;
+getPositionOnPath(pathSegments, position) {
+    // Find which segment this position is on
+    for (let segment of pathSegments) {
+        if (position >= segment.totalLengthBefore && 
+            position <= segment.totalLengthBefore + segment.length) {
+            
+            const progressOnSegment = (position - segment.totalLengthBefore) / segment.length;
+            
+            return {
+                x: segment.start.x + (segment.end.x - segment.start.x) * progressOnSegment,
+                y: segment.start.y + (segment.end.y - segment.start.y) * progressOnSegment
+            };
         }
     }
-    
-    // Add progress on current segment
-    const currentSegment = line.segments[line.currentSegment];
-    const progressDistance = currentSegment.length * line.progress;
-    
-    switch(currentSegment.direction) {
-        case 'right': currentX += progressDistance; break;
-        case 'down': currentY += progressDistance; break;
-        case 'left': currentX -= progressDistance; break;
-        case 'up': currentY -= progressDistance; break;
-    }
-    
-    line.headX = currentX;
-    line.headY = currentY;
+    return null;
 }
+
             
             checkCollisions() {
                 if (this.isInvulnerable) return;
@@ -1198,37 +1178,22 @@ calculateElectricLineHeadPosition(line) {
                     right: this.playerX + 12,
                     bottom: this.playerY + 12
                 };
-                // Check electric line collisions (add this before snake collisions)
-    this.electricLines.forEach(line => {
-        // Check collision with head (moving part)
-        const headRect = {
-            left: line.headX - line.thickness/2,
-            top: line.headY - line.thickness/2,
-            right: line.headX + line.thickness/2,
-            bottom: line.headY + line.thickness/2
+                // In checkCollisions(), replace the electric line collision section:
+this.electricLines.forEach(line => {
+    line.segments.forEach(segment => {
+        const segmentRect = {
+            left: parseInt(segment.style.left),
+            top: parseInt(segment.style.top),
+            right: parseInt(segment.style.left) + parseInt(segment.style.width),
+            bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
         };
         
-        if (this.rectsOverlap(playerRect, headRect)) {
+        if (this.rectsOverlap(playerRect, segmentRect)) {
             this.instantDeath('⚡ Electrocuted!');
             return;
         }
-        
-        // Check collision with static segments
-        const segments = this.gameWorld.querySelectorAll(`[data-line-id="${line.id}"]`);
-        segments.forEach(segment => {
-            const segmentRect = {
-                left: parseInt(segment.style.left),
-                top: parseInt(segment.style.top),
-                right: parseInt(segment.style.left) + parseInt(segment.style.width),
-                bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
-            };
-            
-            if (this.rectsOverlap(playerRect, segmentRect)) {
-                this.instantDeath('⚡ Electrocuted!');
-                return;
-            }
-        });
     });
+});
                 // Check snake collisions
                 this.snakes.forEach(enemy => {
                     if (!enemy.alive) return;
