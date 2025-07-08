@@ -1042,12 +1042,14 @@ const distance = Math.sqrt(
             }
             
             defeat() {
+                this.deathCount++;
+    this.updateDeathCounter();
+                // SAVE IMMEDIATELY after death count increment
+    this.saveGameState();
                 clearInterval(this.timerInterval);
                 this.gameStarted = false;
                 this.bossMusic.pause();
-                
-                this.deathCount++;
-                
+              
                 // Save state with death count and time
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
