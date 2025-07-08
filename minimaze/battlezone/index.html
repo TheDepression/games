@@ -1354,6 +1354,30 @@ createCagedEnemy() {
         enemy.style.opacity = '1';
     }, 100);
 }
+    } else if (this.currentBattle === 5) {
+    // Shadow boss enemy - larger version of player
+    const enemy = document.createElement('div');
+    enemy.id = 'cagedEnemy';
+    enemy.style.position = 'absolute';
+    enemy.style.left = '350px';
+    enemy.style.top = '15px';
+    enemy.style.width = '64px';  // Double size
+    enemy.style.height = '64px';
+    enemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/s.PNG")';
+    enemy.style.backgroundSize = 'contain';
+    enemy.style.backgroundRepeat = 'no-repeat';
+    enemy.style.backgroundPosition = 'center';
+    enemy.style.filter = 'grayscale(100%) brightness(0.3)';
+    enemy.style.opacity = '0.8';
+    enemy.style.zIndex = '50';
+    enemy.style.transition = 'opacity 2s ease-in';
+    
+    this.gameWorld.appendChild(enemy);
+    
+    setTimeout(() => {
+        enemy.style.opacity = '1';
+    }, 100);
+}
 }
 
 openGate() {
@@ -1452,6 +1476,30 @@ enemyStepsForward() {
     forwardEnemy.style.zIndex = '200';
     
     this.gameWorld.appendChild(forwardEnemy);
+} else if (this.currentBattle === 5) {
+    // Remove caged enemy
+    const cagedEnemy = document.getElementById('cagedEnemy');
+    if (cagedEnemy) {
+        cagedEnemy.remove();
+    }
+    
+    // Create larger shadow enemy in front
+    const forwardEnemy = document.createElement('div');
+    forwardEnemy.id = 'forwardEnemy';
+    forwardEnemy.style.position = 'absolute';
+    forwardEnemy.style.left = '340px';
+    forwardEnemy.style.top = '40px';
+    forwardEnemy.style.width = '80px';  // Even bigger
+    forwardEnemy.style.height = '80px';
+    forwardEnemy.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/s.PNG")';
+    forwardEnemy.style.backgroundSize = 'contain';
+    forwardEnemy.style.backgroundRepeat = 'no-repeat';
+    forwardEnemy.style.backgroundPosition = 'center';
+    forwardEnemy.style.filter = 'grayscale(100%) brightness(0.3)';
+    forwardEnemy.style.opacity = '0.8';
+    forwardEnemy.style.zIndex = '200';
+    
+    this.gameWorld.appendChild(forwardEnemy);
 }
     // Close gate
     setTimeout(() => {
@@ -1511,8 +1559,8 @@ switch (this.currentBattle) {
         tauntMessage = 'Huh?! 🐸';
         break;
     case 5:
-        tauntMessage = 'Your final battle taunt here!';
-        break;
+    tauntMessage = 'The Bully made me,... to kill you!';
+    break;
     default:
         tauntMessage = 'GAME OVER, FROG!';
 }
@@ -1578,6 +1626,11 @@ setupBattle() {
     const explosionProjectiles = this.gameWorld.querySelectorAll('[class*="explosion-projectile"]');
     explosionProjectiles.forEach(proj => proj.remove());    
 } else if (this.currentBattle === 4) {
+    const forwardEnemy = document.getElementById('forwardEnemy');
+    if (forwardEnemy) {
+        forwardEnemy.remove();
+    }
+} else if (this.currentBattle === 5) {
     const forwardEnemy = document.getElementById('forwardEnemy');
     if (forwardEnemy) {
         forwardEnemy.remove();
@@ -1801,6 +1854,45 @@ createBattleEnemy() {
     setTimeout(() => {
         this.startLightsOutSequence();
     }, 1000); // Shorter delay since setupBattle already happened
+} else if (this.currentBattle === 5) {
+    // Shadow boss - enhanced player copy
+    const enemyEl = document.createElement('div');
+    enemyEl.className = 'enemy battle-enemy shadow-boss';
+    enemyEl.style.position = 'absolute';
+    enemyEl.style.left = '360px';
+    enemyEl.style.top = '200px';
+    enemyEl.style.width = '64px';   // Double player size
+    enemyEl.style.height = '64px';
+    enemyEl.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/s.PNG")';
+    enemyEl.style.backgroundSize = 'contain';
+    enemyEl.style.backgroundRepeat = 'no-repeat';
+    enemyEl.style.backgroundPosition = 'center';
+    enemyEl.style.filter = 'grayscale(100%) brightness(0.3)';
+    enemyEl.style.opacity = '0.8';
+    enemyEl.style.zIndex = '150';
+    
+    this.gameWorld.appendChild(enemyEl);
+    
+    this.enemy = {
+        element: enemyEl,
+        currentX: 360,
+        currentY: 200,
+        hp: 800,
+        maxHp: 800,
+        alive: true,
+        speed: 2.0,
+        targetX: 360,
+        targetY: 200,
+        jukeTimer: 0,
+        attackTimer: 200, // 3.3 seconds at 60fps
+        projectiles: [],
+        currentDirection: 'n',
+        lastMoveDirection: 'n'
+    };
+    
+    // Show HP display
+    document.getElementById('bossHP').style.display = 'block';
+    document.getElementById('bossHP').textContent = `${this.enemy.hp}/${this.enemy.maxHp}`;
 }
 }
 
@@ -2027,9 +2119,156 @@ updateBattleEnemy() {
     this.updateDrBear();
 } else if (this.currentBattle === 4) {
     this.updateZombies();
+} else if (this.currentBattle === 5) {
+    this.updateShadowBoss();
 }
 }
 
+
+updateShadowBoss() {
+    if (!this.enemy || !this.enemy.alive) return;
+    
+    // Similar to single enemy but tracks direction and shoots purple blasts
+    this.enemy.jukeTimer--;
+    if (this.enemy.jukeTimer <= 0) {
+        const playerDistance = Math.sqrt(
+            Math.pow(this.playerX - this.enemy.currentX, 2) + 
+            Math.pow(this.playerY - this.enemy.currentY, 2)
+        );
+        
+        if (playerDistance > 100) {
+            // Move towards player with juke
+            const angle = Math.atan2(this.playerY - this.enemy.currentY, this.playerX - this.enemy.currentX);
+            const jukeAngle = angle + (Math.random() - 0.5) * Math.PI * 0.4;
+            
+            this.enemy.targetX = this.enemy.currentX + Math.cos(jukeAngle) * 80;
+            this.enemy.targetY = this.enemy.currentY + Math.sin(jukeAngle) * 80;
+        } else {
+            // Random movement when close
+            this.enemy.targetX = this.enemy.currentX + (Math.random() - 0.5) * 120;
+            this.enemy.targetY = this.enemy.currentY + (Math.random() - 0.5) * 120;
+        }
+        
+        this.enemy.jukeTimer = 60 + Math.random() * 60;
+    }
+    
+    // Update direction based on movement
+    const deltaX = this.enemy.targetX - this.enemy.currentX;
+    const deltaY = this.enemy.targetY - this.enemy.currentY;
+    
+    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+        const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+        if (newDirection !== this.enemy.currentDirection) {
+            this.enemy.currentDirection = newDirection;
+            this.enemy.element.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${newDirection}.PNG")`;
+        }
+    }
+    
+    // Move towards target
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    if (distance > 5) {
+        this.enemy.currentX += (deltaX / distance) * this.enemy.speed;
+        this.enemy.currentY += (deltaY / distance) * this.enemy.speed;
+    }
+    
+    // Keep in bounds
+    this.enemy.currentX = Math.max(120, Math.min(680, this.enemy.currentX));
+    this.enemy.currentY = Math.max(120, Math.min(680, this.enemy.currentY));
+    
+    this.enemy.element.style.left = this.enemy.currentX + 'px';
+    this.enemy.element.style.top = this.enemy.currentY + 'px';
+    
+    // Shoot every 3.3 seconds
+    this.enemy.attackTimer--;
+    if (this.enemy.attackTimer <= 0) {
+        this.shadowBossAttack();
+        this.enemy.attackTimer = 200; // 3.3 seconds
+    }
+    
+    // Update projectiles
+    this.updateProjectiles();
+    
+    // Check contact (2 hearts damage)
+    this.checkShadowBossContact();
+}
+
+        shadowBossAttack() {
+    // Create purple blast effect
+    const attackEl = document.createElement('div');
+    attackEl.style.position = 'absolute';
+    attackEl.style.pointerEvents = 'none';
+    attackEl.style.zIndex = '400';
+    attackEl.style.animation = 'slashEffect 0.3s ease-out';
+    attackEl.style.width = '90px';  // Enhanced range
+    attackEl.style.height = '90px';
+    attackEl.style.background = 'radial-gradient(circle, rgba(128,0,128,0.8) 0%, rgba(75,0,130,0.4) 70%, transparent 100%)'; // Purple
+    attackEl.style.borderRadius = '50%';
+    
+    const directionOffsets = {
+        'n': {x: 0, y: -45}, 'ne': {x: 32, y: -32}, 'e': {x: 45, y: 0}, 'se': {x: 32, y: 32},
+        's': {x: 0, y: 45}, 'sw': {x: -32, y: 32}, 'w': {x: -45, y: 0}, 'nw': {x: -32, y: -32}
+    };
+    
+    const offset = directionOffsets[this.enemy.currentDirection];
+    attackEl.style.left = (this.enemy.currentX + offset.x - 45 + 32) + 'px';
+    attackEl.style.top = (this.enemy.currentY + offset.y - 45 + 32) + 'px';
+    
+    this.gameWorld.appendChild(attackEl);
+    
+    setTimeout(() => {
+        if (attackEl.parentNode) {
+            attackEl.remove();
+        }
+    }, 300);
+
+    // Check if attack hits player
+    const attackX = this.enemy.currentX + offset.x + 32;
+    const attackY = this.enemy.currentY + offset.y + 32;
+    
+    const attackRect = {
+        left: attackX - 45,
+        top: attackY - 45,
+        right: attackX + 45,
+        bottom: attackY + 45
+    };
+    
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    if (this.rectsOverlap(attackRect, playerRect)) {
+        this.takeDamage(2); // 2 hearts damage
+    }
+}
+
+checkShadowBossContact() {
+    if (!this.enemy || !this.enemy.alive || this.isInvulnerable) return;
+    
+    const playerRect = {
+        left: this.playerX,
+        top: this.playerY,
+        right: this.playerX + 24,
+        bottom: this.playerY + 24
+    };
+    
+    const enemyRect = {
+        left: this.enemy.currentX,
+        top: this.enemy.currentY,
+        right: this.enemy.currentX + 64,
+        bottom: this.enemy.currentY + 64
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage(2); // 2 hearts damage from contact
+    }
+}
+
+
+
+        
             updateZombies() {
     if (this.battlePhase !== 'fighting') return;
     
