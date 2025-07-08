@@ -925,12 +925,12 @@ if (layout.electricLines) {
     const allLineConfigs = {
         'line1': {
             id: 'line1',
-            startX: 230, startY: 30,
+            startX: 220, startY: 30,
             segments: [
-                { length: 70, direction: 'right' },
                 { length: 70, direction: 'down' },
-                { length: 70, direction: 'left' },
-                { length: 70, direction: 'up' }
+                { length: 70, direction: 'right' },
+                { length: 70, direction: 'up' },
+                { length: 0, direction: 'left' }
             ],
             thickness: 20,
             speed: 1.5
@@ -1267,7 +1267,7 @@ calculateElectricLineHeadPosition(line) {
     this.showMessage(message);
     setTimeout(() => {
         this.gameOver();
-    }, 1000);
+    }, 500);
 }
             
             checkRoomTransitions() {
@@ -1408,7 +1408,7 @@ calculateElectricLineHeadPosition(line) {
                     gameState.timeElapsed = this.timeElapsed;
                     gameState.deathCount = this.deathCount;
                     gameState.playerX = 960;  // Back to weak point entrance in maze2
-                    gameState.playerY = 2360;
+                    gameState.playerY = 2300;
                     gameState.currentUrl = 'maze2';
                     localStorage.setItem('mfGameState', JSON.stringify(gameState));
                     
