@@ -706,19 +706,28 @@
                 this.gameWorld.innerHTML = '<div id="player"></div>';
                 this.player = document.getElementById('player');
                 this.snakes = [];
+                this.electricLines = []; // Add this line
                 
                 // Define room layouts - horizontal chain with secret room
                 const roomLayouts = {
                     '0,0': { // Starting room
-                        exits: ['e'], // only east
-                        walls: [
-                            { x: 80, y: 100, w: 20, h: 150 },
-                            { x: 250, y: 200, w: 20, h: 100 }
-                        ],
-                        snakes: [
-                            { x: 120, y: 180, dir: 'horizontal' }
-                        ]
-                    },
+    exits: ['e'], // only east
+    walls: [
+        {x: 80, y: 70, w: 180, h: 10},
+        {x: 260, y: 70, w: 10, h: 70},
+        {x: 260, y: 210, w: 10, h: 70},
+        {x: 80, y: 70, w: 10, h: 120},
+        {x: 80, y: 180, w: 50, h: 10},
+        {x: 130, y: 180, w: 10, h: 60},
+        {x: 80, y: 240, w: 50, h: 10},
+        {x: 80, y: 240, w: 10, h: 50},
+        {x: 80, y: 290, w: 50, h: 10},
+        {x: 190, y: 150, w: 10, h: 200},
+        {x: 330, y: 210, w: 20, h: 140}
+    ],
+    snakes: [], // Remove snakes
+    electricLine: true // Add flag for electric line
+},
                     '1,0': { // Room 1
                         exits: ['w', 'e'], // west and east
                         walls: [
