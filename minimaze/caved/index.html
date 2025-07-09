@@ -1160,7 +1160,7 @@ createMovingElectricSnake(config) {
         line.segments = [];
         
         // Create body segments behind the head
-        for (let i = 0; i < line.bodyLength; i += 20) { // Every 20 pixels - half the segments!
+        for (let i = 0; i < line.bodyLength; i += 15) { // Every 15 pixels
             const segmentPosition = line.headPosition - i;
             let actualPosition = segmentPosition;
             
