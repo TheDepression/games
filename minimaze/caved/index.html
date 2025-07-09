@@ -714,8 +714,10 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
     exits: ['e'], // only east
     walls: [
         {x: 80, y: 70, w: 180, h: 10},
+        {x: 80, y: 70, w: 50, h: 50},
         {x: 260, y: 70, w: 10, h: 70},
-        {x: 260, y: 210, w: 10, h: 70},
+        {x: 230, y: 210, w: 30, h: 70},
+        {x: 300, y: 210, w: 20, h: 140},
         {x: 80, y: 70, w: 10, h: 120},
         {x: 80, y: 180, w: 50, h: 10},
         {x: 130, y: 180, w: 10, h: 60},
@@ -935,7 +937,7 @@ if (layout.electricLines) {
             segmentSize: 20,
             speed: 2,
             bodyLength: 120, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
+            thickness: 30
         },
         'line2': {
             id: 'line2', 
@@ -961,20 +963,20 @@ if (layout.electricLines) {
             segmentSize: 25,
             speed: 2.6,
             bodyLength: 320, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
+            thickness: 30
         },
         'line1c': {
             id: 'line1c',
             path: [
-                {x: 210, y: 190}, {x: 210, y: 300}, // down
+                {x: 220, y: 190}, {x: 220, y: 300}, // down
                 {x: 290, y: 300}, // right edge  
                 {x: 290, y: 190}, // return up
-                {x: 210, y: 190}  // left back to start
+                {x: 220, y: 190}  // left back to start
             ],
             segmentSize: 25,
             speed: 2.2,
-            bodyLength: 250, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
+            bodyLength: 220, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 15
         }
     };
     
