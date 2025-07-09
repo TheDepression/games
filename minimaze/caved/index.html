@@ -1727,6 +1727,43 @@ this.electricLines.forEach(line => {
                         this.takeDamage();
                     }
                 });
+
+                // ADD THIS SECTION - Item collision detection
+    this.items.forEach(item => {
+        if (item.collected) return;
+        
+        const itemRect = {
+            left: item.x,
+            top: item.y,
+            right: item.x + item.width,
+            bottom: item.y + item.height
+        };
+        
+        if (this.rectsOverlap(playerRect, itemRect)) {
+            item.collected = true;
+            item.element.remove();
+            
+            if (item.type === 'money') {
+                this.tempMoney += item.value;
+                this.showMessage(`💰 +${item.value}¥ (temporary)`);
+                
+                // Track temporary collection
+                if (item.id) {
+                    this.tempCollectedItems.push(item.id);
+                }
+            } else if (item.type === 'purpleHeart') {
+                this.tempMaxHearts += item.value;
+                this.showMessage('💜 Max Hearts +1! (temporary)');
+                
+                // Track temporary collection
+                if (item.id) {
+                    this.tempCollectedPurpleHearts.push(item.id);
+                }
+            }
+            
+            this.updateUI();
+        }
+    });
                 
                 // Check cave exit collision
                 const exits = this.gameWorld.querySelectorAll('.exit-light');
