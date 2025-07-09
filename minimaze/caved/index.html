@@ -741,22 +741,22 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
         { x: 290, y: 220, w: 60, h: 137.5 },
         { x: 110, y: 60, w: 130, h: 240 }
     ],
-    snakes: [
-        { x: 200, y: 200, dir: 'vertical' },
-        { x: 80, y: 150, dir: 'horizontal' }
-    ],
+    snakes: [],
     electricLines: ['line2'] // Add this line
 },
                     '2,0': { // Room 2
                         exits: ['w', 'e'], // west and east
                         walls: [
-                            { x: 50, y: 150, w: 100, h: 20 },
-                            { x: 200, y: 100, w: 20, h: 200 }
+                            { x: 0, y: 0, w: 120, h: 120 },
+                            { x: 220, y: 0, w: 120, h: 120 },
+                            { x: 220, y: 230, w: 130, h: 127.5 },
+                            { x: 0, y: 230, w: 120, h: 127.5 }
                         ],
                         snakes: [
-                            { x: 120, y: 250, dir: 'horizontal' },
-                            { x: 280, y: 180, dir: 'vertical' }
-                        ]
+                            { x: 110, y: 40, dir: 'horizontal' },
+                            { x: 110, y: 290, dir: 'horizontal' }
+                        ],
+                        electricLines: ['line3']
                     },
                     '3,0': { // Room 3 - has secret passage south
                         exits: ['w', 'e', 'secret_s'], // west, east, secret south
@@ -954,7 +954,7 @@ if (layout.electricLines) {
             ],
             segmentSize: 20,
             speed: 1.5,
-            bodyLength: 800,
+            bodyLength: 810,
             thickness: 20
         },
         'line1b': {
@@ -982,6 +982,19 @@ if (layout.electricLines) {
             speed: 3.2,
             bodyLength: 220, // Length of the electric snake body (shorter = bigger gap)
             thickness: 15
+        },
+        'line3': {
+            id: 'line3',
+            path: [
+                {x: 110, y: 110}, {x: 220, y: 110}, // right to
+                {x: 220, y: 220}, // down to   
+                {x: 110, y: 220}, // left to 
+                {x: 110, y: 110}  // up back to start
+            ],
+            segmentSize: 25,
+            speed: 4.0,
+            bodyLength: 330, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 25
         }
     };
     
