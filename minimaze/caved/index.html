@@ -924,7 +924,7 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                             { x: 210, y: 337.5, w: 140, h: 20 }
                         ],
                         snakes: [
-                            { x: 185, y: 270, dir: 'horizontal' }
+                            { x: 200, y: 240, dir: 'horizontal' }
                         ],
                         electricLines: ['line4a', 'line4b', 'line4c']
                     },
@@ -998,7 +998,7 @@ this.items = [];
 // Add NPCs and items based on room
 if (roomX === 0 && roomY === 0) {
     // Entrance room
-    this.createNPC(70, 35, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
+    this.createNPC(80, 30, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
     this.createItem(120, 300, 'money', 300);
 }
 
