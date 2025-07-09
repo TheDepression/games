@@ -753,8 +753,8 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                             { x: 0, y: 230, w: 120, h: 127.5 }
                         ],
                         snakes: [
-                            { x: 110, y: 40, dir: 'horizontal' },
-                            { x: 110, y: 290, dir: 'horizontal' }
+                            { x: 110, y: 25, dir: 'horizontal' },
+                            { x: 110, y: 295, dir: 'horizontal' }
                         ],
                         electricLines: ['line3']
                     },
@@ -991,10 +991,10 @@ if (layout.electricLines) {
                 {x: 110, y: 220}, // left to 
                 {x: 110, y: 110}  // up back to start
             ],
-            segmentSize: 25,
-            speed: 4.0,
+            segmentSize: 20,
+            speed: 3.7,
             bodyLength: 330, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 25
+            thickness: 20
         }
     };
     
