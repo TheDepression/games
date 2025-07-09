@@ -1924,14 +1924,6 @@ this.electricLines.forEach(line => {
     this.showMessage('🌅 Exiting cave...');
     
     setTimeout(() => {
-        // Save temporary items permanently
-        this.money += this.tempMoney;
-        this.maxHearts += this.tempMaxHearts;
-        
-        // Auto-heal to new max hearts (like maze2 does)
-        if (this.tempMaxHearts > 0) {
-            this.hearts = this.maxHearts; // Set to the new maximum
-        }
         
         // Apply temporary gains permanently
 this.money += this.tempMoney;
