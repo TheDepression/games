@@ -1414,50 +1414,6 @@ createMovingElectricSnake(config) {
     }
 }
 
-checkItemCollisions() {
-    const playerRect = {
-        left: this.playerX - 12,
-        top: this.playerY - 12,
-        right: this.playerX + 12,
-        bottom: this.playerY + 12
-    };
-    
-    this.items.forEach(item => {
-        if (item.collected) return;
-        
-        const itemRect = {
-            left: item.x,
-            top: item.y,
-            right: item.x + item.width,
-            bottom: item.y + item.height
-        };
-        
-        if (this.rectsOverlap(playerRect, itemRect)) {
-            item.collected = true;
-            item.element.remove();
-            
-            if (item.type === 'money') {
-                this.tempMoney += item.value;
-                this.showMessage(`💰 +${item.value}¥ (temporary)`);
-                
-                // Track temporary collection
-                if (item.id) {
-                    this.tempCollectedItems.push(item.id);
-                }
-            } else if (item.type === 'purpleHeart') {
-                this.tempMaxHearts += item.value;
-                this.showMessage('💜 Max Hearts +1! (temporary)');
-                
-                // Track temporary collection
-                if (item.id) {
-                    this.tempCollectedPurpleHearts.push(item.id);
-                }
-            }
-            
-            this.updateUI();
-        }
-    });
-}
 
             showNPCMessage(message) {
     if (this.currentNpcMessage === message) return;
@@ -1754,14 +1710,22 @@ this.electricLines.forEach(line => {
             item.element.remove();
             
             if (item.type === 'money') {
-                this.tempMoney += item.value;
-                this.showMessage(`💰 +${item.value}¥ (temporary)`);
-                
-                // Track temporary collection
-                if (item.id) {
-                    this.tempCollectedItems.push(item.id);
-                }
-            } else if (item.type === 'purpleHeart') {
+    this.tempMoney += item.value;
+    this.showMessage(`💰 +${item.value}¥ (temporary)`);
+    
+    // Set the boolean flag
+    if (item.id) {
+        this[item.id] = true;
+    }
+} else if (item.type === 'purpleHeart') {
+    this.tempMaxHearts += item.value;
+    this.showMessage('💜 Max Hearts +1! (temporary)');
+    
+    // Set the boolean flag
+    if (item.id) {
+        this[item.id] = true;
+    }
+} else if (item.type === 'purpleHeart') {
                 this.tempMaxHearts += item.value;
                 this.showMessage('💜 Max Hearts +1! (temporary)');
                 
@@ -1969,13 +1933,18 @@ this.electricLines.forEach(line => {
             this.hearts = this.maxHearts; // Set to the new maximum
         }
         
-        // Move temporary collections to permanent
-        this.permanentCollectedItems.push(...this.tempCollectedItems);
-        this.permanentCollectedPurpleHearts.push(...this.tempCollectedPurpleHearts);
+        // Apply temporary gains permanently
+this.money += this.tempMoney;
+this.maxHearts += this.tempMaxHearts;
 
-        // Clear temp arrays
-this.tempCollectedItems = [];
-this.tempCollectedPurpleHearts = [];
+// Auto-heal to new max hearts if gained any
+if (this.tempMaxHearts > 0) {
+    this.hearts = this.maxHearts;
+}
+
+// Clear temporary counters (flags stay true)
+this.tempMoney = 0;
+this.tempMaxHearts = 0;
         
         
         // SAVE THE GAME STATE BEFORE MODIFYING IT
