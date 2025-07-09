@@ -1038,25 +1038,26 @@ createMovingElectricSnake(config) {
                 });
             }
             
-            const gameLoop = () => {
-    if (this.gameStarted && !this.isTransitioning) {
-        this.frameCount++; // Add this line
-        
-        this.updatePlayer();
-        this.updateSnakes();
-        
-        // Only update electric lines every 2nd frame
-        if (this.frameCount % 2 === 0) {
-            this.updateElectricLines();
-        }
-        
-        this.checkCollisions();
-        this.checkRoomTransitions();
-    }
-    requestAnimationFrame(gameLoop);
-};
-                gameLoop();
+            startGameLoop() {
+    const gameLoop = () => {
+        if (this.gameStarted && !this.isTransitioning) {
+            this.frameCount++; // Increment frame counter
+            
+            this.updatePlayer();
+            this.updateSnakes();
+            
+            // Only update electric lines every 2nd frame
+            if (this.frameCount % 2 === 0) {
+                this.updateElectricLines();
             }
+            
+            this.checkCollisions();
+            this.checkRoomTransitions();
+        }
+        requestAnimationFrame(gameLoop);
+    };
+    gameLoop();
+}
             
             updatePlayer() {
                 if (this.isPaused) return;
