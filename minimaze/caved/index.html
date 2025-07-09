@@ -1961,6 +1961,12 @@ this.electricLines.forEach(line => {
         // Move temporary collections to permanent
         this.permanentCollectedItems.push(...this.tempCollectedItems);
         this.permanentCollectedPurpleHearts.push(...this.tempCollectedPurpleHearts);
+
+        // ADD THESE LINES:
+this.tempCollectedItems = [];
+this.tempCollectedPurpleHearts = [];
+this.tempMoney = 0;
+this.tempMaxHearts = 0;
         
         // SAVE THE GAME STATE BEFORE MODIFYING IT
         this.saveGameState();
