@@ -715,7 +715,7 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
     walls: [
         {x: 80, y: 70, w: 180, h: 10},
         {x: 80, y: 70, w: 50, h: 50},
-        {x: 260, y: 70, w: 10, h: 70},
+        {x: 270, y: 70, w: 10, h: 50},
         {x: 230, y: 210, w: 30, h: 70},
         {x: 300, y: 210, w: 20, h: 140},
         {x: 80, y: 70, w: 10, h: 120},
@@ -929,15 +929,15 @@ if (layout.electricLines) {
         'line1': {
             id: 'line1',
             path: [
-                {x: 220, y: 30}, {x: 220, y: 100}, // down
+                {x: 220, y: 50}, {x: 220, y: 100}, // down
                 {x: 300, y: 100}, // right edge  
-                {x: 300, y: 30}, // return up
-                {x: 220, y: 30}  // left back to start
+                {x: 300, y: 50}, // return up
+                {x: 220, y: 50}  // left back to start
             ],
             segmentSize: 20,
             speed: 2,
-            bodyLength: 120, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 30
+            bodyLength: 100, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
         },
         'line2': {
             id: 'line2', 
