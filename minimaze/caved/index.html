@@ -999,13 +999,13 @@ this.items = [];
 if (roomX === 0 && roomY === 0) {
     // Entrance room
     this.createNPC(80, 30, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
-    this.createItem(120, 300, 'money', 300);
+    this.createItem(240, 300, 'money', 300);
 }
 
-if (roomX === 1 && roomY === 0) {
+if (roomX === 2 && roomY === 0) {
     // Room 1
-    this.createItem(80, 200, 'money', 300);
-    this.createItem(280, 150, 'money', 300);
+    this.createItem(175, 35, 'money', 300);
+    this.createItem(175, 320, 'money', 300);
 }
 
 if (roomX === 3 && roomY === -1) {
@@ -1018,6 +1018,7 @@ if (roomX === 3 && roomY === -1) {
     this.createItem(150, 280, 'money', 300);
     this.createItem(220, 250, 'money', 300);
     this.createItem(280, 200, 'purpleHeart', 1);
+    this.createItem(250, 200, 'purpleHeart', 1);
 }
 
 if (roomX === 5 && roomY === 0) {
@@ -1151,14 +1152,16 @@ if (layout.electricLines) {
         'line2': {
             id: 'line2', 
             path: [
-                {x: 80, y: 30}, {x: 270, y: 30}, // right to
-                {x: 270, y: 320}, // down to
-                {x: 80, y: 320}, // left to  
-                {x: 80, y: 30}  // up back to start
+                
+                {x: 270, y: 30}, {x: 270, y: 320},  // down to
+                 {x: 80, y: 320}, // left to  
+                 {x: 80, y: 30}, //up
+                 {x: 270, y: 30}  // right to base
+               
             ],
             segmentSize: 20,
-            speed: 2.2,
-            bodyLength: 780,
+            speed: 2.4,
+            bodyLength: 730,
             thickness: 20
         },
         'line1b': {
@@ -1196,8 +1199,8 @@ if (layout.electricLines) {
                 {x: 110, y: 110}  // up back to start
             ],
             segmentSize: 20,
-            speed: 3.5,
-            bodyLength: 330, // Length of the electric snake body (shorter = bigger gap)
+            speed: 3.2,
+            bodyLength: 300, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         },
         'line4a': {
@@ -1243,7 +1246,7 @@ if (layout.electricLines) {
             ],
             segmentSize: 20,
             speed: 2.0,
-            bodyLength: 200, // Length of the electric snake body (shorter = bigger gap)
+            bodyLength: 170, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         },
         'line5b': {
@@ -1255,8 +1258,8 @@ if (layout.electricLines) {
                 {x: 200, y: 40}  // left back to start
             ],
             segmentSize: 20,
-            speed: 2.4,
-            bodyLength: 120, // Length of the electric snake body (shorter = bigger gap)
+            speed: 2.0,
+            bodyLength: 100, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         },
         'line5c': {
@@ -1269,7 +1272,7 @@ if (layout.electricLines) {
             ],
             segmentSize: 20,
             speed: 2.0,
-            bodyLength: 200, // Length of the electric snake body (shorter = bigger gap)
+            bodyLength: 170, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         },
         'line5d': {
@@ -1281,8 +1284,8 @@ if (layout.electricLines) {
                 {x: 200, y: 250}  // left back to start
             ],
             segmentSize: 20,
-            speed: 2.4,
-            bodyLength: 120, // Length of the electric snake body (shorter = bigger gap)
+            speed: 2.0,
+            bodyLength: 100, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         }
     };
