@@ -1058,26 +1058,14 @@ this.items = [];
 if (roomX === 0 && roomY === 0) {
     // Entrance room
     this.createNPC(80, 30, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
-    this.createItem(240, 300, 'money', 300);
 }
 
-if (roomX === 2 && roomY === 0) {
-    // Room 1
-    this.createItem(175, 35, 'money', 300);
-    this.createItem(175, 320, 'money', 300);
-}
 
 if (roomX === 3 && roomY === -1) {
     // Secret room
     this.createNPC(100, 100, '🐷', 'how did you find our secret room! darn it!');
     this.createNPC(200, 100, '😎', 'take the purple hearts... I dont need them... please beat the bully and save us!');
     this.createNPC(150, 200, '', 'you cleared the pyramid. now it is time to clear the castle. go get that bully!!', false, 'https://raw.githubusercontent.com/TheDepression/Photos/main/hinapink-min.png');
-    
-    this.createItem(80, 250, 'money', 300);
-    this.createItem(150, 280, 'money', 300);
-    this.createItem(220, 250, 'money', 300);
-    this.createItem(280, 200, 'purpleHeart', 1);
-    this.createItem(250, 200, 'purpleHeart', 1);
 }
 
 if (roomX === 5 && roomY === 0) {
