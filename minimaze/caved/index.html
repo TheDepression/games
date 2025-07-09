@@ -389,8 +389,6 @@
     this.tempMaxHearts = 0; // Temporary max hearts from cave
                 this.tempCollectedItems = []; // Track items collected in current cave session
     this.tempCollectedPurpleHearts = []; // Track purple hearts collected in current cave session
-    this.permanentCollectedItems = []; // Items permanently collected from previous successful exits
-    this.permanentCollectedPurpleHearts = []; // Purple hearts permanently collected
                 
                 // Gun system from maze2
                 this.attackCooldown = false;
@@ -1962,11 +1960,10 @@ this.electricLines.forEach(line => {
         this.permanentCollectedItems.push(...this.tempCollectedItems);
         this.permanentCollectedPurpleHearts.push(...this.tempCollectedPurpleHearts);
 
-        // ADD THESE LINES:
+        // Clear temp arrays
 this.tempCollectedItems = [];
 this.tempCollectedPurpleHearts = [];
-this.tempMoney = 0;
-this.tempMaxHearts = 0;
+        
         
         // SAVE THE GAME STATE BEFORE MODIFYING IT
         this.saveGameState();
