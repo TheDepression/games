@@ -1962,13 +1962,15 @@ this.electricLines.forEach(line => {
         this.permanentCollectedItems.push(...this.tempCollectedItems);
         this.permanentCollectedPurpleHearts.push(...this.tempCollectedPurpleHearts);
         
+        // SAVE THE GAME STATE BEFORE MODIFYING IT
         this.saveGameState();
         
         const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-        gameState.playerX = 960;  // Back to weak point entrance in maze2
+        gameState.playerX = 960;
         gameState.playerY = 2300;
         gameState.currentUrl = 'maze2';
         
+        // SAVE AGAIN WITH THE NEW POSITION
         localStorage.setItem('mfGameState', JSON.stringify(gameState));
         
         window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
