@@ -1444,6 +1444,15 @@ this.playerVelocityY = deltaY * sensitivity;
         const gameState = JSON.parse(savedState);
         this.collectedBanana = gameState.collectedBanana || false;
         this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
+        // Add this to maze2's loadGameState() function:
+this.caveDMoney1 = gameState.caveDMoney1 || false;
+this.caveDMoney2 = gameState.caveDMoney2 || false;
+this.caveDMoney3 = gameState.caveDMoney3 || false;
+this.caveDMoney4 = gameState.caveDMoney4 || false;
+this.caveDMoney5 = gameState.caveDMoney5 || false;
+this.caveDMoneyEntrance = gameState.caveDMoneyEntrance || false;
+this.caveDPurple1 = gameState.caveDPurple1 || false;
+this.caveDPurple2 = gameState.caveDPurple2 || false;
         
         // Load shop purchases
         this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
@@ -1515,6 +1524,14 @@ collectedPurpleHearts: this.collectedPurpleHearts,
 hasOrangePower: this.hasOrangePower,
                     attackDamage: this.attackDamage,
                     hasSuperGunTicket: this.hasSuperGunTicket,
+                    caveDMoney1: this.caveDMoney1,
+caveDMoney2: this.caveDMoney2,
+caveDMoney3: this.caveDMoney3,
+caveDMoney4: this.caveDMoney4,
+caveDMoney5: this.caveDMoney5,
+caveDMoneyEntrance: this.caveDMoneyEntrance,
+caveDPurple1: this.caveDPurple1,
+caveDPurple2: this.caveDPurple2,
                     // Add these lines in saveGameState() after existing properties
 purpleHeartsSold: this.purpleHeartsSold,
 hasSuperGun: this.hasSuperGun,
@@ -1525,6 +1542,7 @@ hasHammerPower: this.hasHammerPower,
 gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
 catFirstDialogComplete: this.catFirstDialogComplete,
 weakPointsBlasted: this.weakPointsBlasted,
+                    
                     
                     playerX: this.playerX,
                     playerY: this.playerY,
