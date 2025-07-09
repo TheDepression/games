@@ -379,6 +379,14 @@
                 this.lastDragX = 0;
                 this.lastDragY = 0;
                 this.currentDirection = 's'; // Start facing south (into cave)
+
+                this.npcs = [];
+    this.items = [];
+    this.npcMessageTimeout = null;
+    this.currentNpcMessage = null;
+    this.mamiKeyLastInteraction = 0;
+    this.tempMoney = 0; // Temporary money from cave (not saved on death)
+    this.tempMaxHearts = 0; // Temporary max hearts from cave
                 
                 // Gun system from maze2
                 this.attackCooldown = false;
@@ -702,6 +710,144 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                 else if (angle >= 247.5 && angle < 292.5) return 'n';
                 else return 'ne';
             }
+
+            createNPC(x, y, emoji, message, isSpecial = false, imageSrc = null) {
+    const npc = document.createElement('div');
+    npc.style.position = 'absolute';
+    npc.style.left = x + 'px';
+    npc.style.top = y + 'px';
+    npc.style.width = '32px';
+    npc.style.height = '32px';
+    npc.style.fontSize = '28px';
+    npc.style.zIndex = '200';
+    npc.style.userSelect = 'none';
+    
+    if (imageSrc) {
+        npc.style.backgroundImage = `url("${imageSrc}")`;
+        npc.style.backgroundSize = 'contain';
+        npc.style.backgroundRepeat = 'no-repeat';
+        npc.style.backgroundPosition = 'center';
+    } else {
+        npc.textContent = emoji;
+        npc.style.textAlign = 'center';
+        npc.style.lineHeight = '32px';
+    }
+    
+    this.gameWorld.appendChild(npc);
+    
+    this.npcs.push({
+        element: npc,
+        x: x,
+        y: y,
+        message: message,
+        isSpecial: isSpecial,
+        width: 32,
+        height: 32
+    });
+}
+
+            createItem(x, y, type, value) {
+    const item = document.createElement('div');
+    item.style.position = 'absolute';
+    item.style.left = x + 'px';
+    item.style.top = y + 'px';
+    item.style.width = '24px';
+    item.style.height = '24px';
+    item.style.fontSize = type === 'money' ? '32px' : '20px';
+    item.style.zIndex = '150';
+    item.style.userSelect = 'none';
+    item.style.textAlign = 'center';
+    item.style.lineHeight = '24px';
+    
+    if (type === 'money') {
+        item.textContent = '💰';
+        item.style.filter = 'drop-shadow(0 0 8px gold)';
+    } else if (type === 'purpleHeart') {
+        item.textContent = '💜';
+        item.style.filter = 'drop-shadow(0 0 8px purple)';
+    }
+    
+    this.gameWorld.appendChild(item);
+    
+    this.items.push({
+        element: item,
+        x: x,
+        y: y,
+        type: type,
+        value: value,
+        width: 24,
+        height: 24,
+        collected: false
+    });
+}
+
+            showMamiKeyPopup() {
+    const now = Date.now();
+    if (now - this.mamiKeyLastInteraction < 3000) return; // 3 second cooldown
+    
+    const popup = document.createElement('div');
+    popup.id = 'mamiKeyPopup';
+    popup.style.position = 'absolute';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.background = 'rgba(0,0,0,0.95)';
+    popup.style.border = '2px solid #666';
+    popup.style.borderRadius = '10px';
+    popup.style.padding = '20px';
+    popup.style.zIndex = '600';
+    popup.style.color = 'white';
+    popup.style.textAlign = 'center';
+    popup.style.maxWidth = '280px';
+    
+    const img = document.createElement('img');
+    img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png';
+    img.style.width = '60px';
+    img.style.height = '60px';
+    img.style.marginBottom = '10px';
+    
+    const message = document.createElement('div');
+    message.style.marginBottom = '15px';
+    message.style.fontSize = '14px';
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '8px 16px';
+    button.style.borderRadius = '4px';
+    button.style.cursor = 'pointer';
+    
+    if (this.hasTrophy) {
+        message.textContent = 'You are a winner!!!! wow - the trophy is beautiful!!! Here you go!!';
+        button.textContent = 'OK';
+        button.onclick = () => {
+            this.hasTrophy = false;
+            this.hasKey = true;
+            this.saveGameState(); // Save key immediately
+            this.updateUI();
+            popup.remove();
+            this.mamiKeyLastInteraction = Date.now();
+            this.showMessage('🔑 Received Castle Key!');
+        };
+    } else {
+        message.textContent = 'so you want a discount on that castle key?';
+        button.textContent = 'YES';
+        button.onclick = () => {
+            message.textContent = 'OK,... I like winners.... come back to me with a trophy from the Battle Arena, - and I will give it to you!';
+            button.textContent = 'OK';
+            button.onclick = () => {
+                popup.remove();
+                this.mamiKeyLastInteraction = Date.now();
+            };
+        };
+    }
+    
+    popup.appendChild(img);
+    popup.appendChild(message);
+    popup.appendChild(button);
+    document.getElementById('gameContainer').appendChild(popup);
+}
             
             createRoom(roomX, roomY) {
                 // Clear existing room
@@ -843,6 +989,41 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                 layout.snakes.forEach(snake => {
                     this.createSnake(snake.x, snake.y, snake.dir);
                 });
+
+
+                // Clear existing NPCs and items
+this.npcs = [];
+this.items = [];
+
+// Add NPCs and items based on room
+if (roomX === 0 && roomY === 0) {
+    // Entrance room
+    this.createNPC(70, 35, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
+    this.createItem(120, 300, 'money', 300);
+}
+
+if (roomX === 1 && roomY === 0) {
+    // Room 1
+    this.createItem(80, 200, 'money', 300);
+    this.createItem(280, 150, 'money', 300);
+}
+
+if (roomX === 3 && roomY === -1) {
+    // Secret room
+    this.createNPC(100, 100, '🐷', 'how did you find our secret room! darn it!');
+    this.createNPC(200, 100, '😎', 'take the purple hearts... I dont need them... please beat the bully and save us!');
+    this.createNPC(150, 200, '', 'you cleared the pyramid. now it is time to clear the castle. go get that bully!!', false, 'https://raw.githubusercontent.com/TheDepression/Photos/main/hinapink-min.png');
+    
+    this.createItem(80, 250, 'money', 300);
+    this.createItem(150, 280, 'money', 300);
+    this.createItem(220, 250, 'money', 300);
+    this.createItem(280, 200, 'purpleHeart', 1);
+}
+
+if (roomX === 5 && roomY === 0) {
+    // Final room
+    this.createNPC(230, 130, '', '', true, 'https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png');
+}
 
                 // Add electric lines if specified for this room (add this after creating snakes)
 if (layout.electricLines) {
@@ -1138,6 +1319,112 @@ createMovingElectricSnake(config) {
     });
 }
 
+            checkNPCCollisions() {
+    const playerRect = {
+        left: this.playerX - 12,
+        top: this.playerY - 12,
+        right: this.playerX + 12,
+        bottom: this.playerY + 12
+    };
+    
+    let touchingNPC = false;
+    
+    this.npcs.forEach(npc => {
+        const npcRect = {
+            left: npc.x,
+            top: npc.y,
+            right: npc.x + npc.width,
+            bottom: npc.y + npc.height
+        };
+        
+        if (this.rectsOverlap(playerRect, npcRect)) {
+            touchingNPC = true;
+            
+            if (npc.isSpecial) {
+                this.showMamiKeyPopup();
+            } else {
+                this.showNPCMessage(npc.message);
+            }
+        }
+    });
+    
+    if (!touchingNPC) {
+        this.hideNPCMessage();
+    }
+}
+
+checkItemCollisions() {
+    const playerRect = {
+        left: this.playerX - 12,
+        top: this.playerY - 12,
+        right: this.playerX + 12,
+        bottom: this.playerY + 12
+    };
+    
+    this.items.forEach(item => {
+        if (item.collected) return;
+        
+        const itemRect = {
+            left: item.x,
+            top: item.y,
+            right: item.x + item.width,
+            bottom: item.y + item.height
+        };
+        
+        if (this.rectsOverlap(playerRect, itemRect)) {
+            item.collected = true;
+            item.element.remove();
+            
+            if (item.type === 'money') {
+                this.tempMoney += item.value;
+                this.showMessage(`💰 +${item.value}¥ (temporary)`);
+            } else if (item.type === 'purpleHeart') {
+                this.tempMaxHearts += item.value;
+                this.showMessage('💜 Max Hearts +1! (temporary)');
+            }
+            
+            this.updateUI();
+        }
+    });
+}
+
+            showNPCMessage(message) {
+    if (this.currentNpcMessage === message) return;
+    
+    this.currentNpcMessage = message;
+    let messageEl = document.getElementById('npcMessage');
+    
+    if (!messageEl) {
+        messageEl = document.createElement('div');
+        messageEl.id = 'npcMessage';
+        messageEl.style.position = 'absolute';
+        messageEl.style.top = '60px';
+        messageEl.style.left = '50%';
+        messageEl.style.transform = 'translateX(-50%)';
+        messageEl.style.background = 'rgba(0,0,0,0.7)';
+        messageEl.style.color = 'white';
+        messageEl.style.padding = '8px 12px';
+        messageEl.style.borderRadius = '6px';
+        messageEl.style.fontSize = '12px';
+        messageEl.style.zIndex = '400';
+        messageEl.style.maxWidth = '300px';
+        messageEl.style.textAlign = 'center';
+        messageEl.style.border = '1px solid rgba(255,255,255,0.3)';
+        document.getElementById('gameContainer').appendChild(messageEl);
+    }
+    
+    messageEl.textContent = message;
+    messageEl.style.display = 'block';
+}
+
+hideNPCMessage() {
+    this.currentNpcMessage = null;
+    const messageEl = document.getElementById('npcMessage');
+    if (messageEl) {
+        messageEl.style.display = 'none';
+    }
+}
+
             positionPlayer() {
                 // Center the 32x32 sprite around playerX, playerY
                 this.player.style.left = (this.playerX - 16) + 'px';
@@ -1174,7 +1461,8 @@ createMovingElectricSnake(config) {
             if (this.frameCount % 2 === 0) {
                 this.updateElectricLines();
             }
-            
+            this.checkNPCCollisions();
+this.checkItemCollisions();
             this.checkCollisions();
             this.checkRoomTransitions();
         }
@@ -1557,6 +1845,13 @@ this.electricLines.forEach(line => {
             }
             
             exitCave() {
+                // Save temporary items permanently
+    this.money += this.tempMoney;
+    this.maxHearts += this.tempMaxHearts;
+                // Auto-heal to new max hearts
+    if (this.tempMaxHearts > 0) {
+        this.hearts = Math.min(this.hearts + this.tempMaxHearts, this.maxHearts);
+    }
                 this.gameStarted = false;
                 clearInterval(this.timerInterval);
                 this.caveMusic.pause();
@@ -1637,6 +1932,8 @@ this.electricLines.forEach(line => {
             }
             
             updateUI() {
+                document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money + this.tempMoney;
                 document.getElementById('hearts').textContent = this.hearts;
                 document.getElementById('money').textContent = this.money;
                 
