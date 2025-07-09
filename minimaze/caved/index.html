@@ -280,16 +280,25 @@
         }
 
         .electric-snake-segment {
-    position: absolute;
-    background: linear-gradient(45deg, #ff0000, #ff4444, #ff0000);
-    opacity: 0.9;
-    z-index: 100;
-    box-shadow: 0 0 15px red, inset 0 0 10px rgba(255,255,255,0.3);
-    border-radius: 2px;
-    animation: electricPulse 0.5s infinite alternate;
-    width: 20px;
-    height: 20px;
-}
+            position: absolute;
+            background: linear-gradient(45deg, #ff0000, #ff4444, #ff0000);
+            opacity: 0.9;
+            z-index: 100;
+            box-shadow: 0 0 15px red, inset 0 0 10px rgba(255,255,255,0.3);
+            border-radius: 2px;
+            animation: electricPulse 0.5s infinite alternate;
+            width: 20px;
+            height: 20px;
+        }
+
+        @keyframes gunPulsate {
+            0%, 100% { 
+                transform: scale(1);
+            }
+            50% { 
+                transform: scale(1.2);
+            }
+        }
     </style>
 </head>
 <body>
@@ -380,13 +389,17 @@
                 this.lastDragY = 0;
                 this.currentDirection = 's'; // Start facing south (into cave)
 
+                // Clear NPC/item arrays for proper room management
                 this.npcs = [];
-    this.items = [];
-    this.npcMessageTimeout = null;
-    this.currentNpcMessage = null;
-    this.mamiKeyLastInteraction = 0;
-    
-    
+                this.items = [];
+                this.npcMessageTimeout = null;
+                this.currentNpcMessage = null;
+                this.mamiKeyLastInteraction = 0;
+                
+                // Session-only collection tracking (reset on death/reload)
+                this.sessionCollectedItems = new Set();
+                this.sessionMoney = 0; // Money gained this session
+                this.sessionMaxHearts = 0; // Max hearts gained this session
                 
                 // Gun system from maze2
                 this.attackCooldown = false;
@@ -404,7 +417,6 @@
                 
                 // Cave enemies
                 this.snakes = [];
-
                 this.electricLines = [];
                 
                 // Timer
@@ -417,13 +429,7 @@
                 this.controlArea = document.getElementById('controlArea');
                 this.caveMusic = document.getElementById('caveMusic');
 
-                this.frameCount = 0; // Add this line
-
-                
-
-// Temporary counters (reset on death, kept on exit)
-this.tempMoney = 0;
-this.tempMaxHearts = 0;
+                this.frameCount = 0;
                 
                 this.preloadPlayerImages();
                 this.setupControls();
@@ -450,18 +456,18 @@ this.tempMaxHearts = 0;
                     this.money = gameState.money || 0;
                     this.timeElapsed = gameState.timeElapsed || 0;
                     this.deathCount = gameState.deathCount || 0;
-                    this.updateDeathCounter(); // Add this line
+                    this.updateDeathCounter();
                     this.maxHearts = gameState.maxHearts || 3;
 
-                    // Load cave D collection flags
-this.caveDMoney1 = gameState.caveDMoney1 || false;
-this.caveDMoney2 = gameState.caveDMoney2 || false;
-this.caveDMoney3 = gameState.caveDMoney3 || false;
-this.caveDMoney4 = gameState.caveDMoney4 || false;
-this.caveDMoney5 = gameState.caveDMoney5 || false;
-this.caveDMoneyEntrance = gameState.caveDMoneyEntrance || false;
-this.caveDPurple1 = gameState.caveDPurple1 || false;
-this.caveDPurple2 = gameState.caveDPurple2 || false;
+                    // Load permanently collected Cave D items
+                    this.cdmoney1 = gameState.cdmoney1 || false;
+                    this.cdmoney2 = gameState.cdmoney2 || false;
+                    this.cdmoney3 = gameState.cdmoney3 || false;
+                    this.cdmoney4 = gameState.cdmoney4 || false;
+                    this.cdmoney5 = gameState.cdmoney5 || false;
+                    this.cdmoneyEntrance = gameState.cdmoneyEntrance || false;
+                    this.cdpheart1 = gameState.cdpheart1 || false;
+                    this.cdpheart2 = gameState.cdpheart2 || false;
                     
                     // Gun upgrades from maze2
                     this.hasWeapon = gameState.hasWeapon || false;
@@ -492,15 +498,16 @@ this.caveDPurple2 = gameState.caveDPurple2 || false;
                     this.hasHammerPower = false;
                     this.hasSuperGun = false;
                     this.hasEnhancedRange = false;
-                    // ADD THESE CAVE FLAG DEFAULTS:
-    this.caveDMoney1 = false;
-    this.caveDMoney2 = false;
-    this.caveDMoney3 = false;
-    this.caveDMoney4 = false;
-    this.caveDMoney5 = false;
-    this.caveDMoneyEntrance = false;
-    this.caveDPurple1 = false;
-    this.caveDPurple2 = false;
+                    
+                    // Initialize Cave D collection flags as false
+                    this.cdmoney1 = false;
+                    this.cdmoney2 = false;
+                    this.cdmoney3 = false;
+                    this.cdmoney4 = false;
+                    this.cdmoney5 = false;
+                    this.cdmoneyEntrance = false;
+                    this.cdpheart1 = false;
+                    this.cdpheart2 = false;
                 }
             }
             
@@ -598,6 +605,24 @@ this.caveDPurple2 = gameState.caveDPurple2 || false;
                 this.playerVelocityY = 0;
             }
             
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            updatePlayerImage(direction) {
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+            }
+
             attack() {
                 if (!this.hasWeapon) return;
                 
@@ -637,7 +662,7 @@ this.caveDPurple2 = gameState.caveDPurple2 || false;
                 const visualCenterY = this.hasEnhancedRange ? 30 : 20;
                 
                 attackEl.style.left = (this.playerX + offset.x - visualCenterX) + 'px';
-attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
+                attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                 
                 this.gameWorld.appendChild(attackEl);
                 
@@ -716,742 +741,228 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                     default: return true;
                 }
             }
-            
-            updatePlayerImage(direction) {
-                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
-            }
-            
-            getDirectionFromMovement(deltaX, deltaY) {
-                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-                if (angle < 0) angle += 360;
-                
-                if (angle >= 337.5 || angle < 22.5) return 'e';
-                else if (angle >= 22.5 && angle < 67.5) return 'se';  
-                else if (angle >= 67.5 && angle < 112.5) return 's';
-                else if (angle >= 112.5 && angle < 157.5) return 'sw';
-                else if (angle >= 157.5 && angle < 202.5) return 'w';
-                else if (angle >= 202.5 && angle < 247.5) return 'nw';
-                else if (angle >= 247.5 && angle < 292.5) return 'n';
-                else return 'ne';
-            }
 
             createNPC(x, y, emoji, message, isSpecial = false, imageSrc = null) {
-    const npc = document.createElement('div');
-    npc.style.position = 'absolute';
-    npc.style.left = x + 'px';
-    npc.style.top = y + 'px';
-    npc.style.width = '32px';
-    npc.style.height = '32px';
-    npc.style.fontSize = '28px';
-    npc.style.zIndex = '200';
-    npc.style.userSelect = 'none';
-    
-    if (imageSrc) {
-    npc.style.backgroundImage = `url("${imageSrc}")`;
-    npc.style.backgroundSize = 'contain';
-    npc.style.backgroundRepeat = 'no-repeat';
-    npc.style.backgroundPosition = 'center';
-    npc.style.width = '64px'; // Double from 32px
-    npc.style.height = '64px'; // Double from 32px
-} else {
-        npc.textContent = emoji;
-        npc.style.textAlign = 'center';
-        npc.style.lineHeight = '32px';
-    }
-    
-    this.gameWorld.appendChild(npc);
-    
-    this.npcs.push({
-        element: npc,
-        x: x,
-        y: y,
-        message: message,
-        isSpecial: isSpecial,
-        width: 32,
-        height: 32
-    });
-}
-
-            createItem(x, y, type, value, id = null) {
-    const item = document.createElement('div');
-    item.style.position = 'absolute';
-    item.style.left = x + 'px';
-    item.style.top = y + 'px';
-    item.style.width = '24px';
-    item.style.height = '24px';
-    item.style.fontSize = type === 'money' ? '32px' : '20px';
-    item.style.zIndex = '150';
-    item.style.userSelect = 'none';
-    item.style.textAlign = 'center';
-    item.style.lineHeight = '24px';
-    
-    if (type === 'money') {
-        item.textContent = '💰';
-        item.style.filter = 'drop-shadow(0 0 8px gold)';
-    } else if (type === 'purpleHeart') {
-        item.textContent = '💜';
-        item.style.filter = 'drop-shadow(0 0 8px purple)';
-    }
-    
-    // Add ID if provided
-    if (id) {
-        item.dataset.id = id;
-    }
-    
-    this.gameWorld.appendChild(item);
-    
-    this.items.push({
-        element: item,
-        x: x,
-        y: y,
-        type: type,
-        value: value,
-        width: 24,
-        height: 24,
-        collected: false,
-        id: id
-    });
-}
-
-            showMamiKeyPopup() {
-    const now = Date.now();
-    if (now - this.mamiKeyLastInteraction < 3000) return; // 3 second cooldown
-    
-    const popup = document.createElement('div');
-    popup.id = 'mamiKeyPopup';
-    popup.style.position = 'absolute';
-    popup.style.top = '50%';
-    popup.style.left = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.background = 'rgba(0,0,0,0.95)';
-    popup.style.border = '2px solid #666';
-    popup.style.borderRadius = '10px';
-    popup.style.padding = '20px';
-    popup.style.zIndex = '600';
-    popup.style.color = 'white';
-    popup.style.textAlign = 'center';
-    popup.style.maxWidth = '280px';
-    
-    const img = document.createElement('img');
-    img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png';
-    img.style.width = '60px';
-    img.style.height = '60px';
-    img.style.marginBottom = '10px';
-    
-    const message = document.createElement('div');
-    message.style.marginBottom = '15px';
-    message.style.fontSize = '14px';
-    
-    const button = document.createElement('button');
-    button.style.background = '#4CAF50';
-    button.style.color = 'white';
-    button.style.border = 'none';
-    button.style.padding = '8px 16px';
-    button.style.borderRadius = '4px';
-    button.style.cursor = 'pointer';
-    
-    if (this.hasTrophy) {
-        message.textContent = 'You are a winner!!!! wow - the trophy is beautiful!!! Here you go!!';
-        button.textContent = 'OK';
-        button.onclick = () => {
-            this.hasTrophy = false;
-            this.hasKey = true;
-            this.saveGameState(); // Save key immediately
-            this.updateUI();
-            popup.remove();
-            this.mamiKeyLastInteraction = Date.now();
-            this.showMessage('🔑 Received Castle Key!');
-        };
-    } else {
-        message.textContent = 'so you want a discount on that castle key?';
-        button.textContent = 'YES';
-        button.onclick = () => {
-            message.textContent = 'OK,... I like winners.... come back to me with a trophy from the Battle Arena, - and I will give it to you!';
-            button.textContent = 'OK';
-            button.onclick = () => {
-                popup.remove();
-                this.mamiKeyLastInteraction = Date.now();
-            };
-        };
-    }
-    
-    popup.appendChild(img);
-    popup.appendChild(message);
-    popup.appendChild(button);
-    document.getElementById('gameContainer').appendChild(popup);
-}
-            
-            createRoom(roomX, roomY) {
-                // Clear existing room
-                this.gameWorld.innerHTML = '<div id="player"></div>';
-                this.player = document.getElementById('player');
-                this.snakes = [];
-                this.electricLines = []; // Add this line
+                const npc = document.createElement('div');
+                npc.style.position = 'absolute';
+                npc.style.left = x + 'px';
+                npc.style.top = y + 'px';
+                npc.style.width = '32px';
+                npc.style.height = '32px';
+                npc.style.fontSize = '28px';
+                npc.style.zIndex = '200';
+                npc.style.userSelect = 'none';
                 
-                // Define room layouts - horizontal chain with secret room
-                const roomLayouts = {
-                    '0,0': { // Starting room
-    exits: ['e'], // only east
-    walls: [
-        {x: 80, y: 70, w: 190, h: 10},
-        {x: 80, y: 70, w: 50, h: 50},
-        {x: 270, y: 70, w: 10, h: 50},
-        {x: 240, y: 210, w: 20, h: 70},
-        {x: 310, y: 210, w: 20, h: 140},
-        {x: 80, y: 70, w: 10, h: 120},
-        {x: 80, y: 180, w: 50, h: 10},
-        {x: 130, y: 180, w: 10, h: 60},
-        {x: 80, y: 240, w: 50, h: 10},
-        {x: 80, y: 240, w: 10, h: 50},
-        {x: 80, y: 290, w: 50, h: 10},
-        {x: 190, y: 150, w: 10, h: 200},
-        {x: 330, y: 210, w: 20, h: 140}
-    ],
-    snakes: [], // Remove snakes
-    electricLines: ['line1', 'line1b', 'line1c']
-},
-                    '1,0': { // Room 1
-    exits: ['w', 'e'], // west and east
-    walls: [
-        { x: 10, y: 0, w: 50, h: 120 },
-        { x: 10, y: 220, w: 50, h: 130 },
-        { x: 290, y: 10, w: 60, h: 110 },
-        { x: 290, y: 220, w: 60, h: 137.5 },
-        { x: 110, y: 60, w: 130, h: 240 }
-    ],
-    snakes: [],
-    electricLines: ['line2'] // Add this line
-},
-                    '2,0': { // Room 2
-                        exits: ['w', 'e'], // west and east
-                        walls: [
-                            { x: 0, y: 0, w: 120, h: 120 },
-                            { x: 220, y: 0, w: 120, h: 120 },
-                            { x: 220, y: 230, w: 130, h: 127.5 },
-                            { x: 0, y: 230, w: 120, h: 127.5 }
+                if (imageSrc) {
+                    npc.style.backgroundImage = `url("${imageSrc}")`;
+                    npc.style.backgroundSize = 'contain';
+                    npc.style.backgroundRepeat = 'no-repeat';
+                    npc.style.backgroundPosition = 'center';
+                    npc.style.width = '64px';
+                    npc.style.height = '64px';
+                } else {
+                    npc.textContent = emoji;
+                    npc.style.textAlign = 'center';
+                    npc.style.lineHeight = '32px';
+                }
+                
+                this.gameWorld.appendChild(npc);
+                
+                this.npcs.push({
+                    element: npc,
+                    x: x,
+                    y: y,
+                    message: message,
+                    isSpecial: isSpecial,
+                    width: imageSrc ? 64 : 32,
+                    height: imageSrc ? 64 : 32
+                });
+                        createElectricLinesForRoom(lineIds) {
+                const allLineConfigs = {
+                    'line1': {
+                        id: 'line1',
+                        path: [
+                            {x: 220, y: 50}, {x: 220, y: 100}, // down
+                            {x: 300, y: 100}, // right edge  
+                            {x: 300, y: 50}, // return up
+                            {x: 220, y: 50}  // left back to start
                         ],
-                        snakes: [
-                            { x: 110, y: 25, dir: 'horizontal' },
-                            { x: 110, y: 295, dir: 'horizontal' }
-                        ],
-                        electricLines: ['line3']
+                        segmentSize: 20,
+                        speed: 2.5,
+                        bodyLength: 100,
+                        thickness: 20
                     },
-                    '3,0': { // Room 3 - has secret passage south
-                        exits: ['w', 'e', 'secret_s'], // west, east, secret south
-                        walls: [
-                            { x: 120, y: 200, w: 20, h: 157.5 },
-                            { x: 210, y: 280, w: 20, h: 77.5 },
-                            { x: 130, y: 200, w: 90, h: 10 },
-                            
-                            { x: 10, y: 10, w: 90, h: 90 },
-                            { x: 100, y: 10, w: 100, h: 50 },
-                            { x: 200, y: 10, w: 80, h: 70 },
-                            { x: 280, y: 10, w: 60, h: 90 },
-                            { x: 220, y: 270, w: 60, h: 87.5 },
-                            { x: 280, y: 300, w: 70, h: 57.5 },
-                            { x: 80, y: 200, w: 50, h: 157.5 },
-                            { x: 10, y: 250, w: 70, h: 107.5 },
-                            
-                            { x: 0, y: 337.5, w: 140, h: 20 },
-                            { x: 210, y: 337.5, w: 140, h: 20 }
+                    'line2': {
+                        id: 'line2', 
+                        path: [
+                            {x: 270, y: 30}, {x: 270, y: 320},  // down to
+                             {x: 80, y: 320}, // left to  
+                             {x: 80, y: 30}, //up
+                             {x: 270, y: 30}  // right to base
                         ],
-                        snakes: [
-                            { x: 200, y: 240, dir: 'horizontal' }
-                        ],
-                        electricLines: ['line4a', 'line4b', 'line4c']
+                        segmentSize: 20,
+                        speed: 2.4,
+                        bodyLength: 730,
+                        thickness: 20
                     },
-                    '4,0': { // Room 4
-                        exits: ['w', 'e'], // west and east
-                        walls: [
-                            { x: 100, y: 170, w: 60, h: 10 },
-                            { x: 160, y: 70, w: 10, h: 220 },
-                            { x: 230, y: 10, w: 10, h: 50 },
-                            { x: 100, y: 0, w: 10, h: 100 },
-                            { x: 100, y: 250, w: 10, h: 110 },
-                            { x: 200, y: 110, w: 60, h: 10 },
-                            { x: 230, y: 270, w: 10, h: 90 },
-                            { x: 160, y: 110, w: 70, h: 110 },
-                            { x: 230, y: 110, w: 10, h: 110 },
-                            { x: 200, y: 220, w: 50, h: 10 },
-                            { x: 250, y: 220, w: 10, h: 10 }
+                    'line1b': {
+                        id: 'line1b',
+                        path: [
+                            {x: 50, y: 105}, {x: 50, y: 320}, // down to
+                            {x: 165, y: 320}, // right to  
+                            {x: 165, y: 105}, //  up to
+                            {x: 50, y: 105}  // left back to start
                         ],
-                        snakes: [],
-                         electricLines: ['line5a', 'line5b', 'line5c', 'line5d']
+                        segmentSize: 25,
+                        speed: 3.6,
+                        bodyLength: 320,
+                        thickness: 23
                     },
-                    '5,0': { // Final room
-                        exits: ['w'], // only west
-                        walls: [
-                            { x: 200, y: 10, w: 150, h: 90 },
-                            { x: 300, y: 100, w: 50, h: 100 },
-                            { x: 200, y: 200, w: 150, h: 157.5 },
-                            { x: 10, y: 280, w: 190, h: 77.5 },
-                            { x: 10, y: 0, w: 190, h: 70 }
+                    'line1c': {
+                        id: 'line1c',
+                        path: [
+                            {x: 220, y: 190}, {x: 220, y: 300}, // down
+                            {x: 290, y: 300}, // right edge  
+                            {x: 290, y: 190}, // return up
+                            {x: 220, y: 190}  // left back to start
                         ],
-                        snakes: [
-                            { x: 200, y: 200, dir: 'horizontal' },
-                            { x: 100, y: 150, dir: 'vertical' }
-                        ]
+                        segmentSize: 25,
+                        speed: 3.2,
+                        bodyLength: 220,
+                        thickness: 15
                     },
-                    '3,-1': { // Secret room below room 3
-                        exits: ['secret_n'], // secret north back to 3,0
-                        walls: [
-                            { x: 0, y: 10, w: 110, h: 30 },
-                            { x: 220, y: 10, w: 130, h: 30 },
-                            { x: 0, y: 40, w: 70, h: 60 },
-                            { x: 270, y: 40, w: 80, h: 60 },
-                            { x: 320, y: 100, w: 20, h: 20 },
-                            { x: 10, y: 100, w: 30, h: 30 }
+                    'line3': {
+                        id: 'line3',
+                        path: [
+                            {x: 110, y: 110}, {x: 220, y: 110}, // right to
+                            {x: 220, y: 220}, // down to   
+                            {x: 110, y: 220}, // left to 
+                            {x: 110, y: 110}  // up back to start
                         ],
-                        snakes: []
+                        segmentSize: 20,
+                        speed: 3.2,
+                        bodyLength: 300,
+                        thickness: 20
+                    },
+                    'line4a': {
+                        id: 'line4a',
+                        path: [
+                            {x: 150, y: 70}, {x: 150, y: 190}, // down
+                            {x: 150, y: 70} // back up  
+                        ],
+                        segmentSize: 20,
+                        speed: 2.3,
+                        bodyLength: 35,
+                        thickness: 15
+                    },
+                    'line4b': {
+                        id: 'line4b',
+                        path: [
+                            {x: 210, y: 90}, {x: 210, y: 190}, // down
+                            {x: 210, y: 90} // up
+                        ],
+                        segmentSize: 20,
+                        speed: 2.9,
+                        bodyLength: 30,
+                        thickness: 15
+                    },
+                    'line4c': {
+                        id: 'line4c',
+                        path: [
+                            {x: 270, y: 100}, {x: 270, y: 260}, // down
+                            {x: 270, y: 100} // up  
+                        ],
+                        segmentSize: 20,
+                        speed: 2.5,
+                        bodyLength: 60,
+                        thickness: 15
+                    },
+                    'line5a': {
+                        id: 'line5a',
+                        path: [
+                            {x: 80, y: 40}, {x: 80, y: 150}, // down
+                            {x: 130, y: 150}, // right  
+                            {x: 130, y: 40}, // up
+                            {x: 80, y: 40}  // left back to start
+                        ],
+                        segmentSize: 20,
+                        speed: 2.0,
+                        bodyLength: 170,
+                        thickness: 20
+                    },
+                    'line5b': {
+                        id: 'line5b',
+                        path: [
+                            {x: 200, y: 40}, {x: 200, y: 90}, // down
+                            {x: 270, y: 90}, // right  
+                            {x: 270, y: 40}, //  up
+                            {x: 200, y: 40}  // left back to start
+                        ],
+                        segmentSize: 20,
+                        speed: 2.0,
+                        bodyLength: 100,
+                        thickness: 20
+                    },
+                    'line5c': {
+                        id: 'line5c',
+                        path: [
+                            {x: 80, y: 210}, {x: 80, y: 320}, // down
+                            {x: 130, y: 320}, // right  
+                            {x: 130, y: 210}, // up
+                            {x: 80, y: 210}  // left
+                        ],
+                        segmentSize: 20,
+                        speed: 2.0,
+                        bodyLength: 170,
+                        thickness: 20
+                    },
+                    'line5d': {
+                        id: 'line5d',
+                        path: [
+                            {x: 200, y: 250}, {x: 200, y: 300}, // down
+                            {x: 270, y: 300}, // right   
+                            {x: 270, y: 250}, // return up
+                            {x: 200, y: 250}  // left back to start
+                        ],
+                        segmentSize: 20,
+                        speed: 2.0,
+                        bodyLength: 100,
+                        thickness: 20
                     }
                 };
                 
-                const layout = roomLayouts[`${roomX},${roomY}`];
-                if (!layout) return;
-                
-                // Create border walls with exits
-                this.createBorderWalls(layout.exits);
-                
-                // Add interior walls
-                layout.walls.forEach(wall => {
-                    this.createWall(wall.x, wall.y, wall.w, wall.h);
-                });
-                
-                // Add snakes
-                layout.snakes.forEach(snake => {
-                    this.createSnake(snake.x, snake.y, snake.dir);
-                });
-
-
-// Add items based on room
-if (roomX === 2 && roomY === 0) {
-    // Room 2 - 2 money bags
-    if (!this.caveDMoney1) {
-        this.createItem(175, 30, 'money', 300, 'caveDMoney1');
-    }
-    if (!this.caveDMoney2) {
-        this.createItem(175, 320, 'money', 300, 'caveDMoney2');
-    }
-}
-
-if (roomX === 3 && roomY === -1) {
-    // Secret room - 3 money and 2 purple hearts
-    if (!this.caveDMoney3) {
-        this.createItem(80, 250, 'money', 300, 'caveDMoney3');
-    }
-    if (!this.caveDMoney4) {
-        this.createItem(150, 280, 'money', 300, 'caveDMoney4');
-    }
-    if (!this.caveDMoney5) {
-        this.createItem(220, 250, 'money', 300, 'caveDMoney5');
-    }
-    
-    // Purple hearts
-    if (!this.caveDPurple1) {
-        this.createItem(280, 200, 'purpleHeart', 1, 'caveDPurple1');
-    }
-    if (!this.caveDPurple2) {
-        this.createItem(240, 200, 'purpleHeart', 1, 'caveDPurple2');
-    }
-}
-
-if (roomX === 0 && roomY === 0) {
-    // Entrance room - 1 money
-    if (!this.caveDMoneyEntrance) {
-        this.createItem(240, 300, 'money', 300, 'caveDMoneyEntrance');
-    }
-}
-
-                // Clear existing NPCs and items
-// this.npcs = [];
-// this.items = [];
-
-// Add NPCs and items based on room
-if (roomX === 0 && roomY === 0) {
-    // Entrance room
-    this.createNPC(80, 30, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
-}
-
-
-if (roomX === 3 && roomY === -1) {
-    // Secret room
-    this.createNPC(100, 100, '🐷', 'how did you find our secret room! darn it!');
-    this.createNPC(200, 100, '😎', 'take the purple hearts... I dont need them... please beat the bully and save us!');
-    this.createNPC(150, 200, '', 'you cleared the pyramid. now it is time to clear the castle. go get that bully!!', false, 'https://raw.githubusercontent.com/TheDepression/Photos/main/hinapink-min.png');
-}
-
-if (roomX === 5 && roomY === 0) {
-    // Final room
-    this.createNPC(230, 130, '', '', true, 'https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png');
-}
-
-                // Add electric lines if specified for this room (add this after creating snakes)
-if (layout.electricLines) {
-    this.createElectricLinesForRoom(layout.electricLines);
-}
-                
-                // Add cave entrance/exit
-                if (roomX === 0 && roomY === 0) {
-                    // Cave entrance at top
-                    const entrance = document.createElement('div');
-                    entrance.className = 'exit-light';
-                    entrance.style.position = 'absolute';
-                    entrance.style.left = '160px';
-                    entrance.style.top = '5px';
-                    entrance.dataset.type = 'exit';
-                    this.gameWorld.appendChild(entrance);
-                }
-                
-                this.positionPlayer();
-                this.updateUI();
-                this.updateRoomInfo();
-            }
-            
-            createBorderWalls(exits) {
-                // Top wall (north)
-                if (!exits.includes('n') && !exits.includes('secret_n')) {
-                    this.createWall(0, 0, 350, 20);
-                } else {
-                    // Gap from 140px to 210px (70px wide)
-                    this.createWall(0, 0, 140, 20);
-                    this.createWall(210, 0, 140, 20);
-                }
-
-                // Bottom wall (south)
-                if (!exits.includes('s') && !exits.includes('secret_s')) {
-                    this.createWall(0, 337.5, 350, 20);
-                } else if (exits.includes('secret_s')) {
-                    // Secret passage - looks like solid wall but passable
-                    this.createSecretWall(0, 337.5, 210, 20);
-                    this.createSecretWall(210, 337.5, 140, 20);
-                } else {
-                    // Normal gap
-                    this.createWall(0, 337.5, 140, 20);
-                    this.createWall(210, 337.5, 140, 20);
-                }
-
-                // Left wall (west)
-                if (!exits.includes('w')) {
-                    this.createWall(0, 0, 20, 357.5);
-                } else {
-                    // Gap from 140px to 217.5px
-                    this.createWall(0, 0, 20, 140);
-                    this.createWall(0, 217.5, 20, 140);
-                }
-
-                // Right wall (east)
-                if (!exits.includes('e')) {
-                    this.createWall(330, 0, 20, 357.5);
-                } else {
-                    // Gap from 140px to 217.5px
-                    this.createWall(330, 0, 20, 140);
-                    this.createWall(330, 217.5, 20, 140);
-                }
-            }
-            
-            createWall(x, y, width, height) {
-                const wall = document.createElement('div');
-                wall.className = 'cave-wall';
-                wall.style.left = x + 'px';
-                wall.style.top = y + 'px';
-                wall.style.width = width + 'px';
-                wall.style.height = height + 'px';
-                this.gameWorld.appendChild(wall);
-            }
-            
-            createSecretWall(x, y, width, height) {
-                const wall = document.createElement('div');
-                wall.className = 'secret-wall';
-                wall.style.left = x + 'px';
-                wall.style.top = y + 'px';
-                wall.style.width = width + 'px';
-                wall.style.height = height + 'px';
-                this.gameWorld.appendChild(wall);
-            }
-            
-            createSnake(x, y, direction) {
-                const snake = document.createElement('div');
-                snake.className = 'enemy';
-                snake.style.left = x + 'px';
-                snake.style.top = y + 'px';
-                snake.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png")';
-                this.gameWorld.appendChild(snake);
-                
-                this.snakes.push({
-                    element: snake,
-                    x: x,
-                    y: y,
-                    startX: x,
-                    startY: y,
-                    direction: direction,
-                    speed: 1,
-                    moveDirection: 1,
-                    range: 100,
-                    hp: 9000, // High HP as requested
-                    maxHp: 9000,
-                    alive: true
+                lineIds.forEach(lineId => {
+                    const config = allLineConfigs[lineId];
+                    if (config) {
+                        this.createMovingElectricSnake(config);
+                    }
                 });
             }
 
-            createElectricLinesForRoom(lineIds) {
-    const allLineConfigs = {
-        'line1': {
-            id: 'line1',
-            path: [
-                {x: 220, y: 50}, {x: 220, y: 100}, // down
-                {x: 300, y: 100}, // right edge  
-                {x: 300, y: 50}, // return up
-                {x: 220, y: 50}  // left back to start
-            ],
-            segmentSize: 20,
-            speed: 2.5,
-            bodyLength: 100, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
-        },
-        'line2': {
-            id: 'line2', 
-            path: [
+            createMovingElectricSnake(config) {
+                // Calculate total path length
+                let totalLength = 0;
+                const pathSegments = [];
                 
-                {x: 270, y: 30}, {x: 270, y: 320},  // down to
-                 {x: 80, y: 320}, // left to  
-                 {x: 80, y: 30}, //up
-                 {x: 270, y: 30}  // right to base
-               
-            ],
-            segmentSize: 20,
-            speed: 2.4,
-            bodyLength: 730,
-            thickness: 20
-        },
-        'line1b': {
-            id: 'line1b',
-            path: [
-                {x: 50, y: 105}, {x: 50, y: 320}, // down to
-                {x: 165, y: 320}, // right to  
-                {x: 165, y: 105}, //  up to
-                {x: 50, y: 105}  // left back to start
-            ],
-            segmentSize: 25,
-            speed: 3.6,
-            bodyLength: 320, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 23
-        },
-        'line1c': {
-            id: 'line1c',
-            path: [
-                {x: 220, y: 190}, {x: 220, y: 300}, // down
-                {x: 290, y: 300}, // right edge  
-                {x: 290, y: 190}, // return up
-                {x: 220, y: 190}  // left back to start
-            ],
-            segmentSize: 25,
-            speed: 3.2,
-            bodyLength: 220, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 15
-        },
-        'line3': {
-            id: 'line3',
-            path: [
-                {x: 110, y: 110}, {x: 220, y: 110}, // right to
-                {x: 220, y: 220}, // down to   
-                {x: 110, y: 220}, // left to 
-                {x: 110, y: 110}  // up back to start
-            ],
-            segmentSize: 20,
-            speed: 3.2,
-            bodyLength: 300, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
-        },
-        'line4a': {
-            id: 'line4a',
-            path: [
-                {x: 150, y: 70}, {x: 150, y: 190}, // down
-                {x: 150, y: 70} // back up  
-            ],
-            segmentSize: 20,
-            speed: 2.3,
-            bodyLength: 35, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 15
-        },
-        'line4b': {
-            id: 'line4b',
-            path: [
-                {x: 210, y: 90}, {x: 210, y: 190}, // down
-                {x: 210, y: 90} // up
-            ],
-            segmentSize: 20,
-            speed: 2.9,
-            bodyLength: 30, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 15
-        },
-        'line4c': {
-            id: 'line4c',
-            path: [
-                {x: 270, y: 100}, {x: 270, y: 260}, // down
-                {x: 270, y: 100} // up  
-            ],
-            segmentSize: 20,
-            speed: 2.5,
-            bodyLength: 60, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 15
-        },
-        'line5a': {
-            id: 'line5a',
-            path: [
-                {x: 80, y: 40}, {x: 80, y: 150}, // down
-                {x: 130, y: 150}, // right  
-                {x: 130, y: 40}, // up
-                {x: 80, y: 40}  // left back to start
-            ],
-            segmentSize: 20,
-            speed: 2.0,
-            bodyLength: 170, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
-        },
-        'line5b': {
-            id: 'line5b',
-            path: [
-                {x: 200, y: 40}, {x: 200, y: 90}, // down
-                {x: 270, y: 90}, // right  
-                {x: 270, y: 40}, //  up
-                {x: 200, y: 40}  // left back to start
-            ],
-            segmentSize: 20,
-            speed: 2.0,
-            bodyLength: 100, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
-        },
-        'line5c': {
-            id: 'line5c',
-            path: [
-                {x: 80, y: 210}, {x: 80, y: 320}, // down
-                {x: 130, y: 320}, // right  
-                {x: 130, y: 210}, // up
-                {x: 80, y: 210}  // left
-            ],
-            segmentSize: 20,
-            speed: 2.0,
-            bodyLength: 170, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
-        },
-        'line5d': {
-            id: 'line5d',
-            path: [
-                {x: 200, y: 250}, {x: 200, y: 300}, // down
-                {x: 270, y: 300}, // right   
-                {x: 270, y: 250}, // return up
-                {x: 200, y: 250}  // left back to start
-            ],
-            segmentSize: 20,
-            speed: 2.0,
-            bodyLength: 100, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
-        }
-    };
-    
-    lineIds.forEach(lineId => {
-        const config = allLineConfigs[lineId];
-        if (config) {
-            this.createMovingElectricSnake(config);
-        }
-    });
-}
-createMovingElectricSnake(config) {
-    // Calculate total path length
-    let totalLength = 0;
-    const pathSegments = [];
-    
-    for (let i = 0; i < config.path.length - 1; i++) {
-        const start = config.path[i];
-        const end = config.path[i + 1];
-        const length = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
-        pathSegments.push({ start, end, length, totalLengthBefore: totalLength });
-        totalLength += length;
-    }
-    
-    this.electricLines.push({
-        id: config.id,
-        pathSegments: pathSegments,
-        totalPathLength: totalLength,
-        bodyLength: config.bodyLength,
-        speed: config.speed,
-        thickness: config.thickness,
-        headPosition: 0, // Position along total path (0 to totalLength)
-        segments: [] // Will hold DOM elements
-    });
-}
-
-            checkNPCCollisions() {
-    const playerRect = {
-        left: this.playerX - 12,
-        top: this.playerY - 12,
-        right: this.playerX + 12,
-        bottom: this.playerY + 12
-    };
-    
-    let touchingNPC = false;
-    
-    this.npcs.forEach(npc => {
-        const npcRect = {
-            left: npc.x,
-            top: npc.y,
-            right: npc.x + npc.width,
-            bottom: npc.y + npc.height
-        };
-        
-        if (this.rectsOverlap(playerRect, npcRect)) {
-            touchingNPC = true;
-            
-            if (npc.isSpecial) {
-                this.showMamiKeyPopup();
-            } else {
-                this.showNPCMessage(npc.message);
+                for (let i = 0; i < config.path.length - 1; i++) {
+                    const start = config.path[i];
+                    const end = config.path[i + 1];
+                    const length = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+                    pathSegments.push({ start, end, length, totalLengthBefore: totalLength });
+                    totalLength += length;
+                }
+                
+                this.electricLines.push({
+                    id: config.id,
+                    pathSegments: pathSegments,
+                    totalPathLength: totalLength,
+                    bodyLength: config.bodyLength,
+                    speed: config.speed,
+                    thickness: config.thickness,
+                    headPosition: 0, // Position along total path (0 to totalLength)
+                    segments: [] // Will hold DOM elements
+                });
             }
-        }
-    });
-    
-    if (!touchingNPC) {
-        this.hideNPCMessage();
-    }
-}
-
-
-            showNPCMessage(message) {
-    if (this.currentNpcMessage === message) return;
-    
-    this.currentNpcMessage = message;
-    let messageEl = document.getElementById('npcMessage');
-    
-    if (!messageEl) {
-        messageEl = document.createElement('div');
-        messageEl.id = 'npcMessage';
-        messageEl.style.position = 'absolute';
-        messageEl.style.top = '60px';
-        messageEl.style.left = '50%';
-        messageEl.style.transform = 'translateX(-50%)';
-        messageEl.style.background = 'rgba(0,0,0,0.7)';
-        messageEl.style.color = 'white';
-        messageEl.style.padding = '8px 12px';
-        messageEl.style.borderRadius = '6px';
-        messageEl.style.fontSize = '12px';
-        messageEl.style.zIndex = '400';
-        messageEl.style.maxWidth = '300px';
-        messageEl.style.textAlign = 'center';
-        messageEl.style.border = '1px solid rgba(255,255,255,0.3)';
-        document.getElementById('gameContainer').appendChild(messageEl);
-    }
-    
-    messageEl.textContent = message;
-    messageEl.style.display = 'block';
-}
-
-hideNPCMessage() {
-    this.currentNpcMessage = null;
-    const messageEl = document.getElementById('npcMessage');
-    if (messageEl) {
-        messageEl.style.display = 'none';
-    }
-}
 
             positionPlayer() {
                 // Center the 32x32 sprite around playerX, playerY
@@ -1478,25 +989,25 @@ hideNPCMessage() {
             }
             
             startGameLoop() {
-    const gameLoop = () => {
-        if (this.gameStarted && !this.isTransitioning) {
-            this.frameCount++; // Increment frame counter
-            
-            this.updatePlayer();
-            this.updateSnakes();
-            
-            // Only update electric lines every 2nd frame
-            if (this.frameCount % 2 === 0) {
-                this.updateElectricLines();
+                const gameLoop = () => {
+                    if (this.gameStarted && !this.isTransitioning) {
+                        this.frameCount++;
+                        
+                        this.updatePlayer();
+                        this.updateSnakes();
+                        
+                        // Only update electric lines every 2nd frame
+                        if (this.frameCount % 2 === 0) {
+                            this.updateElectricLines();
+                        }
+                       
+                        this.checkCollisions();
+                        this.checkRoomTransitions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
             }
-           
-            this.checkCollisions();
-            this.checkRoomTransitions();
-        }
-        requestAnimationFrame(gameLoop);
-    };
-    gameLoop();
-}
             
             updatePlayer() {
                 if (this.isPaused) return;
@@ -1594,61 +1105,61 @@ hideNPCMessage() {
             }
 
             updateElectricLines() {
-    if (this.isPaused) return;
-    
-    this.electricLines.forEach(line => {
-        // Move head position
-        line.headPosition += line.speed;
-        if (line.headPosition >= line.totalPathLength) {
-            line.headPosition = 0; // Loop back to start
-        }
-        
-        // Clear old segments
-        line.segments.forEach(segment => segment.remove());
-        line.segments = [];
-        
-        // Create body segments behind the head
-        for (let i = 0; i < line.bodyLength; i += 15) { // Every 15 pixels
-            const segmentPosition = line.headPosition - i;
-            let actualPosition = segmentPosition;
-            
-            // Handle wraparound for tail
-            if (actualPosition < 0) {
-                actualPosition = line.totalPathLength + actualPosition;
+                if (this.isPaused) return;
+                
+                this.electricLines.forEach(line => {
+                    // Move head position
+                    line.headPosition += line.speed;
+                    if (line.headPosition >= line.totalPathLength) {
+                        line.headPosition = 0; // Loop back to start
+                    }
+                    
+                    // Clear old segments
+                    line.segments.forEach(segment => segment.remove());
+                    line.segments = [];
+                    
+                    // Create body segments behind the head
+                    for (let i = 0; i < line.bodyLength; i += 15) { // Every 15 pixels
+                        const segmentPosition = line.headPosition - i;
+                        let actualPosition = segmentPosition;
+                        
+                        // Handle wraparound for tail
+                        if (actualPosition < 0) {
+                            actualPosition = line.totalPathLength + actualPosition;
+                        }
+                        
+                        const coords = this.getPositionOnPath(line.pathSegments, actualPosition);
+                        if (coords) {
+                            const segment = document.createElement('div');
+                            segment.className = 'electric-snake-segment';
+                            segment.style.left = (coords.x - line.thickness/2) + 'px';
+                            segment.style.top = (coords.y - line.thickness/2) + 'px';
+                            segment.style.width = line.thickness + 'px';
+                            segment.style.height = line.thickness + 'px';
+                            this.gameWorld.appendChild(segment);
+                            line.segments.push(segment);
+                        }
+                    }
+                });
             }
-            
-            const coords = this.getPositionOnPath(line.pathSegments, actualPosition);
-            if (coords) {
-                const segment = document.createElement('div');
-                segment.className = 'electric-snake-segment';
-                segment.style.left = (coords.x - line.thickness/2) + 'px';
-                segment.style.top = (coords.y - line.thickness/2) + 'px';
-                segment.style.width = line.thickness + 'px';
-                segment.style.height = line.thickness + 'px';
-                this.gameWorld.appendChild(segment);
-                line.segments.push(segment);
-            }
-        }
-    });
-}
-getPositionOnPath(pathSegments, position) {
-    // Find which segment this position is on
-    for (let segment of pathSegments) {
-        if (position >= segment.totalLengthBefore && 
-            position <= segment.totalLengthBefore + segment.length) {
-            
-            const progressOnSegment = (position - segment.totalLengthBefore) / segment.length;
-            
-            return {
-                x: segment.start.x + (segment.end.x - segment.start.x) * progressOnSegment,
-                y: segment.start.y + (segment.end.y - segment.start.y) * progressOnSegment
-            };
-        }
-    }
-    return null;
-}
 
-            
+            getPositionOnPath(pathSegments, position) {
+                // Find which segment this position is on
+                for (let segment of pathSegments) {
+                    if (position >= segment.totalLengthBefore && 
+                        position <= segment.totalLengthBefore + segment.length) {
+                        
+                        const progressOnSegment = (position - segment.totalLengthBefore) / segment.length;
+                        
+                        return {
+                            x: segment.start.x + (segment.end.x - segment.start.x) * progressOnSegment,
+                            y: segment.start.y + (segment.end.y - segment.start.y) * progressOnSegment
+                        };
+                    }
+                }
+                return null;
+            }
+
             checkCollisions() {
                 if (this.isInvulnerable) return;
                 
@@ -1659,26 +1170,28 @@ getPositionOnPath(pathSegments, position) {
                     bottom: this.playerY + 12
                 };
                 
-                // In checkCollisions(), replace the electric line collision section:
+                // Electric line collision check
                 let electricHit = false;
-this.electricLines.forEach(line => {
-    if (electricHit) return; // Stop checking if already hit
-    line.segments.forEach(segment => {
-        if (electricHit) return; // Stop checking if already hit
-        const segmentRect = {
-            left: parseInt(segment.style.left),
-            top: parseInt(segment.style.top),
-            right: parseInt(segment.style.left) + parseInt(segment.style.width),
-            bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
-        };
-        
-        if (this.rectsOverlap(playerRect, segmentRect)) {
-            this.instantDeath('⚡ Electrocuted!');
-            return;
-        }
-    });
-});
-                if (electricHit) return; // Don't check other collisions if electric death occurred
+                this.electricLines.forEach(line => {
+                    if (electricHit) return;
+                    line.segments.forEach(segment => {
+                        if (electricHit) return;
+                        const segmentRect = {
+                            left: parseInt(segment.style.left),
+                            top: parseInt(segment.style.top),
+                            right: parseInt(segment.style.left) + parseInt(segment.style.width),
+                            bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
+                        };
+                        
+                        if (this.rectsOverlap(playerRect, segmentRect)) {
+                            this.instantDeath('⚡ Electrocuted!');
+                            electricHit = true;
+                            return;
+                        }
+                    });
+                });
+                if (electricHit) return;
+                
                 // Check snake collisions
                 this.snakes.forEach(enemy => {
                     if (!enemy.alive) return;
@@ -1695,50 +1208,36 @@ this.electricLines.forEach(line => {
                     }
                 });
 
-                // ADD THIS SECTION - Item collision detection
-    this.items.forEach(item => {
-        if (item.collected) return;
-        
-        const itemRect = {
-            left: item.x,
-            top: item.y,
-            right: item.x + item.width,
-            bottom: item.y + item.height
-        };
-        
-        if (this.rectsOverlap(playerRect, itemRect)) {
-            item.collected = true;
-            item.element.remove();
-            
-            if (item.type === 'money') {
-    this.tempMoney += item.value;
-    this.showMessage(`💰 +${item.value}¥ (temporary)`);
-    
-    // Set the boolean flag
-    if (item.id) {
-        this[item.id] = true;
-    }
-} else if (item.type === 'purpleHeart') {
-    this.tempMaxHearts += item.value;
-    this.showMessage('💜 Max Hearts +1! (temporary)');
-    
-    // Set the boolean flag
-    if (item.id) {
-        this[item.id] = true;
-    }
-} else if (item.type === 'purpleHeart') {
-                this.tempMaxHearts += item.value;
-                this.showMessage('💜 Max Hearts +1! (temporary)');
-                
-                // Track temporary collection
-                if (item.id) {
-                    this.tempCollectedPurpleHearts.push(item.id);
-                }
-            }
-            
-            this.updateUI();
-        }
-    });
+                // Item collision detection - only check current room items
+                this.items.forEach(item => {
+                    if (item.collected) return;
+                    // Skip if item element is not in the DOM (room change cleanup)
+                    if (!item.element.parentNode) return;
+                    
+                    const itemRect = {
+                        left: item.x,
+                        top: item.y,
+                        right: item.x + item.width,
+                        bottom: item.y + item.height
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, itemRect)) {
+                        item.collected = true;
+                        item.element.remove();
+                        
+                        if (item.type === 'money') {
+                            this.sessionMoney += item.value;
+                            this.sessionCollectedItems.add(item.id);
+                            this.showMessage(`💰 +${item.value}¥ (session)`);
+                        } else if (item.type === 'purpleHeart') {
+                            this.sessionMaxHearts += item.value;
+                            this.sessionCollectedItems.add(item.id);
+                            this.showMessage('💜 Max Hearts +1! (session)');
+                        }
+                        
+                        this.updateUI();
+                    }
+                });
                 
                 // Check cave exit collision
                 const exits = this.gameWorld.querySelectorAll('.exit-light');
@@ -1759,16 +1258,53 @@ this.electricLines.forEach(line => {
                 this.checkNPCCollisions();
             }
 
+            checkNPCCollisions() {
+                const playerRect = {
+                    left: this.playerX - 12,
+                    top: this.playerY - 12,
+                    right: this.playerX + 12,
+                    bottom: this.playerY + 12
+                };
+                
+                let touchingNPC = false;
+                
+                // Only check NPCs that exist in the current room
+                this.npcs.forEach(npc => {
+                    // Skip if NPC element is not in the DOM (room change cleanup)
+                    if (!npc.element.parentNode) return;
+                    
+                    const npcRect = {
+                        left: npc.x,
+                        top: npc.y,
+                        right: npc.x + npc.width,
+                        bottom: npc.y + npc.height
+                    };
+                    
+                    if (this.rectsOverlap(playerRect, npcRect)) {
+                        touchingNPC = true;
+                        
+                        if (npc.isSpecial) {
+                            this.showMamiKeyPopup();
+                        } else {
+                            this.showNPCMessage(npc.message);
+                        }
+                    }
+                });
+                
+                if (!touchingNPC) {
+                    this.hideNPCMessage();
+                }
+            }
 
             instantDeath(message) {
-    if (this.isDying) return; // Prevent multiple death calls
-    this.isDying = true;
-    
-    this.showMessage(message);
-    setTimeout(() => {
-        this.gameOver();
-    }, 500);
-}
+                if (this.isDying) return; // Prevent multiple death calls
+                this.isDying = true;
+                
+                this.showMessage(message);
+                setTimeout(() => {
+                    this.gameOver();
+                }, 500);
+            }
             
             checkRoomTransitions() {
                 if (this.isTransitioning) return;
@@ -1889,11 +1425,53 @@ this.electricLines.forEach(line => {
                     this.gameOver();
                 }
             }
+
+            exitCave() {
+                this.gameStarted = false;
+                clearInterval(this.timerInterval);
+                this.caveMusic.pause();
+                
+                this.showMessage('🌅 Exiting cave...');
+                
+                setTimeout(() => {
+                    // Apply session gains permanently on successful exit
+                    this.money += this.sessionMoney;
+                    this.maxHearts += this.sessionMaxHearts;
+
+                    // Auto-heal to new max hearts if gained any
+                    if (this.sessionMaxHearts > 0) {
+                        this.hearts = this.maxHearts;
+                    }
+
+                    // Mark collected items as permanently collected
+                    this.sessionCollectedItems.forEach(itemId => {
+                        this[itemId] = true;
+                    });
+                    
+                    // SAVE THE GAME STATE BEFORE MODIFYING IT
+                    this.saveGameState();
+                    
+                    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+                    gameState.playerX = 960;
+                    gameState.playerY = 2300;
+                    gameState.currentUrl = 'maze2';
+                    
+                    // SAVE AGAIN WITH THE NEW POSITION
+                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                    
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                }, 2000);
+            }
             
             gameOver() {
                 this.isDying = false;
                 this.deathCount++;
                 this.updateDeathCounter();
+                
+                // Reset session gains (lose progress on death)
+                this.sessionMoney = 0;
+                this.sessionMaxHearts = 0;
+                this.sessionCollectedItems.clear();
                 
                 this.saveGameState();
                 this.gameStarted = false;
@@ -1916,45 +1494,7 @@ this.electricLines.forEach(line => {
                     window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 }, 3000);
             }
-            
-            exitCave() {
-    this.gameStarted = false;
-    clearInterval(this.timerInterval);
-    this.caveMusic.pause();
-    
-    this.showMessage('🌅 Exiting cave...');
-    
-    setTimeout(() => {
-        
-        // Apply temporary gains permanently
-this.money += this.tempMoney;
-this.maxHearts += this.tempMaxHearts;
 
-// Auto-heal to new max hearts if gained any
-if (this.tempMaxHearts > 0) {
-    this.hearts = this.maxHearts;
-}
-
-// Clear temporary counters (flags stay true)
- this.tempMoney = 0;
- this.tempMaxHearts = 0;
-        
-        
-        // SAVE THE GAME STATE BEFORE MODIFYING IT
-        this.saveGameState();
-        
-        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-        gameState.playerX = 960;
-        gameState.playerY = 2300;
-        gameState.currentUrl = 'maze2';
-        
-        // SAVE AGAIN WITH THE NEW POSITION
-        localStorage.setItem('mfGameState', JSON.stringify(gameState));
-        
-        window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
-    }, 2000);
-}
-            
             saveGameState() {
                 const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
                 gameState.hearts = this.hearts;
@@ -1962,15 +1502,16 @@ if (this.tempMaxHearts > 0) {
                 gameState.timeElapsed = this.timeElapsed;
                 gameState.deathCount = this.deathCount;
                 gameState.maxHearts = this.maxHearts;
-                // Save cave D collection flags
-gameState.caveDMoney1 = this.caveDMoney1;
-gameState.caveDMoney2 = this.caveDMoney2;
-gameState.caveDMoney3 = this.caveDMoney3;
-gameState.caveDMoney4 = this.caveDMoney4;
-gameState.caveDMoney5 = this.caveDMoney5;
-gameState.caveDMoneyEntrance = this.caveDMoneyEntrance;
-gameState.caveDPurple1 = this.caveDPurple1;
-gameState.caveDPurple2 = this.caveDPurple2;
+                
+                // Save Cave D collection flags (NEW NAMING)
+                gameState.cdmoney1 = this.cdmoney1;
+                gameState.cdmoney2 = this.cdmoney2;
+                gameState.cdmoney3 = this.cdmoney3;
+                gameState.cdmoney4 = this.cdmoney4;
+                gameState.cdmoney5 = this.cdmoney5;
+                gameState.cdmoneyEntrance = this.cdmoneyEntrance;
+                gameState.cdpheart1 = this.cdpheart1;
+                gameState.cdpheart2 = this.cdpheart2;
                 
                 // Save all items and upgrades
                 gameState.hasWeapon = this.hasWeapon;
@@ -2025,29 +1566,30 @@ gameState.caveDPurple2 = this.caveDPurple2;
             
             updateUI() {
                 document.getElementById('hearts').textContent = this.hearts;
-    document.getElementById('money').textContent = this.money + this.tempMoney;
+                // Show current money + session money
+                document.getElementById('money').textContent = this.money + this.sessionMoney;
                 
                 let items = [];
                 if (this.hasWeapon) {
-    let gunHTML = '';
-    
-    if (this.hasSuperGun) {
-        gunHTML = '<span style="filter: brightness(0.3);">🔫</span>'; // Deep black for super gun
-    } else if (this.hasHammerPower) {
-        gunHTML = '<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>'; // Grey for hammer
-    } else if (this.hasOrangePower) {
-        gunHTML = '<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2);">🔫</span>'; // Blue for orange
-    } else {
-        gunHTML = '🔫'; // Default green
-    }
-    
-    // Add pulse animation if enhanced range
-    if (this.hasEnhancedRange) {
-        gunHTML = gunHTML.replace('🔫', '<span style="animation: gunPulsate 2s infinite; filter: drop-shadow(0 0 8px gold);">🔫</span>');
-    }
-    
-    items.push(gunHTML);
-}
+                    let gunHTML = '';
+                    
+                    if (this.hasSuperGun) {
+                        gunHTML = '<span style="filter: brightness(0.3);">🔫</span>'; // Deep black for super gun
+                    } else if (this.hasHammerPower) {
+                        gunHTML = '<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>'; // Grey for hammer
+                    } else if (this.hasOrangePower) {
+                        gunHTML = '<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2);">🔫</span>'; // Blue for orange
+                    } else {
+                        gunHTML = '🔫'; // Default green
+                    }
+                    
+                    // Add pulse animation if enhanced range
+                    if (this.hasEnhancedRange) {
+                        gunHTML = gunHTML.replace('🔫', '<span style="animation: gunPulsate 2s infinite; filter: drop-shadow(0 0 8px gold);">🔫</span>');
+                    }
+                    
+                    items.push(gunHTML);
+                }
                 if (this.hasFlashlight) items.push('🔦');
                 if (this.hasBoat) items.push('⛵');
                 if (this.hasKey) items.push('🔑');
@@ -2055,13 +1597,28 @@ gameState.caveDPurple2 = this.caveDPurple2;
                 if (this.hasTrophy) items.push('🏆');
                 
                 if (!document.getElementById('items')) {
-    const itemsDiv = document.createElement('div');
-    itemsDiv.id = 'items';
-    itemsDiv.innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
-    document.getElementById('ui').appendChild(itemsDiv);
-} else {
-    document.getElementById('items').innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
-}
+                    const itemsDiv = document.createElement('div');
+                    itemsDiv.id = 'items';
+                    itemsDiv.innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+                    document.getElementById('ui').appendChild(itemsDiv);
+                } else {
+                    document.getElementById('items').innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+                }
+            }
+
+            showNPCMessage(text) {
+                const message = document.getElementById('message');
+                message.textContent = text;
+                message.style.display = 'block';
+                clearTimeout(this.npcMessageTimeout);
+                // No timeout - message stays until player moves away
+            }
+
+            hideNPCMessage() {
+                const message = document.getElementById('message');
+                if (message.style.display === 'block') {
+                    message.style.display = 'none';
+                }
             }
             
             showMessage(text) {
