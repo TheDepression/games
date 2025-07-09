@@ -726,7 +726,7 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
         {x: 330, y: 210, w: 20, h: 140}
     ],
     snakes: [], // Remove snakes
-    electricLines: ['line1'] // Add this line
+    electricLines: ['line1'], ['line1b'], ['line1c']// Add this line
 },
                     '1,0': { // Room 1
     exits: ['w', 'e'], // west and east
@@ -949,6 +949,32 @@ if (layout.electricLines) {
             speed: 1.5,
             bodyLength: 100,
             thickness: 15
+        },
+        'line1b': {
+            id: 'line1b',
+            path: [
+                {x: 40, y: 110}, {x: 40, y: 320}, // down to
+                {x: 160, y: 320}, // right to  
+                {x: 160, y: 110}, //  up to
+                {x: 40, y: 110}  // left back to start
+            ],
+            segmentSize: 25,
+            speed: 2.6,
+            bodyLength: 320, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
+        },
+        'line1c': {
+            id: 'line1c',
+            path: [
+                {x: 210, y: 190}, {x: 210, y: 300}, // down
+                {x: 290, y: 300}, // right edge  
+                {x: 290, y: 190}, // return up
+                {x: 210, y: 190}  // left back to start
+            ],
+            segmentSize: 25,
+            speed: 2.2,
+            bodyLength: 250, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
         }
     };
     
