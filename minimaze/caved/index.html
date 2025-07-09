@@ -387,6 +387,10 @@
     this.mamiKeyLastInteraction = 0;
     this.tempMoney = 0; // Temporary money from cave (not saved on death)
     this.tempMaxHearts = 0; // Temporary max hearts from cave
+                this.tempCollectedItems = []; // Track items collected in current cave session
+    this.tempCollectedPurpleHearts = []; // Track purple hearts collected in current cave session
+    this.permanentCollectedItems = []; // Items permanently collected from previous successful exits
+    this.permanentCollectedPurpleHearts = []; // Purple hearts permanently collected
                 
                 // Gun system from maze2
                 this.attackCooldown = false;
@@ -447,6 +451,9 @@
                     this.deathCount = gameState.deathCount || 0;
                     this.updateDeathCounter(); // Add this line
                     this.maxHearts = gameState.maxHearts || 3;
+                    // Load permanent cave collections
+        this.permanentCollectedItems = gameState.permanentCollectedItems || [];
+        this.permanentCollectedPurpleHearts = gameState.permanentCollectedPurpleHearts || [];
                     
                     // Gun upgrades from maze2
                     this.hasWeapon = gameState.hasWeapon || false;
@@ -723,11 +730,13 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
     npc.style.userSelect = 'none';
     
     if (imageSrc) {
-        npc.style.backgroundImage = `url("${imageSrc}")`;
-        npc.style.backgroundSize = 'contain';
-        npc.style.backgroundRepeat = 'no-repeat';
-        npc.style.backgroundPosition = 'center';
-    } else {
+    npc.style.backgroundImage = `url("${imageSrc}")`;
+    npc.style.backgroundSize = 'contain';
+    npc.style.backgroundRepeat = 'no-repeat';
+    npc.style.backgroundPosition = 'center';
+    npc.style.width = '64px'; // Double from 32px
+    npc.style.height = '64px'; // Double from 32px
+} else {
         npc.textContent = emoji;
         npc.style.textAlign = 'center';
         npc.style.lineHeight = '32px';
@@ -746,7 +755,7 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
     });
 }
 
-            createItem(x, y, type, value) {
+            createItem(x, y, type, value, id = null) {
     const item = document.createElement('div');
     item.style.position = 'absolute';
     item.style.left = x + 'px';
@@ -767,6 +776,11 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
         item.style.filter = 'drop-shadow(0 0 8px purple)';
     }
     
+    // Add ID if provided
+    if (id) {
+        item.dataset.id = id;
+    }
+    
     this.gameWorld.appendChild(item);
     
     this.items.push({
@@ -777,7 +791,8 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
         value: value,
         width: 24,
         height: 24,
-        collected: false
+        collected: false,
+        id: id
     });
 }
 
@@ -990,6 +1005,50 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                     this.createSnake(snake.x, snake.y, snake.dir);
                 });
 
+                // Clear temporary collections when entering room 0,0 (reset cave session)
+if (roomX === 0 && roomY === 0) {
+    this.tempCollectedItems = [];
+    this.tempCollectedPurpleHearts = [];
+}
+
+// Add items and purple hearts based on room
+if (roomX === 2 && roomY === 0) {
+    // Room 2 - 2 money bags
+    if (!this.tempCollectedItems.includes('cave_money_1') && !this.permanentCollectedItems.includes('cave_money_1')) {
+        this.createItem(175, 30, 'money', 300, 'cave_money_1');
+    }
+    if (!this.tempCollectedItems.includes('cave_money_2') && !this.permanentCollectedItems.includes('cave_money_2')) {
+        this.createItem(175, 320, 'money', 300, 'cave_money_2');
+    }
+}
+
+if (roomX === 3 && roomY === -1) {
+    // Secret room - 3 money and 2 purple hearts
+    if (!this.tempCollectedItems.includes('cave_money_3') && !this.permanentCollectedItems.includes('cave_money_3')) {
+        this.createItem(80, 250, 'money', 300, 'cave_money_3');
+    }
+    if (!this.tempCollectedItems.includes('cave_money_4') && !this.permanentCollectedItems.includes('cave_money_4')) {
+        this.createItem(150, 280, 'money', 300, 'cave_money_4');
+    }
+    if (!this.tempCollectedItems.includes('cave_money_5') && !this.permanentCollectedItems.includes('cave_money_5')) {
+        this.createItem(220, 250, 'money', 300, 'cave_money_5');
+    }
+    
+    // Purple hearts
+    if (!this.tempCollectedPurpleHearts.includes('cave_purple_1') && !this.permanentCollectedPurpleHearts.includes('cave_purple_1')) {
+        this.createItem(280, 200, 'purpleHeart', 1, 'cave_purple_1');
+    }
+    if (!this.tempCollectedPurpleHearts.includes('cave_purple_2') && !this.permanentCollectedPurpleHearts.includes('cave_purple_2')) {
+        this.createItem(240, 200, 'purpleHeart', 1, 'cave_purple_2'); // 40px to the left
+    }
+}
+
+if (roomX === 0 && roomY === 0) {
+    // Entrance room - 1 money
+    if (!this.tempCollectedItems.includes('cave_money_entrance') && !this.permanentCollectedItems.includes('cave_money_entrance')) {
+        this.createItem(240, 300, 'money', 300, 'cave_money_entrance');
+    }
+}
 
                 // Clear existing NPCs and items
 this.npcs = [];
@@ -1381,9 +1440,19 @@ checkItemCollisions() {
             if (item.type === 'money') {
                 this.tempMoney += item.value;
                 this.showMessage(`💰 +${item.value}¥ (temporary)`);
+                
+                // Track temporary collection
+                if (item.id) {
+                    this.tempCollectedItems.push(item.id);
+                }
             } else if (item.type === 'purpleHeart') {
                 this.tempMaxHearts += item.value;
                 this.showMessage('💜 Max Hearts +1! (temporary)');
+                
+                // Track temporary collection
+                if (item.id) {
+                    this.tempCollectedPurpleHearts.push(item.id);
+                }
             }
             
             this.updateUI();
@@ -1848,32 +1917,38 @@ this.electricLines.forEach(line => {
             }
             
             exitCave() {
-                // Save temporary items permanently
-    this.money += this.tempMoney;
-    this.maxHearts += this.tempMaxHearts;
-                // Auto-heal to new max hearts
-    if (this.tempMaxHearts > 0) {
-        this.hearts = Math.min(this.hearts + this.tempMaxHearts, this.maxHearts);
-    }
-                this.gameStarted = false;
-                clearInterval(this.timerInterval);
-                this.caveMusic.pause();
-                
-                this.showMessage('🌅 Exiting cave...');
-                
-                setTimeout(() => {
-                    this.saveGameState();
-                    
-                    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
-                    gameState.playerX = 960;  // Back to weak point entrance in maze2
-                    gameState.playerY = 2300;
-                    gameState.currentUrl = 'maze2';
-                    
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                    
-                    window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
-                }, 2000);
-            }
+    this.gameStarted = false;
+    clearInterval(this.timerInterval);
+    this.caveMusic.pause();
+    
+    this.showMessage('🌅 Exiting cave...');
+    
+    setTimeout(() => {
+        // Save temporary items permanently
+        this.money += this.tempMoney;
+        this.maxHearts += this.tempMaxHearts;
+        
+        // Auto-heal to new max hearts (like maze2 does)
+        if (this.tempMaxHearts > 0) {
+            this.hearts = this.maxHearts; // Set to the new maximum
+        }
+        
+        // Move temporary collections to permanent
+        this.permanentCollectedItems.push(...this.tempCollectedItems);
+        this.permanentCollectedPurpleHearts.push(...this.tempCollectedPurpleHearts);
+        
+        this.saveGameState();
+        
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.playerX = 960;  // Back to weak point entrance in maze2
+        gameState.playerY = 2300;
+        gameState.currentUrl = 'maze2';
+        
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+    }, 2000);
+}
             
             saveGameState() {
                 const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
@@ -1882,6 +1957,9 @@ this.electricLines.forEach(line => {
                 gameState.timeElapsed = this.timeElapsed;
                 gameState.deathCount = this.deathCount;
                 gameState.maxHearts = this.maxHearts;
+                // Save permanent cave collections
+    gameState.permanentCollectedItems = this.permanentCollectedItems;
+    gameState.permanentCollectedPurpleHearts = this.permanentCollectedPurpleHearts;
                 
                 // Save all items and upgrades
                 gameState.hasWeapon = this.hasWeapon;
