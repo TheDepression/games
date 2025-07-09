@@ -1021,48 +1021,43 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                     this.createSnake(snake.x, snake.y, snake.dir);
                 });
 
-                // Clear temporary collections when entering room 0,0 (reset cave session)
-// if (roomX === 0 && roomY === 0) {
- //   this.tempCollectedItems = [];
- //   this.tempCollectedPurpleHearts = [];
-// }
 
-// Add items and purple hearts based on room
+// Add items based on room
 if (roomX === 2 && roomY === 0) {
     // Room 2 - 2 money bags
-    if (!this.tempCollectedItems.includes('cave_money_1') && !this.permanentCollectedItems.includes('cave_money_1')) {
-        this.createItem(175, 30, 'money', 300, 'cave_money_1');
+    if (!this.caveDMoney1) {
+        this.createItem(175, 30, 'money', 300, 'caveDMoney1');
     }
-    if (!this.tempCollectedItems.includes('cave_money_2') && !this.permanentCollectedItems.includes('cave_money_2')) {
-        this.createItem(175, 320, 'money', 300, 'cave_money_2');
+    if (!this.caveDMoney2) {
+        this.createItem(175, 320, 'money', 300, 'caveDMoney2');
     }
 }
 
 if (roomX === 3 && roomY === -1) {
     // Secret room - 3 money and 2 purple hearts
-    if (!this.tempCollectedItems.includes('cave_money_3') && !this.permanentCollectedItems.includes('cave_money_3')) {
-        this.createItem(80, 250, 'money', 300, 'cave_money_3');
+    if (!this.caveDMoney3) {
+        this.createItem(80, 250, 'money', 300, 'caveDMoney3');
     }
-    if (!this.tempCollectedItems.includes('cave_money_4') && !this.permanentCollectedItems.includes('cave_money_4')) {
-        this.createItem(150, 280, 'money', 300, 'cave_money_4');
+    if (!this.caveDMoney4) {
+        this.createItem(150, 280, 'money', 300, 'caveDMoney4');
     }
-    if (!this.tempCollectedItems.includes('cave_money_5') && !this.permanentCollectedItems.includes('cave_money_5')) {
-        this.createItem(220, 250, 'money', 300, 'cave_money_5');
+    if (!this.caveDMoney5) {
+        this.createItem(220, 250, 'money', 300, 'caveDMoney5');
     }
     
     // Purple hearts
-    if (!this.tempCollectedPurpleHearts.includes('cave_purple_1') && !this.permanentCollectedPurpleHearts.includes('cave_purple_1')) {
-        this.createItem(280, 200, 'purpleHeart', 1, 'cave_purple_1');
+    if (!this.caveDPurple1) {
+        this.createItem(280, 200, 'purpleHeart', 1, 'caveDPurple1');
     }
-    if (!this.tempCollectedPurpleHearts.includes('cave_purple_2') && !this.permanentCollectedPurpleHearts.includes('cave_purple_2')) {
-        this.createItem(240, 200, 'purpleHeart', 1, 'cave_purple_2'); // 40px to the left
+    if (!this.caveDPurple2) {
+        this.createItem(240, 200, 'purpleHeart', 1, 'caveDPurple2');
     }
 }
 
 if (roomX === 0 && roomY === 0) {
     // Entrance room - 1 money
-    if (!this.tempCollectedItems.includes('cave_money_entrance') && !this.permanentCollectedItems.includes('cave_money_entrance')) {
-        this.createItem(240, 300, 'money', 300, 'cave_money_entrance');
+    if (!this.caveDMoneyEntrance) {
+        this.createItem(240, 300, 'money', 300, 'caveDMoneyEntrance');
     }
 }
 
