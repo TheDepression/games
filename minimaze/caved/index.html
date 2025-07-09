@@ -385,10 +385,8 @@
     this.npcMessageTimeout = null;
     this.currentNpcMessage = null;
     this.mamiKeyLastInteraction = 0;
-    this.tempMoney = 0; // Temporary money from cave (not saved on death)
-    this.tempMaxHearts = 0; // Temporary max hearts from cave
-                this.tempCollectedItems = []; // Track items collected in current cave session
-    this.tempCollectedPurpleHearts = []; // Track purple hearts collected in current cave session
+    
+    
                 
                 // Gun system from maze2
                 this.attackCooldown = false;
@@ -420,7 +418,20 @@
                 this.caveMusic = document.getElementById('caveMusic');
 
                 this.frameCount = 0; // Add this line
-                
+
+                // Simple boolean flags for each cave item (like Cave A)
+this.caveDMoney1 = false;      // Room 2,0 money #1
+this.caveDMoney2 = false;      // Room 2,0 money #2  
+this.caveDMoney3 = false;      // Secret room money #1
+this.caveDMoney4 = false;      // Secret room money #2
+this.caveDMoney5 = false;      // Secret room money #3
+this.caveDMoneyEntrance = false; // Room 0,0 money
+this.caveDPurple1 = false;     // Secret room purple heart #1
+this.caveDPurple2 = false;     // Secret room purple heart #2
+
+// Temporary counters (reset on death, kept on exit)
+this.tempMoney = 0;
+this.tempMaxHearts = 0;
                 
                 this.preloadPlayerImages();
                 this.setupControls();
@@ -449,9 +460,16 @@
                     this.deathCount = gameState.deathCount || 0;
                     this.updateDeathCounter(); // Add this line
                     this.maxHearts = gameState.maxHearts || 3;
-                    // Load permanent cave collections
-        this.permanentCollectedItems = gameState.permanentCollectedItems || [];
-        this.permanentCollectedPurpleHearts = gameState.permanentCollectedPurpleHearts || [];
+
+                    // Load cave D collection flags
+this.caveDMoney1 = gameState.caveDMoney1 || false;
+this.caveDMoney2 = gameState.caveDMoney2 || false;
+this.caveDMoney3 = gameState.caveDMoney3 || false;
+this.caveDMoney4 = gameState.caveDMoney4 || false;
+this.caveDMoney5 = gameState.caveDMoney5 || false;
+this.caveDMoneyEntrance = gameState.caveDMoneyEntrance || false;
+this.caveDPurple1 = gameState.caveDPurple1 || false;
+this.caveDPurple2 = gameState.caveDPurple2 || false;
                     
                     // Gun upgrades from maze2
                     this.hasWeapon = gameState.hasWeapon || false;
@@ -1987,9 +2005,15 @@ this.tempCollectedPurpleHearts = [];
                 gameState.timeElapsed = this.timeElapsed;
                 gameState.deathCount = this.deathCount;
                 gameState.maxHearts = this.maxHearts;
-                // Save permanent cave collections
-    gameState.permanentCollectedItems = this.permanentCollectedItems;
-    gameState.permanentCollectedPurpleHearts = this.permanentCollectedPurpleHearts;
+                // Save cave D collection flags
+gameState.caveDMoney1 = this.caveDMoney1;
+gameState.caveDMoney2 = this.caveDMoney2;
+gameState.caveDMoney3 = this.caveDMoney3;
+gameState.caveDMoney4 = this.caveDMoney4;
+gameState.caveDMoney5 = this.caveDMoney5;
+gameState.caveDMoneyEntrance = this.caveDMoneyEntrance;
+gameState.caveDPurple1 = this.caveDPurple1;
+gameState.caveDPurple2 = this.caveDPurple2;
                 
                 // Save all items and upgrades
                 gameState.hasWeapon = this.hasWeapon;
