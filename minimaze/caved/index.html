@@ -778,20 +778,27 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
                             { x: 210, y: 337.5, w: 140, h: 20 }
                         ],
                         snakes: [
-                            { x: 200, y: 270, dir: 'horizontal' }
+                            { x: 185, y: 270, dir: 'horizontal' }
                         ],
                         electricLines: ['line4a', 'line4b', 'line4c']
                     },
                     '4,0': { // Room 4
                         exits: ['w', 'e'], // west and east
                         walls: [
-                            { x: 120, y: 120, w: 110, h: 20 },
-                            { x: 70, y: 250, w: 200, h: 20 }
+                            { x: 100, y: 170, w: 60, h: 10 },
+                            { x: 160, y: 70, w: 10, h: 220 },
+                            { x: 230, y: 10, w: 10, h: 50 },
+                            { x: 100, y: 0, w: 10, h: 100 },
+                            { x: 100, y: 250, w: 10, h: 110 },
+                            { x: 200, y: 110, w: 60, h: 10 },
+                            { x: 230, y: 270, w: 10, h: 90 },
+                            { x: 160, y: 110, w: 70, h: 110 },
+                            { x: 230, y: 110, w: 10, h: 110 },
+                            { x: 200, y: 220, w: 50, h: 10 },
+                            { x: 250, y: 220, w: 10, h: 10 }
                         ],
-                        snakes: [
-                            { x: 90, y: 200, dir: 'vertical' },
-                            { x: 280, y: 160, dir: 'vertical' }
-                        ]
+                        snakes: [],
+                         electricLines: ['line5a', 'line5b', 'line5c', 'line5d']
                     },
                     '5,0': { // Final room
                         exits: ['w'], // only west
@@ -964,8 +971,8 @@ if (layout.electricLines) {
                 {x: 80, y: 30}  // up back to start
             ],
             segmentSize: 20,
-            speed: 1.5,
-            bodyLength: 810,
+            speed: 2.2,
+            bodyLength: 780,
             thickness: 20
         },
         'line1b': {
@@ -1003,7 +1010,7 @@ if (layout.electricLines) {
                 {x: 110, y: 110}  // up back to start
             ],
             segmentSize: 20,
-            speed: 3.7,
+            speed: 3.5,
             bodyLength: 330, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         },
@@ -1016,7 +1023,7 @@ if (layout.electricLines) {
             segmentSize: 20,
             speed: 2.3,
             bodyLength: 35, // Length of the electric snake body (shorter = bigger gap)
-            thickness: 20
+            thickness: 15
         },
         'line4b': {
             id: 'line4b',
@@ -1032,12 +1039,64 @@ if (layout.electricLines) {
         'line4c': {
             id: 'line4c',
             path: [
-                {x: 260, y: 100}, {x: 260, y: 260}, // down
-                {x: 260, y: 100} // up  
+                {x: 270, y: 100}, {x: 270, y: 260}, // down
+                {x: 270, y: 100} // up  
             ],
-            segmentSize: 15,
+            segmentSize: 20,
             speed: 2.5,
             bodyLength: 60, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 15
+        },
+        'line5a': {
+            id: 'line5a',
+            path: [
+                {x: 80, y: 40}, {x: 220, y: 150}, // down
+                {x: 130, y: 150}, // right  
+                {x: 130, y: 40}, // up
+                {x: 80, y: 40}  // left back to start
+            ],
+            segmentSize: 20,
+            speed: 2.4,
+            bodyLength: 240, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
+        },
+        'line5b': {
+            id: 'line5b',
+            path: [
+                {x: 190, y: 30}, {x: 190, y: 80}, // down
+                {x: 260, y: 80}, // right  
+                {x: 260, y: 30}, //  up
+                {x: 190, y: 30}  // left back to start
+            ],
+            segmentSize: 20,
+            speed: 2.6,
+            bodyLength: 160, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
+        },
+        'line5c': {
+            id: 'line5c',
+            path: [
+                {x: 80, y: 210}, {x: 80, y: 320}, // down
+                {x: 130, y: 320}, // right  
+                {x: 130, y: 210}, // up
+                {x: 80, y: 210}  // left
+            ],
+            segmentSize: 20,
+            speed: 2.4,
+            bodyLength: 240, // Length of the electric snake body (shorter = bigger gap)
+            thickness: 20
+        },
+        'line5d': {
+            id: 'line5d',
+            path: [
+                {x: 190, y: 250}, {x: 190, y: 300}, // down
+                {x: 260, y: 300}, // right   
+                {x: 260, y: 250}, // return up
+                {x: 190, y: 250}  // left back to start
+            ],
+            segmentSize: 20,
+            speed: 2.6,
+            bodyLength: 160, // Length of the electric snake body (shorter = bigger gap)
             thickness: 20
         }
     };
