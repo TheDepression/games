@@ -1521,8 +1521,7 @@ hideNPCMessage() {
             if (this.frameCount % 2 === 0) {
                 this.updateElectricLines();
             }
-            this.checkNPCCollisions();
-this.checkItemCollisions();
+           
             this.checkCollisions();
             this.checkRoomTransitions();
         }
@@ -1781,6 +1780,7 @@ this.electricLines.forEach(line => {
                         this.exitCave();
                     }
                 });
+                this.checkNPCCollisions();
             }
 
 
