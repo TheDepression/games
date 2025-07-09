@@ -408,6 +408,8 @@
                 this.gameArea = document.getElementById('gameArea');
                 this.controlArea = document.getElementById('controlArea');
                 this.caveMusic = document.getElementById('caveMusic');
+
+                this.frameCount = 0; // Add this line
                 
                 
                 this.preloadPlayerImages();
@@ -1036,17 +1038,23 @@ createMovingElectricSnake(config) {
                 });
             }
             
-            startGameLoop() {
-                const gameLoop = () => {
-                    if (this.gameStarted && !this.isTransitioning) {
-                        this.updatePlayer();
-                        this.updateSnakes();
-                        this.updateElectricLines(); // Add this line
-                        this.checkCollisions();
-                        this.checkRoomTransitions();
-                    }
-                    requestAnimationFrame(gameLoop);
-                };
+            const gameLoop = () => {
+    if (this.gameStarted && !this.isTransitioning) {
+        this.frameCount++; // Add this line
+        
+        this.updatePlayer();
+        this.updateSnakes();
+        
+        // Only update electric lines every 2nd frame
+        if (this.frameCount % 2 === 0) {
+            this.updateElectricLines();
+        }
+        
+        this.checkCollisions();
+        this.checkRoomTransitions();
+    }
+    requestAnimationFrame(gameLoop);
+};
                 gameLoop();
             }
             
