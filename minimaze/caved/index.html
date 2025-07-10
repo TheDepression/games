@@ -1627,10 +1627,12 @@
                         touchingNPC = true;
                         
                         if (npc.isSpecial) {
-                            this.showMamiKeyPopup();
-                        } else {
-                            this.showNPCMessage(npc.message);
-                        }
+    if (!this.isPopupOpen) {
+        this.showMamiKeyPopup();
+    }
+} else {
+    this.showNPCMessage(npc.message);
+}
                     }
                 });
                 
