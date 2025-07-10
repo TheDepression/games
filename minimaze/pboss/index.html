@@ -235,34 +235,18 @@
             opacity: 0.6;
         }
         
-        #bossHealthBar {
+        .boss-health {
             position: fixed;
             top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 250;
+            right: 10px;
             background: rgba(0,0,0,0.8);
             padding: 8px 12px;
             border-radius: 8px;
+            font-size: 12px;
+            z-index: 250;
             border: 1px solid #665;
-            text-align: center;
+            pointer-events: none;
             opacity: 0.6;
-        }
-        
-        .health-bar {
-            width: 200px;
-            height: 20px;
-            background: #333;
-            border: 2px solid #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-        
-        .health-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff4444, #ff8888);
-            transition: width 0.3s ease;
         }
         
         #message {
@@ -329,11 +313,9 @@
         <div id="timer">0:00</div>
         <div id="deathCounter">☠️0</div>
         
-        <div id="bossHealthBar">
-            <div>P-Monster HP</div>
-            <div class="health-bar">
-                <div class="health-fill" id="bossHealthFill" style="width: 100%;"></div>
-            </div>
+        <div class="boss-health">
+            <div>💀 P-Monster</div>
+            <div>HP: <span id="bossHp">6</span>/6</div>
         </div>
         
         <div id="gameArea">
@@ -417,6 +399,10 @@
                 // Load game state
                 this.loadGameState();
                 
+                // Game state flags
+                this.gameStarted = false;
+                this.gameEnded = false;
+                
                 // Player properties
                 this.playerX = 285; // Center of platform
                 this.playerY = 400; // Near bottom of platform
@@ -452,7 +438,6 @@
                 };
                 
                 this.projectiles = [];
-                this.gameStarted = false;
                 this.timerInterval = null;
                 
                 // DOM elements
@@ -520,7 +505,7 @@
             }
             
             handleStart(e) {
-                if (!this.gameStarted) return;
+                if (!this.gameStarted || this.gameEnded) return;
                 e.preventDefault();
                 
                 const now = Date.now();
@@ -555,7 +540,7 @@
             }
             
             handleMove(e) {
-                if (!this.isDragging || !this.gameStarted) return;
+                if (!this.isDragging || !this.gameStarted || this.gameEnded) return;
                 e.preventDefault();
                 
                 const point = e.touches ? e.touches[0] : e;
@@ -607,7 +592,7 @@
             }
             
             attack() {
-                if (!this.hasWeapon) return;
+                if (!this.hasWeapon || this.gameEnded) return;
                 
                 this.attackCooldown = true;
                 
@@ -646,12 +631,13 @@
             }
             
             checkAttackHits(attackX, attackY) {
-                // Adjust boss center point - move it 15px higher for attack detection
-const bossHitY = this.boss.y + 39 - 15; // Makes him more reachable from above
-const distance = Math.sqrt(
-    Math.pow(attackX - (this.boss.x + 39), 2) + 
-    Math.pow(attackY - bossHitY, 2)
-);
+                if (this.gameEnded) return;
+                
+                const bossHitY = this.boss.y + 39 - 15;
+                const distance = Math.sqrt(
+                    Math.pow(attackX - (this.boss.x + 39), 2) + 
+                    Math.pow(attackY - bossHitY, 2)
+                );
                 
                 if (distance <= this.attackRange) {
                     this.boss.hp -= this.attackDamage;
@@ -675,7 +661,7 @@ const distance = Math.sqrt(
                         }
                     }, 1000);
                     
-                    this.updateBossHealthBar();
+                    this.updateBossHP();
                     
                     if (this.boss.hp <= 0) {
                         this.victory();
@@ -753,7 +739,7 @@ const distance = Math.sqrt(
                 this.updateCamera();
                 
                 this.updateUI();
-                this.updateBossHealthBar();
+                this.updateBossHP();
                 this.startGame();
             }
             
@@ -776,7 +762,7 @@ const distance = Math.sqrt(
             
             startGameLoop() {
                 const gameLoop = () => {
-                    if (this.gameStarted) {
+                    if (this.gameStarted && !this.gameEnded) {
                         this.updatePlayer();
                         this.updateBoss();
                         this.updateProjectiles();
@@ -788,6 +774,8 @@ const distance = Math.sqrt(
             }
             
             updatePlayer() {
+                if (!this.gameStarted || this.gameEnded) return;
+                
                 if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
                     const newX = this.playerX + this.playerVelocityX;
                     const newY = this.playerY + this.playerVelocityY;
@@ -808,331 +796,355 @@ const distance = Math.sqrt(
                 this.playerVelocityY *= 0.9;
             }
             
-            updateCamera() {
-                const gameAreaWidth = this.gameArea.offsetWidth;
-                const gameAreaHeight = this.gameArea.offsetHeight;
-                const scrollX = this.playerX - gameAreaWidth / 2 + 12;
-                const scrollY = this.playerY - gameAreaHeight / 2 + 12;
-                this.gameArea.scrollTo({
-                    left: scrollX,
-                    top: scrollY,
-                    behavior: 'auto'
-                });
-            }
-            
-            canMoveTo(x, y) {
-                const playerSize = 24;
-                
-                // Platform boundaries (130px margin + 3px border = 133px start, 310px width)
-                const platformLeft = 133;
-                const platformTop = 133;
-                const platformRight = 133 + 310 - playerSize;
-                const platformBottom = 133 + 320 - playerSize;
-                
-                return x >= platformLeft && x <= platformRight && 
-                       y >= platformTop && y <= platformBottom;
-            }
-            
-            updateBoss() {
-                const bossEl = document.getElementById('boss');
-                const now = Date.now();
-                
-                if (this.boss.state === 'horizontal') {
-                    if (this.boss.direction === 'right') {
-                        this.boss.x += this.boss.speed;
-                        if (this.boss.x >= 570 - 78 - 130) { // Stop before water margin
-                            this.boss.x = 570 - 78 - 130;
-                            this.boss.state = 'vertical';
-                            this.boss.direction = Math.random() < 0.5 ? 'up' : 'down';
-                            const distances = [100, 200, 300];
-                            this.boss.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
-                            this.boss.rideDistance = 0;
-                        }
-                    } else if (this.boss.direction === 'left') {
-                        this.boss.x -= this.boss.speed;
-                        if (this.boss.x <= 130) { // Stop before water margin
-                            this.boss.x = 130;
-                            this.boss.state = 'vertical';
-                            this.boss.direction = Math.random() < 0.5 ? 'up' : 'down';
-                            const distances = [100, 200, 300];
-                            this.boss.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
-                            this.boss.rideDistance = 0;
-                        }
-                    }
-                } else if (this.boss.state === 'vertical') {
-                    // Shoot projectiles while moving vertically
-                    if (now - this.boss.lastShot > this.boss.shotCooldown) {
-                        this.createProjectile();
-                        this.boss.lastShot = now;
-                    }
-                    
-                    if (this.boss.direction === 'up') {
-                        this.boss.y -= this.boss.speed;
-                        this.boss.rideDistance += this.boss.speed;
-                        
-                        if (this.boss.y <= 130) { // Stop before water margin
-                            this.boss.y = 130;
-                            this.boss.direction = 'down';
-                        }
-                        
-                        if (this.boss.rideDistance >= this.boss.targetRideDistance) {
-                            this.boss.state = 'horizontal';
-                            this.boss.direction = this.boss.x <= 130 ? 'right' : 'left';
-                        }
-                    } else if (this.boss.direction === 'down') {
-                        this.boss.y += this.boss.speed;
-                        this.boss.rideDistance += this.boss.speed;
-                        
-                        if (this.boss.y >= 570 - 78 - 130) { // Stop before water margin
-                            this.boss.y = 570 - 78 - 130;
-                            this.boss.direction = 'up';
-                        }
-                        
-                        if (this.boss.rideDistance >= this.boss.targetRideDistance) {
-                            this.boss.state = 'horizontal';
-                            this.boss.direction = this.boss.x <= 130 ? 'right' : 'left';
-                        }
-                    }
-                }
-                
-                bossEl.style.left = this.boss.x + 'px';
-                bossEl.style.top = this.boss.y + 'px';
-            }
-            
-            createProjectile() {
-                const projectile = document.createElement('div');
-                projectile.className = 'projectile';
-                projectile.textContent = '💩';
-                
-                // Start from boss center
-                const startX = this.boss.x + 39;
-                const startY = this.boss.y + 39;
-                
-                // Aim towards player
-                const deltaX = (this.playerX + 12) - startX;
-                const deltaY = (this.playerY + 12) - startY;
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                const speed = 3;
-                const velocityX = (deltaX / distance) * speed;
-                const velocityY = (deltaY / distance) * speed;
-                
-                projectile.style.left = startX + 'px';
-                projectile.style.top = startY + 'px';
-                
-                this.gameWorld.appendChild(projectile);
-                
-                this.projectiles.push({
-                    element: projectile,
-                    x: startX,
-                    y: startY,
-                    velocityX: velocityX,
-                    velocityY: velocityY
-                });
-            }
-            
-            updateProjectiles() {
-                for (let i = this.projectiles.length - 1; i >= 0; i--) {
-                    const projectile = this.projectiles[i];
-                    
-                    projectile.x += projectile.velocityX;
-                    projectile.y += projectile.velocityY;
-                    
-                    projectile.element.style.left = projectile.x + 'px';
-                    projectile.element.style.top = projectile.y + 'px';
-                    
-                    // Remove if out of bounds
-                    if (projectile.x < -20 || projectile.x > 590 || 
-                        projectile.y < -20 || projectile.y > 600) {
-                        projectile.element.remove();
-                        this.projectiles.splice(i, 1);
-                    }
-                }
-            }
-            
-            checkCollisions() {
-                if (this.isInvulnerable) return;
-                
-                const playerRect = {
-                    left: this.playerX,
-                    top: this.playerY,
-                    right: this.playerX + 24,
-                    bottom: this.playerY + 24
-                };
-                
-                // Check boss collision
-                const bossRect = {
-    left: this.boss.x,
-    top: this.boss.y + 5, // Shrink upper hitbox by 5px
-    right: this.boss.x + 78,
-    bottom: this.boss.y + 78
-};
-                
-                if (this.rectsOverlap(playerRect, bossRect)) {
-                    this.takeDamage();
-                }
-                
-                // Check projectile collisions
-                for (let i = this.projectiles.length - 1; i >= 0; i--) {
-                    const projectile = this.projectiles[i];
-                    const projRect = {
-                        left: projectile.x,
-                        top: projectile.y,
-                        right: projectile.x + 20,
-                        bottom: projectile.y + 20
-                    };
-                    
-                    if (this.rectsOverlap(playerRect, projRect)) {
-                        this.takeDamage();
-                        projectile.element.remove();
-                        this.projectiles.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-            
-            rectsOverlap(rect1, rect2) {
-                return rect1.left < rect2.right &&
-                       rect1.right > rect2.left &&
-                       rect1.top < rect2.bottom &&
-                       rect1.bottom > rect2.top;
-            }
-            
-            takeDamage() {
-                if (this.isInvulnerable) return;
-                
-                this.hearts--;
-                this.showMessage('💔 Ouch!');
-                this.updateUI();
-                
-                this.isInvulnerable = true;
-                this.player.classList.add('invulnerable');
-                
-                setTimeout(() => {
-                    this.isInvulnerable = false;
-                    this.player.classList.remove('invulnerable');
-                }, 1000);
-                
-                if (this.hearts <= 0) {
-                    this.defeat();
-                }
-            }
-            
-            victory() {
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                this.bossMusic.pause();
-                
-                // Mark pink boss as defeated
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    gameState.pinkBossDefeated = true;
-                    gameState.currentUrl = 'maze2';
-                    gameState.hearts = this.hearts;
-                    gameState.money = this.money;
-                    gameState.timeElapsed = this.timeElapsed;
-                    gameState.deathCount = this.deathCount;
-                    gameState.playerX = 150; // At pink square
-                    gameState.playerY = 150;
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                }
-                
-                document.getElementById('victoryScreen').style.display = 'flex';
-            }
-            
-            defeat() {
-                this.deathCount++;
-    this.updateDeathCounter();
-                // SAVE IMMEDIATELY after death count increment
-    this.saveGameState();
-                clearInterval(this.timerInterval);
-                this.gameStarted = false;
-                this.bossMusic.pause();
-              
-                // Save state with death count and time
-                const savedState = localStorage.getItem('mfGameState');
-                if (savedState) {
-                    const gameState = JSON.parse(savedState);
-                    gameState.currentUrl = 'maze2';
-                    gameState.hearts = 3; // Reset hearts
-                    gameState.money = this.money;
-                    gameState.timeElapsed = this.timeElapsed;
-                    gameState.deathCount = this.deathCount;
-                    gameState.playerX = 150; // 50px north of pink square
-                    gameState.playerY = 150;
-                    localStorage.setItem('mfGameState', JSON.stringify(gameState));
-                }
-                
+           updateCamera() {
+               const gameAreaWidth = this.gameArea.offsetWidth;
+               const gameAreaHeight = this.gameArea.offsetHeight;
+               const scrollX = this.playerX - gameAreaWidth / 2 + 12;
+               const scrollY = this.playerY - gameAreaHeight / 2 + 12;
+               this.gameArea.scrollTo({
+                   left: scrollX,
+                   top: scrollY,
+                   behavior: 'auto'
+               });
+           }
+           
+           canMoveTo(x, y) {
+               const playerSize = 24;
+               
+               // Platform boundaries (130px margin + 3px border = 133px start, 310px width)
+               const platformLeft = 133;
+               const platformTop = 133;
+               const platformRight = 133 + 310 - playerSize;
+               const platformBottom = 133 + 320 - playerSize;
+               
+               return x >= platformLeft && x <= platformRight && 
+                      y >= platformTop && y <= platformBottom;
+           }
+           
+           updateBoss() {
+               if (!this.gameStarted || this.gameEnded) return;
+               
+               const bossEl = document.getElementById('boss');
+               const now = Date.now();
+               
+               if (this.boss.state === 'horizontal') {
+                   if (this.boss.direction === 'right') {
+                       this.boss.x += this.boss.speed;
+                       if (this.boss.x >= 570 - 78 - 130) { // Stop before water margin
+                           this.boss.x = 570 - 78 - 130;
+                           this.boss.state = 'vertical';
+                           this.boss.direction = Math.random() < 0.5 ? 'up' : 'down';
+                           const distances = [100, 200, 300];
+                           this.boss.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                           this.boss.rideDistance = 0;
+                       }
+                   } else if (this.boss.direction === 'left') {
+                       this.boss.x -= this.boss.speed;
+                       if (this.boss.x <= 130) { // Stop before water margin
+                           this.boss.x = 130;
+                           this.boss.state = 'vertical';
+                           this.boss.direction = Math.random() < 0.5 ? 'up' : 'down';
+                           const distances = [100, 200, 300];
+                           this.boss.targetRideDistance = distances[Math.floor(Math.random() * distances.length)];
+                           this.boss.rideDistance = 0;
+                       }
+                   }
+               } else if (this.boss.state === 'vertical') {
+                   // Shoot projectiles while moving vertically
+                   if (now - this.boss.lastShot > this.boss.shotCooldown) {
+                       this.createProjectile();
+                       this.boss.lastShot = now;
+                   }
+                   
+                   if (this.boss.direction === 'up') {
+                       this.boss.y -= this.boss.speed;
+                       this.boss.rideDistance += this.boss.speed;
+                       
+                       if (this.boss.y <= 130) { // Stop before water margin
+                           this.boss.y = 130;
+                           this.boss.direction = 'down';
+                       }
+                       
+                       if (this.boss.rideDistance >= this.boss.targetRideDistance) {
+                           this.boss.state = 'horizontal';
+                           this.boss.direction = this.boss.x <= 130 ? 'right' : 'left';
+                       }
+                   } else if (this.boss.direction === 'down') {
+                       this.boss.y += this.boss.speed;
+                       this.boss.rideDistance += this.boss.speed;
+                       
+                       if (this.boss.y >= 570 - 78 - 130) { // Stop before water margin
+                           this.boss.y = 570 - 78 - 130;
+                           this.boss.direction = 'up';
+                       }
+                       
+                       if (this.boss.rideDistance >= this.boss.targetRideDistance) {
+                           this.boss.state = 'horizontal';
+                           this.boss.direction = this.boss.x <= 130 ? 'right' : 'left';
+                       }
+                   }
+               }
+               
+               bossEl.style.left = this.boss.x + 'px';
+               bossEl.style.top = this.boss.y + 'px';
+           }
+           
+           createProjectile() {
+               if (this.gameEnded) return;
+               
+               const projectile = document.createElement('div');
+               projectile.className = 'projectile';
+               projectile.textContent = '💩';
+               
+               // Start from boss center
+               const startX = this.boss.x + 39;
+               const startY = this.boss.y + 39;
+               
+               // Aim towards player
+               const deltaX = (this.playerX + 12) - startX;
+               const deltaY = (this.playerY + 12) - startY;
+               const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+               
+               const speed = 3;
+               const velocityX = (deltaX / distance) * speed;
+               const velocityY = (deltaY / distance) * speed;
+               
+               projectile.style.left = startX + 'px';
+               projectile.style.top = startY + 'px';
+               
+               this.gameWorld.appendChild(projectile);
+               
+               this.projectiles.push({
+                   element: projectile,
+                   x: startX,
+                   y: startY,
+                   velocityX: velocityX,
+                   velocityY: velocityY
+               });
+           }
+           
+           updateProjectiles() {
+               if (!this.gameStarted || this.gameEnded) return;
+               
+               for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                   const projectile = this.projectiles[i];
+                   
+                   projectile.x += projectile.velocityX;
+                   projectile.y += projectile.velocityY;
+                   
+                   projectile.element.style.left = projectile.x + 'px';
+                   projectile.element.style.top = projectile.y + 'px';
+                   
+                   // Remove if out of bounds
+                   if (projectile.x < -20 || projectile.x > 590 || 
+                       projectile.y < -20 || projectile.y > 600) {
+                       projectile.element.remove();
+                       this.projectiles.splice(i, 1);
+                   }
+               }
+           }
+           
+           checkCollisions() {
+               if (!this.gameStarted || this.gameEnded || this.isInvulnerable) return;
+               
+               const playerRect = {
+                   left: this.playerX,
+                   top: this.playerY,
+                   right: this.playerX + 24,
+                   bottom: this.playerY + 24
+               };
+               
+               // Check boss collision
+               const bossRect = {
+                   left: this.boss.x,
+                   top: this.boss.y + 5, // Shrink upper hitbox by 5px
+                   right: this.boss.x + 78,
+                   bottom: this.boss.y + 78
+               };
+               
+               if (this.rectsOverlap(playerRect, bossRect)) {
+                   this.takeDamage();
+                   return;
+               }
+               
+               // Check projectile collisions
+               for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                   const projectile = this.projectiles[i];
+                   const projRect = {
+                       left: projectile.x,
+                       top: projectile.y,
+                       right: projectile.x + 20,
+                       bottom: projectile.y + 20
+                   };
+                   
+                   if (this.rectsOverlap(playerRect, projRect)) {
+                       this.takeDamage();
+                       projectile.element.remove();
+                       this.projectiles.splice(i, 1);
+                       break;
+                   }
+               }
+           }
+           
+           rectsOverlap(rect1, rect2) {
+               return rect1.left < rect2.right &&
+                      rect1.right > rect2.left &&
+                      rect1.top < rect2.bottom &&
+                      rect1.bottom > rect2.top;
+           }
+           
+           takeDamage() {
+               if (this.isInvulnerable || this.gameEnded) return;
+               
+               this.hearts--;
+               this.showMessage('💔 Ouch!');
+               this.updateUI();
+               
+               this.isInvulnerable = true;
+               this.player.classList.add('invulnerable');
+               
                setTimeout(() => {
-        document.getElementById('defeatScreen').style.display = 'flex';
-    }, 2000);
-}
-            
-            updateUI() {
-                document.getElementById('hearts').textContent = this.hearts;
-                document.getElementById('money').textContent = this.money;
-                document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
-                
-                const ui = document.getElementById('ui');
-                let itemsHTML = '';
-                if (this.hasWeapon && this.hasOrangePower) {
-                    itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-                } else if (this.hasWeapon) {
-                    itemsHTML += ' 🔫';
-                }
-                
-                if (!document.getElementById('items')) {
-                    const itemsDiv = document.createElement('div');
-                    itemsDiv.id = 'items';
-                    itemsDiv.innerHTML = '+' + itemsHTML;
-                    ui.appendChild(itemsDiv);
-                } else {
-                    document.getElementById('items').innerHTML = '+' + itemsHTML;
-                }
-            }
-            
-            updateTimer() {
-                const minutes = Math.floor(this.timeElapsed / 60);
-                const seconds = this.timeElapsed % 60;
-                const timerEl = document.getElementById('timer');
-                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (this.timeElapsed >= 600) {
-                    timerEl.style.background = 'rgba(255,0,0,0.8)';
-                } else if (this.timeElapsed >= 300) {
-                    timerEl.style.background = 'rgba(255,165,0,0.8)';
-                } else {
-                    timerEl.style.background = 'rgba(0,128,0,0.8)';
-                }
-            }
-            
-            updateBossHealthBar() {
-                const healthPercentage = (this.boss.hp / this.boss.maxHp) * 100;
-                document.getElementById('bossHealthFill').style.width = healthPercentage + '%';
-            }
-            
-            showMessage(text) {
-                const message = document.getElementById('message');
-                message.textContent = text;
-                message.style.display = 'block';
-                
-                clearTimeout(this.messageTimeout);
-                this.messageTimeout = setTimeout(() => {
-                    message.style.display = 'none';
-                }, 2000);
-            }
-        }
-        
-        function returnToWorld() {
-            window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
-        }
-        
-        // Don't auto-start - wait for button click
-        window.onload = function() {
-            // Just show the start screen
-        };
-    </script>
+                   this.isInvulnerable = false;
+                   this.player.classList.remove('invulnerable');
+               }, 1000);
+               
+               if (this.hearts <= 0) {
+                   this.defeat();
+               }
+           }
+           
+           victory() {
+               if (this.gameEnded) return;
+               this.gameEnded = true;
+               
+               clearInterval(this.timerInterval);
+               this.gameStarted = false;
+               this.bossMusic.pause();
+               
+               // Clear all projectiles immediately
+               this.projectiles.forEach(proj => proj.element.remove());
+               this.projectiles = [];
+               
+               // Mark pink boss as defeated
+               const savedState = localStorage.getItem('mfGameState');
+               if (savedState) {
+                   const gameState = JSON.parse(savedState);
+                   gameState.pinkBossDefeated = true;
+                   gameState.currentUrl = 'maze2';
+                   gameState.hearts = this.hearts;
+                   gameState.money = this.money;
+                   gameState.timeElapsed = this.timeElapsed;
+                   gameState.deathCount = this.deathCount;
+                   gameState.playerX = 150; // At pink square
+                   gameState.playerY = 150;
+                   localStorage.setItem('mfGameState', JSON.stringify(gameState));
+               }
+               
+               document.getElementById('victoryScreen').style.display = 'flex';
+           }
+           
+           defeat() {
+               if (this.gameEnded) return;
+               this.gameEnded = true;
+               
+               this.deathCount++;
+               this.updateDeathCounter();
+               this.saveGameState();
+               
+               clearInterval(this.timerInterval);
+               this.gameStarted = false;
+               this.bossMusic.pause();
+               
+               // Clear all projectiles
+               this.projectiles.forEach(proj => proj.element.remove());
+               this.projectiles = [];
+               
+               // Save state with death count and time
+               const savedState = localStorage.getItem('mfGameState');
+               if (savedState) {
+                   const gameState = JSON.parse(savedState);
+                   gameState.currentUrl = 'maze2';
+                   gameState.hearts = 3; // Reset hearts
+                   gameState.money = this.money;
+                   gameState.timeElapsed = this.timeElapsed;
+                   gameState.deathCount = this.deathCount;
+                   gameState.playerX = 150; // 50px north of pink square
+                   gameState.playerY = 150;
+                   localStorage.setItem('mfGameState', JSON.stringify(gameState));
+               }
+               
+               setTimeout(() => {
+                   document.getElementById('defeatScreen').style.display = 'flex';
+               }, 2000);
+           }
+           
+           updateUI() {
+               document.getElementById('hearts').textContent = this.hearts;
+               document.getElementById('money').textContent = this.money;
+               document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+               
+               const ui = document.getElementById('ui');
+               let itemsHTML = '';
+               if (this.hasWeapon && this.hasOrangePower) {
+                   itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
+               } else if (this.hasWeapon) {
+                   itemsHTML += ' 🔫';
+               }
+               
+               if (!document.getElementById('items')) {
+                   const itemsDiv = document.createElement('div');
+                   itemsDiv.id = 'items';
+                   itemsDiv.innerHTML = '+' + itemsHTML;
+                   ui.appendChild(itemsDiv);
+               } else {
+                   document.getElementById('items').innerHTML = '+' + itemsHTML;
+               }
+           }
+           
+           updateDeathCounter() {
+               document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+           }
+           
+           updateTimer() {
+               const minutes = Math.floor(this.timeElapsed / 60);
+               const seconds = this.timeElapsed % 60;
+               const timerEl = document.getElementById('timer');
+               timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+               
+               if (this.timeElapsed >= 600) {
+                   timerEl.style.background = 'rgba(255,0,0,0.8)';
+               } else if (this.timeElapsed >= 300) {
+                   timerEl.style.background = 'rgba(255,165,0,0.8)';
+               } else {
+                   timerEl.style.background = 'rgba(0,128,0,0.8)';
+               }
+           }
+           
+           updateBossHP() {
+               const hitsNeeded = Math.ceil(this.boss.hp / 100);
+               document.getElementById('bossHp').textContent = hitsNeeded;
+           }
+           
+           showMessage(text) {
+               const message = document.getElementById('message');
+               message.textContent = text;
+               message.style.display = 'block';
+               
+               clearTimeout(this.messageTimeout);
+               this.messageTimeout = setTimeout(() => {
+                   message.style.display = 'none';
+               }, 2000);
+           }
+       }
+       
+       function returnToWorld() {
+           window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+       }
+       
+       // Don't auto-start - wait for button click
+       window.onload = function() {
+           // Just show the start screen
+       };
+   </script>
 </body>
 </html>
-                        
