@@ -340,13 +340,26 @@
             }
 
             // Check if this is the last slide
-            if (index === endingSequence.length - 1) {
-                nextButton.style.display = 'none';
-                escapeButton.style.display = 'block';
-            } else {
-                nextButton.style.display = 'block';
-                escapeButton.style.display = 'none';
-            }
+if (index === endingSequence.length - 1) {
+    nextButton.style.display = 'none';
+    escapeButton.style.display = 'block';
+    escapeButton.disabled = true; // Disable initially
+    
+    // Enable escape button when video ends OR after 6 seconds (whichever comes first)
+    const enableEscape = () => {
+        escapeButton.disabled = false;
+    };
+    
+    if (currentItem.type === 'video') {
+        video.addEventListener('ended', enableEscape, { once: true });
+        setTimeout(enableEscape, 6000); // Fallback timer
+    } else {
+        setTimeout(enableEscape, 5000); // For images
+    }
+} else {
+    nextButton.style.display = 'block';
+    escapeButton.style.display = 'none';
+}
         }
 
         function nextSlide() {
