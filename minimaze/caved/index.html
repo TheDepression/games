@@ -804,72 +804,94 @@
            }
 
            showMamiKeyPopup() {
-               const now = Date.now();
-               if (now - this.mamiKeyLastInteraction < 3000) return;
-               
-               const popup = document.createElement('div');
-               popup.id = 'mamiKeyPopup';
-               popup.style.position = 'absolute';
-               popup.style.top = '50%';
-               popup.style.left = '50%';
-               popup.style.transform = 'translate(-50%, -50%)';
-               popup.style.background = 'rgba(0,0,0,0.95)';
-               popup.style.border = '2px solid #666';
-               popup.style.borderRadius = '10px';
-               popup.style.padding = '20px';
-               popup.style.zIndex = '600';
-               popup.style.color = 'white';
-               popup.style.textAlign = 'center';
-               popup.style.maxWidth = '280px';
-               
-               const img = document.createElement('img');
-               img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png';
-               img.style.width = '60px';
-               img.style.height = '60px';
-               img.style.marginBottom = '10px';
-               
-               const message = document.createElement('div');
-               message.style.marginBottom = '15px';
-               message.style.fontSize = '14px';
-               
-               const button = document.createElement('button');
-               button.style.background = '#4CAF50';
-               button.style.color = 'white';
-               button.style.border = 'none';
-               button.style.padding = '8px 16px';
-               button.style.borderRadius = '4px';
-               button.style.cursor = 'pointer';
-               
-               if (this.hasTrophy) {
-                   message.textContent = 'You are a winner!!!! wow - the trophy is beautiful!!! Here you go!!';
-                   button.textContent = 'OK';
-                   button.onclick = () => {
-                       this.hasTrophy = false;
-                       this.hasKey = true;
-                       this.saveGameState();
-                       this.updateUI();
-                       popup.remove();
-                       this.mamiKeyLastInteraction = Date.now();
-                       this.showMessage('🔑 Received Castle Key!');
-                   };
-               } else {
-                   message.textContent = 'so you want a discount on that castle key?';
-                   button.textContent = 'YES';
-                   button.onclick = () => {
-                       message.textContent = 'OK,... I like winners.... come back to me with a trophy from the Battle Arena, - and I will give it to you!';
-                       button.textContent = 'OK';
-                       button.onclick = () => {
-                           popup.remove();
-                           this.mamiKeyLastInteraction = Date.now();
-                       };
-                   };
-               }
-               
-               popup.appendChild(img);
-               popup.appendChild(message);
-               popup.appendChild(button);
-               document.getElementById('gameContainer').appendChild(popup);
-           }
+    const now = Date.now();
+    if (now - this.mamiKeyLastInteraction < 3000 || this.isPopupOpen) return;
+    
+    this.isPopupOpen = true;
+    
+    // Remove any existing popup first
+    const existingPopup = document.getElementById('mamiKeyPopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    
+    const popup = document.createElement('div');
+    popup.id = 'mamiKeyPopup';
+    popup.style.position = 'absolute';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.background = 'rgba(0,0,0,0.95)';
+    popup.style.border = '2px solid #666';
+    popup.style.borderRadius = '10px';
+    popup.style.padding = '20px';
+    popup.style.zIndex = '600';
+    popup.style.color = 'white';
+    popup.style.textAlign = 'center';
+    popup.style.maxWidth = '280px';
+    
+    const img = document.createElement('img');
+    img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/mamikey.png';
+    img.style.width = '60px';
+    img.style.height = '60px';
+    img.style.marginBottom = '10px';
+    
+    const message = document.createElement('div');
+    message.style.marginBottom = '15px';
+    message.style.fontSize = '14px';
+    
+    const button = document.createElement('button');
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.padding = '8px 16px';
+    button.style.borderRadius = '4px';
+    button.style.cursor = 'pointer';
+    
+    // Updated logic for all three states:
+    if (this.hasKey && !this.hasTrophy) {
+        // State 3: Already has key, no trophy
+        message.textContent = 'Enjoy your key! You made a good trade.';
+        button.textContent = 'OK';
+        button.onclick = () => {
+            popup.remove();
+            this.isPopupOpen = false;
+            this.mamiKeyLastInteraction = Date.now();
+        };
+    } else if (this.hasTrophy && !this.hasKey) {
+        // State 2: Has trophy, wants to trade for key
+        message.textContent = 'You are a winner!!!! wow - the trophy is beautiful!!! Here you go!!';
+        button.textContent = 'Trade Trophy for Key';
+        button.onclick = () => {
+            this.hasTrophy = false;
+            this.hasKey = true;
+            this.saveGameState(); // This makes it permanent
+            this.updateUI();
+            popup.remove();
+            this.isPopupOpen = false;
+            this.mamiKeyLastInteraction = Date.now();
+            this.showMessage('🔑 Received Castle Key!');
+        };
+    } else {
+        // State 1: No trophy, no key (or has both somehow)
+        message.textContent = 'so you want a discount on that castle key?';
+        button.textContent = 'YES';
+        button.onclick = () => {
+            message.textContent = 'OK,... I like winners.... come back to me with a trophy from the Battle Arena, - and I will give it to you!';
+            button.textContent = 'OK';
+            button.onclick = () => {
+                popup.remove();
+                this.isPopupOpen = false;
+                this.mamiKeyLastInteraction = Date.now();
+            };
+        };
+    }
+    
+    popup.appendChild(img);
+    popup.appendChild(message);
+    popup.appendChild(button);
+    document.getElementById('gameContainer').appendChild(popup);
+}
            
            createRoom(roomX, roomY) {
                this.gameWorld.innerHTML = '<div id="player"></div>';
