@@ -692,16 +692,7 @@
     }
 }
 
-        cover-square {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 40px;
-    height: 40px;
-    background: #000;
-    z-index: 500; /* Higher than gorilla (z-index: 50) but lower than UI */
-    pointer-events: none; /* Doesn't interfere with gameplay */
-}
+  
     </style>
 </head>
 <body>
@@ -1685,10 +1676,19 @@ this.updateForestVisibility();
                 this.player.style.top = (this.playerY - visualOffset) + 'px';
                 this.updatePlayerImage('s');
 
-                // Add black cover square at (0,0) to hide any glitched elements
+                // ADD THE COVER SQUARE HERE:
 const coverSquare = document.createElement('div');
 coverSquare.className = 'cover-square';
+coverSquare.style.position = 'absolute';
+coverSquare.style.left = '0px';
+coverSquare.style.top = '0px';
+coverSquare.style.width = '40px';
+coverSquare.style.height = '40px';
+coverSquare.style.background = 'red'; // Make it red so we can see it
+coverSquare.style.zIndex = '500';
+coverSquare.style.pointerEvents = 'none';
 this.gameWorld.appendChild(coverSquare);
+console.log('Cover square created:', coverSquare); // Debug log
                 
                 // Create enemies - 30% faster than original
                 this.createEnemies();
