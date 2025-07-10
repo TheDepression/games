@@ -1064,8 +1064,10 @@ const distance = Math.sqrt(
                     localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 }
                 
-                document.getElementById('defeatScreen').style.display = 'flex';
-            }
+               setTimeout(() => {
+        document.getElementById('defeatScreen').style.display = 'flex';
+    }, 2000);
+}
             
             updateUI() {
                 document.getElementById('hearts').textContent = this.hearts;
