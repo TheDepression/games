@@ -3303,6 +3303,12 @@ purpleHearts.forEach(purpleHeart => {
     };
     
     if (this.rectsOverlap(playerRect, heartRect)) {
+
+        // CHECK IF ALREADY COLLECTED FIRST debido
+    if (this.collectedPurpleHearts.includes(purpleHeart.dataset.id)) {
+        purpleHeart.remove(); // Clean up if somehow still visible
+        return;
+    }
         // Mark as being collected to prevent double-collection
         purpleHeart.dataset.collecting = 'true';
         
