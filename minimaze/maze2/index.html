@@ -1622,8 +1622,8 @@ weakPointsBlasted: this.weakPointsBlasted,
 }
 
             initLevel() {
-                // Clear existing elements
-                const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone');
+                // Clear existing elements debido below
+                const elements = this.gameWorld.querySelectorAll('.maze-wall, .tree-wall, .breakable-wall, .enemy, .friendly, .heart-pickup, .money-pickup, .exit, .foreground-enemy, .water-zone, .forest-zone, .desert-zone, .grass-zone, .lava-zone, .gorilla-encounter, .gorilla-friend, .forest-gorilla');
                 elements.forEach(el => el.remove());
                 
                 this.movingEnemies = [];
