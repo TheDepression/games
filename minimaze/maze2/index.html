@@ -2143,6 +2143,11 @@ this.gameWorld.appendChild(fakeQuicksand);
   {x: 1600, y: 2340, w: 60, h: 60},
   {x: 2340, y: 1980, w: 60, h: 60},
   {x: 500, y: 1960, w: 60, h: 40},
+            // In the tiled array, add these 4 gates:
+{x: 2240, y: 2360, w: 10, h: 40, gateId: 'gateA'},
+{x: 2280, y: 2360, w: 10, h: 40, gateId: 'gateB'}, 
+{x: 2320, y: 2360, w: 10, h: 40, gateId: 'gateC'},
+{x: 2360, y: 2360, w: 10, h: 40, gateId: 'gateD'},
   {x: 880, y: 2220, w: 20, h: 20}
         ],
         pathway: [
@@ -2156,19 +2161,40 @@ this.gameWorld.appendChild(fakeQuicksand);
             const wallEl = document.createElement('div');
             
             if (color === 'tiled') {
-                wallEl.className = 'tiled-wall';
-            } else if (color === 'pathway') {
-                wallEl.className = 'pathway';
-            } else {
-                wallEl.className = 'maze-wall';
-                wallEl.style.background = color;
-            }
-            
-            wallEl.style.left = wall.x + 'px';
-            wallEl.style.top = wall.y + 'px';
-            wallEl.style.width = wall.w + 'px';
-            wallEl.style.height = wall.h + 'px';
-            this.gameWorld.appendChild(wallEl);
+    // Skip creating this wall if it's a gate that's been opened
+    if (wall.gateId && this.openedGates.includes(wall.gateId)) {
+        return; // Don't create the wall - it's been opened
+    }
+    
+    wallEl.className = 'tiled-wall';
+    wallEl.style.left = wall.x + 'px';
+    wallEl.style.top = wall.y + 'px';
+    wallEl.style.width = wall.w + 'px';
+    wallEl.style.height = wall.h + 'px';
+    
+    // Add gate data if this is a gate
+    if (wall.gateId) {
+        wallEl.dataset.gateId = wall.gateId;
+        wallEl.dataset.type = 'gate';
+    }
+    
+    this.gameWorld.appendChild(wallEl);
+} else if (color === 'pathway') {
+    wallEl.className = 'pathway';
+    wallEl.style.left = wall.x + 'px';
+    wallEl.style.top = wall.y + 'px';
+    wallEl.style.width = wall.w + 'px';
+    wallEl.style.height = wall.h + 'px';
+    this.gameWorld.appendChild(wallEl);
+} else {
+    wallEl.className = 'maze-wall';
+    wallEl.style.background = color;
+    wallEl.style.left = wall.x + 'px';
+    wallEl.style.top = wall.y + 'px';
+    wallEl.style.width = wall.w + 'px';
+    wallEl.style.height = wall.h + 'px';
+    this.gameWorld.appendChild(wallEl);
+}
         });
     });
     
@@ -3272,6 +3298,27 @@ if (battleNPC) {
         this.handleBattleNPC();
     }
 }
+
+                // Check gate interactions
+const gates = this.gameWorld.querySelectorAll('[data-type="gate"]');
+gates.forEach(gate => {
+    const gateX = parseInt(gate.style.left);
+    const gateY = parseInt(gate.style.top);
+    const gateW = parseInt(gate.style.width);
+    const gateH = parseInt(gate.style.height);
+    
+    // Expand hitbox by 1px on all sides
+    const gateRect = {
+        left: gateX - 1,
+        top: gateY - 1,
+        right: gateX + gateW + 1,
+        bottom: gateY + gateH + 1
+    };
+    
+    if (this.rectsOverlap(playerRect, gateRect)) {
+        this.handleGateInteraction(gate);
+    }
+});
 
 // Check weak point entrances
 const entrances = this.gameWorld.querySelectorAll('.weak-point-entrance');
@@ -4456,6 +4503,120 @@ transferToBattlezone() {
     setTimeout(() => {
         window.location.href = 'https://thedepression.github.io/games/minimaze/battlezone';
     }, 500);
+}
+
+            handleGateInteraction(gate) {
+    const now = Date.now();
+    const gateId = gate.dataset.gateId;
+    const interactionKey = `gate_${gateId}`;
+    
+    // Prevent spam (3 second cooldown)
+    if (this.lastGateInteraction[interactionKey] && 
+        now - this.lastGateInteraction[interactionKey] < 3000) {
+        return;
+    }
+    
+    this.lastGateInteraction[interactionKey] = now;
+    this.showGateDialog(gateId);
+}
+
+            showGateDialog(gateId) {
+    this.gameStarted = false; // Pause game
+    
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'gateDialog';
+    dialogOverlay.style.position = 'fixed';
+    dialogOverlay.style.top = '0';
+    dialogOverlay.style.left = '0';
+    dialogOverlay.style.width = '100%';
+    dialogOverlay.style.height = '100%';
+    dialogOverlay.style.background = 'rgba(0,0,0,0.8)';
+    dialogOverlay.style.display = 'flex';
+    dialogOverlay.style.justifyContent = 'center';
+    dialogOverlay.style.alignItems = 'center';
+    dialogOverlay.style.zIndex = '400';
+    
+    const dialogBox = document.createElement('div');
+    dialogBox.style.background = 'rgba(0,0,0,0.9)';
+    dialogBox.style.color = 'white';
+    dialogBox.style.padding = '20px';
+    dialogBox.style.borderRadius = '10px';
+    dialogBox.style.textAlign = 'center';
+    dialogBox.style.maxWidth = '300px';
+    dialogBox.style.border = '2px solid #555';
+    
+    const text = document.createElement('p');
+    text.style.margin = '10px 0';
+    text.style.fontSize = '14px';
+    text.textContent = `🚪 Pay 2000¥ to open ${gateId.toUpperCase()}?`;
+    
+    const moneyText = document.createElement('p');
+    moneyText.style.margin = '5px 0';
+    moneyText.style.fontSize = '12px';
+    moneyText.style.opacity = '0.8';
+    moneyText.textContent = `You have: ${this.money}¥`;
+    
+    const yesButton = document.createElement('button');
+    yesButton.style.background = this.money >= 2000 ? '#4CAF50' : '#666';
+    yesButton.style.color = 'white';
+    yesButton.style.border = 'none';
+    yesButton.style.padding = '10px 15px';
+    yesButton.style.borderRadius = '5px';
+    yesButton.style.cursor = this.money >= 2000 ? 'pointer' : 'not-allowed';
+    yesButton.style.fontSize = '14px';
+    yesButton.style.margin = '5px';
+    yesButton.textContent = 'Yes';
+    yesButton.disabled = this.money < 2000;
+    yesButton.onclick = () => {
+        if (this.money >= 2000) {
+            this.openGate(gateId);
+        }
+        dialogOverlay.remove();
+    };
+    
+    const noButton = document.createElement('button');
+    noButton.style.background = '#f44336';
+    noButton.style.color = 'white';
+    noButton.style.border = 'none';
+    noButton.style.padding = '10px 15px';
+    noButton.style.borderRadius = '5px';
+    noButton.style.cursor = 'pointer';
+    noButton.style.fontSize = '14px';
+    noButton.style.margin = '5px';
+    noButton.textContent = 'No';
+    noButton.onclick = () => {
+        dialogOverlay.remove();
+        this.gameStarted = true;
+        this.showMessage('🚪 Gate remains closed.');
+    };
+    
+    dialogBox.appendChild(text);
+    dialogBox.appendChild(moneyText);
+    dialogBox.appendChild(yesButton);
+    dialogBox.appendChild(noButton);
+    dialogOverlay.appendChild(dialogBox);
+    document.body.appendChild(dialogOverlay);
+}
+
+openGate(gateId) {
+    // Deduct money
+    this.money -= 2000;
+    
+    // Mark gate as opened permanently
+    this.openedGates.push(gateId);
+    
+    // Remove the gate wall from the DOM
+    const gateWall = this.gameWorld.querySelector(`[data-gate-id="${gateId}"]`);
+    if (gateWall) {
+        gateWall.remove();
+    }
+    
+    // Save state and restart game
+    this.gameStarted = true;
+    this.updateUI();
+    this.saveGameState();
+    
+    this.showMessage(`🚪✨ ${gateId.toUpperCase()} opened permanently!`);
 }
         }
 
