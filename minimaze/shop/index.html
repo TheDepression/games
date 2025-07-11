@@ -417,7 +417,7 @@
                 this.hasSuperGunTicket = false;
 
                 // Shop tracking
-                this.purpleHeartsSold = 0; // Track how many sold (0-3)
+           //     this.purpleHeartsSold = 0; // Track how many sold (0-3)
                 this.hasSuperGun = false;
                 this.hasEnhancedRange = false;
 
@@ -700,7 +700,7 @@ if (distance <= effectiveRange) {
                     this.hasHammerPower = gameState.hasHammerPower || false;
                     
                     // Shop specific items
-                    this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
+            //        this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
                     this.hasSuperGun = gameState.hasSuperGun || false;
                     this.hasEnhancedRange = gameState.hasEnhancedRange || false;
                     
@@ -732,7 +732,7 @@ if (distance <= effectiveRange) {
         deathCount: this.deathCount,
         
         hasTrophy: this.hasTrophy,
-        purpleHeartsSold: this.purpleHeartsSold || existingState.purpleHeartsSold,
+   //     purpleHeartsSold: this.purpleHeartsSold || existingState.purpleHeartsSold,
         hasSuperGun: this.hasSuperGun || existingState.hasSuperGun,
         hasEnhancedRange: this.hasEnhancedRange || existingState.hasEnhancedRange,
         
@@ -810,7 +810,10 @@ if (distance <= effectiveRange) {
                     
                     // Test enemy cage walls
                     {x: 295, y: 300, w: 10, h: 50, color: 'black'},
-                    {x: 295, y: 300, w: 50, h: 10, color: 'black'}
+                    {x: 295, y: 300, w: 50, h: 10, color: 'black'},
+                     {x: 60, y: 0, w: 10, h: 60, color: 'black'},
+                    {x: 0, y: 60, w: 60, h: 10, color: 'black'},
+                    
                 ];
 
                 walls.forEach(wall => {
@@ -826,7 +829,7 @@ if (distance <= effectiveRange) {
 
                 // Shop counters
                 const counters = [
-                    {x: 50, y: 50, w: 60, h: 30}, // Purple heart seller
+           //         {x: 50, y: 50, w: 60, h: 30}, // Purple heart seller
                     {x: 150, y: 50, w: 60, h: 30}, // Super gun seller
                     {x: 250, y: 50, w: 60, h: 30}  // Range enhancer seller
                 ];
@@ -844,13 +847,13 @@ if (distance <= effectiveRange) {
 
             createShopkeepers() {
                 // Purple heart seller
-                const heartSeller = document.createElement('div');
-                heartSeller.className = 'friendly heart-seller';
-                heartSeller.textContent = '👩🏻‍🍳';
-                heartSeller.style.left = '80px';
-                heartSeller.style.top = '90px';
-                heartSeller.dataset.type = 'heartSeller';
-                this.gameWorld.appendChild(heartSeller);
+          //      const heartSeller = document.createElement('div');
+           //     heartSeller.className = 'friendly heart-seller';
+            //    heartSeller.textContent = '👩🏻‍🍳';
+          //      heartSeller.style.left = '80px';
+           //     heartSeller.style.top = '90px';
+            //    heartSeller.dataset.type = 'heartSeller';
+          //      this.gameWorld.appendChild(heartSeller);
 
                 // Super gun seller
                 const gunSeller = document.createElement('div');
@@ -874,18 +877,18 @@ if (distance <= effectiveRange) {
 
             createCounterDisplays() {
     // Purple heart counter display (3 hearts minus sold)
-    const heartsToShow = 4 - this.purpleHeartsSold;
-    for (let i = 0; i < heartsToShow; i++) {
-        const heartDisplay = document.createElement('div');
-        heartDisplay.style.position = 'absolute';
-        heartDisplay.style.left = (55 + i * 12) + 'px'; // Spread across counter
-        heartDisplay.style.top = '55px';
-        heartDisplay.style.fontSize = '12px';
-        heartDisplay.style.pointerEvents = 'none';
-        heartDisplay.style.zIndex = '45';
-        heartDisplay.textContent = '💜';
-        this.gameWorld.appendChild(heartDisplay);
-    }
+//    const heartsToShow = 4 - this.purpleHeartsSold;
+  //  for (let i = 0; i < heartsToShow; i++) {
+    //    const heartDisplay = document.createElement('div');
+     //   heartDisplay.style.position = 'absolute';
+ //       heartDisplay.style.left = (55 + i * 12) + 'px'; // Spread across counter
+  //      heartDisplay.style.top = '55px';
+   //     heartDisplay.style.fontSize = '12px';
+    //    heartDisplay.style.pointerEvents = 'none';
+     //   heartDisplay.style.zIndex = '45';
+ //       heartDisplay.textContent = '💜';
+  //      this.gameWorld.appendChild(heartDisplay);
+  //  }
 
     // Super gun counter display (only if not purchased)
     if (!this.hasSuperGun) {
@@ -923,6 +926,26 @@ if (distance <= effectiveRange) {
                 enemyEl.textContent = '👺';
                 enemyEl.style.left = '310px';
                 enemyEl.style.top = '315px';
+                this.gameWorld.appendChild(enemyEl);
+
+                this.testEnemy = {
+                    element: enemyEl,
+                    currentX: 310,
+                    currentY: 315,
+                    hp: 350,
+                    maxHp: 350,
+                    alive: true,
+                    direction: 1,
+                    flipTimer: 0
+                };
+            }
+
+            createTestEnemy() {
+                const enemyEl = document.createElement('div');
+                enemyEl.className = 'enemy test-demon2';
+                enemyEl.textContent = '👺';
+                enemyEl.style.left = '20px';
+                enemyEl.style.top = '20px';
                 this.gameWorld.appendChild(enemyEl);
 
                 this.testEnemy = {
@@ -1092,42 +1115,42 @@ if (distance <= effectiveRange) {
                 }
             }
 
-            handleHeartSeller() {
-                const heartsLeft = 4 - this.purpleHeartsSold;
+       //     handleHeartSeller() {
+         //       const heartsLeft = 4 - this.purpleHeartsSold;
                 
-                if (heartsLeft <= 0) {
-                    this.showNPCMessage("👩🏻‍🍳 I'm all sold out of purple hearts! Sorry!");
-                    return;
-                }
+         //       if (heartsLeft <= 0) {
+         //           this.showNPCMessage("👩🏻‍🍳 I'm all sold out of purple hearts! Sorry!");
+         //           return;
+         //       }
 
-                const now = Date.now();
-                const npcKey = 'heartSeller_80_90';
+         //       const now = Date.now();
+         //       const npcKey = 'heartSeller_80_90';
                 
-                if (this.lastInteractionTime[npcKey] && 
-                    now - this.lastInteractionTime[npcKey] < 3000) {
-                    return;
-                }
+         //       if (this.lastInteractionTime[npcKey] && 
+         //           now - this.lastInteractionTime[npcKey] < 3000) {
+         //           return;
+         //       }
 
-                if (!this.lastInteractionTime[npcKey]) {
-                    this.showNPCMessage(`👩🏻‍🍳 Purple hearts for 1000¥ each! ${heartsLeft} left in stock!`);
-                    this.lastInteractionTime[npcKey] = now - 2500;
-                    return;
-                }
+         //       if (!this.lastInteractionTime[npcKey]) {
+         //           this.showNPCMessage(`👩🏻‍🍳 Purple hearts for 1000¥ each! ${heartsLeft} left in stock!`);
+         //           this.lastInteractionTime[npcKey] = now - 2500;
+         //           return;
+         //       }
 
-                if (this.money >= 1000) {
-                    this.pendingPurchase = {
-                        type: 'purpleHeart',
-                        cost: 1000,
-                        seller: 'heartSeller'
-                    };
-                    this.showPurchaseDialog(`Buy purple heart for 1000¥? (${heartsLeft} left)`);
-                } else {
-                    const needed = 1000 - this.money;
-                    this.showNPCMessage(`👩🏻‍🍳 Purple hearts cost 1000¥. You need ${needed}¥ more!`);
-                }
+         //       if (this.money >= 1000) {
+         //           this.pendingPurchase = {
+         //               type: 'purpleHeart',
+         //               cost: 1000,
+          //              seller: 'heartSeller'
+          //          };
+         //           this.showPurchaseDialog(`Buy purple heart for 1000¥? (${heartsLeft} left)`);
+         //       } else {
+         //           const needed = 1000 - this.money;
+         //           this.showNPCMessage(`👩🏻‍🍳 Purple hearts cost 1000¥. You need ${needed}¥ more!`);
+         //       }
                 
-                this.lastInteractionTime[npcKey] = now;
-            }
+         //       this.lastInteractionTime[npcKey] = now;
+      //      }
 
             handleGunSeller() {
                 if (this.hasSuperGun) {
@@ -1212,12 +1235,13 @@ if (distance <= effectiveRange) {
                 const purchase = this.pendingPurchase;
                 this.money -= purchase.cost;
                 
-                if (purchase.type === 'purpleHeart') {
-                    this.maxHearts++;
-                    this.hearts = this.maxHearts; // Fill to new max
-                    this.purpleHeartsSold++;
-                    this.showMessage(`💜 Max health increased to ${this.maxHearts}! ⚡`);
-                } else if (purchase.type === 'superGun') {
+      //          if (purchase.type === 'purpleHeart') {
+      //              this.maxHearts++;
+       //             this.hearts = this.maxHearts; // Fill to new max
+       //             this.purpleHeartsSold++;
+       //             this.showMessage(`💜 Max health increased to ${this.maxHearts}! ⚡`);
+       //         } else 
+                    if (purchase.type === 'superGun') {
                     this.hasSuperGun = true;
                     this.attackDamage = 150;
                     this.showMessage('🔫⚫ Super Gun acquired! 150 damage! Test it on the demon!');
