@@ -865,6 +865,8 @@ this.pendingAction = null;
                 // Add these after existing properties in constructor
 this.maxHearts = 3; // Starting max hearts
 this.collectedPurpleHearts = []; // Track which purple hearts have been collected
+                this.openedGates = []; // Track which gates have been opened
+this.lastGateInteraction = {}; // Prevent spam clicking gates
 
                 
                 // FORCE DEFAULT ITEMS (all from maze1 except specified)
@@ -1455,7 +1457,8 @@ this.cdmoney5 = gameState.cdmoney5 || false;
 this.cdmoneyEntrance = gameState.cdmoneyEntrance || false;
 this.cdpheart1 = gameState.cdpheart1 || false;
 this.cdpheart2 = gameState.cdpheart2 || false;
-        
+
+        this.openedGates = gameState.openedGates || [];
         // Load shop purchases
      //   this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
         this.hasSuperGun = gameState.hasSuperGun || false;
@@ -1536,6 +1539,7 @@ cdmoney5: this.cdmoney5,
 cdmoneyEntrance: this.cdmoneyEntrance,
 cdpheart1: this.cdpheart1,
 cdpheart2: this.cdpheart2,
+                    openedGates: this.openedGates,
                     // Add these lines in saveGameState() after existing properties
 // purpleHeartsSold: this.purpleHeartsSold,
 hasSuperGun: this.hasSuperGun,
