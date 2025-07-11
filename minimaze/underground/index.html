@@ -301,6 +301,15 @@
                 transition: opacity 0.2s ease;
             }
         }
+
+        @keyframes gunPulsate {
+    0%, 100% { 
+        transform: scale(1);
+    }
+    50% { 
+        transform: scale(1.2);
+    }
+}
     </style>
 </head>
 <body>
@@ -611,6 +620,50 @@ this.hasLavaShoes = gameState.hasLavaShoes || false;
                     this.deathCount = gameState.deathCount || 0;
                     this.maxHearts = gameState.maxHearts || 3;
                     this.kingMoneyReceived = gameState.kingMoneyReceived || false;
+
+                    // Gate system
+this.openedGates = gameState.openedGates || [];
+
+// Missing collectible tracking
+this.collectedRedHearts = gameState.collectedRedHearts || [];
+this.collectedMoney = gameState.collectedMoney || [];
+this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+
+// Missing flags and upgrades
+this.hasTrophy = gameState.hasTrophy || false;
+this.hasPyramidKey = gameState.hasPyramidKey || false;
+this.collectedBanana = gameState.collectedBanana || false;
+this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
+this.pinkBossDefeated = gameState.pinkBossDefeated || false;
+this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+this.hasSuperGun = gameState.hasSuperGun || false;
+this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
+this.gorillaHammerDialogComplete = gameState.gorillaHammerDialogComplete || false;
+this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
+this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+
+// CaveD specific
+this.cdmoney1 = gameState.cdmoney1 || false;
+this.cdmoney2 = gameState.cdmoney2 || false;
+this.cdmoney3 = gameState.cdmoney3 || false;
+this.cdmoney4 = gameState.cdmoney4 || false;
+this.cdmoney5 = gameState.cdmoney5 || false;
+this.cdmoneyEntrance = gameState.cdmoneyEntrance || false;
+this.cdpheart1 = gameState.cdpheart1 || false;
+this.cdpheart2 = gameState.cdpheart2 || false;
+
+// Attack system with proper upgrades
+if (gameState.hasSuperGun) {
+    this.attackDamage = 150;
+} else if (gameState.hasOrangePower || gameState.hasHammerPower) {
+    this.attackDamage = 100;
+} else {
+    this.attackDamage = 50;
+}
+
+if (gameState.hasEnhancedRange) {
+    this.attackRange = 90;
+}
                     
                     this.updateUI();
                     this.updateTimer();
@@ -624,6 +677,42 @@ this.hasLavaShoes = gameState.hasLavaShoes || false;
                 const gameState = JSON.parse(localStorage.getItem('mfGameState'));
                 gameState.hearts = this.hearts;
                 gameState.money = this.money;
+
+
+                // Gate system
+openedGates: this.openedGates,
+
+// Missing collectible tracking
+collectedRedHearts: this.collectedRedHearts,
+collectedMoney: this.collectedMoney,
+collectedPurpleHearts: this.collectedPurpleHearts,
+
+// Missing flags and upgrades
+hasTrophy: this.hasTrophy,
+hasPyramidKey: this.hasPyramidKey,
+collectedBanana: this.collectedBanana,
+gorillaEncounterComplete: this.gorillaEncounterComplete,
+pinkBossDefeated: this.pinkBossDefeated,
+hasEnhancedRange: this.hasEnhancedRange,
+hasSuperGun: this.hasSuperGun,
+hasSuperGunTicket: this.hasSuperGunTicket,
+gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
+catFirstDialogComplete: this.catFirstDialogComplete,
+weakPointsBlasted: this.weakPointsBlasted,
+
+// CaveD specific
+cdmoney1: this.cdmoney1,
+cdmoney2: this.cdmoney2,
+cdmoney3: this.cdmoney3,
+cdmoney4: this.cdmoney4,
+cdmoney5: this.cdmoney5,
+cdmoneyEntrance: this.cdmoneyEntrance,
+cdpheart1: this.cdpheart1,
+cdpheart2: this.cdpheart2,
+
+// Attack system
+attackDamage: this.attackDamage,
+                
                 gameState.timeElapsed = this.timeElapsed;
                 gameState.deathCount = this.deathCount;
                 gameState.maxHearts = this.maxHearts;
@@ -1062,12 +1151,26 @@ if (queen) {
     if (gameState.hasKey) items.push('🔑');
     if (gameState.hasBoat && !gameState.boatIsBroken) items.push('⛵');
     if (gameState.hasBoat && gameState.boatIsBroken) items.push('<span style="opacity: 0.3; filter: grayscale(100%);">⛵</span>');
-    if (gameState.hasHammer) items.push('🔨');
     if (gameState.hasFlashlight) items.push('🔦');
-    if (gameState.hasPencil) items.push('✏️');
-    if (gameState.hasWeapon && gameState.hasHammerPower) items.push('<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>');
-    else if (gameState.hasWeapon && gameState.hasOrangePower) items.push('<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>');
-    else if (gameState.hasWeapon) items.push('🔫');
+                if (this.hasTrophy) itemsHTML += ' 🏆';
+    // Enhanced gun display
+    if (this.hasWeapon) {
+        let gunStyle = '';
+        
+        if (this.hasSuperGun) {
+            gunStyle = 'filter: brightness(0.3);';
+        } else if (this.hasHammerPower) {
+            gunStyle = 'filter: grayscale(0.9) brightness(0.8);';
+        } else if (this.hasOrangePower) {
+            gunStyle = 'filter: hue-rotate(120deg) saturate(2) brightness(1.2);';
+        }
+        
+        if (this.hasEnhancedRange) {
+            gunStyle += ' animation: gunPulsate 2s infinite; filter: ' + gunStyle.replace('filter: ', '') + ' drop-shadow(0 0 8px gold);';
+        }
+        
+        itemsHTML += ` <span style="${gunStyle}">🔫</span>`;
+    }
     if (gameState.hasLavaShoes) items.push('🥾');
     
     const ui = document.getElementById('ui');
