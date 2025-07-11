@@ -1617,10 +1617,10 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                     const exitX = parseInt(exit.style.left);
                     const exitY = parseInt(exit.style.top);
                     const exitRect = {
-                        left: exitX - 5,
-                        top: exitY - 5,
+                        left: exitX - 1,
+                        top: exitY - 1,
                         right: exitX + 35,
-                        bottom: exitY + 15
+                        bottom: exitY + 20
                     };
                     
                     if (this.rectsOverlap(playerRect, exitRect)) {
