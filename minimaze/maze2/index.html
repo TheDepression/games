@@ -877,7 +877,7 @@ this.collectedPurpleHearts = []; // Track which purple hearts have been collecte
                 this.hasPyramidKey = true;
                 this.hasTrophy = false;
                 // Shop purchases from shop
-this.purpleHeartsSold = 0; // Track how many purple hearts were sold in shop
+// this.purpleHeartsSold = 0; // Track how many purple hearts were sold in shop
 this.hasSuperGun = false;
 this.hasEnhancedRange = false;
 this.hasSuperGunTicket = false; // You already have this one
@@ -1457,7 +1457,7 @@ this.cdpheart1 = gameState.cdpheart1 || false;
 this.cdpheart2 = gameState.cdpheart2 || false;
         
         // Load shop purchases
-        this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
+     //   this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
         this.hasSuperGun = gameState.hasSuperGun || false;
         this.hasEnhancedRange = gameState.hasEnhancedRange || false;
         
@@ -1537,7 +1537,7 @@ cdmoneyEntrance: this.cdmoneyEntrance,
 cdpheart1: this.cdpheart1,
 cdpheart2: this.cdpheart2,
                     // Add these lines in saveGameState() after existing properties
-purpleHeartsSold: this.purpleHeartsSold,
+// purpleHeartsSold: this.purpleHeartsSold,
 hasSuperGun: this.hasSuperGun,
 hasEnhancedRange: this.hasEnhancedRange,
                     pinkBossDefeated: this.pinkBossDefeated,
@@ -1833,7 +1833,7 @@ quicksandPositions.forEach(pos => {
 const rpgHouse = document.createElement('div');
 rpgHouse.style.position = 'absolute';
 rpgHouse.style.left = '2280px';
-rpgHouse.style.top = '2300px';
+rpgHouse.style.top = '2220px';
 rpgHouse.style.width = '60px';
 rpgHouse.style.height = '60px';
 rpgHouse.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/rpghouse-min.png")';
@@ -1884,6 +1884,7 @@ this.gameWorld.appendChild(fakeQuicksand);
             {x: 0, y: 1470, w: 180, h: 10},
             {x: 0, y: 1630, w: 180, h: 10},
   {x: 200, y: 1800, w: 300, h: 10},
+             {x: 2230, y: 2360, w: 240, h: 10},    // the purple heart store wall
   {x: 600, y: 360, w: 20, h: 920},
   {x: 600, y: 360, w: 380, h: 20},
   {x: 1580, y: 360, w: 20, h: 40},
@@ -2582,11 +2583,12 @@ createCollectibles() {
         {x: 100, y: 1460, id: 'red_heart_8'},
         {x: 1940, y: 860, id: 'red_heart_9'},
     {x: 1080, y: 1200, id: 'red_heart_10'},
-    {x: 2380, y: 2340, id: 'red_heart_11'},
-    {x: 2360, y: 2360, id: 'red_heart_12'},
-    {x: 2340, y: 2380, id: 'red_heart_13'},
-    {x: 1480, y: 2300, id: 'red_heart_14'},
-    {x: 2200, y: 1820, id: 'red_heart_15'}
+    {x: 2380, y: 2400, id: 'red_heart_11'},
+    {x: 2340, y: 2400, id: 'red_heart_12'},
+    {x: 2300, y: 2400, id: 'red_heart_13'},
+    {x: 2260, y: 2400, id: 'red_heart_14'},
+    {x: 1480, y: 2300, id: 'red_heart_15'},
+        {x: 2200, y: 1820, id: 'red_heart_16'}
     ];
 
     redHeartPositions.forEach(pos => {
