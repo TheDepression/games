@@ -437,6 +437,20 @@
                 this.motherPaid = true;
                 this.caveBossDefeated = true;
                 this.pyramidBossDefeated = true;
+
+                // newly added
+                this.openedGates = [];
+this.lastGateInteraction = {};
+               this.weakPointsBlasted = [];
+                this.cdmoney1 = false;
+this.cdmoney2 = false;
+this.cdmoney3 = false;
+this.cdmoney4 = false;
+this.cdmoney5 = false;
+this.cdmoneyEntrance = false;
+this.cdpheart1 = false;
+this.cdpheart2 = false;
+                
                 
                 // Gun system
                 this.attackCooldown = false;
@@ -701,6 +715,18 @@ if (this.testEnemies) {
                     this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
                     this.hasOrangePower = gameState.hasOrangePower || false;
                     this.hasHammerPower = gameState.hasHammerPower || false;
+
+                    // newly added
+                    this.openedGates = gameState.openedGates || [];
+                    this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+                    this.cdmoney1 = gameState.cdmoney1 || false;
+this.cdmoney2 = gameState.cdmoney2 || false;
+this.cdmoney3 = gameState.cdmoney3 || false;
+this.cdmoney4 = gameState.cdmoney4 || false;
+this.cdmoney5 = gameState.cdmoney5 || false;
+this.cdmoneyEntrance = gameState.cdmoneyEntrance || false;
+this.cdpheart1 = gameState.cdpheart1 || false;
+this.cdpheart2 = gameState.cdpheart2 || false;
                     
                     // Shop specific items
             //        this.purpleHeartsSold = gameState.purpleHeartsSold || 0;
@@ -733,6 +759,17 @@ if (this.testEnemies) {
         money: this.money,
         timeElapsed: this.timeElapsed,
         deathCount: this.deathCount,
+        // newly added
+        openedGates: this.openedGates,
+        weakPointsBlasted: this.weakPointsBlasted,
+        cdmoney1: this.cdmoney1,
+cdmoney2: this.cdmoney2,
+cdmoney3: this.cdmoney3,
+cdmoney4: this.cdmoney4,
+cdmoney5: this.cdmoney5,
+cdmoneyEntrance: this.cdmoneyEntrance,
+cdpheart1: this.cdpheart1,
+cdpheart2: this.cdpheart2,
         
         hasTrophy: this.hasTrophy,
    //     purpleHeartsSold: this.purpleHeartsSold || existingState.purpleHeartsSold,
