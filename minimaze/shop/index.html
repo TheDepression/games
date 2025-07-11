@@ -1109,21 +1109,21 @@ if (distance <= effectiveRange) {
                 }
 
                 if (!this.lastInteractionTime[npcKey]) {
-                    this.showNPCMessage(`👩🏻‍🍳 Purple hearts for 3000¥ each! ${heartsLeft} left in stock!`);
+                    this.showNPCMessage(`👩🏻‍🍳 Purple hearts for 1000¥ each! ${heartsLeft} left in stock!`);
                     this.lastInteractionTime[npcKey] = now - 2500;
                     return;
                 }
 
-                if (this.money >= 3000) {
+                if (this.money >= 1000) {
                     this.pendingPurchase = {
                         type: 'purpleHeart',
-                        cost: 3000,
+                        cost: 1000,
                         seller: 'heartSeller'
                     };
-                    this.showPurchaseDialog(`Buy purple heart for 3000¥? (${heartsLeft} left)`);
+                    this.showPurchaseDialog(`Buy purple heart for 1000¥? (${heartsLeft} left)`);
                 } else {
-                    const needed = 3000 - this.money;
-                    this.showNPCMessage(`👩🏻‍🍳 Purple hearts cost 3000¥. You need ${needed}¥ more!`);
+                    const needed = 1000 - this.money;
+                    this.showNPCMessage(`👩🏻‍🍳 Purple hearts cost 1000¥. You need ${needed}¥ more!`);
                 }
                 
                 this.lastInteractionTime[npcKey] = now;
