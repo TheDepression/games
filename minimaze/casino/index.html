@@ -757,6 +757,20 @@ this.animationTimers = {};
                     this.hasPyramidKey = gameState.hasPyramidKey || false;
                     this.hasLavaShoes = gameState.hasLavaShoes || false;
                     this.hasWeapon = gameState.hasWeapon || false;
+
+                    // newly added
+                    this.openedGates = gameState.openedGates || [];
+                    this.hasTrophy = gameState.hasTrophy || false;
+                    this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+this.hasSuperGun = gameState.hasSuperGun || false;
+                    this.cdmoney1 = gameState.cdmoney1 || false;
+this.cdmoney2 = gameState.cdmoney2 || false;
+this.cdmoney3 = gameState.cdmoney3 || false;
+this.cdmoney4 = gameState.cdmoney4 || false;
+this.cdmoney5 = gameState.cdmoney5 || false;
+this.cdmoneyEntrance = gameState.cdmoneyEntrance || false;
+this.cdpheart1 = gameState.cdpheart1 || false;
+this.cdpheart2 = gameState.cdpheart2 || false;
                     
                     // Progress flags
                     this.bullyDefeated = gameState.bullyDefeated || false;
@@ -780,6 +794,21 @@ this.animationTimers = {};
                     deathCount: this.deathCount,
                     maxHearts: this.maxHearts,
                     collectedPurpleHearts: this.collectedPurpleHearts,
+                    // newly added
+                    openedGates: this.openedGates,
+                    hasTrophy: this.hasTrophy,
+                    hasEnhancedRange: this.hasEnhancedRange,
+hasSuperGun: this.hasSuperGun,
+                    cdmoney1: this.cdmoney1,
+cdmoney2: this.cdmoney2,
+cdmoney3: this.cdmoney3,
+cdmoney4: this.cdmoney4,
+cdmoney5: this.cdmoney5,
+cdmoneyEntrance: this.cdmoneyEntrance,
+cdpheart1: this.cdpheart1,
+cdpheart2: this.cdpheart2,
+
+                    
                     collectedBanana: this.collectedBanana,
                     gorillaEncounterComplete: this.gorillaEncounterComplete,
                     hasOrangePower: this.hasOrangePower,
