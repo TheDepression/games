@@ -921,44 +921,46 @@ if (distance <= effectiveRange) {
 }
 
             createTestEnemy() {
-                const enemyEl = document.createElement('div');
-                enemyEl.className = 'enemy test-demon';
-                enemyEl.textContent = '👺';
-                enemyEl.style.left = '310px';
-                enemyEl.style.top = '315px';
-                this.gameWorld.appendChild(enemyEl);
+    // First test demon (original position)
+    const enemyEl1 = document.createElement('div');
+    enemyEl1.className = 'enemy test-demon';
+    enemyEl1.textContent = '👺';
+    enemyEl1.style.left = '310px';
+    enemyEl1.style.top = '315px';
+    this.gameWorld.appendChild(enemyEl1);
 
-                this.testEnemy = {
-                    element: enemyEl,
-                    currentX: 310,
-                    currentY: 315,
-                    hp: 350,
-                    maxHp: 350,
-                    alive: true,
-                    direction: 1,
-                    flipTimer: 0
-                };
-            }
+    // Second test demon (new position)
+    const enemyEl2 = document.createElement('div');
+    enemyEl2.className = 'enemy test-demon';
+    enemyEl2.textContent = '👺';
+    enemyEl2.style.left = '20px';
+    enemyEl2.style.top = '20px';
+    this.gameWorld.appendChild(enemyEl2);
 
-            createTestEnemy() {
-                const enemyEl = document.createElement('div');
-                enemyEl.className = 'enemy test-demon2';
-                enemyEl.textContent = '👺';
-                enemyEl.style.left = '20px';
-                enemyEl.style.top = '20px';
-                this.gameWorld.appendChild(enemyEl);
-
-                this.testEnemy = {
-                    element: enemyEl,
-                    currentX: 310,
-                    currentY: 315,
-                    hp: 350,
-                    maxHp: 350,
-                    alive: true,
-                    direction: 1,
-                    flipTimer: 0
-                };
-            }
+    // Store both demons in an array
+    this.testEnemies = [
+        {
+            element: enemyEl1,
+            currentX: 310,
+            currentY: 315,
+            hp: 350,
+            maxHp: 350,
+            alive: true,
+            direction: 1,
+            flipTimer: 0
+        },
+        {
+            element: enemyEl2,
+            currentX: 20,
+            currentY: 20,
+            hp: 350,
+            maxHp: 350,
+            alive: true,
+            direction: 1,
+            flipTimer: 0
+        }
+    ];
+}
 
             createExit() {
                 const exitEl = document.createElement('div');
@@ -1003,22 +1005,26 @@ if (distance <= effectiveRange) {
             }
 
             updateTestEnemy() {
-                if (!this.testEnemy || !this.testEnemy.alive) return;
-                
-                // Flip horizontally every 2 seconds
-                this.testEnemy.flipTimer++;
-                if (this.testEnemy.flipTimer >= 120) { // 2 seconds at 60fps
-                    this.testEnemy.direction *= -1;
-                    this.testEnemy.flipTimer = 0;
-                    
-                    // Visual flip effect
-                    if (this.testEnemy.direction === 1) {
-                        this.testEnemy.element.style.transform = 'scaleX(1)';
-                    } else {
-                        this.testEnemy.element.style.transform = 'scaleX(-1)';
-                    }
-                }
+    if (!this.testEnemies) return;
+    
+    this.testEnemies.forEach(enemy => {
+        if (!enemy.alive) return;
+        
+        // Flip horizontally every 2 seconds
+        enemy.flipTimer++;
+        if (enemy.flipTimer >= 120) { // 2 seconds at 60fps
+            enemy.direction *= -1;
+            enemy.flipTimer = 0;
+            
+            // Visual flip effect
+            if (enemy.direction === 1) {
+                enemy.element.style.transform = 'scaleX(1)';
+            } else {
+                enemy.element.style.transform = 'scaleX(-1)';
             }
+        }
+    });
+}
 
             canMoveTo(x, y) {
                 const playerSize = 24;
