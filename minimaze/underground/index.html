@@ -680,38 +680,40 @@ if (gameState.hasEnhancedRange) {
 
 
                 // Gate system
-openedGates: this.openedGates,
+gameState.openedGates = this.openedGates;
 
 // Missing collectible tracking
-collectedRedHearts: this.collectedRedHearts,
-collectedMoney: this.collectedMoney,
-collectedPurpleHearts: this.collectedPurpleHearts,
+gameState.collectedRedHearts = this.collectedRedHearts;
+gameState.collectedMoney = this.collectedMoney;
+gameState.collectedPurpleHearts = this.collectedPurpleHearts;
 
 // Missing flags and upgrades
-hasTrophy: this.hasTrophy,
-hasPyramidKey: this.hasPyramidKey,
-collectedBanana: this.collectedBanana,
-gorillaEncounterComplete: this.gorillaEncounterComplete,
-pinkBossDefeated: this.pinkBossDefeated,
-hasEnhancedRange: this.hasEnhancedRange,
-hasSuperGun: this.hasSuperGun,
-hasSuperGunTicket: this.hasSuperGunTicket,
-gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
-catFirstDialogComplete: this.catFirstDialogComplete,
-weakPointsBlasted: this.weakPointsBlasted,
+gameState.hasTrophy = this.hasTrophy;
+gameState.hasPyramidKey = this.hasPyramidKey;
+gameState.collectedBanana = this.collectedBanana;
+gameState.gorillaEncounterComplete = this.gorillaEncounterComplete;
+gameState.pinkBossDefeated = this.pinkBossDefeated;
+gameState.hasEnhancedRange = this.hasEnhancedRange;
+gameState.hasSuperGun = this.hasSuperGun;
+gameState.hasSuperGunTicket = this.hasSuperGunTicket;
+gameState.gorillaHammerDialogComplete = this.gorillaHammerDialogComplete;
+gameState.catFirstDialogComplete = this.catFirstDialogComplete;
+gameState.weakPointsBlasted = this.weakPointsBlasted;
 
 // CaveD specific
-cdmoney1: this.cdmoney1,
-cdmoney2: this.cdmoney2,
-cdmoney3: this.cdmoney3,
-cdmoney4: this.cdmoney4,
-cdmoney5: this.cdmoney5,
-cdmoneyEntrance: this.cdmoneyEntrance,
-cdpheart1: this.cdpheart1,
-cdpheart2: this.cdpheart2,
+gameState.cdmoney1 = this.cdmoney1;
+gameState.cdmoney2 = this.cdmoney2;
+gameState.cdmoney3 = this.cdmoney3;
+gameState.cdmoney4 = this.cdmoney4;
+gameState.cdmoney5 = this.cdmoney5;
+gameState.cdmoneyEntrance = this.cdmoneyEntrance;
+gameState.cdpheart1 = this.cdpheart1;
+gameState.cdpheart2 = this.cdpheart2;
 
 // Attack system
-attackDamage: this.attackDamage,
+gameState.attackDamage = this.attackDamage;
+gameState.hasOrangePower = this.hasOrangePower;
+gameState.hasHammerPower = this.hasHammerPower;
                 
                 gameState.timeElapsed = this.timeElapsed;
                 gameState.deathCount = this.deathCount;
