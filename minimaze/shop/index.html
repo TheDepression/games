@@ -638,53 +638,56 @@ attackEl.style.borderRadius = '50%';
             }
 
             checkAttackHits(attackX, attackY) {
-                // Check test enemy collision
-                if (this.testEnemy && this.testEnemy.alive) {
-                    const distance = Math.sqrt(
-                        Math.pow(attackX - this.testEnemy.currentX, 2) + 
-                        Math.pow(attackY - this.testEnemy.currentY, 2)
-                    );
-                    
-                   const effectiveRange = this.hasEnhancedRange ? 90 : 45;
-if (distance <= effectiveRange) {
-                        this.testEnemy.hp -= this.attackDamage;
-                        
-                        // Show damage number
-                        const damageText = document.createElement('div');
-                        damageText.style.position = 'absolute';
-                        damageText.style.color = '#ff4444';
-                        damageText.style.fontWeight = 'bold';
-                        damageText.style.fontSize = '14px';
-                        damageText.style.pointerEvents = 'none';
-                        damageText.style.zIndex = '500';
-                        damageText.style.animation = 'damageFloat 1s ease-out';
-                        damageText.textContent = `-${this.attackDamage}`;
-                        damageText.style.left = this.testEnemy.currentX + 'px';
-                        damageText.style.top = this.testEnemy.currentY + 'px';
-                        this.gameWorld.appendChild(damageText);
-                        
-                        setTimeout(() => {
-                            if (damageText.parentNode) {
-                                damageText.remove();
-                            }
-                        }, 1000);
-                        
-                        if (this.testEnemy.hp <= 0) {
-                            this.testEnemy.alive = false;
-                            this.testEnemy.element.classList.add('defeated');
-                            this.showMessage(`💀 Test demon defeated! Damage: ${this.attackDamage}`);
-                            
-                            // Respawn after 5 seconds
-                            setTimeout(() => {
-                                this.testEnemy.alive = true;
-                                this.testEnemy.hp = this.testEnemy.maxHp;
-                                this.testEnemy.element.classList.remove('defeated');
-                            }, 5000);
-                        }
-                    }
+                // Replace the single testEnemy check with:
+if (this.testEnemies) {
+    this.testEnemies.forEach(enemy => {
+        if (!enemy.alive) return;
+        
+        const distance = Math.sqrt(
+            Math.pow(attackX - enemy.currentX, 2) + 
+            Math.pow(attackY - enemy.currentY, 2)
+        );
+        
+        const effectiveRange = this.hasEnhancedRange ? 90 : 45;
+        if (distance <= effectiveRange) {
+            enemy.hp -= this.attackDamage;
+            
+            // Show damage number
+            const damageText = document.createElement('div');
+            damageText.style.position = 'absolute';
+            damageText.style.color = '#ff4444';
+            damageText.style.fontWeight = 'bold';
+            damageText.style.fontSize = '14px';
+            damageText.style.pointerEvents = 'none';
+            damageText.style.zIndex = '500';
+            damageText.style.animation = 'damageFloat 1s ease-out';
+            damageText.textContent = `-${this.attackDamage}`;
+            damageText.style.left = enemy.currentX + 'px';
+            damageText.style.top = enemy.currentY + 'px';
+            this.gameWorld.appendChild(damageText);
+            
+            setTimeout(() => {
+                if (damageText.parentNode) {
+                    damageText.remove();
                 }
+            }, 1000);
+            
+            if (enemy.hp <= 0) {
+                enemy.alive = false;
+                enemy.element.classList.add('defeated');
+                this.showMessage(`💀 Test demon defeated! Damage: ${this.attackDamage}`);
+                
+                // Respawn after 5 seconds
+                setTimeout(() => {
+                    enemy.alive = true;
+                    enemy.hp = enemy.maxHp;
+                    enemy.element.classList.remove('defeated');
+                }, 5000);
             }
-
+        }
+    });
+}
+            }
             loadGameState() {
                 const savedState = localStorage.getItem('mfGameState');
                 if (savedState) {
