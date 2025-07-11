@@ -874,11 +874,11 @@ if (distance <= effectiveRange) {
 
             createCounterDisplays() {
     // Purple heart counter display (3 hearts minus sold)
-    const heartsToShow = 3 - this.purpleHeartsSold;
+    const heartsToShow = 4 - this.purpleHeartsSold;
     for (let i = 0; i < heartsToShow; i++) {
         const heartDisplay = document.createElement('div');
         heartDisplay.style.position = 'absolute';
-        heartDisplay.style.left = (55 + i * 15) + 'px'; // Spread across counter
+        heartDisplay.style.left = (55 + i * 12) + 'px'; // Spread across counter
         heartDisplay.style.top = '55px';
         heartDisplay.style.fontSize = '12px';
         heartDisplay.style.pointerEvents = 'none';
