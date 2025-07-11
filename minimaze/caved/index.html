@@ -461,6 +461,13 @@
                     this.hasHammerPower = gameState.hasHammerPower || false;
                     this.hasSuperGun = gameState.hasSuperGun || false;
                     this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+
+                    // newly added
+                    this.openedGates = gameState.openedGates || [];
+                    this.collectedRedHearts = gameState.collectedRedHearts || [];
+this.collectedMoney = gameState.collectedMoney || [];
+this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+                    
                     
                     this.hasFlashlight = true;
                     this.hasBoat = gameState.hasBoat || false;
@@ -1613,7 +1620,7 @@
                         left: exitX - 5,
                         top: exitY - 5,
                         right: exitX + 35,
-                        bottom: exitY + 25
+                        bottom: exitY + 15
                     };
                     
                     if (this.rectsOverlap(playerRect, exitRect)) {
@@ -1879,6 +1886,12 @@
                 gameState.cdmoneyEntrance = this.cdmoneyEntrance;
                 gameState.cdpheart1 = this.cdpheart1;
                 gameState.cdpheart2 = this.cdpheart2;
+
+                // newly added
+                gameState.openedGates = this.openedGates;
+                gameState.collectedRedHearts = this.collectedRedHearts;
+gameState.collectedMoney = this.collectedMoney;
+gameState.collectedPurpleHearts = this.collectedPurpleHearts;
                 
                 // Save all items and upgrades
                 gameState.hasWeapon = this.hasWeapon;
