@@ -1478,6 +1478,7 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
                        attackEl.remove();
                    }
                }, 300);
+               this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
                
                setTimeout(() => {
                    this.attackCooldown = false;
