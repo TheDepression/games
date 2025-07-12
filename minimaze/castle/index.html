@@ -449,6 +449,7 @@
                 // Electric lines system
                 this.electricLines = [];
                 this.frameCount = 0;
+                this.isDying = false;
 
                 this.enemies = [];
 this.projectiles = [];
@@ -1676,29 +1677,30 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
            }
            
            gameOver() {
-               this.deathCount++;
-               this.updateDeathCounter();
-               
-               this.saveGameState();
-               this.gameStarted = false;
-               clearInterval(this.timerInterval);
-               this.castleMusic.pause();
-               
-               this.showMessage('💀 You died in the castle!');
-               
-               setTimeout(() => {
-                   this.hearts = 3;
-                   this.playerX = 240;
-                   this.playerY = 850;
-                   this.currentFloor = 1;
-                   
-                   this.createFloor(this.currentFloor);
-                   this.startGameTimer();
-                   this.saveGameState();
-                   
-                   this.showMessage('🔄 Respawned at castle entrance!');
-               }, 3000);
-           }
+               this.isDying = false;
+    this.deathCount++;
+    this.updateDeathCounter();
+    
+    this.saveGameState();
+    this.gameStarted = false;
+    clearInterval(this.timerInterval);
+    this.castleMusic.pause();
+    
+    this.showMessage('💀 You died in the castle!');
+    
+    setTimeout(() => {
+        this.hearts = 3;
+        this.playerX = 240;
+        this.playerY = 850;
+        this.currentFloor = 1;
+        
+        this.createFloor(this.currentFloor);
+        this.startGame(); // ADD THIS LINE - restarts the game loop
+        this.saveGameState();
+        
+        this.showMessage('🔄 Respawned at castle entrance!');
+    }, 3000);
+}
            
            rectsOverlap(rect1, rect2) {
                return rect1.left < rect2.right &&
