@@ -4194,6 +4194,28 @@ transferToWeakPoint(url) {
 
 
 
+            transferToCastle() {
+    this.gameStarted = false;
+    this.playerVelocityX = 0;
+    this.playerVelocityY = 0;
+    this.isDragging = false;
+    
+    this.saveGameState();
+    
+    const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+    gameState.currentUrl = 'castle';
+    gameState.timeElapsed = this.timeElapsed;
+    gameState.lastSaveTime = Date.now();
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
+    
+    this.showMessage('🏰 Entering the castle...');
+    setTimeout(() => {
+        window.location.href = 'https://thedepression.github.io/games/minimaze/castle';
+    }, 500);
+}
+
+            
+
             transferToCutscene() {
                 this.gameStarted = false; // ADD THIS LINE FIRST
     this.playerVelocityX = 0;
