@@ -1059,6 +1059,8 @@ createGoblin(x, y) {
                        
                        if (this.frameCount % 2 === 0) {
                            this.updateElectricLines();
+                           this.updateEnemies();
+this.updateProjectiles();
                        }
                        
                        this.checkCollisions();
