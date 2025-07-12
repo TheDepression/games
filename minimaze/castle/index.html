@@ -1012,40 +1012,40 @@
            }
            
            canMoveTo(x, y) {
-               const playerSize = 24;
-               const padding = 2;
-               
-               const points = [
-                   {x: x + padding, y: y + padding},
-                   {x: x + playerSize - padding, y: y + padding},
-                   {x: x + padding, y: y + playerSize - padding},
-                   {x: x + playerSize - padding, y: y + playerSize - padding},
-                   {x: x + playerSize/2, y: y + padding},
-                   {x: x + playerSize/2, y: y + playerSize - padding},
-                   {x: x + padding, y: y + playerSize/2},
-                   {x: x + playerSize - padding, y: y + playerSize/2}
-               ];
-               
-               const walls = this.gameWorld.querySelectorAll('.castle-wall, .light-castle-wall');
-               
-               for (let wall of walls) {
-                   const wallRect = {
-                       left: parseInt(wall.style.left),
-                       top: parseInt(wall.style.top),
-                       right: parseInt(wall.style.left) + parseInt(wall.style.width),
-                       bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
-                   };
-                   
-                   for (let point of points) {
-                       if (point.x >= wallRect.left && point.x <= wallRect.right &&
-                           point.y >= wallRect.top && point.y <= wallRect.bottom) {
-                           return false;
-                       }
-                   }
-               }
-               
-               return true;
-           }
+    const playerSize = 24;
+    const padding = 2;
+    
+    const points = [
+        {x: x + padding, y: y + padding},
+        {x: x + playerSize - padding, y: y + padding},
+        {x: x + padding, y: y + playerSize - padding},
+        {x: x + playerSize - padding, y: y + playerSize - padding},
+        {x: x + playerSize/2, y: y + padding},
+        {x: x + playerSize/2, y: y + playerSize - padding},
+        {x: x + padding, y: y + playerSize/2},
+        {x: x + playerSize - padding, y: y + playerSize/2}
+    ];
+    
+    const walls = this.gameWorld.querySelectorAll('.castle-wall, .light-castle-wall');
+    
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + (parseInt(wall.style.width) || 20),
+            bottom: parseInt(wall.style.top) + (parseInt(wall.style.height) || 20)
+        };
+        
+        for (let point of points) {
+            if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
            
            checkCollisions() {
                if (this.isInvulnerable) return;
