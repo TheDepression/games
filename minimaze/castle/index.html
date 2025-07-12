@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Castle - Master Frog's Adventure</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2c2c2c;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #1a1a1a;
+            border: 3px solid #666;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: #4a4a4a;
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 350px;
+            height: 900px;
+            transform-origin: 0 0;
+            transition: none;
+        }
+        
+        .castle-wall {
+            position: absolute;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+            background-repeat: repeat;
+            background-size: 20px 20px;
+            border: 1px solid rgba(100,100,100,0.3);
+            opacity: 0.6;
+            filter: grayscale(100%) brightness(0.8);
+            z-index: 30;
+        }
+        
+        .light-castle-wall {
+            position: absolute;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+            background-repeat: repeat;
+            background-size: 20px 20px;
+            border: 1px solid rgba(120,120,120,0.4);
+            opacity: 0.7;
+            filter: grayscale(100%) brightness(1.2);
+            z-index: 30;
+        }
+        
+        .electric-snake-segment {
+            position: absolute;
+            background: linear-gradient(45deg, #ff0000, #ff4444, #ff0000);
+            opacity: 0.9;
+            z-index: 100;
+            box-shadow: 0 0 15px red, inset 0 0 10px rgba(255,255,255,0.3);
+            border-radius: 2px;
+            animation: electricPulse 0.5s infinite alternate;
+            width: 20px;
+            height: 20px;
+        }
+
+        @keyframes electricPulse {
+            0%, 100% { 
+                transform: scale(1);
+            }
+            50% { 
+                transform: scale(1.2);
+            }
+        }
+        
+        .friendly {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+        }
+        
+        .ladder {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+            animation: glow 2s infinite;
+        }
+        
+        .door {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+        }
+        
+        .boss {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/bully.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 250;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 5px gold); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 10px gold); }
+        }
+        
+        @keyframes slashEffect {
+            0% { 
+                transform: scale(0.5) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(2) rotate(0deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes damageFloat {
+            0% {
+                transform: translateY(0px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 300;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #333;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #555;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 250;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #666;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+
+        #deathCounter {
+            position: fixed;
+            top: 10px;
+            right: 90px;
+            z-index: 250;
+            background: rgba(128,0,128,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        #pauseBtn {
+            position: fixed;
+            top: 10px;
+            right: 160px;
+            z-index: 250;
+            background: rgba(100,0,100,0.8);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 450;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+        }
+        
+        #startScreen, #pauseMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+
+        @keyframes gunPulsate {
+            0%, 100% { 
+                transform: scale(1);
+            }
+            50% { 
+                transform: scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (window.innerHeight <= 667) {
+            const style = document.createElement('style');
+            style.textContent = `
+                #ui, #timer, #deathCounter, #pauseBtn {
+                    opacity: 0.6 !important;
+                }
+                #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
+                    opacity: 1 !important;
+                    transition: opacity 0.2s ease;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    </script>
+
+    <div id="gameContainer">
+        <div id="ui">
+            <div>🏰 Castle Floor: <span id="currentFloor">1</span></div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+        </div>
+        <div id="timer">0:00</div>
+        <div id="deathCounter">☠️0</div>
+        <button id="pauseBtn" onclick="pauseGame()">⏸️</button>
+        
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="startScreen">
+            <h2>🏰 Dark Castle</h2>
+            <div style="margin: 20px 0;">The final stronghold awaits...</div>
+            <p style="font-size: 12px; opacity: 0.8;">🔫 Use your TNT gun to survive the castle!</p>
+            <button class="start-button" onclick="startCastle()">Enter Castle</button>
+        </div>
+        
+        <div id="pauseMenu" style="display: none;">
+            <h3>⏸️ Game Paused</h3>
+            <button onclick="resumeGame()">Continue Game</button>
+        </div>
+        
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">🏰 Dark Castle</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe to move, double-tap to shoot!</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px;">
+                <div>🔫 Defeat the bully once and for all!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Climb to the top floor...</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="castleMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/acastle.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // CHECK ACCESS AND VALIDATE ENTRY
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            
+            if (!savedState) {
+                alert('No game data found! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+            
+            const gameState = JSON.parse(savedState);
+            
+            // Check if they have the key
+            if (!gameState.hasKey) {
+                alert('You need a key to enter the castle!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+        });
+
+        class CastleGame {
+            constructor() {
+                // Load all game state from maze2
+                this.loadGameState();
+                
+                // Castle specific properties
+                this.gameStarted = false;
+                this.isPaused = false;
+                this.isInvulnerable = false;
+                this.isTransitioning = false;
+                
+                // Player state
+                this.playerX = 220;
+                this.playerY = 850;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.lastDragX = 0;
+                this.lastDragY = 0;
+                this.currentDirection = 's';
+                
+                // Current floor (1-8)
+                this.currentFloor = 1;
+                
+                // Attack system (from maze2)
+                this.attackCooldown = false;
+                this.attackRange = this.hasEnhancedRange ? 90 : 45;
+                this.attackDamage = this.calculateAttackDamage();
+                this.lastTap = 0;
+                this.lastTapX = null;
+                this.lastTapY = null;
+                this.tapDelay = 250;
+                
+                // Electric lines system
+                this.electricLines = [];
+                this.frameCount = 0;
+                
+                // Timer
+                this.timerInterval = null;
+                
+                // Elements
+                this.player = document.getElementById('player');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.gameArea = document.getElementById('gameArea');
+                this.controlArea = document.getElementById('controlArea');
+                this.castleMusic = document.getElementById('castleMusic');
+                
+                this.preloadPlayerImages();
+                this.setupControls();
+                this.createFloor(this.currentFloor);
+                this.updatePlayerImage('s');
+            }
+            
+            loadGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    
+                    // Core stats
+                    this.hearts = gameState.hearts || 3;
+                    this.money = gameState.money || 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+                    this.maxHearts = gameState.maxHearts || 3;
+                    
+                    // All collected items tracking
+                    this.collectedRedHearts = gameState.collectedRedHearts || [];
+                    this.collectedMoney = gameState.collectedMoney || [];
+                    this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+                    this.openedGates = gameState.openedGates || [];
+                    this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+                    
+                    // Items
+                    this.hasKey = gameState.hasKey || false;
+                    this.hasBoat = gameState.hasBoat || false;
+                    this.boatIsBroken = gameState.boatIsBroken || false;
+                    this.hasFlashlight = gameState.hasFlashlight || false;
+                    this.hasHammer = gameState.hasHammer || false;
+                    this.hasLavaShoes = gameState.hasLavaShoes || false;
+                    this.hasPencil = gameState.hasPencil || false;
+                    this.hasPyramidKey = gameState.hasPyramidKey || false;
+                    this.hasTrophy = gameState.hasTrophy || false;
+                    
+                    // Weapon and upgrades
+                    this.hasWeapon = gameState.hasWeapon || false;
+                    this.hasOrangePower = gameState.hasOrangePower || false;
+                    this.hasHammerPower = gameState.hasHammerPower || false;
+                    this.hasSuperGun = gameState.hasSuperGun || false;
+                    this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+                    
+                    // Quest flags
+                    this.bullyDefeated = gameState.bullyDefeated || false;
+                    this.motherPaid = gameState.motherPaid || false;
+                    this.caveBossDefeated = gameState.caveBossDefeated || false;
+                    this.pyramidBossDefeated = gameState.pyramidBossDefeated || false;
+                    this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
+                    this.pinkBossDefeated = gameState.pinkBossDefeated || false;
+                    
+                    this.updateDeathCounter();
+                }
+            }
+            
+            calculateAttackDamage() {
+                if (this.hasSuperGun) {
+                    return 150;
+                } else if (this.hasOrangePower || this.hasHammerPower) {
+                    return 100;
+                } else {
+                    return 50;
+                }
+            }
+            
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+            
+            setupControls() {
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+            
+            handleStart(e) {
+                if (!this.gameStarted || this.isTransitioning || this.isPaused) return;
+                e.preventDefault();
+                
+                const now = Date.now();
+                const point = e.touches ? e.touches[0] : e;
+                const currentX = point.clientX;
+                const currentY = point.clientY;
+                
+                if (this.hasWeapon && now - this.lastTap < this.tapDelay && !this.attackCooldown) {
+                    if (this.lastTapX && this.lastTapY) {
+                        const tapDistance = Math.sqrt(
+                            Math.pow(currentX - this.lastTapX, 2) + 
+                            Math.pow(currentY - this.lastTapY, 2)
+                        );
+                        
+                        if (tapDistance < 30) {
+                            this.attack();
+                            this.lastTap = 0;
+                            this.lastTapX = null;
+                            this.lastTapY = null;
+                            return;
+                        }
+                    }
+                }
+                
+                this.lastTap = now;
+                this.lastTapX = currentX;
+                this.lastTapY = currentY;
+                
+                this.isDragging = true;
+                this.lastDragX = currentX;
+                this.lastDragY = currentY;
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging || !this.gameStarted || this.isTransitioning || this.isPaused) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+                
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.currentDirection = newDirection;
+                        this.updatePlayerImage(newDirection);
+                    }
+                }
+                
+                const sensitivity = 0.6;
+                this.playerVelocityX = deltaX * sensitivity;
+                this.playerVelocityY = deltaY * sensitivity;
+                
+                const maxVelocity = 10;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            updatePlayerImage(direction) {
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+            }
+            
+            createFloor(floorNumber) {
+                // Clear existing floor
+                this.gameWorld.innerHTML = '<div id="player"></div>';
+                this.player = document.getElementById('player');
+                this.electricLines = [];
+                
+                // Create walls for this floor
+                this.createWalls(floorNumber);
+                
+                // Create electric lines for some floors
+                if ([2, 4, 6, 7].includes(floorNumber)) {
+                    this.createElectricLines(floorNumber);
+                }
+                
+                // Create NPCs and interactive elements
+                this.createFloorElements(floorNumber);
+                
+                this.positionPlayer();
+                this.centerCameraOnPlayer();
+                this.updateUI();
+                this.updateFloorInfo(floorNumber);
+            }
+            
+            createWalls(floorNumber) {
+                // Border walls
+                this.createWall(0, 0, 350, 20, false); // Top
+                this.createWall(0, 880, 350, 20, false); // Bottom
+                this.createWall(0, 0, 20, 900, false); // Left
+                this.createWall(330, 0, 20, 900, false); // Right
+                
+                // Floor-specific wall layouts
+                const wallConfigs = this.getWallConfig(floorNumber);
+                wallConfigs.forEach(wall => {
+                    this.createWall(wall.x, wall.y, wall.w, wall.h, wall.light || false);
+                });
+            }
+            
+            getWallConfig(floorNumber) {
+                // Different wall patterns for each floor
+                const configs = {
+                    1: [
+                        {x: 60, y: 60, w: 100, h: 20},
+                        {x: 190, y: 60, w: 100, h: 20},
+                        {x: 280, y: 150, w: 20, h: 200},
+                        {x: 50, y: 300, w: 150, h: 20}
+                    ],
+                    2: [
+                        {x: 100, y: 100, w: 150, h: 20, light: true},
+                        {x: 100, y: 200, w: 20, h: 150, light: true},
+                        {x: 230, y: 200, w: 20, h: 150, light: true},
+                        {x: 100, y: 350, w: 150, h: 20, light: true}
+                    ],
+                    3: [
+                        {x: 80, y: 80, w: 190, h: 20},
+                        {x: 80, y: 300, w: 190, h: 20},
+                        {x: 50, y: 150, w: 100, h: 20},
+                        {x: 200, y: 180, w: 100, h: 20}
+                    ],
+                    4: [
+                        {x: 60, y: 120, w: 20, h: 200, light: true},
+                        {x: 270, y: 120, w: 20, h: 200, light: true},
+                        {x: 120, y: 250, w: 110, h: 20, light: true}
+                    ],
+                    5: [
+                        {x: 100, y: 60, w: 150, h: 20},
+                        {x: 175, y: 80, w: 20, h: 120},
+                        {x: 100, y: 300, w: 150, h: 20},
+                        {x: 175, y: 320, w: 20, h: 120}
+                    ],
+                    6: [
+                        {x: 50, y: 100, w: 250, h: 20, light: true},
+                        {x: 150, y: 120, w: 20, h: 100, light: true},
+                        {x: 50, y: 400, w: 250, h: 20, light: true}
+                    ],
+                    7: [
+                        {x: 80, y: 150, w: 80, h: 20, light: true},
+                        {x: 190, y: 150, w: 80, h: 20, light: true},
+                        {x: 175, y: 200, w: 20, h: 200, light: true}
+                    ],
+                    8: [] // Top floor - minimal walls for boss fight
+                };
+                
+                return configs[floorNumber] || [];
+            }
+            
+            createWall(x, y, width, height, isLight = false) {
+                const wall = document.createElement('div');
+                wall.className = isLight ? 'light-castle-wall' : 'castle-wall';
+                wall.style.left = x + 'px';
+                wall.style.top = y + 'px';
+                wall.style.width = width + 'px';
+                wall.style.height = height + 'px';
+                this.gameWorld.appendChild(wall);
+            }
+            
+            createElectricLines(floorNumber) {
+                const lineConfigs = {
+                    2: [
+                        {
+                            id: 'castle_line_2a',
+                            path: [
+                                {x: 120, y: 120}, {x: 250, y: 120},
+                                {x: 250, y: 350}, {x: 120, y: 350},
+                                {x: 120, y: 120}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 200,
+                            thickness: 20
+                        }
+                    ],
+                    4: [
+                        {
+                            id: 'castle_line_4a',
+                            path: [
+                                {x: 80, y: 140}, {x: 80, y: 300},
+                                {x: 270, y: 300}, {x: 270, y: 140},
+                                {x: 80, y: 140}
+                            ],
+                            segmentSize: 20,
+                            speed: 3.0,
+                            bodyLength: 300,
+                            thickness: 20
+                        }
+                    ],
+                    6: [
+                        {
+                            id: 'castle_line_6a',
+                            path: [
+                                {x: 70, y: 120}, {x: 280, y: 120},
+                                {x: 280, y: 400}, {x: 70, y: 400},
+                                {x: 70, y: 120}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.8,
+                            bodyLength: 400,
+                            thickness: 20
+                        }
+                    ],
+                    7: [
+                        {
+                            id: 'castle_line_7a',
+                            path: [
+                                {x: 100, y: 170}, {x: 250, y: 170},
+                                {x: 195, y: 220}, {x: 195, y: 400},
+                                {x: 100, y: 170}
+                            ],
+                            segmentSize: 20,
+                            speed: 3.2,
+                           bodyLength: 250,
+                           thickness: 20
+                       }
+                   ]
+               };
+               
+               const configs = lineConfigs[floorNumber];
+               if (configs) {
+                   configs.forEach(config => {
+                       this.createMovingElectricSnake(config);
+                   });
+               }
+           }
+           
+           createMovingElectricSnake(config) {
+               let totalLength = 0;
+               const pathSegments = [];
+               
+               for (let i = 0; i < config.path.length - 1; i++) {
+                   const start = config.path[i];
+                   const end = config.path[i + 1];
+                   const length = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+                   pathSegments.push({ start, end, length, totalLengthBefore: totalLength });
+                   totalLength += length;
+               }
+               
+               this.electricLines.push({
+                   id: config.id,
+                   pathSegments: pathSegments,
+                   totalPathLength: totalLength,
+                   bodyLength: config.bodyLength,
+                   speed: config.speed,
+                   thickness: config.thickness,
+                   headPosition: 0,
+                   segments: []
+               });
+           }
+           
+           getPositionOnPath(pathSegments, position) {
+               for (let segment of pathSegments) {
+                   if (position >= segment.totalLengthBefore && 
+                       position <= segment.totalLengthBefore + segment.length) {
+                       
+                       const progressOnSegment = (position - segment.totalLengthBefore) / segment.length;
+                       
+                       return {
+                           x: segment.start.x + (segment.end.x - segment.start.x) * progressOnSegment,
+                           y: segment.start.y + (segment.end.y - segment.start.y) * progressOnSegment
+                       };
+                   }
+               }
+               return null;
+           }
+           
+           createFloorElements(floorNumber) {
+               // Create ladder (except on top floor)
+               if (floorNumber < 8) {
+                   const ladder = document.createElement('div');
+                   ladder.className = 'ladder';
+                   ladder.textContent = '🪜';
+                   ladder.style.left = '175px';
+                   ladder.style.top = '25px';
+                   ladder.dataset.type = 'ladder';
+                   this.gameWorld.appendChild(ladder);
+               }
+               
+               // Create door
+               const door = document.createElement('div');
+               door.className = 'door';
+               door.textContent = '🚪';
+               door.style.left = '175px';
+               door.style.top = '860px';
+               door.dataset.type = 'door';
+               this.gameWorld.appendChild(door);
+               
+               // Floor 1 NPCs
+               if (floorNumber === 1) {
+                   // Cat girlfriend
+                   const cat = document.createElement('div');
+                   cat.className = 'friendly cat-girlfriend';
+                   cat.style.left = '45px';
+                   cat.style.top = '820px';
+                   cat.style.width = '25px';
+                   cat.style.height = '25px';
+                   cat.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/gfcat-min.png")';
+                   cat.style.backgroundSize = 'contain';
+                   cat.style.backgroundRepeat = 'no-repeat';
+                   cat.style.backgroundPosition = 'center';
+                   cat.style.zIndex = '40';
+                   cat.dataset.message = "Meow! The bully is at the top of the castle!";
+                   this.gameWorld.appendChild(cat);
+                   
+                   // Scientist NPC
+                   const scientist = document.createElement('div');
+                   scientist.className = 'friendly';
+                   scientist.textContent = '👨🏻‍🔬';
+                   scientist.style.left = '300px';
+                   scientist.style.top = '820px';
+                   scientist.dataset.message = "My experiments show the bully has incredible power!";
+                   this.gameWorld.appendChild(scientist);
+               }
+               
+               // Floor 8 boss
+               if (floorNumber === 8) {
+                   const boss = document.createElement('div');
+                   boss.className = 'boss';
+                   boss.style.left = '175px';
+                   boss.style.top = '120px';
+                   boss.dataset.type = 'boss';
+                   this.gameWorld.appendChild(boss);
+               }
+           }
+           
+           positionPlayer() {
+               this.player.style.left = (this.playerX - 16) + 'px';
+               this.player.style.top = (this.playerY - 16) + 'px';
+           }
+           
+           centerCameraOnPlayer() {
+               const gameAreaWidth = this.gameArea.offsetWidth;
+               const gameAreaHeight = this.gameArea.offsetHeight;
+               const scrollX = this.playerX - gameAreaWidth / 2 + 16;
+               const scrollY = this.playerY - gameAreaHeight / 2 + 16;
+               this.gameArea.scrollTo({
+                   left: scrollX,
+                   top: scrollY,
+                   behavior: 'auto'
+               });
+           }
+           
+           startGame() {
+               this.gameStarted = true;
+               this.startGameLoop();
+               this.startTimer();
+               
+               this.castleMusic.play().catch(e => {
+                   console.log('Music autoplay blocked');
+                   const tryMusic = () => {
+                       this.castleMusic.play().catch(e => console.log('Music failed:', e));
+                       document.removeEventListener('click', tryMusic);
+                       document.removeEventListener('touchstart', tryMusic);
+                   };
+                   document.addEventListener('click', tryMusic);
+                   document.addEventListener('touchstart', tryMusic);
+               });
+           }
+           
+           startGameLoop() {
+               const gameLoop = () => {
+                   if (this.gameStarted && !this.isTransitioning) {
+                       this.frameCount++;
+                       
+                       this.updatePlayer();
+                       
+                       if (this.frameCount % 2 === 0) {
+                           this.updateElectricLines();
+                       }
+                       
+                       this.checkCollisions();
+                   }
+                   requestAnimationFrame(gameLoop);
+               };
+               gameLoop();
+           }
+           
+           updatePlayer() {
+               if (this.isPaused) return;
+               
+               if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                   const newX = this.playerX + this.playerVelocityX;
+                   const newY = this.playerY + this.playerVelocityY;
+                   
+                   if (this.canMoveTo(newX, newY)) {
+                       this.playerX = newX;
+                       this.playerY = newY;
+                       this.positionPlayer();
+                       
+                       const gameAreaWidth = this.gameArea.offsetWidth;
+                       const gameAreaHeight = this.gameArea.offsetHeight;
+                       const scrollX = this.playerX - gameAreaWidth / 2 + 16;
+                       const scrollY = this.playerY - gameAreaHeight / 2 + 16;
+                       this.gameArea.scrollTo({
+                           left: scrollX,
+                           top: scrollY,
+                           behavior: 'auto'
+                       });
+                   }
+                   
+                   this.playerVelocityX *= 0.88;
+                   this.playerVelocityY *= 0.88;
+               }
+           }
+           
+           updateElectricLines() {
+               if (this.isPaused) return;
+               
+               this.electricLines.forEach(line => {
+                   line.headPosition += line.speed;
+                   if (line.headPosition >= line.totalPathLength) {
+                       line.headPosition = 0;
+                   }
+                   
+                   line.segments.forEach(segment => segment.remove());
+                   line.segments = [];
+                   
+                   for (let i = 0; i < line.bodyLength; i += 15) {
+                       const segmentPosition = line.headPosition - i;
+                       let actualPosition = segmentPosition;
+                       
+                       if (actualPosition < 0) {
+                           actualPosition = line.totalPathLength + actualPosition;
+                       }
+                       
+                       const coords = this.getPositionOnPath(line.pathSegments, actualPosition);
+                       if (coords) {
+                           const segment = document.createElement('div');
+                           segment.className = 'electric-snake-segment';
+                           segment.style.left = (coords.x - line.thickness/2) + 'px';
+                           segment.style.top = (coords.y - line.thickness/2) + 'px';
+                           segment.style.width = line.thickness + 'px';
+                           segment.style.height = line.thickness + 'px';
+                           this.gameWorld.appendChild(segment);
+                           line.segments.push(segment);
+                       }
+                   }
+               });
+           }
+           
+           canMoveTo(x, y) {
+               const playerSize = 24;
+               const padding = 2;
+               
+               const points = [
+                   {x: x + padding, y: y + padding},
+                   {x: x + playerSize - padding, y: y + padding},
+                   {x: x + padding, y: y + playerSize - padding},
+                   {x: x + playerSize - padding, y: y + playerSize - padding},
+                   {x: x + playerSize/2, y: y + padding},
+                   {x: x + playerSize/2, y: y + playerSize - padding},
+                   {x: x + padding, y: y + playerSize/2},
+                   {x: x + playerSize - padding, y: y + playerSize/2}
+               ];
+               
+               const walls = this.gameWorld.querySelectorAll('.castle-wall, .light-castle-wall');
+               
+               for (let wall of walls) {
+                   const wallRect = {
+                       left: parseInt(wall.style.left),
+                       top: parseInt(wall.style.top),
+                       right: parseInt(wall.style.left) + parseInt(wall.style.width),
+                       bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+                   };
+                   
+                   for (let point of points) {
+                       if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                           point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                           return false;
+                       }
+                   }
+               }
+               
+               return true;
+           }
+           
+           checkCollisions() {
+               if (this.isInvulnerable) return;
+               
+               const playerRect = {
+                   left: this.playerX - 12,
+                   top: this.playerY - 12,
+                   right: this.playerX + 12,
+                   bottom: this.playerY + 12
+               };
+               
+               // Electric line collision check
+               let electricHit = false;
+               this.electricLines.forEach(line => {
+                   if (electricHit) return;
+                   line.segments.forEach(segment => {
+                       if (electricHit) return;
+                       const segmentRect = {
+                           left: parseInt(segment.style.left),
+                           top: parseInt(segment.style.top),
+                           right: parseInt(segment.style.left) + parseInt(segment.style.width),
+                           bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
+                       };
+                       
+                       if (this.rectsOverlap(playerRect, segmentRect)) {
+                           this.instantDeath('⚡ Electrocuted!');
+                           electricHit = true;
+                           return;
+                       }
+                   });
+               });
+               if (electricHit) return;
+               
+               // Check interactive elements
+               const elements = this.gameWorld.querySelectorAll('[data-type]');
+               elements.forEach(element => {
+                   const elemX = parseInt(element.style.left);
+                   const elemY = parseInt(element.style.top);
+                   const elemRect = {
+                       left: elemX - 5,
+                       top: elemY - 5,
+                       right: elemX + 35,
+                       bottom: elemY + 35
+                   };
+                   
+                   if (this.rectsOverlap(playerRect, elemRect)) {
+                       const type = element.dataset.type;
+                       
+                       if (type === 'ladder') {
+                           this.goUpstairs();
+                       } else if (type === 'door') {
+                           this.goDownstairs();
+                       } else if (type === 'boss') {
+                           this.showMessage('👑 The final boss awaits! (Coming soon...)');
+                       }
+                   }
+               });
+               
+               // Check friendly NPCs
+               const friendlies = this.gameWorld.querySelectorAll('.friendly');
+               friendlies.forEach(friendly => {
+                   const friendlyX = parseInt(friendly.style.left);
+                   const friendlyY = parseInt(friendly.style.top);
+                   const friendlyRect = {
+                       left: friendlyX,
+                       top: friendlyY,
+                       right: friendlyX + 22,
+                       bottom: friendlyY + 22
+                   };
+                   
+                   if (this.rectsOverlap(playerRect, friendlyRect)) {
+                       this.showMessage(friendly.dataset.message);
+                   }
+               });
+           }
+           
+           attack() {
+               if (!this.hasWeapon) return;
+               
+               this.attackCooldown = true;
+               
+               const attackEl = document.createElement('div');
+               attackEl.style.position = 'absolute';
+               attackEl.style.pointerEvents = 'none';
+               attackEl.style.zIndex = '400';
+               attackEl.style.animation = 'slashEffect 0.3s ease-out';
+               
+               if (this.hasEnhancedRange) {
+                   attackEl.style.width = '60px';
+                   attackEl.style.height = '60px';
+               } else {
+                   attackEl.style.width = '40px';
+                   attackEl.style.height = '40px';
+               }
+               
+               attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+               attackEl.style.borderRadius = '50%';
+               
+               const directionOffsets = {
+                   'n': {x: 0, y: -35},
+                   'ne': {x: 25, y: -25},
+                   'e': {x: 35, y: 0},
+                   'se': {x: 25, y: 25},
+                   's': {x: 0, y: 35},
+                   'sw': {x: -25, y: 25},
+                   'w': {x: -35, y: 0},
+                   'nw': {x: -25, y: -25}
+               };
+               
+               const offset = directionOffsets[this.currentDirection];
+               const visualCenterX = this.hasEnhancedRange ? 30 : 20;
+               const visualCenterY = this.hasEnhancedRange ? 30 : 20;
+               
+               attackEl.style.left = (this.playerX + offset.x - visualCenterX) + 'px';
+               attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
+               
+               this.gameWorld.appendChild(attackEl);
+               
+               setTimeout(() => {
+                   if (attackEl.parentNode) {
+                       attackEl.remove();
+                   }
+               }, 300);
+               
+               setTimeout(() => {
+                   this.attackCooldown = false;
+               }, 500);
+           }
+           
+           goUpstairs() {
+               if (this.currentFloor >= 8 || this.isTransitioning) return;
+               this.isTransitioning = true;
+               this.playerVelocityX = 0;
+               this.playerVelocityY = 0;
+               this.isDragging = false;
+               
+               this.currentFloor++;
+               this.showMessage(`🏰 Ascending to Floor ${this.currentFloor}!`);
+               
+               setTimeout(() => {
+                   this.playerX = 220;
+                   this.playerY = 850;
+                   this.createFloor(this.currentFloor);
+                   this.updatePlayerImage(this.currentDirection);
+                   this.isTransitioning = false;
+               }, 1000);
+           }
+           
+           goDownstairs() {
+               if (this.isTransitioning) return;
+               this.isTransitioning = true;
+               this.playerVelocityX = 0;
+               this.playerVelocityY = 0;
+               this.isDragging = false;
+               
+               if (this.currentFloor <= 1) {
+                   this.exitCastle();
+                   return;
+               }
+               
+               this.currentFloor--;
+               this.showMessage(`🏰 Descending to Floor ${this.currentFloor}!`);
+               
+               setTimeout(() => {
+                   this.playerX = 220;
+                   this.playerY = 30;
+                   this.createFloor(this.currentFloor);
+                   this.updatePlayerImage(this.currentDirection);
+                   this.isTransitioning = false;
+               }, 1000);
+           }
+           
+           exitCastle() {
+               this.gameStarted = false;
+               clearInterval(this.timerInterval);
+               this.castleMusic.pause();
+               
+               this.showMessage('🌅 Exiting castle...');
+               
+               setTimeout(() => {
+                   this.saveGameState();
+                   
+                   const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+                   gameState.playerX = 2340;
+                   gameState.playerY = 300;
+                   gameState.currentUrl = 'maze2';
+                   
+                   localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                   
+                   window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+               }, 2000);
+           }
+           
+           instantDeath(message) {
+               this.showMessage(message);
+               setTimeout(() => {
+                   this.gameOver();
+               }, 500);
+           }
+           
+           gameOver() {
+               this.deathCount++;
+               this.updateDeathCounter();
+               
+               this.saveGameState();
+               this.gameStarted = false;
+               clearInterval(this.timerInterval);
+               this.castleMusic.pause();
+               
+               this.showMessage('💀 You died in the castle!');
+               
+               setTimeout(() => {
+                   this.hearts = 3;
+                   this.playerX = 220;
+                   this.playerY = 850;
+                   this.currentFloor = 1;
+                   
+                   this.createFloor(this.currentFloor);
+                   this.startGameTimer();
+                   this.saveGameState();
+                   
+                   this.showMessage('🔄 Respawned at castle entrance!');
+               }, 3000);
+           }
+           
+           rectsOverlap(rect1, rect2) {
+               return rect1.left < rect2.right &&
+                      rect1.right > rect2.left &&
+                      rect1.top < rect2.bottom &&
+                      rect1.bottom > rect2.top;
+           }
+           
+           saveGameState() {
+               const gameState = {
+                   hearts: this.hearts,
+                   money: this.money,
+                   timeElapsed: this.timeElapsed,
+                   deathCount: this.deathCount,
+                   maxHearts: this.maxHearts,
+                   collectedRedHearts: this.collectedRedHearts,
+                   collectedMoney: this.collectedMoney,
+                   collectedPurpleHearts: this.collectedPurpleHearts,
+                   openedGates: this.openedGates,
+                   weakPointsBlasted: this.weakPointsBlasted,
+                   hasKey: this.hasKey,
+                   hasBoat: this.hasBoat,
+                   boatIsBroken: this.boatIsBroken,
+                   hasFlashlight: this.hasFlashlight,
+                   hasHammer: this.hasHammer,
+                   hasLavaShoes: this.hasLavaShoes,
+                   hasPencil: this.hasPencil,
+                   hasPyramidKey: this.hasPyramidKey,
+                   hasTrophy: this.hasTrophy,
+                   hasWeapon: this.hasWeapon,
+                   hasOrangePower: this.hasOrangePower,
+                   hasHammerPower: this.hasHammerPower,
+                   hasSuperGun: this.hasSuperGun,
+                   hasEnhancedRange: this.hasEnhancedRange,
+                   bullyDefeated: this.bullyDefeated,
+                   motherPaid: this.motherPaid,
+                   caveBossDefeated: this.caveBossDefeated,
+                   pyramidBossDefeated: this.pyramidBossDefeated,
+                   gorillaEncounterComplete: this.gorillaEncounterComplete,
+                   pinkBossDefeated: this.pinkBossDefeated,
+                   currentUrl: 'castle',
+                   lastSaveTime: Date.now()
+               };
+               localStorage.setItem('mfGameState', JSON.stringify(gameState));
+           }
+           
+           startTimer() {
+               this.updateTimer();
+               this.timerInterval = setInterval(() => {
+                   if (!this.isPaused) {
+                       this.timeElapsed++;
+                       this.updateTimer();
+                   }
+               }, 1000);
+           }
+           
+           updateTimer() {
+               const minutes = Math.floor(this.timeElapsed / 60);
+               const seconds = this.timeElapsed % 60;
+               const timerEl = document.getElementById('timer');
+               timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+               
+               if (this.timeElapsed >= 600) {
+                   timerEl.style.background = 'rgba(255,0,0,0.8)';
+               } else if (this.timeElapsed >= 300) {
+                   timerEl.style.background = 'rgba(255,165,0,0.8)';
+               } else {
+                   timerEl.style.background = 'rgba(0,128,0,0.8)';
+               }
+           }
+           
+           updateFloorInfo(floorNumber) {
+               document.getElementById('currentFloor').textContent = floorNumber;
+           }
+           
+           updateDeathCounter() {
+               document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+           }
+           
+           updateUI() {
+               document.getElementById('hearts').textContent = this.hearts;
+               document.getElementById('money').textContent = this.money;
+               
+               let items = [];
+               if (this.hasWeapon) {
+                   let gunHTML = '';
+                   
+                   if (this.hasSuperGun) {
+                       gunHTML = '<span style="filter: brightness(0.3);">🔫</span>';
+                   } else if (this.hasHammerPower) {
+                       gunHTML = '<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
+                   } else if (this.hasOrangePower) {
+                       gunHTML = '<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2);">🔫</span>';
+                   } else {
+                       gunHTML = '🔫';
+                   }
+                   
+                   if (this.hasEnhancedRange) {
+                       gunHTML = gunHTML.replace('🔫', '<span style="animation: gunPulsate 2s infinite; filter: drop-shadow(0 0 8px gold);">🔫</span>');
+                   }
+                   
+                   items.push(gunHTML);
+               }
+               if (this.hasFlashlight) items.push('🔦');
+               if (this.hasBoat) items.push('⛵');
+               if (this.hasKey) items.push('🔑');
+               if (this.hasLavaShoes) items.push('🥾');
+               if (this.hasTrophy) items.push('🏆');
+               
+               if (!document.getElementById('items')) {
+                   const itemsDiv = document.createElement('div');
+                   itemsDiv.id = 'items';
+                   itemsDiv.innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+                   document.getElementById('ui').appendChild(itemsDiv);
+               } else {
+                   document.getElementById('items').innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+               }
+           }
+           
+           showMessage(text) {
+               const message = document.getElementById('message');
+               message.textContent = text;
+               message.style.display = 'block';
+               
+               clearTimeout(this.messageTimeout);
+               this.messageTimeout = setTimeout(() => {
+                   message.style.display = 'none';
+               }, 2500);
+           }
+       }
+
+       let game;
+
+       function startCastle() {
+           document.getElementById('startScreen').style.display = 'none';
+           
+           game = new CastleGame();
+           game.startGame();
+       }
+
+       function pauseGame() {
+           if (game && game.gameStarted) {
+               game.isPaused = true;
+               game.castleMusic.pause();
+               document.getElementById('pauseMenu').style.display = 'flex';
+           }
+       }
+
+       function resumeGame() {
+           if (game) {
+               game.isPaused = false;
+               document.getElementById('pauseMenu').style.display = 'none';
+               game.castleMusic.play().catch(e => console.log('Music resume failed:', e));
+           }
+       }
+   </script>
+</body>
+</html>
