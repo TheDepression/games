@@ -1132,6 +1132,157 @@ this.updateProjectiles();
                    }
                });
            }
+
+            updateEnemies() {
+    if (this.isPaused) return;
+    
+    const now = Date.now();
+    
+    this.enemies.forEach(enemy => {
+        if (!enemy.alive) return;
+        
+        if (enemy.type === 'bear') {
+            // Bears shoot projectiles every 4 seconds
+            if (now - enemy.lastShot > enemy.shotCooldown) {
+                this.createProjectile(enemy.currentX + 15, enemy.currentY + 15);
+                enemy.lastShot = now;
+            }
+        } else if (enemy.type === 'panda') {
+            // Pandas spin and bounce off walls
+            enemy.angle += enemy.rotationSpeed;
+            
+            const newX = enemy.currentX + Math.cos(enemy.angle) * enemy.speed;
+            const newY = enemy.currentY + Math.sin(enemy.angle) * enemy.speed;
+            
+            if (this.canEnemyMoveTo(newX, newY)) {
+                enemy.currentX = newX;
+                enemy.currentY = newY;
+            } else {
+                // Bounce off wall
+                enemy.angle += Math.PI;
+            }
+            
+            enemy.element.style.left = enemy.currentX + 'px';
+            enemy.element.style.top = enemy.currentY + 'px';
+        } else if (enemy.type === 'goblin') {
+            // Goblins track player when in range
+            const distance = Math.sqrt(
+                Math.pow(this.playerX - enemy.currentX, 2) + 
+                Math.pow(this.playerY - enemy.currentY, 2)
+            );
+            
+            if (distance <= enemy.detectionRange) {
+                enemy.isChasing = true;
+            }
+            
+            if (enemy.isChasing) {
+                const deltaX = this.playerX - enemy.currentX;
+                const deltaY = this.playerY - enemy.currentY;
+                const moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                if (moveDistance > 5) {
+                    const moveX = (deltaX / moveDistance) * enemy.speed;
+                    const moveY = (deltaY / moveDistance) * enemy.speed;
+                    
+                    const newX = enemy.currentX + moveX;
+                    const newY = enemy.currentY + moveY;
+                    
+                    if (this.canEnemyMoveTo(newX, newY)) {
+                        enemy.currentX = newX;
+                        enemy.currentY = newY;
+                        enemy.element.style.left = enemy.currentX + 'px';
+                        enemy.element.style.top = enemy.currentY + 'px';
+                    }
+                }
+            }
+        }
+    });
+}
+
+updateProjectiles() {
+    if (this.isPaused) return;
+    
+    this.projectiles.forEach((projectile, index) => {
+        const deltaX = this.playerX - projectile.startX;
+        const deltaY = this.playerY - projectile.startY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        const moveX = (deltaX / distance) * projectile.speed;
+        const moveY = (deltaY / distance) * projectile.speed;
+        
+        projectile.currentX += moveX;
+        projectile.currentY += moveY;
+        
+        projectile.element.style.left = projectile.currentX + 'px';
+        projectile.element.style.top = projectile.currentY + 'px';
+        
+        // Remove if hits wall or goes out of bounds
+        if (!this.canEnemyMoveTo(projectile.currentX, projectile.currentY) || 
+            projectile.currentX < 0 || projectile.currentX > 350 ||
+            projectile.currentY < 0 || projectile.currentY > 900) {
+            projectile.element.remove();
+            this.projectiles.splice(index, 1);
+        }
+    });
+}
+
+createProjectile(x, y) {
+    const projectile = document.createElement('div');
+    projectile.className = 'projectile';
+    projectile.textContent = '💉';
+    projectile.style.position = 'absolute';
+    projectile.style.left = x + 'px';
+    projectile.style.top = y + 'px';
+    projectile.style.width = '20px';
+    projectile.style.height = '20px';
+    projectile.style.fontSize = '16px';
+    projectile.style.display = 'flex';
+    projectile.style.alignItems = 'center';
+    projectile.style.justifyContent = 'center';
+    projectile.style.zIndex = '80';
+    this.gameWorld.appendChild(projectile);
+    
+    this.projectiles.push({
+        element: projectile,
+        currentX: x,
+        currentY: y,
+        startX: x,
+        startY: y,
+        speed: 2
+    });
+}
+
+canEnemyMoveTo(x, y) {
+    const enemySize = 30;
+    const enemyRect = {
+        left: x,
+        top: y,
+        right: x + enemySize,
+        bottom: y + enemySize
+    };
+    
+    const walls = this.gameWorld.querySelectorAll('.castle-wall, .light-castle-wall');
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + parseInt(wall.style.width),
+            bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+        };
+        
+        if (enemyRect.right > wallRect.left &&
+            enemyRect.left < wallRect.right &&
+            enemyRect.bottom > wallRect.top &&
+            enemyRect.top < wallRect.bottom) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+
+            
            
            canMoveTo(x, y) {
     const playerSize = 24;
@@ -1200,6 +1351,42 @@ this.updateProjectiles();
                    });
                });
                if (electricHit) return;
+
+
+               // Check enemy collisions
+this.enemies.forEach(enemy => {
+    if (!enemy.alive) return;
+    
+    const enemyRect = {
+        left: enemy.currentX,
+        top: enemy.currentY,
+        right: enemy.currentX + 30,
+        bottom: enemy.currentY + 30
+    };
+    
+    if (this.rectsOverlap(playerRect, enemyRect)) {
+        this.takeDamage();
+    }
+});
+
+// Check projectile collisions
+this.projectiles.forEach((projectile, index) => {
+    const projectileRect = {
+        left: projectile.currentX,
+        top: projectile.currentY,
+        right: projectile.currentX + 20,
+        bottom: projectile.currentY + 20
+    };
+    
+    if (this.rectsOverlap(playerRect, projectileRect)) {
+        this.takeDamage();
+        projectile.element.remove();
+        this.projectiles.splice(index, 1);
+    }
+});
+
+
+               
                
                // Check interactive elements
                const elements = this.gameWorld.querySelectorAll('[data-type]');
