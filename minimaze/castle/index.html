@@ -1282,7 +1282,92 @@ canEnemyMoveTo(x, y) {
 }
 
 
+            checkAttackHits(attackX, attackY) {
+    const effectiveRange = this.hasEnhancedRange ? 90 : 45;
+    
+    this.enemies.forEach(enemy => {
+        if (!enemy.alive) return;
+        
+        const deltaX = enemy.currentX - this.playerX;
+        const deltaY = enemy.currentY - this.playerY;
+        const directionCheck = this.isInFrontOfPlayer(deltaX, deltaY);
+        
+        if (directionCheck) {
+            const distance = Math.sqrt(
+                Math.pow(this.playerX - enemy.currentX, 2) +
+                Math.pow(this.playerY - enemy.currentY, 2)
+            );
             
+            if (distance <= effectiveRange) {
+                enemy.hp -= this.attackDamage;
+                
+                const damageText = document.createElement('div');
+                damageText.style.position = 'absolute';
+                damageText.style.color = '#ff4444';
+                damageText.style.fontWeight = 'bold';
+                damageText.style.fontSize = '14px';
+                damageText.style.pointerEvents = 'none';
+                damageText.style.zIndex = '500';
+                damageText.style.animation = 'damageFloat 1s ease-out';
+                damageText.textContent = `-${this.attackDamage}`;
+                damageText.style.left = enemy.currentX + 'px';
+                damageText.style.top = enemy.currentY + 'px';
+                this.gameWorld.appendChild(damageText);
+                
+                setTimeout(() => {
+                    if (damageText.parentNode) {
+                        damageText.remove();
+                    }
+                }, 1000);
+                
+                if (enemy.hp <= 0) {
+                    enemy.alive = false;
+                    enemy.element.style.opacity = '0.3';
+                    enemy.element.style.filter = 'grayscale(100%)';
+                    
+                    // Stop chasing if goblin dies
+                    if (enemy.type === 'goblin') {
+                        enemy.isChasing = false;
+                    }
+                }
+            }
+        }
+    });
+}
+
+isInFrontOfPlayer(deltaX, deltaY) {
+    switch(this.currentDirection) {
+        case 'n': return deltaY < 0;
+        case 'ne': return deltaX > 0 && deltaY < 0;
+        case 'e': return deltaX > 0;
+        case 'se': return deltaX > 0 && deltaY > 0;
+        case 's': return deltaY > 0;
+        case 'sw': return deltaX < 0 && deltaY > 0;
+        case 'w': return deltaX < 0;
+        case 'nw': return deltaX < 0 && deltaY < 0;
+        default: return true;
+    }
+}
+
+takeDamage() {
+    if (this.isInvulnerable) return;
+    
+    this.hearts--;
+    this.showMessage('💔 Ouch!');
+    this.updateUI();
+    
+    this.isInvulnerable = true;
+    this.player.classList.add('invulnerable');
+    
+    setTimeout(() => {
+        this.isInvulnerable = false;
+        this.player.classList.remove('invulnerable');
+    }, 1500);
+    
+    if (this.hearts <= 0) {
+        this.gameOver();
+    }
+}
            
            canMoveTo(x, y) {
     const playerSize = 24;
