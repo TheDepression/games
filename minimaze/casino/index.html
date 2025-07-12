@@ -3889,9 +3889,9 @@ startSlotGame() {
         gamePhase: 'welcome',
         symbols: ['👩🏼‍⚕️', '🍕', '🤖', '🐷', '🍒', '🐚', '⚔️'],
         reels: [
-            { spinning: false, currentSymbol: 0, speed: 0.1, position: 0 },
-            { spinning: false, currentSymbol: 1, speed: 0.1, position: 0 },
-            { spinning: false, currentSymbol: 2, speed: 0.1, position: 0 }
+            { spinning: false, currentSymbol: 0, speed: 0.07, position: 0 },
+            { spinning: false, currentSymbol: 1, speed: 0.07, position: 0 },
+            { spinning: false, currentSymbol: 2, speed: 0.07, position: 0 }
         ],
         stoppedReels: 0,
         finalSymbols: [null, null, null],
@@ -3942,8 +3942,9 @@ showSlotRules() {
                 • 3 spinning reels with 7 different symbols<br>
                 • Tap to stop each reel one by one<br>
                 • Reels slow down before stopping<br>
-                • Match 3 identical symbols to win 500¥<br>
-                • Special: 3 swords ⚔️ = 500¥ + Super Gun Ticket!<br>
+                • Match 2 identical symbols to win 500¥<br>
+                • Match 3 identical symbols to win 2000¥<br>
+                • Special: 3 swords ⚔️ = 2000¥ + Super Gun Ticket!<br>
                 • No match: 0¥ (200¥ loss)
             </div>
         </div>
@@ -4036,7 +4037,7 @@ stopReel(reelIndex) {
     const reel = this.slotGameState.reels[reelIndex];
     
     // Start slowdown
-    reel.speed *= 0.3; // Dramatically slow down
+    reel.speed *= 0.2; // Dramatically slow down
     
     // Stop after slowdown period
     setTimeout(() => {
@@ -4069,40 +4070,50 @@ stopReel(reelIndex) {
 checkSlotResult() {
     const [symbol1, symbol2, symbol3] = this.slotGameState.finalSymbols;
     
+    // Check for 3 matches first
     if (symbol1 === symbol2 && symbol2 === symbol3) {
-        // Winner!
-        this.money += 500;
+        // Three of a kind!
+        this.money += 2000;
         this.updateUI();
         
         // Special bonus for swords
         if (symbol1 === '⚔️') {
             this.hasSuperGunTicket = true;
             this.saveGameState();
-            this.showSlotWin(true);
+            this.showSlotWin('jackpot');
         } else {
             this.saveGameState();
-            this.showSlotWin(false);
+            this.showSlotWin('triple');
         }
-    } else {
+    }
+    // Check for 2 matches
+    else if (symbol1 === symbol2 || symbol2 === symbol3 || symbol1 === symbol3) {
+        // Two of a kind!
+        this.money += 500;
+        this.updateUI();
+        this.saveGameState();
+        this.showSlotWin('double');
+    } 
+    else {
         // No match
         this.showSlotLose();
     }
 }
 
-showSlotWin(isSwordBonus) {
+showSlotWin(winType) {
     const content = document.getElementById('rpsContent');
     
-    if (isSwordBonus) {
+    if (winType === 'jackpot') {
         content.innerHTML = `
             <div style="margin-bottom: 20px;">
                 <div style="font-size: 24px; color: #ffd700; margin-bottom: 15px;">
                     ⚔️ JACKPOT BONUS! ⚔️
                 </div>
                 <div style="font-size: 18px; margin-bottom: 10px;">
-                    Triple swords! You won 500¥ PLUS a Super Gun Ticket!
+                    Triple swords! You won 2000¥ PLUS a Super Gun Ticket!
                 </div>
                 <div style="font-size: 16px; color: #4CAF50; margin-bottom: 10px;">
-                    +500¥ earned!
+                    +2000¥ earned!
                 </div>
                 <div style="font-size: 14px; background: rgba(255,215,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid #ffd700;">
                     🎫 Super Gun Ticket: 2000¥ discount on weapon upgrade!
@@ -4112,16 +4123,33 @@ showSlotWin(isSwordBonus) {
                 <button class="rps-btn rps-btn-primary" onclick="game.hideSlotOverlay()">Collect Prize!</button>
             </div>
         `;
-        
         this.showConfetti();
-    } else {
+    } else if (winType === 'triple') {
         content.innerHTML = `
             <div style="margin-bottom: 20px;">
                 <div style="font-size: 24px; color: #4CAF50; margin-bottom: 15px;">
-                    🎰 WINNER! 🎰
+                    🎰 TRIPLE MATCH! 🎰
                 </div>
                 <div style="font-size: 18px; margin-bottom: 10px;">
                     Triple ${this.slotGameState.finalSymbols[0]}! Perfect match!
+                </div>
+                <div style="font-size: 16px; color: #4CAF50;">
+                    +2000¥ earned!
+                </div>
+            </div>
+            <div class="rps-buttons">
+                <button class="rps-btn rps-btn-primary" onclick="game.hideSlotOverlay()">Collect Prize!</button>
+            </div>
+        `;
+        this.showConfetti();
+    } else if (winType === 'double') {
+        content.innerHTML = `
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 20px; color: #4CAF50; margin-bottom: 15px;">
+                    🎯 DOUBLE MATCH! 🎯
+                </div>
+                <div style="font-size: 16px; margin-bottom: 10px;">
+                    Two matching symbols!
                 </div>
                 <div style="font-size: 16px; color: #4CAF50;">
                     +500¥ earned!
@@ -4131,8 +4159,6 @@ showSlotWin(isSwordBonus) {
                 <button class="rps-btn rps-btn-primary" onclick="game.hideSlotOverlay()">Collect Prize!</button>
             </div>
         `;
-        
-        this.showConfetti();
     }
 }
 
