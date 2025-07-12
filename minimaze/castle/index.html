@@ -642,6 +642,8 @@ this.projectiles = [];
                 this.gameWorld.innerHTML = '<div id="player"></div>';
                 this.player = document.getElementById('player');
                 this.electricLines = [];
+                this.enemies = [];
+this.projectiles = [];
                 
                 // Create walls for this floor
                 this.createWalls(floorNumber);
@@ -653,6 +655,8 @@ this.projectiles = [];
                 
                 // Create NPCs and interactive elements
                 this.createFloorElements(floorNumber);
+                
+                this.createEnemies(floorNumber);
                 
                 this.positionPlayer();
                 this.centerCameraOnPlayer();
