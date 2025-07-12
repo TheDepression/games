@@ -1160,8 +1160,8 @@
                const visualCenterX = this.hasEnhancedRange ? 30 : 20;
                const visualCenterY = this.hasEnhancedRange ? 30 : 20;
                
-               attackEl.style.left = (this.playerX + offset.x - visualCenterX) + 'px';
-               attackEl.style.top = (this.playerY + offset.y - visualCenterY) + 'px';
+               attackEl.style.left = (this.playerX + offset.x - visualCenterX + 12) + 'px';
+attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
                
                this.gameWorld.appendChild(attackEl);
                
