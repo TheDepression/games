@@ -425,7 +425,7 @@
                 this.isTransitioning = false;
                 
                 // Player state
-                this.playerX = 220;
+                this.playerX = 240;
                 this.playerY = 850;
                 this.playerVelocityX = 0;
                 this.playerVelocityY = 0;
@@ -1186,7 +1186,7 @@
                this.showMessage(`🏰 Ascending to Floor ${this.currentFloor}!`);
                
                setTimeout(() => {
-                   this.playerX = 220;
+                   this.playerX = 240;
                    this.playerY = 850;
                    this.createFloor(this.currentFloor);
                    this.updatePlayerImage(this.currentDirection);
@@ -1210,7 +1210,7 @@
                this.showMessage(`🏰 Descending to Floor ${this.currentFloor}!`);
                
                setTimeout(() => {
-                   this.playerX = 220;
+                   this.playerX = 240;
                    this.playerY = 30;
                    this.createFloor(this.currentFloor);
                    this.updatePlayerImage(this.currentDirection);
@@ -1259,7 +1259,7 @@
                
                setTimeout(() => {
                    this.hearts = 3;
-                   this.playerX = 220;
+                   this.playerX = 240;
                    this.playerY = 850;
                    this.currentFloor = 1;
                    
