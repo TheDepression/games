@@ -1694,9 +1694,37 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
     }, 500);
 }
            
-//   debido        this.createFloor(this.currentFloor);
-//this.positionPlayer(); // ADD THIS LINE
-//this.updatePlayerImage(this.currentDirection); // ADD THIS LINE TOO
+gameOver() {
+    this.isDying = false; // Reset the flag
+    this.deathCount++;
+    this.updateDeathCounter();
+    
+    this.saveGameState();
+    this.gameStarted = false;
+    clearInterval(this.timerInterval);
+    this.castleMusic.pause();
+    
+    this.showMessage('💀 You died in the castle!');
+    
+    setTimeout(() => {
+        this.hearts = 3;
+        this.playerX = 220;
+        this.playerY = 850;
+        this.currentFloor = 1;
+        
+        this.createFloor(this.currentFloor);
+        this.positionPlayer(); // Make player visible
+        this.updatePlayerImage(this.currentDirection); // Show correct sprite
+        
+        // Just restart the game state, don't call startGame() again
+        this.gameStarted = true;
+        this.startTimer();
+        this.castleMusic.play().catch(e => console.log('Music resume failed:', e));
+        
+        this.saveGameState();
+        this.showMessage('🔄 Respawned at castle entrance!');
+    }, 3000);
+}
            
            rectsOverlap(rect1, rect2) {
                return rect1.left < rect2.right &&
