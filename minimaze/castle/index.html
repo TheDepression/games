@@ -1670,11 +1670,14 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
            }
            
            instantDeath(message) {
-               this.showMessage(message);
-               setTimeout(() => {
-                   this.gameOver();
-               }, 500);
-           }
+    if (this.isDying) return; // Prevent multiple death calls
+    this.isDying = true;
+    
+    this.showMessage(message);
+    setTimeout(() => {
+        this.gameOver();
+    }, 500);
+}
            
            gameOver() {
                this.isDying = false;
