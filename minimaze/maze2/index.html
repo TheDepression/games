@@ -3608,9 +3608,9 @@ if (inQuicksand && closestQuicksand) {
                     
                     if (this.rectsOverlap(playerRect, exitRect)) {
                         if (this.hasKey) {
-                            this.completeLevel();
+                           this.transferToCastle();
                         } else {
-                            this.showMessage('🔑 You need a key to exit!');
+                            this.showMessage('🔑 You need a key to enter!');
                         }
                     }
                 }
