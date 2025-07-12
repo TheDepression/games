@@ -2585,6 +2585,7 @@ refreshGorilla() {
                     {x: 780, y: 560, message: "WHY ARE YOU NOT LISTENING!?!", customEmoji: "🪧"},
                     {x: 880, y: 720, message: "Private... Do NOT enter!", customEmoji: "🪧"},
                     {x: 1940, y: 2020, message: "", customEmoji: "🤵🏻‍♂️", specialType: "battleNPC"},
+                    {x: 1960, y: 2320, message: "Do not forget the cat will fill your health anytime. Just go visit her in the forest!", customEmoji: "🐰"},
                     {x: 2200, y: 2280, message: "The bully cannot keep me down! I have rebuilt my shop even better. Take a look inside.", customEmoji: "🥸"},
                     {x: 200, y: 2100, message: "There is a secret in the quicksand between the cactus and the broken pyramid", customEmoji: "🐷"},
                     {x: 20, y: 100, message: "I heard there was a new secret cave in the deep south. The castle-key seller is rumored to be hiding there!", customEmoji: "🦆"},
@@ -2606,18 +2607,18 @@ refreshGorilla() {
 createCollectibles() {
     // Create red hearts for testing (around x:40 y:1400 area)
     const redHeartPositions = [
-        {x: 40, y: 1400, id: 'red_heart_1'},
-        {x: 60, y: 1420, id: 'red_heart_2'},
-        {x: 80, y: 1400, id: 'red_heart_3'},
-        {x: 100, y: 1420, id: 'red_heart_4'},
-        {x: 40, y: 1440, id: 'red_heart_5'},
-        {x: 60, y: 1460, id: 'red_heart_6'},
-        {x: 80, y: 1440, id: 'red_heart_7'},
-        {x: 100, y: 1460, id: 'red_heart_8'},
-        {x: 1940, y: 860, id: 'red_heart_9'},
-    {x: 1080, y: 1200, id: 'red_heart_10'},
-    {x: 1480, y: 2300, id: 'red_heart_11'},
-        {x: 2200, y: 1820, id: 'red_heart_12'}
+        {x: 40, y: 1400, id: 'red_heart_n1'},
+        {x: 60, y: 1420, id: 'red_heart_n2'},
+        {x: 80, y: 1400, id: 'red_heart_n3'},
+        {x: 100, y: 1420, id: 'red_heart_n4'},
+        {x: 40, y: 1440, id: 'red_heart_n5'},
+        {x: 60, y: 1460, id: 'red_heart_n6'},
+        {x: 80, y: 1440, id: 'red_heart_n7'},
+        {x: 100, y: 1460, id: 'red_heart_n8'},
+        {x: 1940, y: 860, id: 'red_heart_n9'},
+    {x: 1080, y: 1200, id: 'red_heart_n10'},
+    {x: 1480, y: 2300, id: 'red_heart_n11'},
+        {x: 2200, y: 1820, id: 'red_heart_n12'}
     ];
 
     redHeartPositions.forEach(pos => {
@@ -2639,15 +2640,15 @@ createCollectibles() {
             createMoneyCollectibles() {
     // Create money pickups in the same area as red hearts
     const moneyPositions = [
-        {x: 2340, y: 1480, id: 'money_1'},
-        {x: 2360, y: 1480, id: 'money_2'},
-        {x: 1590, y: 760, id: 'money_3'},
-        {x: 760, y: 320, id: 'money_4'},
-        {x: 1230, y: 410, id: 'money_5'},
-        {x: 1180, y: 840, id: 'money_6'},
-        {x: 2120, y: 2360, id: 'money_7'},
-        {x: 260, y: 2180, id: 'money_8'},
-                {x: 2160, y: 200, id: 'money_9'},
+        {x: 2340, y: 1480, id: 'money_n1'},
+        {x: 2360, y: 1480, id: 'money_n2'},
+        {x: 1590, y: 760, id: 'money_n3'},
+        {x: 760, y: 320, id: 'money_n4'},
+        {x: 1230, y: 410, id: 'money_n5'},
+        {x: 1180, y: 840, id: 'money_n6'},
+        {x: 2120, y: 2360, id: 'money_n7'},
+        {x: 260, y: 2180, id: 'money_n8'},
+                {x: 2160, y: 200, id: 'money_n9'},
                 {x: 20, y: 140, id: 'money_n10'},
         {x: 1880, y: 1870, id: 'money_n11'},
         {x: 1900, y: 1870, id: 'money_n12'},
