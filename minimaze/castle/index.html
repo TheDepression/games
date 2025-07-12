@@ -897,9 +897,10 @@
            }
            
            positionPlayer() {
-               this.player.style.left = (this.playerX - 16) + 'px';
-               this.player.style.top = (this.playerY - 16) + 'px';
-           }
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+}
            
            centerCameraOnPlayer() {
                const gameAreaWidth = this.gameArea.offsetWidth;
