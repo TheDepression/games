@@ -969,6 +969,9 @@ createPanda(x, y) {
     panda.style.zIndex = '60';
     this.gameWorld.appendChild(panda);
     
+    // Random initial direction
+    const randomAngle = Math.random() * Math.PI * 2;
+    
     this.enemies.push({
         element: panda,
         type: 'panda',
@@ -977,9 +980,11 @@ createPanda(x, y) {
         hp: 600,
         maxHp: 600,
         alive: true,
-        angle: Math.random() * Math.PI * 2,
-        speed: 1.5,
-        rotationSpeed: 0.1
+        directionX: Math.cos(randomAngle),
+        directionY: Math.sin(randomAngle),
+        speed: 2,
+        rotation: 0,
+        rotationSpeed: 8 // degrees per frame
     });
 }
 
@@ -1153,54 +1158,78 @@ this.updateProjectiles();
         enemy.lastShot = now;
     }
 } else if (enemy.type === 'panda') {
-            // Pandas spin and bounce off walls
-            enemy.angle += enemy.rotationSpeed;
+    // Pandas move in straight lines and bounce off walls, with visual rotation
+    const newX = enemy.currentX + enemy.directionX * enemy.speed;
+    const newY = enemy.currentY + enemy.directionY * enemy.speed;
+    
+    let bounced = false;
+    
+    // Check wall collision and bounce
+    if (!this.canEnemyMoveTo(newX, enemy.currentY)) {
+        enemy.directionX *= -1; // Reverse X direction
+        bounced = true;
+    }
+    if (!this.canEnemyMoveTo(enemy.currentX, newY)) {
+        enemy.directionY *= -1; // Reverse Y direction
+        bounced = true;
+    }
+    
+    // Update position only if no collision
+    if (this.canEnemyMoveTo(newX, newY)) {
+        enemy.currentX = newX;
+        enemy.currentY = newY;
+    } else if (!bounced) {
+        // Corner collision - reverse both directions
+        enemy.directionX *= -1;
+        enemy.directionY *= -1;
+    }
+    
+    // Visual rotation
+    enemy.rotation += enemy.rotationSpeed;
+    if (enemy.rotation >= 360) enemy.rotation -= 360;
+    
+    enemy.element.style.left = enemy.currentX + 'px';
+    enemy.element.style.top = enemy.currentY + 'px';
+    enemy.element.style.transform = `rotate(${enemy.rotation}deg)`;
+} else if (enemy.type === 'goblin') {
+    // Goblins track player when in range
+    const distance = Math.sqrt(
+        Math.pow(this.playerX - enemy.currentX, 2) + 
+        Math.pow(this.playerY - enemy.currentY, 2)
+    );
+    
+    if (distance <= enemy.detectionRange) {
+        enemy.isChasing = true;
+    }
+    
+    if (enemy.isChasing) {
+        const deltaX = this.playerX - enemy.currentX;
+        const deltaY = this.playerY - enemy.currentY;
+        const moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        if (moveDistance > 5) {
+            const moveX = (deltaX / moveDistance) * enemy.speed;
+            const moveY = (deltaY / moveDistance) * enemy.speed;
             
-            const newX = enemy.currentX + Math.cos(enemy.angle) * enemy.speed;
-            const newY = enemy.currentY + Math.sin(enemy.angle) * enemy.speed;
+            const newX = enemy.currentX + moveX;
+            const newY = enemy.currentY + moveY;
             
             if (this.canEnemyMoveTo(newX, newY)) {
                 enemy.currentX = newX;
                 enemy.currentY = newY;
-            } else {
-                // Bounce off wall
-                enemy.angle += Math.PI;
-            }
-            
-            enemy.element.style.left = enemy.currentX + 'px';
-            enemy.element.style.top = enemy.currentY + 'px';
-        } else if (enemy.type === 'goblin') {
-            // Goblins track player when in range
-            const distance = Math.sqrt(
-                Math.pow(this.playerX - enemy.currentX, 2) + 
-                Math.pow(this.playerY - enemy.currentY, 2)
-            );
-            
-            if (distance <= enemy.detectionRange) {
-                enemy.isChasing = true;
-            }
-            
-            if (enemy.isChasing) {
-                const deltaX = this.playerX - enemy.currentX;
-                const deltaY = this.playerY - enemy.currentY;
-                const moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                enemy.element.style.left = enemy.currentX + 'px';
+                enemy.element.style.top = enemy.currentY + 'px';
                 
-                if (moveDistance > 5) {
-                    const moveX = (deltaX / moveDistance) * enemy.speed;
-                    const moveY = (deltaY / moveDistance) * enemy.speed;
-                    
-                    const newX = enemy.currentX + moveX;
-                    const newY = enemy.currentY + moveY;
-                    
-                    if (this.canEnemyMoveTo(newX, newY)) {
-                        enemy.currentX = newX;
-                        enemy.currentY = newY;
-                        enemy.element.style.left = enemy.currentX + 'px';
-                        enemy.element.style.top = enemy.currentY + 'px';
-                    }
+                // Flip horizontally when moving left
+                if (deltaX < 0) {
+                    enemy.element.style.transform = 'scaleX(-1)';
+                } else {
+                    enemy.element.style.transform = 'scaleX(1)';
                 }
             }
         }
+    }
+}
     });
 }
 
