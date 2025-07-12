@@ -1142,12 +1142,17 @@ this.updateProjectiles();
         if (!enemy.alive) return;
         
         if (enemy.type === 'bear') {
-            // Bears shoot projectiles every 4 seconds
-            if (now - enemy.lastShot > enemy.shotCooldown) {
-                this.createProjectile(enemy.currentX + 15, enemy.currentY + 15);
-                enemy.lastShot = now;
-            }
-        } else if (enemy.type === 'panda') {
+    // Bears shoot projectiles every 4 seconds if player is within 200px
+    const distanceToPlayer = Math.sqrt(
+        Math.pow(this.playerX - enemy.currentX, 2) + 
+        Math.pow(this.playerY - enemy.currentY, 2)
+    );
+    
+    if (distanceToPlayer <= 200 && now - enemy.lastShot > enemy.shotCooldown) {
+        this.createProjectile(enemy.currentX + 15, enemy.currentY + 15);
+        enemy.lastShot = now;
+    }
+} else if (enemy.type === 'panda') {
             // Pandas spin and bounce off walls
             enemy.angle += enemy.rotationSpeed;
             
