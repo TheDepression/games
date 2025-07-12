@@ -3889,9 +3889,9 @@ startSlotGame() {
         gamePhase: 'welcome',
         symbols: ['👩🏼‍⚕️', '🍕', '🤖', '🐷', '🍒', '🐚', '⚔️'],
         reels: [
-            { spinning: false, currentSymbol: 0, speed: 0.07, position: 0 },
-            { spinning: false, currentSymbol: 1, speed: 0.07, position: 0 },
-            { spinning: false, currentSymbol: 2, speed: 0.07, position: 0 }
+            { spinning: false, currentSymbol: 0, speed: 0.17, position: 0 },
+            { spinning: false, currentSymbol: 1, speed: 0.17, position: 0 },
+            { spinning: false, currentSymbol: 2, speed: 0.17, position: 0 }
         ],
         stoppedReels: 0,
         finalSymbols: [null, null, null],
@@ -3942,7 +3942,7 @@ showSlotRules() {
                 • 3 spinning reels with 7 different symbols<br>
                 • Tap to stop each reel one by one<br>
                 • Reels slow down before stopping<br>
-                • Match 2 identical symbols to win 500¥<br>
+                • Match 2 identical symbols to win 400¥<br>
                 • Match 3 identical symbols to win 2000¥<br>
                 • Special: 3 swords ⚔️ = 2000¥ + Super Gun Ticket!<br>
                 • No match: 0¥ (200¥ loss)
@@ -4089,7 +4089,7 @@ checkSlotResult() {
     // Check for 2 matches
     else if (symbol1 === symbol2 || symbol2 === symbol3 || symbol1 === symbol3) {
         // Two of a kind!
-        this.money += 500;
+        this.money += 400;
         this.updateUI();
         this.saveGameState();
         this.showSlotWin('double');
