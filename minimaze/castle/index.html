@@ -1545,9 +1545,9 @@ takeDamage() {
     
     const segmentRect = {
         left: parseInt(segment.style.left) - 10,        // Move left by 10
-        top: parseInt(segment.style.top) - 10,          // Move up by 10  
+        top: parseInt(segment.style.top) - 15,          // Move up by 10  
         right: parseInt(segment.style.left) + parseInt(segment.style.width) - 10,  // Shave 10 off right
-        bottom: parseInt(segment.style.top) + parseInt(segment.style.height) - 10  // Shave 10 off bottom
+        bottom: parseInt(segment.style.top) + parseInt(segment.style.height) - 15  // Shave 10 off bottom
     };
     
     if (this.rectsOverlap(playerRect, segmentRect)) {
