@@ -702,8 +702,8 @@ this.projectiles = [];
                         {x: 290, y: 220, w: 60, h: 80},
                         {x: 0, y: 360, w: 60, h: 80},   // mid
                         {x: 290, y: 360, w: 60, h: 80},
-                        {x: 20, y: 560, w: 60, h: 80}, // bottom
-                        {x: 270, y: 560, w: 60, h: 80},
+                        {x: 20, y: 480, w: 100, h: 160}, // bottom
+                        {x: 230, y: 480, w: 100, h: 160},
                     ],
                     2: [
                         {x: 100, y: 100, w: 150, h: 20, light: true},
@@ -763,7 +763,7 @@ this.projectiles = [];
                                  {x: 75, y: 600},{x: 180, y: 600},{x: 75, y: 600}
                             ],
                             segmentSize: 20,
-                            speed: 2.0,
+                            speed: 1.0,
                             bodyLength: 10,
                             thickness: 50
                         },
@@ -773,7 +773,27 @@ this.projectiles = [];
                                 {x: 175, y: 600},{x: 280, y: 600},{x: 175, y: 600}
                             ],
                             segmentSize: 20,
-                            speed: 2.0,
+                            speed: 1.0,
+                            bodyLength: 10,
+                            thickness: 50
+                        },
+                        {
+                            id: 'castle_line_1c',
+                            path: [
+                                 {x: 75, y: 550},{x: 180, y: 550},{x: 75, y: 550}
+                            ],
+                            segmentSize: 20,
+                            speed: 1.0,
+                            bodyLength: 10,
+                            thickness: 50
+                        },
+                        {
+                            id: 'castle_line_1d',
+                            path: [
+                                {x: 175, y: 550},{x: 280, y: 550},{x: 175, y: 550}
+                            ],
+                            segmentSize: 20,
+                            speed: 1.0,
                             bodyLength: 10,
                             thickness: 50
                         }
