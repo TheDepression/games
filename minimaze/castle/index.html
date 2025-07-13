@@ -1544,20 +1544,26 @@ takeDamage() {
                this.electricLines.forEach(line => {
                    if (electricHit) return;
                    line.segments.forEach(segment => {
-                       if (electricHit) return;
-                       const segmentRect = {
-                           left: parseInt(segment.style.left),
-                           top: parseInt(segment.style.top),
-                           right: parseInt(segment.style.left) + parseInt(segment.style.width),
-                           bottom: parseInt(segment.style.top) + parseInt(segment.style.height)
-                       };
-                       
-                       if (this.rectsOverlap(playerRect, segmentRect)) {
-                           this.instantDeath('⚡ Electrocuted!');
-                           electricHit = true;
-                           return;
-                       }
-                   });
+    if (electricHit) return;
+    
+    // Get the actual center position of the segment
+    const segmentCenterX = parseInt(segment.style.left) + parseInt(segment.style.width) / 2;
+    const segmentCenterY = parseInt(segment.style.top) + parseInt(segment.style.height) / 2;
+    const segmentSize = parseInt(segment.style.width); // Should be 20px
+    
+    const segmentRect = {
+        left: segmentCenterX - segmentSize/2,
+        top: segmentCenterY - segmentSize/2,
+        right: segmentCenterX + segmentSize/2,
+        bottom: segmentCenterY + segmentSize/2
+    };
+    
+    if (this.rectsOverlap(playerRect, segmentRect)) {
+        this.instantDeath('⚡ Electrocuted!');
+        electricHit = true;
+        return;
+    }
+});
                });
                if (electricHit) return;
 
