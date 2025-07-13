@@ -698,10 +698,12 @@ this.projectiles = [];
                 // Different wall patterns for each floor
                 const configs = {
                     1: [
-                        {x: 60, y: 60, w: 100, h: 20},
-                        {x: 190, y: 60, w: 100, h: 20},
-                        {x: 280, y: 150, w: 20, h: 200},
-                        {x: 50, y: 300, w: 150, h: 20}
+                        {x: 0, y: 220, w: 60, h: 80},    // top
+                        {x: 290, y: 220, w: 60, h: 80},
+                        {x: 0, y: 360, w: 60, h: 80},   // mid
+                        {x: 290, y: 360, w: 60, h: 80},
+                        {x: 0, y: 560, w: 60, h: 80}, // bottom
+                        {x: 290, y: 560, w: 60, h: 80},
                     ],
                     2: [
                         {x: 100, y: 100, w: 150, h: 20, light: true},
@@ -754,6 +756,88 @@ this.projectiles = [];
             
             createElectricLines(floorNumber) {
                 const lineConfigs = {
+                    1: [
+                        {
+                            id: 'castle_line_1a',
+                            path: [
+                                {x: 220, y: 250}, {x: 20, y: 250},
+                                {x: 220, y: 250}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 280,
+                            thickness: 20
+                        }
+                    ],
+                    1: [
+                        {
+                            id: 'castle_line_1b',
+                            path: [
+                                {x: 330, y: 250}, {x: 220, y: 250},
+                                {x: 330, y: 250}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 280,
+                            thickness: 20
+                        }
+                    ],
+                    1: [
+                        {
+                            id: 'castle_line_1c',
+                            path: [
+                                {x: 120, y: 120}, {x: 250, y: 120},
+                                {x: 250, y: 350}, {x: 120, y: 350},
+                                {x: 120, y: 120}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 200,
+                            thickness: 20
+                        }
+                    ],
+                    1: [
+                        {
+                            id: 'castle_line_1d',
+                            path: [
+                                {x: 120, y: 120}, {x: 250, y: 120},
+                                {x: 250, y: 350}, {x: 120, y: 350},
+                                {x: 120, y: 120}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 200,
+                            thickness: 20
+                        }
+                    ],
+                    1: [
+                        {
+                            id: 'castle_line_1e',
+                            path: [
+                                {x: 120, y: 120}, {x: 250, y: 120},
+                                {x: 250, y: 350}, {x: 120, y: 350},
+                                {x: 120, y: 120}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 200,
+                            thickness: 20
+                        }
+                    ],
+                    1: [
+                        {
+                            id: 'castle_line_1f',
+                            path: [
+                                {x: 120, y: 120}, {x: 250, y: 120},
+                                {x: 250, y: 350}, {x: 120, y: 350},
+                                {x: 120, y: 120}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.5,
+                            bodyLength: 200,
+                            thickness: 20
+                        }
+                    ],
                     2: [
                         {
                             id: 'castle_line_2a',
