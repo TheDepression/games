@@ -1543,19 +1543,14 @@ takeDamage() {
                let electricHit = false;
                this.electricLines.forEach(line => {
                    if (electricHit) return;
-                   line.segments.forEach(segment => {
+                  line.segments.forEach(segment => {
     if (electricHit) return;
     
-    // Get the actual center position of the segment
-    const segmentCenterX = parseInt(segment.style.left) + parseInt(segment.style.width) / 2;
-    const segmentCenterY = parseInt(segment.style.top) + parseInt(segment.style.height) / 2;
-    const segmentSize = parseInt(segment.style.width); // Should be 20px
-    
     const segmentRect = {
-        left: segmentCenterX - segmentSize/2,
-        top: segmentCenterY - segmentSize/2,
-        right: segmentCenterX + segmentSize/2,
-        bottom: segmentCenterY + segmentSize/2
+        left: parseInt(segment.style.left) - 10,        // Move left by 10
+        top: parseInt(segment.style.top) - 10,          // Move up by 10  
+        right: parseInt(segment.style.left) + parseInt(segment.style.width) - 10,  // Shave 10 off right
+        bottom: parseInt(segment.style.top) + parseInt(segment.style.height) - 10  // Shave 10 off bottom
     };
     
     if (this.rectsOverlap(playerRect, segmentRect)) {
