@@ -665,7 +665,7 @@ this.projectiles = [];
                 this.createWalls(floorNumber);
                 
                 // Create electric lines for some floors
-                if ([1, 2, 4, 6, 7].includes(floorNumber)) {
+                if ([1, 2, 3, 4, 5, 6, 7].includes(floorNumber)) {
                     this.createElectricLines(floorNumber);
                 }
                 
@@ -806,6 +806,34 @@ this.projectiles = [];
                             thickness: 20
                         }
                     ],
+                    5: [
+    {
+        id: 'castle_line_5_left',
+        path: [
+            {x: 50, y: 400}, {x: 120, y: 400}
+        ],
+        segmentSize: 20,
+        speed: 1.5,
+        bodyLength: 70,
+        thickness: 25,
+        wallType: 'movingWall',
+        wallSide: 'left',
+        partnerId: 'castle_line_5_right'
+    },
+    {
+        id: 'castle_line_5_right', 
+        path: [
+            {x: 165, y: 400}, {x: 235, y: 400}
+        ],
+        segmentSize: 20,
+        speed: 1.5,
+        bodyLength: 70,
+        thickness: 25,
+        wallType: 'movingWall',
+        wallSide: 'right',
+        partnerId: 'castle_line_5_left'
+    }
+],
                     6: [
                         {
                             id: 'castle_line_6a',
@@ -1144,39 +1172,101 @@ this.updateProjectiles();
            }
            
            updateElectricLines() {
-               if (this.isPaused) return;
-               
-               this.electricLines.forEach(line => {
-                   line.headPosition += line.speed;
-                   if (line.headPosition >= line.totalPathLength) {
-                       line.headPosition = 0;
-                   }
-                   
-                   line.segments.forEach(segment => segment.remove());
-                   line.segments = [];
-                   
-                   for (let i = 0; i < line.bodyLength; i += 15) {
-                       const segmentPosition = line.headPosition - i;
-                       let actualPosition = segmentPosition;
-                       
-                       if (actualPosition < 0) {
-                           actualPosition = line.totalPathLength + actualPosition;
-                       }
-                       
-                       const coords = this.getPositionOnPath(line.pathSegments, actualPosition);
-                       if (coords) {
-                           const segment = document.createElement('div');
-                           segment.className = 'electric-snake-segment';
-                           segment.style.left = (coords.x - line.thickness/2) + 'px';
-                           segment.style.top = (coords.y - line.thickness/2) + 'px';
-                           segment.style.width = line.thickness + 'px';
-                           segment.style.height = line.thickness + 'px';
-                           this.gameWorld.appendChild(segment);
-                           line.segments.push(segment);
-                       }
-                   }
-               });
-           }
+    if (this.isPaused) return;
+    
+    this.electricLines.forEach(line => {
+        // Clear existing segments
+        line.segments.forEach(segment => segment.remove());
+        line.segments = [];
+        
+        if (line.wallType === 'movingWall') {
+            // Handle moving wall gaps
+            this.updateMovingWall(line);
+        } else {
+            // Handle normal electric lines (your existing code)
+            line.headPosition += line.speed;
+            if (line.headPosition >= line.totalPathLength) {
+                line.headPosition = 0;
+            }
+            
+            for (let i = 0; i < line.bodyLength; i += 15) {
+                const segmentPosition = line.headPosition - i;
+                let actualPosition = segmentPosition;
+                
+                if (actualPosition < 0) {
+                    actualPosition = line.totalPathLength + actualPosition;
+                }
+                
+                const coords = this.getPositionOnPath(line.pathSegments, actualPosition);
+                if (coords) {
+                    const segment = document.createElement('div');
+                    segment.className = 'electric-snake-segment';
+                    segment.style.left = (coords.x - line.thickness/2) + 'px';
+                    segment.style.top = (coords.y - line.thickness/2) + 'px';
+                    segment.style.width = line.thickness + 'px';
+                    segment.style.height = line.thickness + 'px';
+                    this.gameWorld.appendChild(segment);
+                    line.segments.push(segment);
+                }
+            }
+        }
+    });
+}
+
+
+            updateMovingWall(line) {
+    // 6 second cycle (3 seconds each direction)
+    const cycleTime = 6000;
+    const progress = (Date.now() % cycleTime) / cycleTime;
+    
+    // Calculate expansion/contraction
+    let wallProgress;
+    if (progress < 0.5) {
+        // First half: left expands, right contracts
+        wallProgress = progress * 2;
+    } else {
+        // Second half: left contracts, right expands  
+        wallProgress = (1 - progress) * 2;
+    }
+    
+    const startY = line.pathSegments[0].start.y;
+    const minWidth = 50;
+    const maxWidth = 120;
+    
+    if (line.wallSide === 'left') {
+        // Left wall: starts at x:50, expands rightward
+        const wallWidth = minWidth + (maxWidth - minWidth) * wallProgress;
+        const startX = line.pathSegments[0].start.x;
+        
+        for (let x = startX; x < startX + wallWidth; x += 15) {
+            const segment = document.createElement('div');
+            segment.className = 'electric-snake-segment';
+            segment.style.left = x + 'px';
+            segment.style.top = startY + 'px';
+            segment.style.width = line.thickness + 'px';
+            segment.style.height = line.thickness + 'px';
+            this.gameWorld.appendChild(segment);
+            line.segments.push(segment);
+        }
+    } else if (line.wallSide === 'right') {
+        // Right wall: ends at x:235, contracts leftward (maintaining 45px gap)
+        const leftWallEnd = 50 + minWidth + (maxWidth - minWidth) * wallProgress;
+        const gapSize = 45;
+        const rightWallStart = leftWallEnd + gapSize;
+        const rightWallEnd = line.pathSegments[0].end.x;
+        
+        for (let x = rightWallStart; x < rightWallEnd; x += 15) {
+            const segment = document.createElement('div');
+            segment.className = 'electric-snake-segment';
+            segment.style.left = x + 'px';
+            segment.style.top = startY + 'px';
+            segment.style.width = line.thickness + 'px';
+            segment.style.height = line.thickness + 'px';
+            this.gameWorld.appendChild(segment);
+            line.segments.push(segment);
+        }
+    }
+}
 
             updateEnemies() {
     if (this.isPaused) return;
