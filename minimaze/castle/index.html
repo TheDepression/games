@@ -702,8 +702,8 @@ this.projectiles = [];
                         {x: 290, y: 220, w: 60, h: 80},
                         {x: 0, y: 360, w: 60, h: 80},   // mid
                         {x: 290, y: 360, w: 60, h: 80},
-                        {x: 20, y: 480, w: 100, h: 160}, // bottom
-                        {x: 230, y: 480, w: 100, h: 160},
+                        {x: 20, y: 460, w: 100, h: 140}, // bottom
+                        {x: 250, y: 460, w: 100, h: 140},
                     ],
                     2: [
                         {x: 100, y: 100, w: 150, h: 20, light: true},
@@ -791,6 +791,26 @@ this.projectiles = [];
                             id: 'castle_line_1d',
                             path: [
                                 {x: 175, y: 550},{x: 280, y: 550},{x: 175, y: 550}
+                            ],
+                            segmentSize: 20,
+                            speed: 1.0,
+                            bodyLength: 10,
+                            thickness: 50
+                        },
+                        {
+                            id: 'castle_line_1e',
+                            path: [
+                                 {x: 75, y: 500},{x: 180, y: 500},{x: 75, y: 500}
+                            ],
+                            segmentSize: 20,
+                            speed: 1.0,
+                            bodyLength: 10,
+                            thickness: 50
+                        },
+                        {
+                            id: 'castle_line_1f',
+                            path: [
+                                {x: 175, y: 500},{x: 280, y: 500},{x: 175, y: 500}
                             ],
                             segmentSize: 20,
                             speed: 1.0,
