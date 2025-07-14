@@ -506,9 +506,8 @@ this.projectiles = [];
 
                 // Add these properties in the CastleGame constructor after other properties
 this.hasPineapplePower = false;
-this.pineappleCharges = 0;
-this.maxPineappleCharges = 3;
-this.lastPineappleRecharge = Date.now();
+this.pineappleCharged = false;
+this.lastGunUse = Date.now();
 this.pineappleRechargeInterval = 10000; // 10 seconds
 this.pineappleProjectiles = [];
 
@@ -551,9 +550,8 @@ this.pineappleProjectiles = [];
 
                     // Pineapple power (only loaded if coming from castle/boss fight)
 this.hasPineapplePower = gameState.hasPineapplePower || false;
-this.pineappleCharges = gameState.pineappleCharges || 0;
-this.maxPineappleCharges = gameState.maxPineappleCharges || 3;
-this.lastPineappleRecharge = gameState.lastPineappleRecharge || Date.now();
+this.pineappleCharged = gameState.pineappleCharged || false;
+this.lastGunUse = gameState.lastGunUse || Date.now();
 this.pineappleRechargeInterval = gameState.pineappleRechargeInterval || 10000;
                     
                     // Items
