@@ -1336,12 +1336,11 @@ this.updateProjectiles();
                    this.playerVelocityY *= 0.88;
                }
                // Pineapple power recharge system
-if (this.hasPineapplePower && this.pineappleCharges < this.maxPineappleCharges) {
+if (this.hasPineapplePower && !this.pineappleCharged) {
     const now = Date.now();
-    if (now - this.lastPineappleRecharge >= this.pineappleRechargeInterval) {
-        this.pineappleCharges++;
-        this.lastPineappleRecharge = now;
-        this.showMessage(`🍍 Pineapple charged! (${this.pineappleCharges}/${this.maxPineappleCharges})`);
+    if (now - this.lastGunUse >= this.pineappleRechargeInterval) {
+        this.pineappleCharged = true;
+        this.updateUI(); // Update UI to show glow
     }
 }
            }
@@ -1923,11 +1922,15 @@ takeDamage() {
     
     this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
     
-    // Pineapple projectile if available
-    if (this.hasPineapplePower && this.pineappleCharges > 0) {
-        this.firePineappleProjectile();
-        this.pineappleCharges--;
-    }
+    // Reset gun use timer and fire pineapple if charged
+this.lastGunUse = Date.now();
+
+// Pineapple projectile if available
+if (this.hasPineapplePower && this.pineappleCharged) {
+    this.firePineappleProjectile();
+    this.pineappleCharged = false;
+    this.updateUI(); // Update UI to remove glow
+}
     
     setTimeout(() => {
         this.attackCooldown = false;
