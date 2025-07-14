@@ -366,6 +366,17 @@
 .choice-btn:hover {
     opacity: 0.8;
 }
+
+        @keyframes pineapplePulse {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px #ff6600) brightness(1.2);
+    }
+    50% { 
+        transform: scale(1.4);
+        filter: drop-shadow(0 0 25px #ff6600) brightness(2);
+    }
+}
     </style>
 </head>
 <body>
@@ -510,6 +521,8 @@ this.pineappleCharged = false;
 this.lastGunUse = Date.now();
 this.pineappleRechargeInterval = 10000; // 10 seconds
 this.pineappleProjectiles = [];
+
+                this.lastPineappleDialog = 0;
 
                 this.currentChoice = null;
                 
@@ -1844,12 +1857,17 @@ takeDamage() {
                     this.updateUI();
                 }
             } else if (type === 'pineapple_seller') {
-                if (!this.hasPineapplePower) {
-                    this.showPineappleChoice();
-                } else {
-                    this.showMessage(`🍍 You already have Pineapple Power! ${this.pineappleCharged ? '🍍Ready!' : 'Recharging'}`);
-                }
-            }
+    const now = Date.now();
+    if (now - this.lastPineappleDialog > 3000) { // 3 second cooldown
+        if (!this.hasPineapplePower) {
+            this.showPineappleChoice();
+            this.lastPineappleDialog = now;
+        } else {
+            this.showMessage(`🍍 You already have Pineapple Power! ${this.pineappleCharged ? 'Ready to fire!' : 'Recharging...'}`);
+            this.lastPineappleDialog = now;
+        }
+    }
+}
         }
     });
     
@@ -2264,6 +2282,7 @@ handlePineappleChoice(accepted) {
     dialog.style.display = 'none';
     this.isPaused = false;
     this.currentChoice = null;
+    this.lastPineappleDialog = Date.now(); // Reset dialog timer
     
     if (accepted) {
         if (this.money >= 500) {
