@@ -739,9 +739,25 @@ this.projectiles = [];
   {x: 100, y: 140, w: 240, h: 10}
                     ],
                     4: [
-                        {x: 60, y: 120, w: 20, h: 200, light: true},
-                        {x: 270, y: 120, w: 20, h: 200, light: true},
-                        {x: 120, y: 250, w: 110, h: 20, light: true}
+                        {x: 50, y: 500, w: 80, h: 80},
+  {x: 170, y: 500, w: 80, h: 80},
+  {x: 290, y: 500, w: 60, h: 80},
+  {x: 140, y: 620, w: 80, h: 80},
+  {x: 260, y: 620, w: 80, h: 80},
+  {x: 100, y: 740, w: 80, h: 80},
+  {x: 220, y: 740, w: 80, h: 80},
+  {x: 10, y: 740, w: 50, h: 80},
+  {x: 20, y: 380, w: 80, h: 80},
+  {x: 140, y: 380, w: 80, h: 80},
+  {x: 260, y: 380, w: 80, h: 80},
+  {x: 20, y: 620, w: 80, h: 80},
+  {x: 10, y: 260, w: 30, h: 80},
+  {x: 80, y: 260, w: 80, h: 80},
+  {x: 200, y: 260, w: 80, h: 80},
+  {x: 320, y: 260, w: 20, h: 80},
+  {x: 20, y: 140, w: 80, h: 80},
+  {x: 140, y: 140, w: 80, h: 80},
+  {x: 260, y: 140, w: 80, h: 80}
                     ],
                     5: [
                         {x: 100, y: 60, w: 150, h: 20},
@@ -879,12 +895,20 @@ this.projectiles = [];
                         {
                             id: 'castle_line_4a',
                             path: [
-                                {x: 80, y: 140}, {x: 80, y: 300},
-                                {x: 270, y: 300}, {x: 270, y: 140},
-                                {x: 80, y: 140}
+                                {x: 20, y: 120}, {x: 240, y: 120},
+                                {x: 240, y: 240}, {x: 300, y: 240},
+                                {x: 180, y: 240}, {x: 180, y: 360}, {x: 20, y: 360},
+                                {x: 120, y: 360}, {x: 120, y: 480}, {x: 260, y: 480},
+                                {x: 260, y: 600}, {x: 330, y: 600}, {x: 120, y: 600},
+                                {x: 120, y: 720}, {x: 200, y: 720}, {x: 200, y: 840},
+                                {x: 20, y: 840}, {x: 80, y: 840}, {x: 80, y: 720},
+                                {x: 330, y: 720}, {x: 240, y: 720}, {x: 240, y: 600},
+                                {x: 20, y: 600}, {x: 20, y: 480}, {x: 330, y: 480},
+                                {x: 240, y: 480}, {x: 240, y: 360}, {x: 60, y: 360},
+                                {x: 60, y: 240}, {x: 120, y: 240}, {x: 120, y: 120},{x: 20, y: 120}
                             ],
                             segmentSize: 20,
-                            speed: 3.0,
+                            speed: 1.5,
                             bodyLength: 300,
                             thickness: 20
                         }
@@ -1043,15 +1067,27 @@ this.projectiles = [];
     } else if (floorNumber === 3) {
         // Spinning pandas that bounce off walls
         this.createPanda(260, 180);
-        this.createPanda(180, 280);
+        this.createPanda(185, 280);
          this.createPanda(180, 380);
         this.createPanda(300, 360);
+         this.createPanda(280, 360);
+        this.createPanda(285, 345);
         this.createPanda(300, 620);
+        this.createPanda(305, 610);
         this.createPanda(60, 540);
     } else if (floorNumber === 4) {
         // Tracking goblins
-        this.createGoblin(150, 400);
-        this.createGoblin(250, 600);
+        this.createGoblin(120, 240);
+        this.createGoblin(300, 300);
+         this.createGoblin(240, 200);
+        this.createGoblin(180, 480);
+         this.createGoblin(200, 600);
+        this.createGoblin(320, 480);
+         this.createGoblin(20, 550);
+        this.createGoblin(60, 330);
+         this.createGoblin(180, 120);
+         this.createGoblin(80, 800);
+        this.createGoblin(120, 170);
     }
 }
 
