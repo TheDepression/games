@@ -1587,10 +1587,10 @@ this.enemies.forEach(enemy => {
     if (!enemy.alive) return;
     
     const enemyRect = {
-        left: enemy.currentX,
-        top: enemy.currentY,
-        right: enemy.currentX + 30,
-        bottom: enemy.currentY + 30
+        left: enemy.currentX - 10,
+        top: enemy.currentY - 15,
+        right: enemy.currentX + 20,
+        bottom: enemy.currentY + 15
     };
     
     if (this.rectsOverlap(playerRect, enemyRect)) {
@@ -1601,10 +1601,10 @@ this.enemies.forEach(enemy => {
 // Check projectile collisions
 this.projectiles.forEach((projectile, index) => {
     const projectileRect = {
-        left: projectile.currentX,
-        top: projectile.currentY,
-        right: projectile.currentX + 20,
-        bottom: projectile.currentY + 20
+        left: projectile.currentX - 10,
+        top: projectile.currentY - 15,
+        right: projectile.currentX + 10,
+        bottom: projectile.currentY + 15
     };
     
     if (this.rectsOverlap(playerRect, projectileRect)) {
@@ -1623,10 +1623,10 @@ this.projectiles.forEach((projectile, index) => {
                    const elemX = parseInt(element.style.left);
                    const elemY = parseInt(element.style.top);
                    const elemRect = {
-                       left: elemX - 5,
-                       top: elemY - 5,
-                       right: elemX + 35,
-                       bottom: elemY + 35
+                       left: elemX - 10,
+                       top: elemY - 15,
+                       right: elemX + 10,
+                       bottom: elemY + 15
                    };
                    
                    if (this.rectsOverlap(playerRect, elemRect)) {
@@ -1648,10 +1648,10 @@ this.projectiles.forEach((projectile, index) => {
                    const friendlyX = parseInt(friendly.style.left);
                    const friendlyY = parseInt(friendly.style.top);
                    const friendlyRect = {
-                       left: friendlyX,
-                       top: friendlyY,
-                       right: friendlyX + 22,
-                       bottom: friendlyY + 22
+                       left: friendlyX - 10,
+                       top: friendlyY - 15,
+                       right: friendlyX + 10,
+                       bottom: friendlyY + 15
                    };
                    
                    if (this.rectsOverlap(playerRect, friendlyRect)) {
