@@ -326,24 +326,6 @@
                 transform: scale(1.2);
             }
         }
-    </style>
-</head>
-<body>
-    <script>
-        if (window.innerHeight <= 667) {
-            const style = document.createElement('style');
-            style.textContent = `
-                #ui, #timer, #deathCounter, #pauseBtn {
-                    opacity: 0.6 !important;
-                }
-                #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
-                    opacity: 1 !important;
-                    transition: opacity 0.2s ease;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
         #choiceDialog {
     position: absolute;
     top: 50%;
@@ -384,6 +366,25 @@
 .choice-btn:hover {
     opacity: 0.8;
 }
+    </style>
+</head>
+<body>
+    <script>
+        if (window.innerHeight <= 667) {
+            const style = document.createElement('style');
+            style.textContent = `
+                #ui, #timer, #deathCounter, #pauseBtn {
+                    opacity: 0.6 !important;
+                }
+                #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
+                    opacity: 1 !important;
+                    transition: opacity 0.2s ease;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        
     </script>
 
     <div id="gameContainer">
@@ -1835,11 +1836,11 @@ this.projectiles.forEach((projectile, index) => {
                            this.goUpstairs();
                        } else if (type === 'door') {
                            this.goDownstairs();
-                       } } else if (type === 'boss') {
+                       } else if (type === 'boss') {
     // Save current state including pineapple power for cutscene
     this.saveGameStateWithPineapple();
     this.showMessage('👑 Confronting the final boss...');
-    
+                   }
     setTimeout(() => {
         window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene3';
     }, 2000);
@@ -1863,31 +1864,6 @@ this.projectiles.forEach((projectile, index) => {
                        this.showMessage(friendly.dataset.message);
                    }
                });
-               // Check special interactions
-if (this.rectsOverlap(playerRect, elemRect)) {
-    const type = element.dataset.type;
-    
-    if (type === 'healer') {
-        if (this.hearts < this.maxHearts) {
-            this.hearts = this.maxHearts;
-            this.showMessage('❤️ Fully healed by cat girlfriend!');
-            this.updateUI();
-        }
-    } else if (type === 'pineapple_seller') {
-    if (!this.hasPineapplePower) {
-        this.showPineappleChoice();
-    } else {
-        this.showMessage(`🍍 You already have Pineapple Power! Charges: ${this.pineappleCharges}/${this.maxPineappleCharges}`);
-    }
-}
-    } else if (type === 'ladder') {
-        this.goUpstairs();
-    } else if (type === 'door') {
-        this.goDownstairs();
-    } else if (type === 'boss') {
-        this.showMessage('👑 The final boss awaits! (Coming soon...)');
-    }
-}
            }
            
            attack() {
