@@ -1749,122 +1749,130 @@ takeDamage() {
 }
            
            checkCollisions() {
-               if (this.isInvulnerable) return;
-               
-               const playerRect = {
-                   left: this.playerX - 12,
-                   top: this.playerY - 12,
-                   right: this.playerX + 12,
-                   bottom: this.playerY + 12
-               };
-               
-               // Electric line collision check
-               let electricHit = false;
-               this.electricLines.forEach(line => {
-                   if (electricHit) return;
-                  line.segments.forEach(segment => {
+    if (this.isInvulnerable) return;
+    
+    const playerRect = {
+        left: this.playerX - 12,
+        top: this.playerY - 12,
+        right: this.playerX + 12,
+        bottom: this.playerY + 12
+    };
+    
+    // Electric line collision check
+    let electricHit = false;
+    this.electricLines.forEach(line => {
+        if (electricHit) return;
+        line.segments.forEach(segment => {
+            if (electricHit) return;
+            
+            const segmentRect = {
+                left: parseInt(segment.style.left) - 10,        // Move left by 10
+                top: parseInt(segment.style.top) - 15,          // Move up by 10  
+                right: parseInt(segment.style.left) + parseInt(segment.style.width) - 10,  // Shave 10 off right
+                bottom: parseInt(segment.style.top) + parseInt(segment.style.height) - 15  // Shave 10 off bottom
+            };
+            
+            if (this.rectsOverlap(playerRect, segmentRect)) {
+                this.instantDeath('⚡ Electrocuted!');
+                electricHit = true;
+                return;
+            }
+        });
+    });
     if (electricHit) return;
-    
-    const segmentRect = {
-        left: parseInt(segment.style.left) - 10,        // Move left by 10
-        top: parseInt(segment.style.top) - 15,          // Move up by 10  
-        right: parseInt(segment.style.left) + parseInt(segment.style.width) - 10,  // Shave 10 off right
-        bottom: parseInt(segment.style.top) + parseInt(segment.style.height) - 15  // Shave 10 off bottom
-    };
-    
-    if (this.rectsOverlap(playerRect, segmentRect)) {
-        this.instantDeath('⚡ Electrocuted!');
-        electricHit = true;
-        return;
-    }
-});
-               });
-               if (electricHit) return;
 
+    // Check enemy collisions
+    this.enemies.forEach(enemy => {
+        if (!enemy.alive) return;
+        
+        const enemyRect = {
+            left: enemy.currentX - 10,
+            top: enemy.currentY - 15,
+            right: enemy.currentX + 20,
+            bottom: enemy.currentY + 15
+        };
+        
+        if (this.rectsOverlap(playerRect, enemyRect)) {
+            this.takeDamage();
+        }
+    });
 
-               // Check enemy collisions
-this.enemies.forEach(enemy => {
-    if (!enemy.alive) return;
+    // Check projectile collisions
+    this.projectiles.forEach((projectile, index) => {
+        const projectileRect = {
+            left: projectile.currentX - 10,
+            top: projectile.currentY - 15,
+            right: projectile.currentX + 10,
+            bottom: projectile.currentY + 15
+        };
+        
+        if (this.rectsOverlap(playerRect, projectileRect)) {
+            this.takeDamage();
+            projectile.element.remove();
+            this.projectiles.splice(index, 1);
+        }
+    });
+
+    // Check interactive elements
+    const elements = this.gameWorld.querySelectorAll('[data-type]');
+    elements.forEach(element => {
+        const elemX = parseInt(element.style.left);
+        const elemY = parseInt(element.style.top);
+        const elemRect = {
+            left: elemX - 10,
+            top: elemY - 15,
+            right: elemX + 10,
+            bottom: elemY + 15
+        };
+        
+        if (this.rectsOverlap(playerRect, elemRect)) {
+            const type = element.dataset.type;
+            
+            if (type === 'ladder') {
+                this.goUpstairs();
+            } else if (type === 'door') {
+                this.goDownstairs();
+            } else if (type === 'boss') {
+                // Save current state including pineapple power for cutscene
+                this.saveGameStateWithPineapple();
+                this.showMessage('👑 Confronting the final boss...');
+                
+                setTimeout(() => {
+                    window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene3';
+                }, 2000);
+            } else if (type === 'healer') {
+                if (this.hearts < this.maxHearts) {
+                    this.hearts = this.maxHearts;
+                    this.showMessage('❤️ Fully healed by cat girlfriend!');
+                    this.updateUI();
+                }
+            } else if (type === 'pineapple_seller') {
+                if (!this.hasPineapplePower) {
+                    this.showPineappleChoice();
+                } else {
+                    this.showMessage(`🍍 You already have Pineapple Power! Charges: ${this.pineappleCharges}/${this.maxPineappleCharges}`);
+                }
+            }
+        }
+    });
     
-    const enemyRect = {
-        left: enemy.currentX - 10,
-        top: enemy.currentY - 15,
-        right: enemy.currentX + 20,
-        bottom: enemy.currentY + 15
-    };
-    
-    if (this.rectsOverlap(playerRect, enemyRect)) {
-        this.takeDamage();
-    }
-});
-
-// Check projectile collisions
-this.projectiles.forEach((projectile, index) => {
-    const projectileRect = {
-        left: projectile.currentX - 10,
-        top: projectile.currentY - 15,
-        right: projectile.currentX + 10,
-        bottom: projectile.currentY + 15
-    };
-    
-    if (this.rectsOverlap(playerRect, projectileRect)) {
-        this.takeDamage();
-        projectile.element.remove();
-        this.projectiles.splice(index, 1);
-    }
-});
-
-
-               
-               
-               // Check interactive elements
-               const elements = this.gameWorld.querySelectorAll('[data-type]');
-               elements.forEach(element => {
-                   const elemX = parseInt(element.style.left);
-                   const elemY = parseInt(element.style.top);
-                   const elemRect = {
-                       left: elemX - 10,
-                       top: elemY - 15,
-                       right: elemX + 10,
-                       bottom: elemY + 15
-                   };
-                   
-                   if (this.rectsOverlap(playerRect, elemRect)) {
-                       const type = element.dataset.type;
-                       
-                       if (type === 'ladder') {
-                           this.goUpstairs();
-                       } else if (type === 'door') {
-                           this.goDownstairs();
-                       } else if (type === 'boss') {
-    // Save current state including pineapple power for cutscene
-    this.saveGameStateWithPineapple();
-    this.showMessage('👑 Confronting the final boss...');
-                   }
-    setTimeout(() => {
-        window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene3';
-    }, 2000);
+    // Check friendly NPCs
+    const friendlies = this.gameWorld.querySelectorAll('.friendly');
+    friendlies.forEach(friendly => {
+        const friendlyX = parseInt(friendly.style.left);
+        const friendlyY = parseInt(friendly.style.top);
+        const friendlyRect = {
+            left: friendlyX - 10,
+            top: friendlyY - 15,
+            right: friendlyX + 10,
+            bottom: friendlyY + 15
+        };
+        
+        if (this.rectsOverlap(playerRect, friendlyRect)) {
+            this.showMessage(friendly.dataset.message);
+        }
+    });
 }
-                   }
-               });
-               
-               // Check friendly NPCs
-               const friendlies = this.gameWorld.querySelectorAll('.friendly');
-               friendlies.forEach(friendly => {
-                   const friendlyX = parseInt(friendly.style.left);
-                   const friendlyY = parseInt(friendly.style.top);
-                   const friendlyRect = {
-                       left: friendlyX - 10,
-                       top: friendlyY - 15,
-                       right: friendlyX + 10,
-                       bottom: friendlyY + 15
-                   };
-                   
-                   if (this.rectsOverlap(playerRect, friendlyRect)) {
-                       this.showMessage(friendly.dataset.message);
-                   }
-               });
-           }
            
            attack() {
     if (!this.hasWeapon) return;
