@@ -665,7 +665,7 @@ this.projectiles = [];
                 this.createWalls(floorNumber);
                 
                 // Create electric lines for some floors
-                if ([1, 2, 4, 6, 7].includes(floorNumber)) {
+                if ([1, 2, 3, 4, 6, 7].includes(floorNumber)) {
                     this.createElectricLines(floorNumber);
                 }
                 
@@ -726,10 +726,17 @@ this.projectiles = [];
   {x: 0, y: 160, w: 120, h: 10}
                     ],
                     3: [
-                        {x: 80, y: 80, w: 190, h: 20},
-                        {x: 80, y: 300, w: 190, h: 20},
-                        {x: 50, y: 150, w: 100, h: 20},
-                        {x: 200, y: 180, w: 100, h: 20}
+                        {x: 140, y: 680, w: 220, h: 10},
+  {x: 100, y: 540, w: 10, h: 200},
+  {x: 0, y: 580, w: 120, h: 10},
+  {x: 0, y: 480, w: 240, h: 10},
+  {x: 240, y: 400, w: 120, h: 10},
+  {x: 260, y: 300, w: 10, h: 100},
+  {x: 100, y: 340, w: 160, h: 10},
+  {x: 120, y: 280, w: 10, h: 120},
+  {x: 0, y: 200, w: 200, h: 10},
+                        {x: 40, y: 400, w: 30, h: 10},
+  {x: 100, y: 140, w: 260, h: 10}
                     ],
                     4: [
                         {x: 60, y: 120, w: 20, h: 200, light: true},
@@ -851,6 +858,19 @@ this.projectiles = [];
                             ],
                             segmentSize: 20,
                             speed: 1.6,
+                            bodyLength: 100,
+                            thickness: 20
+                        }
+                    ],
+                    3: [
+                        {
+                            id: 'castle_line_3a',
+                            path: [
+                                {x: 120, y: 720}, {x: 320, y: 720},
+                                {x: 120, y: 720}
+                            ],
+                            segmentSize: 20,
+                            speed: 2.6,
                             bodyLength: 100,
                             thickness: 20
                         }
@@ -1022,10 +1042,12 @@ this.projectiles = [];
         this.createBear(60, 600);
     } else if (floorNumber === 3) {
         // Spinning pandas that bounce off walls
-        this.createPanda(120, 300);
-        this.createPanda(200, 500);
-        this.createPanda(80, 700);
-        this.createPanda(280, 200);
+        this.createPanda(260, 180);
+        this.createPanda(180, 280);
+         this.createPanda(180, 380);
+        this.createPanda(300, 360);
+        this.createPanda(300, 620);
+        this.createPanda(60, 540);
     } else if (floorNumber === 4) {
         // Tracking goblins
         this.createGoblin(150, 400);
