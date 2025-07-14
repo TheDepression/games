@@ -1526,18 +1526,18 @@ this.pineappleProjectiles.forEach((projectile, index) => {
         );
         
         if (distance < 25) {
-            enemy.hp -= 80; // Pineapple damage
+            enemy.hp -= 500; // Pineapple damage
             
             // Damage text
             const damageText = document.createElement('div');
             damageText.style.position = 'absolute';
             damageText.style.color = '#ffaa00';
             damageText.style.fontWeight = 'bold';
-            damageText.style.fontSize = '14px';
+            damageText.style.fontSize = '18px';
             damageText.style.pointerEvents = 'none';
             damageText.style.zIndex = '500';
             damageText.style.animation = 'damageFloat 1s ease-out';
-            damageText.textContent = '🍍-80';
+            damageText.textContent = '🍍-500';
             damageText.style.left = enemy.currentX + 'px';
             damageText.style.top = enemy.currentY + 'px';
             this.gameWorld.appendChild(damageText);
@@ -1847,7 +1847,7 @@ takeDamage() {
                 if (!this.hasPineapplePower) {
                     this.showPineappleChoice();
                 } else {
-                    this.showMessage(`🍍 You already have Pineapple Power! Charges: ${this.pineappleCharges}/${this.maxPineappleCharges}`);
+                    this.showMessage(`🍍 You already have Pineapple Power! ${this.pineappleCharged ? '🍍Ready!' : 'Recharging'}`);
                 }
             }
         }
@@ -2169,12 +2169,11 @@ kingMoneyReceived: this.kingMoneyReceived,
                if (this.hasTrophy) items.push('🏆');
                // Add pineapple power indicator
 if (this.hasPineapplePower) {
-    let pineappleDisplay = `🍍${this.pineappleCharges}`;
-    if (this.pineappleCharges < this.maxPineappleCharges) {
-        const rechargeProgress = Math.floor((Date.now() - this.lastPineappleRecharge) / this.pineappleRechargeInterval * 100);
-        pineappleDisplay += ` (${rechargeProgress}%)`;
+    if (this.pineappleCharged) {
+        items.push('<span style="animation: gunPulsate 1s infinite; filter: drop-shadow(0 0 8px orange);">🍍</span>');
+    } else {
+        items.push('🍍');
     }
-    items.push(pineappleDisplay);
 }
                
                if (!document.getElementById('items')) {
@@ -2240,18 +2239,21 @@ if (this.hasPineapplePower) {
     const text = document.getElementById('choiceText');
     
     text.innerHTML = `
-        <div style="margin-bottom: 10px;">🍍 <strong>Pineapple Power Upgrade</strong></div>
-        <div style="font-size: 12px; margin-bottom: 8px;">
-            • Shoots pineapple projectiles across the screen<br>
-            • Charges every 10 seconds (max 3 charges)<br>
-            • Works with your gun attacks<br>
-            • Melts when you leave the castle
-        </div>
-        <div style="color: ${this.money >= 500 ? '#4CAF50' : '#f44336'};">
-            Cost: 500¥ (You have: ${this.money}¥)
-        </div>
-        <div style="margin-top: 10px;">Purchase Pineapple Power?</div>
-    `;
+    <div style="margin-bottom: 15px;">
+        <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/pineapplehealth-min.png" style="width: 40px; height: 40px; display: block; margin: 0 auto 10px auto;">
+    </div>
+    <div style="margin-bottom: 10px;">🍍 <strong>Pineapple Power Upgrade</strong></div>
+    <div style="font-size: 12px; margin-bottom: 8px;">
+        • Shoots powerful pineapple projectiles (500 damage)<br>
+        • Recharges after 10 seconds of not shooting<br>
+        • Works with your gun attacks<br>
+        • Melts when you leave the castle
+    </div>
+    <div style="color: ${this.money >= 500 ? '#4CAF50' : '#f44336'};">
+        Cost: 500¥ (You have: ${this.money}¥)
+    </div>
+    <div style="margin-top: 10px;">Purchase Pineapple Power?</div>
+`;
     
     dialog.style.display = 'block';
     this.currentChoice = 'pineapple';
@@ -2267,8 +2269,8 @@ handlePineappleChoice(accepted) {
         if (this.money >= 500) {
             this.money -= 500;
             this.hasPineapplePower = true;
-            this.pineappleCharges = 3;
-            this.lastPineappleRecharge = Date.now();
+this.pineappleCharged = true;
+this.lastGunUse = Date.now();
             this.showMessage('🍍 Pineapple Power purchased! Press attack to fire!');
             this.updateUI();
         } else {
@@ -2326,11 +2328,10 @@ handlePineappleChoice(accepted) {
         pinkBossDefeated: this.pinkBossDefeated,
         
         // SPECIAL: Include pineapple power for boss fight
-        hasPineapplePower: this.hasPineapplePower,
-        pineappleCharges: this.pineappleCharges,
-        maxPineappleCharges: this.maxPineappleCharges,
-        lastPineappleRecharge: this.lastPineappleRecharge,
-        pineappleRechargeInterval: this.pineappleRechargeInterval,
+hasPineapplePower: this.hasPineapplePower,
+pineappleCharged: this.pineappleCharged,
+lastGunUse: this.lastGunUse,
+pineappleRechargeInterval: this.pineappleRechargeInterval,
         
         currentUrl: 'cutscene3',
         lastSaveTime: Date.now()
