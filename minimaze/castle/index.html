@@ -2170,7 +2170,7 @@ kingMoneyReceived: this.kingMoneyReceived,
                // Add pineapple power indicator
 if (this.hasPineapplePower) {
     if (this.pineappleCharged) {
-        items.push('<span style="animation: gunPulsate 1s infinite; filter: drop-shadow(0 0 8px orange);">🍍</span>');
+        items.push('<span style="animation: gunPulsate 0.5s infinite; filter: drop-shadow(0 0 15px #ff6600) brightness(1.5); transform-origin: center;">🍍</span>');
     } else {
         items.push('🍍');
     }
@@ -2269,8 +2269,8 @@ handlePineappleChoice(accepted) {
         if (this.money >= 500) {
             this.money -= 500;
             this.hasPineapplePower = true;
-this.pineappleCharged = true;
-this.lastGunUse = Date.now();
+            this.pineappleCharged = true;
+            this.lastGunUse = Date.now();
             this.showMessage('🍍 Pineapple Power purchased! Press attack to fire!');
             this.updateUI();
         } else {
