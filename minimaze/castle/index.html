@@ -514,6 +514,7 @@
 
                 this.enemies = [];
 this.projectiles = [];
+                this.breakableWalls = [];
 
                 // Add these properties in the CastleGame constructor after other properties
 this.hasPineapplePower = false;
@@ -1238,6 +1239,21 @@ this.gameWorld.appendChild(scientist);
                }
            }
 
+            if (floorNumber === 6) {
+    // Create breakable walls
+    const breakableWallConfigs = [
+        {x: 230, y: 530, w: 20, h: 100},
+        {x: 170, y: 380, w: 20, h: 100},
+        {x: 40, y: 310, w: 100, h: 20},
+        {x: 190, y: 240, w: 20, h: 60},
+        {x: 240, y: 230, w: 20, h: 90},
+        {x: 260, y: 180, w: 90, h: 20}
+    ];
+    
+    breakableWallConfigs.forEach((config, index) => {
+        this.createBreakableWall(config.x, config.y, config.w, config.h, `breakable_${index}`);
+    });
+}
 
             createEnemies(floorNumber) {
     if (floorNumber === 2) {
@@ -1291,7 +1307,7 @@ this.gameWorld.appendChild(scientist);
         this.createBear(290, 495);
          this.createBear(60, 615);
         this.createBear(290, 615);
-    }else if (floorNumber === 7) {
+    } else if (floorNumber === 7) {
         this.createGoblin(130, 340);
         this.createGoblin(140, 220);
         this.createGoblin(300, 120);
@@ -1394,6 +1410,31 @@ createGoblin(x, y) {
         speed: 1.2,
         isChasing: false,
         detectionRange: 150
+    });
+}
+
+            createBreakableWall(x, y, width, height, id) {
+    const wall = document.createElement('div');
+    wall.className = 'breakable-wall';
+    wall.style.position = 'absolute';
+    wall.style.left = x + 'px';
+    wall.style.top = y + 'px';
+    wall.style.width = width + 'px';
+    wall.style.height = height + 'px';
+    wall.style.background = '#808080';
+    wall.style.opacity = '0.7';
+    wall.style.border = '1px solid rgba(100,100,100,0.3)';
+    wall.style.zIndex = '30';
+    wall.dataset.id = id;
+    this.gameWorld.appendChild(wall);
+    
+    this.breakableWalls.push({
+        element: wall,
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        id: id
     });
 }
 
@@ -1869,7 +1910,7 @@ takeDamage() {
         {x: x + playerSize - padding, y: y + playerSize/2}
     ];
     
-    const walls = this.gameWorld.querySelectorAll('.castle-wall, .light-castle-wall');
+    const walls = this.gameWorld.querySelectorAll('.castle-wall, .light-castle-wall, .breakable-wall');
     
     for (let wall of walls) {
         const wallRect = {
