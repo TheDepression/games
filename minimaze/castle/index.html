@@ -866,9 +866,11 @@ this.projectiles = [];
                         {x: 120, y: 100, w: 210, h: 20, light: true}
                     ],
                     7: [
-                        {x: 80, y: 150, w: 80, h: 20, light: true},
-                        {x: 190, y: 150, w: 80, h: 20, light: true},
-                        {x: 175, y: 200, w: 20, h: 200, light: true}
+                         {x: 10, y: 220, w: 50, h: 180},
+  {x: 10, y: 400, w: 190, h: 50},
+  {x: 280, y: 220, w: 60, h: 320},
+  {x: 80, y: 520, w: 200, h: 20},
+  {x: 200, y: 400, w: 20, h: 20}
                     ],
                     8: [] // Top floor - minimal walls for boss fight
                 };
@@ -1116,13 +1118,12 @@ this.projectiles = [];
                         {
                             id: 'castle_line_7a',
                             path: [
-                                {x: 100, y: 170}, {x: 250, y: 170},
-                                {x: 195, y: 220}, {x: 195, y: 400},
-                                {x: 100, y: 170}
+                                {x: 40, y: 440}, {x: 40, y: 480},
+                                {x: 240, y: 480}, {x: 240, y: 400}
                             ],
                             segmentSize: 20,
-                            speed: 3.2,
-                           bodyLength: 250,
+                            speed: 2.2,
+                           bodyLength: 50,
                            thickness: 20
                        }
                    ]
@@ -1290,6 +1291,15 @@ this.gameWorld.appendChild(scientist);
         this.createBear(290, 495);
          this.createBear(60, 615);
         this.createBear(290, 615);
+    }else if (floorNumber === 7) {
+        this.createGoblin(130, 340);
+        this.createGoblin(140, 220);
+        this.createGoblin(300, 120);
+        this.createGoblin(80, 40);
+         this.createPanda(260, 660);
+        this.createPanda(60, 680);
+       this.createBear(80, 680);
+        this.createBear(260, 680);
     }
 }
 
