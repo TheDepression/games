@@ -1239,19 +1239,8 @@ scientist.dataset.type = 'pineapple_seller';
 scientist.dataset.message = "🍍 My pineapple power is the best!";
 this.gameWorld.appendChild(scientist);
 }
-               
-               // Floor 8 boss
-               if (floorNumber === 8) {
-                   const boss = document.createElement('div');
-                   boss.className = 'boss';
-                   boss.style.left = '175px';
-                   boss.style.top = '120px';
-                   boss.dataset.type = 'boss';
-                   this.gameWorld.appendChild(boss);
-               }
-           }
 
-            if (floorNumber === 6) {
+               if (floorNumber === 6) {
     // Create breakable walls
     const breakableWallConfigs = [
         {x: 230, y: 530, w: 20, h: 100},
@@ -1266,6 +1255,19 @@ this.gameWorld.appendChild(scientist);
         this.createBreakableWall(config.x, config.y, config.w, config.h, `breakable_${index}`);
     });
 }
+               
+               // Floor 8 boss
+               if (floorNumber === 8) {
+                   const boss = document.createElement('div');
+                   boss.className = 'boss';
+                   boss.style.left = '175px';
+                   boss.style.top = '120px';
+                   boss.dataset.type = 'boss';
+                   this.gameWorld.appendChild(boss);
+               }
+           }
+
+        
 
             createEnemies(floorNumber) {
     if (floorNumber === 2) {
