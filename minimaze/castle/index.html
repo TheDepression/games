@@ -515,6 +515,8 @@
                 this.enemies = [];
 this.projectiles = [];
                 this.breakableWalls = [];
+                this.floor7GoblinsDefeated = 0;
+this.floor7LadderCreated = false;
 
                 // Add these properties in the CastleGame constructor after other properties
 this.hasPineapplePower = false;
@@ -733,6 +735,10 @@ this.cdpheart2 = gameState.cdpheart2 || false;
             }
             
             createFloor(floorNumber) {
+                if (floorNumber === 7) {
+    this.floor7GoblinsDefeated = 0;
+    this.floor7LadderCreated = false;
+}
                 // Clear existing floor
                 this.gameWorld.innerHTML = '<div id="player"></div>';
                 this.player = document.getElementById('player');
@@ -1180,15 +1186,21 @@ this.projectiles = [];
            
            createFloorElements(floorNumber) {
                // Create ladder (except on top floor)
-               if (floorNumber < 8) {
-                   const ladder = document.createElement('div');
-                   ladder.className = 'ladder';
-                   ladder.textContent = '🪜';
-                   ladder.style.left = '175px';
-                   ladder.style.top = '25px';
-                   ladder.dataset.type = 'ladder';
-                   this.gameWorld.appendChild(ladder);
-               }
+               // Create ladder (except on top floor and conditionally on floor 7)
+if (floorNumber < 8) {
+    if (floorNumber === 7) {
+        // Don't create ladder initially on floor 7
+        // It will be created when all goblins are defeated
+    } else {
+        const ladder = document.createElement('div');
+        ladder.className = 'ladder';
+        ladder.textContent = '🪜';
+        ladder.style.left = '175px';
+        ladder.style.top = '25px';
+        ladder.dataset.type = 'ladder';
+        this.gameWorld.appendChild(ladder);
+    }
+}
                
                // Create door
                const door = document.createElement('div');
@@ -1735,14 +1747,20 @@ this.pineappleProjectiles.forEach((projectile, index) => {
             }, 1000);
             
             if (enemy.hp <= 0) {
-                enemy.alive = false;
-                enemy.element.style.opacity = '0.3';
-                enemy.element.style.filter = 'grayscale(100%)';
-                
-                if (enemy.type === 'goblin') {
-                    enemy.isChasing = false;
-                }
-            }
+    enemy.alive = false;
+    enemy.element.style.opacity = '0.3';
+    enemy.element.style.filter = 'grayscale(100%)';
+    
+    // Check if this is a goblin on floor 7
+    if (enemy.type === 'goblin' && this.currentFloor === 7) {
+        this.floor7GoblinsDefeated++;
+        this.checkFloor7LadderSpawn();
+    }
+    
+    if (enemy.type === 'goblin') {
+        enemy.isChasing = false;
+    }
+}
             
             // Remove projectile
             projectile.element.remove();
@@ -1807,6 +1825,51 @@ canEnemyMoveTo(x, y) {
     return true;
 }
 
+            checkBreakableWallHits() {
+    const effectiveRange = this.hasEnhancedRange ? 90 : 45;
+    
+    const directionOffsets = {
+        'n': {x: 0, y: -35}, 'ne': {x: 25, y: -25}, 'e': {x: 35, y: 0},
+        'se': {x: 25, y: 25}, 's': {x: 0, y: 35}, 'sw': {x: -25, y: 25},
+        'w': {x: -35, y: 0}, 'nw': {x: -25, y: -25}
+    };
+    
+    const offset = directionOffsets[this.currentDirection];
+    const attackX = this.playerX + offset.x;
+    const attackY = this.playerY + offset.y;
+    
+    this.breakableWalls.forEach((wall, index) => {
+        const distance = Math.sqrt(
+            Math.pow(attackX - (wall.x + wall.width/2), 2) +
+            Math.pow(attackY - (wall.y + wall.height/2), 2)
+        );
+        
+        if (distance <= effectiveRange) {
+            // Check if attack direction is towards the wall
+            const deltaX = (wall.x + wall.width/2) - this.playerX;
+            const deltaY = (wall.y + wall.height/2) - this.playerY;
+            
+            if (this.isInFrontOfPlayer(deltaX, deltaY)) {
+                // Destroy the wall
+                wall.element.remove();
+                this.breakableWalls.splice(index, 1);
+            }
+        }
+    });
+}
+
+            checkFloor7LadderSpawn() {
+    if (this.currentFloor === 7 && this.floor7GoblinsDefeated >= 4 && !this.floor7LadderCreated) {
+        const ladder = document.createElement('div');
+        ladder.className = 'ladder';
+        ladder.textContent = '🪜';
+        ladder.style.left = '175px';
+        ladder.style.top = '25px';
+        ladder.dataset.type = 'ladder';
+        this.gameWorld.appendChild(ladder);
+        this.floor7LadderCreated = true;
+    }
+}
 
             checkAttackHits(attackX, attackY) {
     const effectiveRange = this.hasEnhancedRange ? 90 : 45;
@@ -1847,15 +1910,20 @@ canEnemyMoveTo(x, y) {
                 }, 1000);
                 
                 if (enemy.hp <= 0) {
-                    enemy.alive = false;
-                    enemy.element.style.opacity = '0.3';
-                    enemy.element.style.filter = 'grayscale(100%)';
-                    
-                    // Stop chasing if goblin dies
-                    if (enemy.type === 'goblin') {
-                        enemy.isChasing = false;
-                    }
-                }
+    enemy.alive = false;
+    enemy.element.style.opacity = '0.3';
+    enemy.element.style.filter = 'grayscale(100%)';
+    
+    // Check if this is a goblin on floor 7
+    if (enemy.type === 'goblin' && this.currentFloor === 7) {
+        this.floor7GoblinsDefeated++;
+        this.checkFloor7LadderSpawn();
+    }
+    
+    if (enemy.type === 'goblin') {
+        enemy.isChasing = false;
+    }
+}
             }
         }
     });
@@ -2112,6 +2180,9 @@ takeDamage() {
     }, 300);
     
     this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
+
+               // Check breakable wall hits
+this.checkBreakableWallHits();
     
     // Reset gun use timer and fire pineapple if charged
 this.lastGunUse = Date.now();
