@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Boss - Master Frog's Adventure</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2c2c2c;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #gameContainer {
+            width: 350px;
+            height: 550px;
+            background: #1a1a1a;
+            border: 3px solid #666;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        
+        #gameArea {
+            width: 350px;
+            height: 357.5px;
+            position: relative;
+            overflow: hidden;
+            background: #4a4a4a;
+            touch-action: none;
+        }
+        
+        #gameWorld {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            transform-origin: 0 0;
+            transition: none;
+        }
+        
+        .boss-wall {
+            position: absolute;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/tilerock.png');
+            background-repeat: repeat;
+            background-size: 20px 20px;
+            border: 1px solid rgba(100,100,100,0.3);
+            opacity: 0.6;
+            filter: grayscale(100%) brightness(0.8);
+            z-index: 30;
+        }
+        
+        #machine {
+            position: absolute;
+            width: 120px;
+            height: 70px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/machine-min.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: brightness(1.4) drop-shadow(0 0 8px rgba(0,255,255,0.6));
+            z-index: 31;
+        }
+        
+        #boss {
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 40;
+            transition: none;
+        }
+        
+        .p-monster {
+            position: absolute;
+            width: 35px;
+            height: 25px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/pmonster-min.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 45;
+        }
+        
+        .sword-projectile {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .pineapple-projectile {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('https://raw.githubusercontent.com/TheDepression/Photos/main/pineapplehealth-min.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 55;
+        }
+        
+        #player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 300;
+            transition: none;
+        }
+        
+        .invulnerable {
+            animation: blink 0.2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        @keyframes explode {
+            0% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.8;
+                filter: brightness(2) drop-shadow(0 0 20px orange);
+            }
+            100% { 
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes damageFloat {
+            0% {
+                transform: translateY(0px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes slashEffect {
+            0% { 
+                transform: scale(0.5) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(2) rotate(0deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes pineapplePulse {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px #ff6600) brightness(1.2);
+            }
+            50% { 
+                transform: scale(1.4);
+                filter: drop-shadow(0 0 25px #ff6600) brightness(2);
+            }
+        }
+        
+        @keyframes gunPulsate {
+            0%, 100% { 
+                transform: scale(1);
+            }
+            50% { 
+                transform: scale(1.2);
+            }
+        }
+        
+        @keyframes hoverBoss {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        #controlArea {
+            width: 100%;
+            height: 35%;
+            background: #333;
+            position: absolute;
+            bottom: 0;
+            touch-action: none;
+            border-top: 2px solid #555;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 250;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 250;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #666;
+            pointer-events: none;
+        }
+        
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 250;
+            background: rgba(255,0,0,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+
+        #deathCounter {
+            position: fixed;
+            top: 10px;
+            right: 90px;
+            z-index: 250;
+            background: rgba(128,0,128,0.8);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #665;
+            pointer-events: none;
+        }
+        
+        #pauseBtn {
+            position: fixed;
+            top: 10px;
+            right: 160px;
+            z-index: 250;
+            background: rgba(100,0,100,0.8);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 450;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            max-width: 280px;
+            text-align: center;
+        }
+        
+        #startScreen, #pauseMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .start-button {
+            background: #ff6b35;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        .start-button:hover {
+            background: #ff5722;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (window.innerHeight <= 667) {
+            const style = document.createElement('style');
+            style.textContent = `
+                #ui, #timer, #deathCounter, #pauseBtn {
+                    opacity: 0.6 !important;
+                }
+                #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
+                    opacity: 1 !important;
+                    transition: opacity 0.2s ease;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    </script>
+
+    <div id="gameContainer">
+        <div id="ui">
+            <div>⚔️ Final Boss Fight</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+            <div>🤖 Machine: <span id="machineHp">2500</span></div>
+            <div>👹 Boss: <span id="bossHp">9000</span></div>
+        </div>
+        <div id="timer">0:00</div>
+        <div id="deathCounter">☠️0</div>
+        <button id="pauseBtn" onclick="pauseGame()">⏸️</button>
+        
+        <div id="gameArea">
+            <div id="gameWorld">
+                <div id="player"></div>
+                <div id="machine"></div>
+                <div id="boss"></div>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="startScreen">
+            <h2>⚔️ Final Boss Fight</h2>
+            <div style="margin: 20px 0;">Face the ultimate challenge...</div>
+            <p style="font-size: 12px; opacity: 0.8;">🔫 Destroy the machine first, then defeat the boss!</p>
+            <button class="start-button" onclick="startBossFight()">Begin Fight</button>
+        </div>
+        
+        <div id="pauseMenu" style="display: none;">
+            <h3>⏸️ Game Paused</h3>
+            <button onclick="resumeGame()">Continue Fight</button>
+        </div>
+        
+        <div id="controlArea">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 18px; font-weight: bold;">⚔️ Final Boss Battle</div>
+                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe to move, double-tap to shoot!</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px;">
+                <div>💡 Destroy the machine to make boss vulnerable!</div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">🍍 Pineapple can break bubble mode</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bossMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/finalbullyfight.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // CHECK ACCESS AND VALIDATE ENTRY
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            
+            if (!savedState) {
+                alert('No game data found! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+            
+            const gameState = JSON.parse(savedState);
+            
+            // Check if they're coming from cutscene3
+            if (gameState.currentUrl !== 'cutscene3') {
+                alert('Invalid access! Complete the castle first.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+        });
+
+        class BossFight {
+            constructor() {
+                // Load all game state
+                this.loadGameState();
+                
+                // Game state
+                this.gameStarted = false;
+                this.isPaused = false;
+                this.isInvulnerable = false;
+                this.isDying = false;
+                
+                // Player state
+                this.playerX = 260;
+                this.playerY = 420;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+                this.isDragging = false;
+                this.lastDragX = 0;
+                this.lastDragY = 0;
+                this.currentDirection = 's';
+                
+                // Attack system
+                this.attackCooldown = false;
+                this.attackRange = this.hasEnhancedRange ? 100 : 50;
+                this.attackDamage = this.calculateAttackDamage();
+                this.lastTap = 0;
+                this.lastTapX = null;
+                this.lastTapY = null;
+                this.tapDelay = 250;
+                
+                // Machine
+                this.machineHp = 2500;
+                this.machineDestroyed = false;
+                
+                // Boss state
+                this.bossX = 220;
+                this.bossY = 200;
+                this.bossHp = 9000;
+                this.bossMode = 'tracking'; // tracking, bubble
+                this.bossDirection = 1; // 1 for right, -1 for left
+                this.bossSpeed = 2.5;
+                this.bossLastModeChange = Date.now();
+                this.bossAttackTimer = Date.now();
+                this.bossStopTimer = Date.now();
+                this.bossStopped = false;
+                
+                // Bubble mode
+                this.bubbleCycles = 0;
+                this.pmonsters = [];
+                this.pmonsterShootTimer = 0;
+                this.pmonsterRotation = 0;
+                
+                // Projectiles
+                this.swordProjectiles = [];
+                this.pineappleProjectiles = [];
+                
+                // Timer
+                this.timerInterval = null;
+                
+                // Elements
+                this.player = document.getElementById('player');
+                this.boss = document.getElementById('boss');
+                this.machine = document.getElementById('machine');
+                this.gameWorld = document.getElementById('gameWorld');
+                this.gameArea = document.getElementById('gameArea');
+                this.controlArea = document.getElementById('controlArea');
+                this.bossMusic = document.getElementById('bossMusic');
+                
+                this.preloadPlayerImages();
+                this.setupControls();
+                this.createWalls();
+                this.positionElements();
+                this.updatePlayerImage('s');
+                this.updateBossImage();
+            }
+            
+            loadGameState() {
+                const savedState = localStorage.getItem('mfGameState');
+                if (savedState) {
+                    const gameState = JSON.parse(savedState);
+                    
+                    // Core stats
+                    this.hearts = gameState.hearts || 3;
+                    this.money = gameState.money || 0;
+                    this.timeElapsed = gameState.timeElapsed || 0;
+                    this.deathCount = gameState.deathCount || 0;
+                    this.maxHearts = gameState.maxHearts || 3;
+                    
+                    // All tracking data
+                    this.collectedRedHearts = gameState.collectedRedHearts || [];
+                    this.collectedMoney = gameState.collectedMoney || [];
+                    this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
+                    this.openedGates = gameState.openedGates || [];
+                    this.weakPointsBlasted = gameState.weakPointsBlasted || [];
+                    
+                    // Items
+                    this.hasKey = gameState.hasKey || false;
+                    this.hasBoat = gameState.hasBoat || false;
+                    this.boatIsBroken = gameState.boatIsBroken || false;
+                    this.hasFlashlight = gameState.hasFlashlight || false;
+                    this.hasHammer = gameState.hasHammer || false;
+                    this.hasLavaShoes = gameState.hasLavaShoes || false;
+                    this.hasPencil = gameState.hasPencil || false;
+                    this.hasPyramidKey = gameState.hasPyramidKey || false;
+                    this.hasTrophy = gameState.hasTrophy || false;
+                    this.hasSuperGunTicket = gameState.hasSuperGunTicket || false;
+                    this.collectedBanana = gameState.collectedBanana || false;
+                    
+                    // Weapon and upgrades
+                    this.hasWeapon = gameState.hasWeapon || false;
+                    this.hasOrangePower = gameState.hasOrangePower || false;
+                    this.hasHammerPower = gameState.hasHammerPower || false;
+                    this.hasSuperGun = gameState.hasSuperGun || false;
+                    this.hasEnhancedRange = gameState.hasEnhancedRange || false;
+                    
+                    // Pineapple power
+                    this.hasPineapplePower = gameState.hasPineapplePower || false;
+                    this.pineappleCharged = gameState.pineappleCharged || false;
+                    this.lastGunUse = gameState.lastGunUse || Date.now();
+                    this.pineappleRechargeInterval = gameState.pineappleRechargeInterval || 10000;
+                    
+                    // Quest flags
+                    this.bullyDefeated = gameState.bullyDefeated || false;
+                    this.motherPaid = gameState.motherPaid || false;
+                    this.caveBossDefeated = gameState.caveBossDefeated || false;
+                    this.pyramidBossDefeated = gameState.pyramidBossDefeated || false;
+                    this.gorillaEncounterComplete = gameState.gorillaEncounterComplete || false;
+                    this.pinkBossDefeated = gameState.pinkBossDefeated || false;
+                    
+                    // Castle data tracking
+                    this.cdmoney1 = gameState.cdmoney1 || false;
+                    this.cdmoney2 = gameState.cdmoney2 || false;
+                    this.cdmoney3 = gameState.cdmoney3 || false;
+                    this.cdmoney4 = gameState.cdmoney4 || false;
+                    this.cdmoney5 = gameState.cdmoney5 || false;
+                    this.cdmoneyEntrance = gameState.cdmoneyEntrance || false;
+                    this.cdpheart1 = gameState.cdpheart1 || false;
+                    this.cdpheart2 = gameState.cdpheart2 || false;
+                    this.gorillaHammerDialogComplete = gameState.gorillaHammerDialogComplete || false;
+                    this.catFirstDialogComplete = gameState.catFirstDialogComplete || false;
+                    this.kingMoneyReceived = gameState.kingMoneyReceived || false;
+                    
+                    this.updateDeathCounter();
+                }
+            }
+            
+            calculateAttackDamage() {
+                if (this.hasSuperGun) {
+                    return 150;
+                } else if (this.hasOrangePower || this.hasHammerPower) {
+                    return 100;
+                } else {
+                    return 50;
+                }
+            }
+            
+            preloadPlayerImages() {
+                const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+                this.playerImages = {};
+                
+                directions.forEach(direction => {
+                    const img = new Image();
+                    img.src = `https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG`;
+                    this.playerImages[direction] = img;
+                });
+            }
+            
+            setupControls() {
+                this.controlArea.addEventListener('touchstart', (e) => this.handleStart(e), {passive: false});
+                this.controlArea.addEventListener('touchmove', (e) => this.handleMove(e), {passive: false});
+                this.controlArea.addEventListener('touchend', (e) => this.handleEnd(e), {passive: false});
+                
+                this.controlArea.addEventListener('mousedown', (e) => this.handleStart(e));
+                this.controlArea.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.controlArea.addEventListener('mouseup', (e) => this.handleEnd(e));
+                this.controlArea.addEventListener('mouseleave', (e) => this.handleEnd(e));
+            }
+            
+            handleStart(e) {
+                if (!this.gameStarted || this.isPaused) return;
+                e.preventDefault();
+                
+                const now = Date.now();
+                const point = e.touches ? e.touches[0] : e;
+                const currentX = point.clientX;
+                const currentY = point.clientY;
+                
+                if (this.hasWeapon && now - this.lastTap < this.tapDelay && !this.attackCooldown) {
+                    if (this.lastTapX && this.lastTapY) {
+                        const tapDistance = Math.sqrt(
+                            Math.pow(currentX - this.lastTapX, 2) + 
+                            Math.pow(currentY - this.lastTapY, 2)
+                        );
+                        
+                        if (tapDistance < 30) {
+                            this.attack();
+                            this.lastTap = 0;
+                            this.lastTapX = null;
+                            this.lastTapY = null;
+                            return;
+                        }
+                    }
+                }
+                
+                this.lastTap = now;
+                this.lastTapX = currentX;
+                this.lastTapY = currentY;
+                
+                this.isDragging = true;
+                this.lastDragX = currentX;
+                this.lastDragY = currentY;
+            }
+            
+            handleMove(e) {
+                if (!this.isDragging || !this.gameStarted || this.isPaused) return;
+                e.preventDefault();
+                
+                const point = e.touches ? e.touches[0] : e;
+                const deltaX = point.clientX - this.lastDragX;
+                const deltaY = point.clientY - this.lastDragY;
+                
+                if (Math.abs(deltaX) > 1.2 || Math.abs(deltaY) > 1.2) {
+                    const newDirection = this.getDirectionFromMovement(deltaX, deltaY);
+                    if (newDirection !== this.currentDirection) {
+                        this.currentDirection = newDirection;
+                        this.updatePlayerImage(newDirection);
+                    }
+                }
+                
+                const sensitivity = 0.6;
+                this.playerVelocityX = deltaX * sensitivity;
+                this.playerVelocityY = deltaY * sensitivity;
+                
+                const maxVelocity = 10;
+                this.playerVelocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityX));
+                this.playerVelocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.playerVelocityY));
+                
+                this.lastDragX = point.clientX;
+                this.lastDragY = point.clientY;
+            }
+            
+            handleEnd(e) {
+                this.isDragging = false;
+                this.playerVelocityX = 0;
+                this.playerVelocityY = 0;
+            }
+            
+            getDirectionFromMovement(deltaX, deltaY) {
+                let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+                if (angle < 0) angle += 360;
+                
+                if (angle >= 337.5 || angle < 22.5) return 'e';
+                else if (angle >= 22.5 && angle < 67.5) return 'se';  
+                else if (angle >= 67.5 && angle < 112.5) return 's';
+                else if (angle >= 112.5 && angle < 157.5) return 'sw';
+                else if (angle >= 157.5 && angle < 202.5) return 'w';
+                else if (angle >= 202.5 && angle < 247.5) return 'nw';
+                else if (angle >= 247.5 && angle < 292.5) return 'n';
+                else return 'ne';
+            }
+            
+            updatePlayerImage(direction) {
+                this.player.style.backgroundImage = `url("https://raw.githubusercontent.com/TheDepression/Photos/main/${direction}.PNG")`;
+            }
+            
+            updateBossImage() {
+                if (this.bossMode === 'bubble') {
+                    this.boss.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/bullybubble.png")';
+                    this.boss.style.animation = 'hoverBoss 2s infinite ease-in-out';
+                    this.boss.style.filter = 'drop-shadow(0 5px 10px rgba(0,0,0,0.5))';
+                } else {
+                    this.boss.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/finalbully-min.png")';
+                    this.boss.style.animation = 'none';
+                    this.boss.style.filter = 'none';
+                    this.boss.style.transform = this.bossDirection === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+                }
+            }
+            
+            createWalls() {
+                // Boss room walls
+                this.createWall(460, 0, 40, 500); // Right wall
+                this.createWall(0, 0, 40, 500);   // Left wall  
+                this.createWall(40, 0, 420, 60);  // Top wall
+                this.createWall(40, 480, 420, 20); // Bottom wall
+            }
+            
+            createWall(x, y, width, height) {
+                const wall = document.createElement('div');
+                wall.className = 'boss-wall';
+                wall.style.left = x + 'px';
+                wall.style.top = y + 'px';
+                wall.style.width = width + 'px';
+                wall.style.height = height + 'px';
+                this.gameWorld.appendChild(wall);
+            }
+            
+            positionElements() {
+                // Position player
+                this.player.style.left = (this.playerX - 16) + 'px';
+                this.player.style.top = (this.playerY - 16) + 'px';
+                
+                // Position machine
+                this.machine.style.left = '190px';
+                this.machine.style.top = '50px';
+                
+                // Position boss
+                this.boss.style.left = (this.bossX - 37.5) + 'px';
+                this.boss.style.top = (this.bossY - 37.5) + 'px';
+                
+                this.centerCameraOnPlayer();
+            }
+            
+            centerCameraOnPlayer() {
+                const gameAreaWidth = this.gameArea.offsetWidth;
+                const gameAreaHeight = this.gameArea.offsetHeight;
+                const scrollX = this.playerX - gameAreaWidth / 2 + 16;
+                const scrollY = this.playerY - gameAreaHeight / 2 + 16;
+                this.gameArea.scrollTo({
+                    left: scrollX,
+                    top: scrollY,
+                    behavior: 'auto'
+                });
+            }
+            
+            startGame() {
+                this.gameStarted = true;
+                this.startGameLoop();
+                this.startTimer();
+                
+                this.bossMusic.play().catch(e => {
+                    console.log('Music autoplay blocked');
+                    const tryMusic = () => {
+                        this.bossMusic.play().catch(e => console.log('Music failed:', e));
+                        document.removeEventListener('click', tryMusic);
+                        document.removeEventListener('touchstart', tryMusic);
+                    };
+                    document.addEventListener('click', tryMusic);
+                    document.addEventListener('touchstart', tryMusic);
+                });
+            }
+            
+            startGameLoop() {
+                const gameLoop = () => {
+                    if (this.gameStarted) {
+                        this.updatePlayer();
+                        this.updateBoss();
+                        this.updateProjectiles();
+                        this.checkCollisions();
+                    }
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+            
+            updatePlayer() {
+                if (this.isPaused) return;
+                
+                if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
+                  const newX = this.playerX + this.playerVelocityX;
+                   const newY = this.playerY + this.playerVelocityY;
+                   
+                   if (this.canMoveTo(newX, newY)) {
+                       this.playerX = newX;
+                       this.playerY = newY;
+                       this.player.style.left = (this.playerX - 16) + 'px';
+                       this.player.style.top = (this.playerY - 16) + 'px';
+                       
+                       this.centerCameraOnPlayer();
+                   }
+                   
+                   this.playerVelocityX *= 0.88;
+                   this.playerVelocityY *= 0.88;
+               }
+               
+               // Pineapple power recharge system
+               if (this.hasPineapplePower && !this.pineappleCharged) {
+                   const now = Date.now();
+                   if (now - this.lastGunUse >= this.pineappleRechargeInterval) {
+                       this.pineappleCharged = true;
+                       this.updateUI();
+                   }
+               }
+           }
+           
+           updateBoss() {
+               if (this.isPaused || this.bossHp <= 0) return;
+               
+               const now = Date.now();
+               
+               // Check mode transitions
+               if (this.bossMode === 'tracking') {
+                   // Switch to bubble mode after 40 seconds
+                   if (now - this.bossLastModeChange > 40000) {
+                       this.enterBubbleMode();
+                   }
+                   
+                   // Random stops every 7-10 seconds
+                   if (!this.bossStopped && now - this.bossStopTimer > (7000 + Math.random() * 3000)) {
+                       this.bossStopped = true;
+                       this.bossStopTimer = now;
+                   }
+                   
+                   if (this.bossStopped && now - this.bossStopTimer > 1000) {
+                       this.bossStopped = false;
+                       this.bossStopTimer = now;
+                   }
+                   
+                   // Move towards player (if not stopped)
+                   if (!this.bossStopped) {
+                       const deltaX = this.playerX - this.bossX;
+                       const deltaY = this.playerY - this.bossY;
+                       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                       
+                       if (distance > 5) {
+                           const moveX = (deltaX / distance) * this.bossSpeed;
+                           const moveY = (deltaY / distance) * this.bossSpeed;
+                           
+                           const newX = this.bossX + moveX;
+                           const newY = this.bossY + moveY;
+                           
+                           if (this.canBossMoveTo(newX, newY)) {
+                               this.bossX = newX;
+                               this.bossY = newY;
+                               
+                               // Update direction for sprite flipping
+                               this.bossDirection = deltaX < 0 ? -1 : 1;
+                               this.updateBossImage();
+                               
+                               this.boss.style.left = (this.bossX - 37.5) + 'px';
+                               this.boss.style.top = (this.bossY - 37.5) + 'px';
+                           }
+                       }
+                   }
+                   
+                   // Throw swords randomly (3-5 second intervals)
+                   if (now - this.bossAttackTimer > (3000 + Math.random() * 2000)) {
+                       this.throwSword();
+                       this.bossAttackTimer = now;
+                   }
+                   
+               } else if (this.bossMode === 'bubble') {
+                   // Handle bubble mode
+                   this.updateBubbleMode();
+               }
+           }
+           
+           enterBubbleMode() {
+               this.bossMode = 'bubble';
+               this.bubbleCycles = 0;
+               this.updateBossImage();
+               this.createPMonsterRing();
+               this.pmonsterShootTimer = Date.now();
+               this.pmonsterRotation = 0;
+           }
+           
+           createPMonsterRing() {
+               // Clear existing p-monsters
+               this.pmonsters.forEach(pm => pm.element.remove());
+               this.pmonsters = [];
+               
+               // Create 6 p-monsters in a ring
+               for (let i = 0; i < 6; i++) {
+                   const angle = (i / 6) * Math.PI * 2;
+                   const radius = 60;
+                   const x = this.bossX + Math.cos(angle) * radius;
+                   const y = this.bossY + Math.sin(angle) * radius;
+                   
+                   const pm = document.createElement('div');
+                   pm.className = 'p-monster';
+                   pm.style.left = (x - 17.5) + 'px';
+                   pm.style.top = (y - 12.5) + 'px';
+                   this.gameWorld.appendChild(pm);
+                   
+                   this.pmonsters.push({
+                       element: pm,
+                       angle: angle,
+                       shot: false
+                   });
+               }
+           }
+           
+           updateBubbleMode() {
+               const now = Date.now();
+               
+               // Rotate p-monsters around boss
+               this.pmonsterRotation += 0.05;
+               const radius = 60;
+               
+               this.pmonsters.forEach((pm, index) => {
+                   if (!pm.shot) {
+                       const angle = pm.angle + this.pmonsterRotation;
+                       const x = this.bossX + Math.cos(angle) * radius;
+                       const y = this.bossY + Math.sin(angle) * radius;
+                       
+                       pm.element.style.left = (x - 17.5) + 'px';
+                       pm.element.style.top = (y - 12.5) + 'px';
+                   }
+               });
+               
+               // Shoot p-monsters one at a time (2 second intervals)
+               if (now - this.pmonsterShootTimer > 2000) {
+                   const unshot = this.pmonsters.find(pm => !pm.shot);
+                   if (unshot) {
+                       this.shootPMonster(unshot);
+                       this.pmonsterShootTimer = now;
+                   } else {
+                       // All shot, check if we should do another cycle
+                       this.bubbleCycles++;
+                       if (this.bubbleCycles < 3) {
+                           // Start next cycle
+                           this.createPMonsterRing();
+                       } else {
+                           // Exit bubble mode
+                           this.exitBubbleMode();
+                       }
+                   }
+               }
+           }
+           
+           shootPMonster(pm) {
+               pm.shot = true;
+               
+               // Calculate direction to player
+               const deltaX = this.playerX - (parseInt(pm.element.style.left) + 17.5);
+               const deltaY = this.playerY - (parseInt(pm.element.style.top) + 12.5);
+               const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+               
+               // Convert to projectile
+               pm.element.className = 'p-monster-projectile';
+               pm.element.style.zIndex = '55';
+               
+               this.swordProjectiles.push({
+                   element: pm.element,
+                   x: parseInt(pm.element.style.left) + 17.5,
+                   y: parseInt(pm.element.style.top) + 12.5,
+                   directionX: deltaX / distance,
+                   directionY: deltaY / distance,
+                   speed: 3,
+                   type: 'pmonster'
+               });
+           }
+           
+           exitBubbleMode() {
+               this.bossMode = 'tracking';
+               this.bossLastModeChange = Date.now();
+               this.bossAttackTimer = Date.now();
+               this.bossStopTimer = Date.now();
+               this.updateBossImage();
+               
+               // Clean up any remaining p-monsters
+               this.pmonsters.forEach(pm => pm.element.remove());
+               this.pmonsters = [];
+           }
+           
+           throwSword() {
+               const sword = document.createElement('div');
+               sword.className = 'sword-projectile';
+               sword.textContent = '⚔️';
+               sword.style.left = (this.bossX - 10) + 'px';
+               sword.style.top = (this.bossY - 10) + 'px';
+               this.gameWorld.appendChild(sword);
+               
+               // Calculate direction to player
+               const deltaX = this.playerX - this.bossX;
+               const deltaY = this.playerY - this.bossY;
+               const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+               
+               this.swordProjectiles.push({
+                   element: sword,
+                   x: this.bossX,
+                   y: this.bossY,
+                   directionX: deltaX / distance,
+                   directionY: deltaY / distance,
+                   speed: 4,
+                   type: 'sword'
+               });
+           }
+           
+           updateProjectiles() {
+               if (this.isPaused) return;
+               
+               // Update sword projectiles
+               this.swordProjectiles.forEach((projectile, index) => {
+                   projectile.x += projectile.directionX * projectile.speed;
+                   projectile.y += projectile.directionY * projectile.speed;
+                   
+                   projectile.element.style.left = (projectile.x - 10) + 'px';
+                   projectile.element.style.top = (projectile.y - 10) + 'px';
+                   
+                   // Remove if out of bounds
+                   if (projectile.x < 0 || projectile.x > 500 || projectile.y < 0 || projectile.y > 500) {
+                       projectile.element.remove();
+                       this.swordProjectiles.splice(index, 1);
+                   }
+               });
+               
+               // Update pineapple projectiles
+               this.pineappleProjectiles.forEach((projectile, index) => {
+                   projectile.x += projectile.directionX * projectile.speed;
+                   projectile.y += projectile.directionY * projectile.speed;
+                   
+                   projectile.element.style.left = (projectile.x - 10) + 'px';
+                   projectile.element.style.top = (projectile.y - 10) + 'px';
+                   
+                   // Remove if out of bounds
+                   if (projectile.x < 0 || projectile.x > 500 || projectile.y < 0 || projectile.y > 500) {
+                       projectile.element.remove();
+                       this.pineappleProjectiles.splice(index, 1);
+                   }
+               });
+           }
+           
+           attack() {
+               if (!this.hasWeapon) return;
+               
+               this.attackCooldown = true;
+               
+               // Regular attack effect
+               const attackEl = document.createElement('div');
+               attackEl.style.position = 'absolute';
+               attackEl.style.pointerEvents = 'none';
+               attackEl.style.zIndex = '400';
+               attackEl.style.animation = 'slashEffect 0.3s ease-out';
+               
+               if (this.hasEnhancedRange) {
+                   attackEl.style.width = '60px';
+                   attackEl.style.height = '60px';
+               } else {
+                   attackEl.style.width = '40px';
+                   attackEl.style.height = '40px';
+               }
+               
+               attackEl.style.background = 'radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,0,0,0.4) 70%, transparent 100%)';
+               attackEl.style.borderRadius = '50%';
+               
+               const directionOffsets = {
+                   'n': {x: 0, y: -35}, 'ne': {x: 25, y: -25}, 'e': {x: 35, y: 0},
+                   'se': {x: 25, y: 25}, 's': {x: 0, y: 35}, 'sw': {x: -25, y: 25},
+                   'w': {x: -35, y: 0}, 'nw': {x: -25, y: -25}
+               };
+               
+               const offset = directionOffsets[this.currentDirection];
+               const visualCenterX = this.hasEnhancedRange ? 30 : 20;
+               const visualCenterY = this.hasEnhancedRange ? 30 : 20;
+               
+               attackEl.style.left = (this.playerX + offset.x - visualCenterX + 16) + 'px';
+               attackEl.style.top = (this.playerY + offset.y - visualCenterY + 16) + 'px';
+               
+               this.gameWorld.appendChild(attackEl);
+               
+               setTimeout(() => {
+                   if (attackEl.parentNode) {
+                       attackEl.remove();
+                   }
+               }, 300);
+               
+               this.checkAttackHits();
+               
+               // Reset gun use timer and fire pineapple if charged
+               this.lastGunUse = Date.now();
+               
+               // Pineapple projectile if available
+               if (this.hasPineapplePower && this.pineappleCharged) {
+                   this.firePineappleProjectile();
+                   this.pineappleCharged = false;
+                   this.updateUI();
+               }
+               
+               setTimeout(() => {
+                   this.attackCooldown = false;
+               }, 500);
+           }
+           
+           checkAttackHits() {
+               const effectiveRange = this.hasEnhancedRange ? 100 : 50;
+               
+               // Check machine hit
+               if (!this.machineDestroyed) {
+                   const machineDistance = Math.sqrt(
+                       Math.pow(this.playerX - 250, 2) + // Machine center X
+                       Math.pow(this.playerY - 85, 2)    // Machine center Y
+                   );
+                   
+                   if (machineDistance <= effectiveRange && this.isInFrontOfPlayer(250 - this.playerX, 85 - this.playerY)) {
+                       const damage = this.attackDamage;
+                       this.machineHp -= damage;
+                       
+                       this.showDamageText(250, 85, damage, '#44ff44');
+                       
+                       if (this.machineHp <= 0) {
+                           this.machineHp = 0;
+                           this.destroyMachine();
+                       }
+                       
+                       this.updateUI();
+                   }
+               }
+               
+               // Check boss hit (only if not in bubble mode)
+               if (this.bossMode !== 'bubble') {
+                   const bossDistance = Math.sqrt(
+                       Math.pow(this.playerX - this.bossX, 2) +
+                       Math.pow(this.playerY - this.bossY, 2)
+                   );
+                   
+                   if (bossDistance <= effectiveRange && this.isInFrontOfPlayer(this.bossX - this.playerX, this.bossY - this.playerY)) {
+                       let damage = this.machineDestroyed ? this.attackDamage : 10;
+                       this.bossHp -= damage;
+                       
+                       this.showDamageText(this.bossX, this.bossY, damage, '#ff4444');
+                       
+                       if (this.bossHp <= 0) {
+                           this.bossHp = 0;
+                           this.bossDied();
+                       }
+                       
+                       this.updateUI();
+                   }
+               }
+           }
+           
+           firePineappleProjectile() {
+               const directionVectors = {
+                   'n': {x: 0, y: -1}, 'ne': {x: 0.707, y: -0.707}, 'e': {x: 1, y: 0},
+                   'se': {x: 0.707, y: 0.707}, 's': {x: 0, y: 1}, 'sw': {x: -0.707, y: 0.707},
+                   'w': {x: -1, y: 0}, 'nw': {x: -0.707, y: -0.707}
+               };
+               
+               const direction = directionVectors[this.currentDirection];
+               
+               const projectile = document.createElement('div');
+               projectile.className = 'pineapple-projectile';
+               projectile.style.left = (this.playerX - 10) + 'px';
+               projectile.style.top = (this.playerY - 10) + 'px';
+               this.gameWorld.appendChild(projectile);
+               
+               this.pineappleProjectiles.push({
+                   element: projectile,
+                   x: this.playerX,
+                   y: this.playerY,
+                   directionX: direction.x,
+                   directionY: direction.y,
+                   speed: 8
+               });
+           }
+           
+           checkCollisions() {
+               if (this.isInvulnerable || this.isPaused) return;
+               
+               const playerRect = {
+                   left: this.playerX - 16,
+                   top: this.playerY - 16,
+                   right: this.playerX + 16,
+                   bottom: this.playerY + 16
+               };
+               
+               // Check boss collision (only if not in bubble mode)
+               if (this.bossMode !== 'bubble') {
+                   const bossRect = {
+                       left: this.bossX - 37.5,
+                       top: this.bossY - 37.5,
+                       right: this.bossX + 37.5,
+                       bottom: this.bossY + 37.5
+                   };
+                   
+                   if (this.rectsOverlap(playerRect, bossRect)) {
+                       this.takeDamage();
+                       return;
+                   }
+               }
+               
+               // Check sword projectile collisions
+               this.swordProjectiles.forEach((projectile, index) => {
+                   const projRect = {
+                       left: projectile.x - 10,
+                       top: projectile.y - 10,
+                       right: projectile.x + 10,
+                       bottom: projectile.y + 10
+                   };
+                   
+                   if (this.rectsOverlap(playerRect, projRect)) {
+                       this.takeDamage();
+                       projectile.element.remove();
+                       this.swordProjectiles.splice(index, 1);
+                   }
+               });
+               
+               // Check pineapple projectile hits
+               this.pineappleProjectiles.forEach((projectile, index) => {
+                   // Check machine hit
+                   if (!this.machineDestroyed) {
+                       const machineDistance = Math.sqrt(
+                           Math.pow(projectile.x - 250, 2) +
+                           Math.pow(projectile.y - 85, 2)
+                       );
+                       
+                       if (machineDistance < 30) {
+                           this.machineHp -= 500;
+                           this.showDamageText(250, 85, 500, '#ffaa00');
+                           
+                           if (this.machineHp <= 0) {
+                               this.machineHp = 0;
+                               this.destroyMachine();
+                           }
+                           
+                           projectile.element.remove();
+                           this.pineappleProjectiles.splice(index, 1);
+                           this.updateUI();
+                           return;
+                       }
+                   }
+                   
+                   // Check boss hit
+                   const bossDistance = Math.sqrt(
+                       Math.pow(projectile.x - this.bossX, 2) +
+                       Math.pow(projectile.y - this.bossY, 2)
+                   );
+                   
+                   if (bossDistance < 40) {
+                       if (this.bossMode === 'bubble') {
+                           // Break bubble mode
+                           this.exitBubbleMode();
+                           this.showMessage('🍍 Bubble broken!');
+                       } else {
+                           // Normal damage
+                           const damage = this.machineDestroyed ? 500 : 10;
+                           this.bossHp -= damage;
+                           this.showDamageText(this.bossX, this.bossY, damage, '#ffaa00');
+                           
+                           if (this.bossHp <= 0) {
+                               this.bossHp = 0;
+                               this.bossDied();
+                           }
+                       }
+                       
+                       projectile.element.remove();
+                       this.pineappleProjectiles.splice(index, 1);
+                       this.updateUI();
+                   }
+               });
+           }
+           
+           destroyMachine() {
+               this.machineDestroyed = true;
+               
+               // Explosion effect
+               this.machine.style.animation = 'explode 0.5s ease-out';
+               
+               setTimeout(() => {
+                   this.machine.style.opacity = '0.2';
+                   this.machine.style.filter = 'grayscale(100%)';
+               }, 500);
+               
+               this.showMessage('💥 Machine destroyed! Boss is now vulnerable!');
+           }
+           
+           bossDied() {
+               this.gameStarted = false;
+               clearInterval(this.timerInterval);
+               this.bossMusic.pause();
+               
+               this.showMessage('👹 NOOO!');
+               
+               setTimeout(() => {
+                   this.saveWinState();
+                   window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene4';
+               }, 3000);
+           }
+           
+           takeDamage() {
+               if (this.isInvulnerable) return;
+               
+               this.hearts--;
+               this.showMessage('💔 Ouch!');
+               this.updateUI();
+               
+               this.isInvulnerable = true;
+               this.player.classList.add('invulnerable');
+               
+               setTimeout(() => {
+                   this.isInvulnerable = false;
+                   this.player.classList.remove('invulnerable');
+               }, 1500);
+               
+               if (this.hearts <= 0) {
+                   this.gameOver();
+               }
+           }
+           
+           gameOver() {
+               this.deathCount++;
+               this.updateDeathCounter();
+               
+               this.gameStarted = false;
+               clearInterval(this.timerInterval);
+               this.bossMusic.pause();
+               
+               this.showMessage('💀 GAME OVER FROG! MY MACHINE KEEPS ME STRONG! HAHAA!');
+               
+               setTimeout(() => {
+                   this.saveGameState();
+                   
+                   // Redirect to castle entrance
+                   const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+                   gameState.playerX = 240;
+                   gameState.playerY = 850;
+                   gameState.currentUrl = 'castle';
+                   
+                   localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                   window.location.href = 'https://thedepression.github.io/games/minimaze/castle';
+               }, 4000);
+           }
+           
+           isInFrontOfPlayer(deltaX, deltaY) {
+               switch(this.currentDirection) {
+                   case 'n': return deltaY < 0;
+                   case 'ne': return deltaX > 0 && deltaY < 0;
+                   case 'e': return deltaX > 0;
+                   case 'se': return deltaX > 0 && deltaY > 0;
+                   case 's': return deltaY > 0;
+                   case 'sw': return deltaX < 0 && deltaY > 0;
+                   case 'w': return deltaX < 0;
+                   case 'nw': return deltaX < 0 && deltaY < 0;
+                   default: return true;
+               }
+           }
+           
+           showDamageText(x, y, damage, color) {
+               const damageText = document.createElement('div');
+               damageText.style.position = 'absolute';
+               damageText.style.color = color;
+               damageText.style.fontWeight = 'bold';
+               damageText.style.fontSize = '16px';
+               damageText.style.pointerEvents = 'none';
+               damageText.style.zIndex = '500';
+               damageText.style.animation = 'damageFloat 1s ease-out';
+               damageText.textContent = `-${damage}`;
+               damageText.style.left = x + 'px';
+               damageText.style.top = y + 'px';
+               this.gameWorld.appendChild(damageText);
+               
+               setTimeout(() => {
+                   if (damageText.parentNode) {
+                       damageText.remove();
+                   }
+               }, 1000);
+           }
+           
+           canMoveTo(x, y) {
+               const playerSize = 24;
+               const padding = 2;
+               
+               // Check bounds
+               if (x - 12 < 40 || x + 12 > 460 || y - 12 < 60 || y + 12 > 480) {
+                   return false;
+               }
+               
+               return true;
+           }
+           
+           canBossMoveTo(x, y) {
+               const bossSize = 75;
+               
+               // Check bounds  
+               if (x - 37.5 < 40 || x + 37.5 > 460 || y - 37.5 < 60 || y + 37.5 > 480) {
+                   return false;
+               }
+               
+               return true;
+           }
+           
+           rectsOverlap(rect1, rect2) {
+               return rect1.left < rect2.right &&
+                      rect1.right > rect2.left &&
+                      rect1.top < rect2.bottom &&
+                      rect1.bottom > rect2.top;
+           }
+           
+           saveGameState() {
+               const gameState = {
+                   hearts: this.hearts,
+                   money: this.money,
+                   timeElapsed: this.timeElapsed,
+                   deathCount: this.deathCount,
+                   maxHearts: this.maxHearts,
+                   collectedRedHearts: this.collectedRedHearts,
+                   collectedMoney: this.collectedMoney,
+                   collectedPurpleHearts: this.collectedPurpleHearts,
+                   openedGates: this.openedGates,
+                   weakPointsBlasted: this.weakPointsBlasted,
+                   hasKey: this.hasKey,
+                   hasBoat: this.hasBoat,
+                   boatIsBroken: this.boatIsBroken,
+                   hasFlashlight: this.hasFlashlight,
+                   hasHammer: this.hasHammer,
+                   hasLavaShoes: this.hasLavaShoes,
+                   hasPencil: this.hasPencil,
+                   hasPyramidKey: this.hasPyramidKey,
+                   hasTrophy: this.hasTrophy,
+                   hasSuperGunTicket: this.hasSuperGunTicket,
+                   collectedBanana: this.collectedBanana,
+                   cdmoney1: this.cdmoney1,
+                   cdmoney2: this.cdmoney2,
+                   cdmoney3: this.cdmoney3,
+                   cdmoney4: this.cdmoney4,
+                   cdmoney5: this.cdmoney5,
+                   cdmoneyEntrance: this.cdmoneyEntrance,
+                   cdpheart1: this.cdpheart1,
+                   cdpheart2: this.cdpheart2,
+                   gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
+                   catFirstDialogComplete: this.catFirstDialogComplete,
+                   kingMoneyReceived: this.kingMoneyReceived,
+                   hasWeapon: this.hasWeapon,
+                   hasOrangePower: this.hasOrangePower,
+                   hasHammerPower: this.hasHammerPower,
+                   hasSuperGun: this.hasSuperGun,
+                   hasEnhancedRange: this.hasEnhancedRange,
+                   hasPineapplePower: this.hasPineapplePower,
+                   pineappleCharged: this.pineappleCharged,
+                   lastGunUse: this.lastGunUse,
+                   pineappleRechargeInterval: this.pineappleRechargeInterval,
+                   bullyDefeated: this.bullyDefeated,
+                   motherPaid: this.motherPaid,
+                   caveBossDefeated: this.caveBossDefeated,
+                   pyramidBossDefeated: this.pyramidBossDefeated,
+                   gorillaEncounterComplete: this.gorillaEncounterComplete,
+                   pinkBossDefeated: this.pinkBossDefeated,
+                   currentUrl: 'castle',
+                   lastSaveTime: Date.now()
+               };
+               localStorage.setItem('mfGameState', JSON.stringify(gameState));
+           }
+           
+           saveWinState() {
+               const gameState = {
+                   hearts: this.hearts,
+                   money: this.money,
+                   timeElapsed: this.timeElapsed,
+                   deathCount: this.deathCount,
+                   maxHearts: this.maxHearts,
+                   collectedRedHearts: this.collectedRedHearts,
+                   collectedMoney: this.collectedMoney,
+                   collectedPurpleHearts: this.collectedPurpleHearts,
+                   openedGates: this.openedGates,
+                   weakPointsBlasted: this.weakPointsBlasted,
+                   hasKey: this.hasKey,
+                   hasBoat: this.hasBoat,
+                   boatIsBroken: this.boatIsBroken,
+                   hasFlashlight: this.hasFlashlight,
+                   hasHammer: this.hasHammer,
+                   hasLavaShoes: this.hasLavaShoes,
+                   hasPencil: this.hasPencil,
+                   hasPyramidKey: this.hasPyramidKey,
+                   hasTrophy: this.hasTrophy,
+                   hasSuperGunTicket: this.hasSuperGunTicket,
+                   collectedBanana: this.collectedBanana,
+                   cdmoney1: this.cdmoney1,
+                   cdmoney2: this.cdmoney2,
+                   cdmoney3: this.cdmoney3,
+                   cdmoney4: this.cdmoney4,
+                   cdmoney5: this.cdmoney5,
+                   cdmoneyEntrance: this.cdmoneyEntrance,
+                   cdpheart1: this.cdpheart1,
+                   cdpheart2: this.cdpheart2,
+                   gorillaHammerDialogComplete: this.gorillaHammerDialogComplete,
+                   catFirstDialogComplete: this.catFirstDialogComplete,
+                   kingMoneyReceived: this.kingMoneyReceived,
+                    hasWeapon: this.hasWeapon,
+                     hasOrangePower: this.hasOrangePower,
+                   hasHammerPower: this.hasHammerPower,
+                   hasSuperGun: this.hasSuperGun,
+                   hasEnhancedRange: this.hasEnhancedRange,
+                   hasPineapplePower: this.hasPineapplePower,
+                   pineappleCharged: this.pineappleCharged,
+                   lastGunUse: this.lastGunUse,
+                   pineappleRechargeInterval: this.pineappleRechargeInterval,
+                   bullyDefeated: this.bullyDefeated,
+                   motherPaid: this.motherPaid,
+                   caveBossDefeated: this.caveBossDefeated,
+                   pyramidBossDefeated: this.pyramidBossDefeated,
+                   gorillaEncounterComplete: this.gorillaEncounterComplete,
+                   pinkBossDefeated: this.pinkBossDefeated,
+                   finalBossDefeated: true, // NEW FLAG FOR FINAL BOSS WIN
+                   currentUrl: 'cutscene4',
+                   lastSaveTime: Date.now()
+               };
+               localStorage.setItem('mfGameState', JSON.stringify(gameState));
+           }
+           
+           startTimer() {
+               this.updateTimer();
+               this.timerInterval = setInterval(() => {
+                   if (!this.isPaused) {
+                       this.timeElapsed++;
+                       this.updateTimer();
+                   }
+               }, 1000);
+           }
+           
+           updateTimer() {
+               const minutes = Math.floor(this.timeElapsed / 60);
+               const seconds = this.timeElapsed % 60;
+               const timerEl = document.getElementById('timer');
+               timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+               
+               if (this.timeElapsed >= 600) {
+                   timerEl.style.background = 'rgba(255,0,0,0.8)';
+               } else if (this.timeElapsed >= 300) {
+                   timerEl.style.background = 'rgba(255,165,0,0.8)';
+               } else {
+                   timerEl.style.background = 'rgba(0,128,0,0.8)';
+               }
+           }
+           
+           updateDeathCounter() {
+               document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+           }
+           
+           updateUI() {
+               document.getElementById('hearts').textContent = this.hearts;
+               document.getElementById('money').textContent = this.money;
+               document.getElementById('machineHp').textContent = this.machineDestroyed ? 'DESTROYED' : this.machineHp;
+               document.getElementById('bossHp').textContent = this.bossHp;
+               
+               let items = [];
+               if (this.hasWeapon) {
+                   let gunHTML = '';
+                   
+                   if (this.hasSuperGun) {
+                       gunHTML = '<span style="filter: brightness(0.3);">🔫</span>';
+                   } else if (this.hasHammerPower) {
+                       gunHTML = '<span style="filter: grayscale(0.9) brightness(0.8);">🔫</span>';
+                   } else if (this.hasOrangePower) {
+                       gunHTML = '<span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2);">🔫</span>';
+                   } else {
+                       gunHTML = '🔫';
+                   }
+                   
+                   if (this.hasEnhancedRange) {
+                       gunHTML = gunHTML.replace('🔫', '<span style="animation: gunPulsate 2s infinite; filter: drop-shadow(0 0 8px gold);">🔫</span>');
+                   }
+                   
+                   items.push(gunHTML);
+               }
+               if (this.hasFlashlight) items.push('🔦');
+               if (this.hasBoat) items.push('⛵');
+               if (this.hasKey) items.push('🔑');
+               if (this.hasLavaShoes) items.push('🥾');
+               if (this.hasTrophy) items.push('🏆');
+               
+               // Add pineapple power indicator
+               if (this.hasPineapplePower) {
+                   if (this.pineappleCharged) {
+                       items.push('<span style="animation: pineapplePulse 0.8s infinite; filter: drop-shadow(0 0 20px #ff6600) brightness(1.8);">🍍</span>');
+                   } else {
+                       items.push('🍍');
+                   }
+               }
+               
+               if (!document.getElementById('items')) {
+                   const itemsDiv = document.createElement('div');
+                   itemsDiv.id = 'items';
+                   itemsDiv.innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+                   document.getElementById('ui').appendChild(itemsDiv);
+               } else {
+                   document.getElementById('items').innerHTML = '+' + (items.length > 0 ? items.join(' ') : '');
+               }
+           }
+           
+           showMessage(text) {
+               const message = document.getElementById('message');
+               message.textContent = text;
+               message.style.display = 'block';
+               
+               clearTimeout(this.messageTimeout);
+               this.messageTimeout = setTimeout(() => {
+                   message.style.display = 'none';
+               }, 2500);
+           }
+       }
+
+       let game;
+
+       function startBossFight() {
+           document.getElementById('startScreen').style.display = 'none';
+           
+           game = new BossFight();
+           game.startGame();
+       }
+
+       function pauseGame() {
+           if (game && game.gameStarted) {
+               game.isPaused = true;
+               game.bossMusic.pause();
+               document.getElementById('pauseMenu').style.display = 'flex';
+           }
+       }
+
+       function resumeGame() {
+           if (game) {
+               game.isPaused = false;
+               document.getElementById('pauseMenu').style.display = 'none';
+               game.bossMusic.play().catch(e => console.log('Music resume failed:', e));
+           }
+       }
+   </script>
+</body>
+</html>
