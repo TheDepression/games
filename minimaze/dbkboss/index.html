@@ -725,8 +725,9 @@
             
             positionElements() {
                 // Position player
-                this.player.style.left = (this.playerX - 16) + 'px';
-                this.player.style.top = (this.playerY - 16) + 'px';
+                const visualOffset = 4;
+this.player.style.left = (this.playerX - visualOffset) + 'px';
+this.player.style.top = (this.playerY - visualOffset) + 'px';
                 
                 // Position machine
                 this.machine.style.left = '190px';
