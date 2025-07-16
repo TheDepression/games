@@ -450,7 +450,7 @@
                 
                 // Attack system
                 this.attackCooldown = false;
-                this.attackRange = this.hasEnhancedRange ? 100 : 50;
+                this.attackRange = this.hasEnhancedRange ? 120 : 65;
                 this.attackDamage = this.calculateAttackDamage();
                 this.lastTap = 0;
                 this.lastTapX = null;
@@ -1104,7 +1104,7 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
            }
            
            checkAttackHits() {
-               const effectiveRange = this.hasEnhancedRange ? 100 : 50;
+               const effectiveRange = this.hasEnhancedRange ? 120 : 65;
                
                // Check machine hit
                if (!this.machineDestroyed) {
