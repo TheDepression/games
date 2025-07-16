@@ -420,9 +420,9 @@
             const gameState = JSON.parse(savedState);
             
             // Check if they're coming from cutscene3
-            if (gameState.currentUrl !== 'cutscene3') {
+            if (gameState.currentUrl !== 'dbkboss') {
                 alert('Invalid access! Complete the castle first.');
-                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                window.location.href = 'https://thedepression.github.io/games/minimaze/castle';
                 return;
             }
         });
