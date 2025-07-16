@@ -1253,7 +1253,6 @@ this.gameWorld.appendChild(scientist);
         {x: 230, y: 530, w: 20, h: 100},
         {x: 170, y: 380, w: 20, h: 100},
         {x: 40, y: 310, w: 100, h: 20},
-        {x: 190, y: 240, w: 20, h: 60},
         {x: 240, y: 230, w: 20, h: 90},
         {x: 260, y: 180, w: 90, h: 20}
     ];
@@ -1267,7 +1266,7 @@ this.gameWorld.appendChild(scientist);
                if (floorNumber === 8) {
                    const boss = document.createElement('div');
                    boss.className = 'boss';
-                   boss.style.left = '175px';
+                   boss.style.left = '155px';
                    boss.style.top = '120px';
                    boss.dataset.type = 'boss';
                    this.gameWorld.appendChild(boss);
@@ -1334,8 +1333,8 @@ this.gameWorld.appendChild(scientist);
        this.createBear(80, 680);
         this.createBear(260, 680);
     } else if (floorNumber === 8) {
-       this.createBear(60, 620);
-        this.createBear(300, 620);
+       this.createBear(40, 620);
+        this.createBear(280, 620);
     }
 }
 
