@@ -725,7 +725,8 @@
             
             positionElements() {
                 // Position player
-                const visualOffset = 4;
+                // In updatePlayer() and positionElements()
+const visualOffset = (32 - 24) / 2; // = 4
 this.player.style.left = (this.playerX - visualOffset) + 'px';
 this.player.style.top = (this.playerY - visualOffset) + 'px';
                 
@@ -792,7 +793,8 @@ this.player.style.top = (this.playerY - visualOffset) + 'px';
                    if (this.canMoveTo(newX, newY)) {
                        this.playerX = newX;
                        this.playerY = newY;
-                       const visualOffset = 4; // Same as castle: (32 - 24) / 2
+                       // In updatePlayer() and positionElements()
+const visualOffset = (32 - 24) / 2; // = 4
 this.player.style.left = (this.playerX - visualOffset) + 'px';
 this.player.style.top = (this.playerY - visualOffset) + 'px';
                        
