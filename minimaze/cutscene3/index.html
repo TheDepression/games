@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Frog: Cat Rescue</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #endingContainer {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #mediaContainer {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: #222;
+            border: 3px solid #daa520;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #endingVideo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        
+        #endingImage {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        
+        #subtitleBox {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #daa520;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        #navigationContainer {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        button {
+            background: #daa520;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #b8860b;
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        #nextButton {
+            display: block;
+        }
+        
+        #fightButton {
+            background: #ff6b35;
+            display: none;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        
+        #fightButton:hover {
+            background: #ff5722;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="startScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center;">
+        <h2>🌸 Cat Rescue Mission</h2>
+        <p style="font-size: 18px; margin: 20px 0;">You've reached the mysterious island...</p>
+        <button class="start-button" style="background: #ff6b35; font-size: 20px; padding: 15px 30px;" onclick="startEnding()">Watch Cutscene</button>
+    </div>
+
+    <div id="endingContainer">
+        <div id="mediaContainer">
+            <video id="endingVideo" muted playsinline disablepictureinpicture>
+                <source src="" type="video/quicktime">
+                Your browser does not support the video element.
+            </video>
+            <img id="endingImage" src="" alt="Ending Scene">
+        </div>
+        <div id="subtitleBox">
+            <p id="subtitleText">Loading...</p>
+        </div>
+        <div id="navigationContainer">
+            <button id="nextButton" onclick="nextSlide()" disabled>Next</button>
+            <button id="fightButton" onclick="startFight()">Fight!</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/TheDepression/Sounds/main/cutscene.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Check access on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('mfGameState');
+            if (!savedState) {
+                alert('No game data found! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+                return;
+            }
+
+            const gameState = JSON.parse(savedState);
+            
+            // Check if they completed the gorilla encounter (have access to this cutscene)
+            if (!gameState.gorillaEncounterComplete) {
+                alert('You must complete the gorilla encounter first!');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+            
+            // Check if they're coming from maze2
+            if (gameState.currentUrl !== 'cutscene2') {
+                alert('Invalid access! Redirecting to proper location.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+                return;
+            }
+        });
+
+        // Cutscene sequence data
+        const endingSequence = [
+            {
+                type: 'image',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/sc21-min.png',
+                subtitle: 'Oh look! There she is!!!'
+            },
+            {
+                type: 'image',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/cs22-min.png',
+                subtitle: 'Don\'t worry, cat... I am here to rescue you!'
+            },
+            {
+                type: 'image',
+                src: 'https://raw.githubusercontent.com/TheDepression/Photos/main/Thumbnails/cs23-min.png',
+                subtitle: 'Watch out, frog! The P-Monster is guarding me!!'
+            }
+        ];
+
+        let currentSlide = 0;
+        let nextButtonTimer = null;
+
+        function init() {
+            // Don't start anything automatically - wait for user interaction
+        }
+
+        function startEnding() {
+            // Hide start screen
+            document.getElementById('startScreen').style.display = 'none';
+            
+            // Start background music
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.play().catch(e => console.log('Music play failed:', e));
+            
+            // Show first slide
+            showSlide(0);
+        }
+
+        function showSlide(index) {
+            const video = document.getElementById('endingVideo');
+            const image = document.getElementById('endingImage');
+            const subtitle = document.getElementById('subtitleText');
+            const nextButton = document.getElementById('nextButton');
+            const fightButton = document.getElementById('fightButton');
+            const currentItem = endingSequence[index];
+
+            // Update subtitle
+            subtitle.textContent = currentItem.subtitle;
+
+            // Clear any existing timer
+            if (nextButtonTimer) {
+                clearTimeout(nextButtonTimer);
+                nextButtonTimer = null;
+            }
+
+            // Disable next button initially
+            nextButton.disabled = true;
+
+            if (currentItem.type === 'video') {
+                // Show video, hide image
+                video.style.display = 'block';
+                image.style.display = 'none';
+                
+                video.src = currentItem.src;
+                video.load();
+                
+                // Enable next button when video ends
+                video.onended = function() {
+                    nextButton.disabled = false;
+                };
+                
+                // Auto-play video with better error handling
+                video.play().then(() => {
+                    console.log('Video started playing');
+                }).catch(e => {
+                    console.log('Video play failed:', e);
+                    // If video fails to play, enable next button after 3 seconds
+                    setTimeout(() => {
+                        nextButton.disabled = false;
+                    }, 3000);
+                });
+                
+            } else {
+                // Show image, hide video
+                video.style.display = 'none';
+                image.style.display = 'block';
+                
+                image.src = currentItem.src;
+                
+                // Add fade effect
+                image.classList.add('fade-in');
+                setTimeout(() => image.classList.remove('fade-in'), 500);
+                
+                // Enable next button after 5 seconds for images
+                nextButtonTimer = setTimeout(() => {
+                    nextButton.disabled = false;
+                }, 5000);
+            }
+
+            // Check if this is the last slide
+if (index === endingSequence.length - 1) {
+    nextButton.style.display = 'none';
+    fightButton.style.display = 'block';
+    fightButton.disabled = true; // Disable initially
+    
+    // Enable fight button after 3 seconds
+    setTimeout(() => {
+        fightButton.disabled = false;
+    }, 3000);
+} else {
+    nextButton.style.display = 'block';
+    fightButton.style.display = 'none';
+}
+        }
+
+        function nextSlide() {
+            if (currentSlide < endingSequence.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function startFight() {
+            // Stop music
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.pause();
+            
+            // Load and save all game state data
+            const savedState = localStorage.getItem('mfGameState');
+            if (savedState) {
+                const gameState = JSON.parse(savedState);
+                
+                // Update current URL to track progression
+                gameState.currentUrl = 'dbkboss';
+                gameState.lastSaveTime = Date.now();
+                
+                // Save the updated state
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                
+                // Transfer to pink boss fight
+                window.location.href = 'https://thedepression.github.io/games/minimaze/dbkboss';
+            } else {
+                // No game state, send back to maze2
+                alert('Game state lost! Returning to main world.');
+                window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+            }
+        }
+
+        // Start when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
