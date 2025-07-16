@@ -500,7 +500,7 @@
                 
                 // Attack system (from maze2)
                 this.attackCooldown = false;
-                this.attackRange = this.hasEnhancedRange ? 100 : 50;
+                this.attackRange = this.hasEnhancedRange ? 120 : 65;
                 this.attackDamage = this.calculateAttackDamage();
                 this.lastTap = 0;
                 this.lastTapX = null;
@@ -1849,7 +1849,7 @@ canEnemyMoveTo(x, y) {
 }
 
             checkBreakableWallHits() {
-    const effectiveRange = this.hasEnhancedRange ? 100 : 50;
+    const effectiveRange = this.hasEnhancedRange ? 120 : 65;
     
     const directionOffsets = {
         'n': {x: 0, y: -35}, 'ne': {x: 25, y: -25}, 'e': {x: 35, y: 0},
@@ -1895,7 +1895,7 @@ canEnemyMoveTo(x, y) {
 }
 
             checkAttackHits(attackX, attackY) {
-    const effectiveRange = this.hasEnhancedRange ? 100 : 50;
+    const effectiveRange = this.hasEnhancedRange ? 120 : 65;
     
     this.enemies.forEach(enemy => {
         if (!enemy.alive) return;
