@@ -467,7 +467,7 @@
                 this.bossHp = 9000;
                 this.bossMode = 'tracking'; // tracking, bubble
                 this.bossDirection = 1; // 1 for right, -1 for left
-                this.bossSpeed = 1.0;
+                this.bossSpeed = 1.2;
                 this.bossLastModeChange = Date.now();
                 this.bossAttackTimer = Date.now();
                 this.bossStopTimer = Date.now();
@@ -935,7 +935,7 @@
                    } else {
                        // All shot, check if we should do another cycle
                        this.bubbleCycles++;
-                       if (this.bubbleCycles < 3) {
+                       if (this.bubbleCycles < 2) {
                            // Start next cycle
                            this.createPMonsterRing();
                        } else {
@@ -947,27 +947,26 @@
            }
            
            shootPMonster(pm) {
-               pm.shot = true;
-               
-               // Calculate direction to player
-               const deltaX = this.playerX - (parseInt(pm.element.style.left) + 17.5);
-               const deltaY = this.playerY - (parseInt(pm.element.style.top) + 12.5);
-               const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-               
-               // Convert to projectile
-               pm.element.className = 'p-monster-projectile';
-               pm.element.style.zIndex = '55';
-               
-               this.swordProjectiles.push({
-                   element: pm.element,
-                   x: parseInt(pm.element.style.left) + 17.5,
-                   y: parseInt(pm.element.style.top) + 12.5,
-                   directionX: deltaX / distance,
-                   directionY: deltaY / distance,
-                   speed: 3,
-                   type: 'pmonster'
-               });
-           }
+    pm.shot = true;
+    
+    // Calculate direction to player
+    const deltaX = this.playerX - (parseInt(pm.element.style.left) + 17.5);
+    const deltaY = this.playerY - (parseInt(pm.element.style.top) + 12.5);
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    // Keep the p-monster styling but change z-index
+    pm.element.style.zIndex = '55';
+    
+    this.swordProjectiles.push({
+        element: pm.element,
+        x: parseInt(pm.element.style.left) + 17.5,
+        y: parseInt(pm.element.style.top) + 12.5,
+        directionX: deltaX / distance,
+        directionY: deltaY / distance,
+        speed: 3,
+        type: 'pmonster'
+    });
+}
            
            exitBubbleMode() {
                this.bossMode = 'tracking';
