@@ -1378,21 +1378,22 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
                }, 1000);
            }
            
-           canMoveTo(x, y) {
+           // Replace the canMoveTo function in your boss battle file with this corrected version:
+
+canMoveTo(x, y) {
     const playerSize = 24;
     const padding = 2;
-    const halfSize = playerSize / 2; // 12
     
-    // Treat x,y as CENTER of player, so offset by halfSize
+    // Create collision points around the player - treating x,y as center coordinates
     const points = [
-        {x: x - halfSize + padding, y: y - halfSize + padding}, // top-left
-        {x: x + halfSize - padding, y: y - halfSize + padding}, // top-right  
-        {x: x - halfSize + padding, y: y + halfSize - padding}, // bottom-left
-        {x: x + halfSize - padding, y: y + halfSize - padding}, // bottom-right
-        {x: x, y: y - halfSize + padding}, // top-center
-        {x: x, y: y + halfSize - padding}, // bottom-center
-        {x: x - halfSize + padding, y: y}, // left-center
-        {x: x + halfSize - padding, y: y}  // right-center
+        {x: x + padding, y: y + padding},                    // top-left from center
+        {x: x + playerSize - padding, y: y + padding},       // top-right from center
+        {x: x + padding, y: y + playerSize - padding},       // bottom-left from center
+        {x: x + playerSize - padding, y: y + playerSize - padding}, // bottom-right from center
+        {x: x + playerSize/2, y: y + padding},               // top-center
+        {x: x + playerSize/2, y: y + playerSize - padding},  // bottom-center
+        {x: x + padding, y: y + playerSize/2},               // left-center
+        {x: x + playerSize - padding, y: y + playerSize/2}   // right-center
     ];
     
     const walls = this.gameWorld.querySelectorAll('.boss-wall');
