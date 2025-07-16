@@ -1262,15 +1262,31 @@ this.gameWorld.appendChild(scientist);
     });
 }
                
-               // Floor 8 boss
-               if (floorNumber === 8) {
-                   const boss = document.createElement('div');
-                   boss.className = 'boss';
-                   boss.style.left = '155px';
-                   boss.style.top = '120px';
-                   boss.dataset.type = 'boss';
-                   this.gameWorld.appendChild(boss);
-               }
+               // Floor 8 boss and decoration
+if (floorNumber === 8) {
+    // Machine decoration
+    const machine = document.createElement('div');
+    machine.style.position = 'absolute';
+    machine.style.left = '140px';
+    machine.style.top = '60px';
+    machine.style.width = '80px';
+    machine.style.height = '40px';
+    machine.style.backgroundImage = 'url("https://raw.githubusercontent.com/TheDepression/Photos/main/machine-min.png")';
+    machine.style.backgroundSize = 'contain';
+    machine.style.backgroundRepeat = 'no-repeat';
+    machine.style.backgroundPosition = 'center';
+    machine.style.filter = 'brightness(1.4) drop-shadow(0 0 8px rgba(0,255,255,0.6))';
+    machine.style.zIndex = '35';
+    this.gameWorld.appendChild(machine);
+    
+    // Boss
+    const boss = document.createElement('div');
+    boss.className = 'boss';
+    boss.style.left = '155px';
+    boss.style.top = '120px';
+    boss.dataset.type = 'boss';
+    this.gameWorld.appendChild(boss);
+}
            }
 
         
