@@ -2110,7 +2110,8 @@ takeDamage() {
                 // Save current state including pineapple power for cutscene
                 this.saveGameStateWithPineapple();
                 this.showMessage('👑 Confronting the final boss...');
-                
+                this.gameStarted = false;
+               clearInterval(this.timerInterval);
                 setTimeout(() => {
                     window.location.href = 'https://thedepression.github.io/games/minimaze/cutscene3';
                 }, 2000);
