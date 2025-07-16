@@ -1379,16 +1379,42 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
            }
            
            canMoveTo(x, y) {
-               const playerSize = 24;
-               const padding = 2;
-               
-               // Check bounds
-               if (x - 12 < 40 || x + 12 > 460 || y - 12 < 60 || y + 12 > 480) {
-                   return false;
-               }
-               
-               return true;
-           }
+    const playerSize = 24;
+    const padding = 2;
+    const halfSize = playerSize / 2; // 12
+    
+    // Treat x,y as CENTER of player, so offset by halfSize
+    const points = [
+        {x: x - halfSize + padding, y: y - halfSize + padding}, // top-left
+        {x: x + halfSize - padding, y: y - halfSize + padding}, // top-right  
+        {x: x - halfSize + padding, y: y + halfSize - padding}, // bottom-left
+        {x: x + halfSize - padding, y: y + halfSize - padding}, // bottom-right
+        {x: x, y: y - halfSize + padding}, // top-center
+        {x: x, y: y + halfSize - padding}, // bottom-center
+        {x: x - halfSize + padding, y: y}, // left-center
+        {x: x + halfSize - padding, y: y}  // right-center
+    ];
+    
+    const walls = this.gameWorld.querySelectorAll('.boss-wall');
+    
+    for (let wall of walls) {
+        const wallRect = {
+            left: parseInt(wall.style.left),
+            top: parseInt(wall.style.top),
+            right: parseInt(wall.style.left) + parseInt(wall.style.width),
+            bottom: parseInt(wall.style.top) + parseInt(wall.style.height)
+        };
+        
+        for (let point of points) {
+            if (point.x >= wallRect.left && point.x <= wallRect.right &&
+                point.y >= wallRect.top && point.y <= wallRect.bottom) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
            
            canBossMoveTo(x, y) {
                const bossSize = 75;
