@@ -1248,8 +1248,8 @@ if (this.bossMode !== 'bubble') {
                        );
                        
                        if (machineDistance < 30) {
-                           this.machineHp -= 500;
-                           this.showDamageText(250, 85, 500, '#ffaa00');
+                           this.machineHp -= 1000;
+                           this.showDamageText(250, 85, 1000, '#ffaa00');
                            
                            if (this.machineHp <= 0) {
                                this.machineHp = 0;
@@ -1276,7 +1276,7 @@ if (this.bossMode !== 'bubble') {
                            this.showMessage('🍍 Bubble broken!');
                        } else {
                            // Normal damage
-                           const damage = this.machineDestroyed ? 500 : 10;
+                           const damage = this.machineDestroyed ? 1000 : 10;
                            this.bossHp -= damage;
                            this.showDamageText(this.bossX, this.bossY, damage, '#ffaa00');
                            
