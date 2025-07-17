@@ -359,7 +359,6 @@
         <div id="ui">
             <div>⚔️ Final Boss Fight</div>
             <div>❤️ <span id="hearts">3</span></div>
-            <div>💰 <span id="money">0</span>¥</div>
             <div>🤖 Machine: <span id="machineHp">2500</span></div>
             <div>👹 Boss: <span id="bossHp">9000</span></div>
         </div>
@@ -866,7 +865,7 @@ this.player.style.top = (this.playerY - visualOffset) + 'px';
                    }
                    
                    // Throw swords randomly (3-5 second intervals)
-                   if (now - this.bossAttackTimer > (3000 + Math.random() * 2000)) {
+                   if (now - this.bossAttackTimer > (5000 + Math.random() * 2000)) {
                        this.throwSword();
                        this.bossAttackTimer = now;
                    }
@@ -985,28 +984,36 @@ this.player.style.top = (this.playerY - visualOffset) + 'px';
            }
            
            throwSword() {
-               const sword = document.createElement('div');
-               sword.className = 'sword-projectile';
-               sword.textContent = '⚔️';
-               sword.style.left = (this.bossX - 10) + 'px';
-               sword.style.top = (this.bossY - 10) + 'px';
-               this.gameWorld.appendChild(sword);
-               
-               // Calculate direction to player
-               const deltaX = this.playerX - this.bossX;
-               const deltaY = this.playerY - this.bossY;
-               const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-               
-               this.swordProjectiles.push({
-                   element: sword,
-                   x: this.bossX,
-                   y: this.bossY,
-                   directionX: deltaX / distance,
-                   directionY: deltaY / distance,
-                   speed: 4,
-                   type: 'sword'
-               });
-           }
+    // Throw 4 swords simultaneously
+    for (let i = 0; i < 4; i++) {
+        const sword = document.createElement('div');
+        sword.className = 'sword-projectile';
+        sword.textContent = '⚔️';
+        sword.style.left = (this.bossX - 10) + 'px';
+        sword.style.top = (this.bossY - 10) + 'px';
+        this.gameWorld.appendChild(sword);
+        
+        // Calculate direction to player
+        const deltaX = this.playerX - this.bossX;
+        const deltaY = this.playerY - this.bossY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        // Add slight spread to each sword (so they don't all go exactly the same direction)
+        const spread = (i - 1.5) * 0.1; // Creates spread of -0.3, -0.1, 0.1, 0.3
+        const directionX = (deltaX / distance) + spread;
+        const directionY = (deltaY / distance) + spread;
+        
+        this.swordProjectiles.push({
+            element: sword,
+            x: this.bossX,
+            y: this.bossY,
+            directionX: directionX,
+            directionY: directionY,
+            speed: 3.5,
+            type: 'sword'
+        });
+    }
+}
            
            updateProjectiles() {
                if (this.isPaused) return;
@@ -1577,7 +1584,6 @@ canMoveTo(x, y) {
            
            updateUI() {
                document.getElementById('hearts').textContent = this.hearts;
-               document.getElementById('money').textContent = this.money;
                document.getElementById('machineHp').textContent = this.machineDestroyed ? 'DESTROYED' : this.machineHp;
                document.getElementById('bossHp').textContent = this.bossHp;
                
