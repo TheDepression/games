@@ -29,19 +29,16 @@
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
              touch-action: pinch-zoom; /* ADD THIS LINE */
-              /* Calculate scale to fit 350px into container width */
-    --game-scale: calc(100vw / 350);
         }
         
         #gameArea {
-    width: 350px;
-    height: 357.5px;
+    width: 100%;
+    height: calc(100% * 357.5 / 550);
     position: relative;
     overflow: hidden;
     background: linear-gradient(45deg, #d2d4cb 0%, #bfbfb2 50%, #c1c7b3 100%);
     touch-action: pinch-zoom; /* ADD THIS LINE */
-               transform-origin: top left;
-    transform: scale(calc(100vw / 350px));
+          
 }
         
         #gameWorld {
