@@ -4749,6 +4749,26 @@ openGate(gateId) {
     
     game.pendingAction = null;
 }
+
+        // ADD THIS NEW CODE HERE:
+        // Prevent double-tap zoom but allow pinch zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            let now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                // Only prevent if it's NOT on the game container
+                if (!event.target.closest('#gameContainer')) {
+                    event.preventDefault();
+                }
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Apply no double-tap zoom to everything except game container
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.touchAction = 'manipulation';
+            document.getElementById('gameContainer').style.touchAction = 'pinch-zoom';
+        });
     </script>
 </body>
 </html>
