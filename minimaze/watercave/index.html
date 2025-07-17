@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>watercave</title>
+</head>
+<body style="background: #000; color: white; text-align: center; padding: 50px;">
+    <h2>🕳️ どこ行くの？ ...</h2>
+    <script>
+        // Update player position and redirect back
+        const gameState = JSON.parse(localStorage.getItem('mfGameState'));
+        gameState.playerX = 50;
+        gameState.playerY = 260;
+        gameState.currentUrl = 'maze2';
+        localStorage.setItem('mfGameState', JSON.stringify(gameState));
+        
+        // Redirect after 1 second
+        setTimeout(() => {
+            window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
+        }, 1000);
+    </script>
+</body>
+</html>
