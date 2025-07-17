@@ -2009,7 +2009,7 @@ this.gameWorld.appendChild(fakeQuicksand);
   {x: 140, y: 60, w: 10, h: 200},
   {x: 140, y: 60, w: 140, h: 10},
   {x: 240, y: 60, w: 10, h: 80},
-  {x: 80, y: 100, w: 10, h: 220},
+  {x: 80, y: 100, w: 10, h: 260},
   {x: 260, y: 320, w: 100, h: 10},
   {x: 480, y: 0, w: 10, h: 60},
   {x: 480, y: 60, w: 360, h: 10},
@@ -2081,6 +2081,7 @@ this.gameWorld.appendChild(fakeQuicksand);
 {x: 1000, y: 350, w: 70, h: 7},{x: 980, y: 310, w: 110, h: 40},{x: 1000, y: 300, w: 70, h: 10},
   {x: 100, y: 1990, w: 60, h: 110},
   {x: 160, y: 1960, w: 60, h: 50},
+            {x: 10, y: 200, w: 50, h: 50}, // secret money warp left side
   {x: 270, y: 2220, w: 220, h: 50},
   {x: 1340, y: 1360, w: 160, h: 50},
   {x: 980, y: 1920, w: 50, h: 80},
@@ -2478,7 +2479,8 @@ refreshGorilla() {
         {x: 960, y: 2360, id: 'weak_point_3', url: 'caved'},
         {x: 860, y: 620, id: 'weak_point_4', url: 'casino'},
         {x: 1020, y: 340, id: 'weak_point_5', url: 'leaveforest'},
-        {x: 2320, y: 820, id: 'weak_point_6', url: 'watercave'}
+        {x: 2320, y: 820, id: 'weak_point_6', url: 'watercave'},
+        {x: 20, y: 230, id: 'weak_point_7', url: 'watercave2'}
     ];
     
     weakPointPositions.forEach(pos => {
@@ -2654,7 +2656,15 @@ createCollectibles() {
         {x: 1900, y: 1870, id: 'money_n12'},
         {x: 2200, y: 700, id: 'money_n13'},
         {x: 2300, y: 700, id: 'money_n14'},
-        {x: 2200, y: 800, id: 'money_n15'}
+        {x: 2200, y: 800, id: 'money_n15'},
+                {x: 20, y: 330, id: 'money_n16'},
+        {x: 30, y: 340, id: 'money_n17'},
+        {x: 40, y: 320, id: 'money_n18'},
+        {x: 50, y: 330, id: 'money_n19'},
+                {x: 60, y: 320, id: 'money_n20},
+        {x: 50, y: 1000, id: 'money_n21'},
+        {x: 60, y: 1000, id: 'money_n22'},
+        {x: 860, y: 800, id: 'money_n23'}
     ];
 
     moneyPositions.forEach(pos => {
