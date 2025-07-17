@@ -305,22 +305,29 @@ video.onended = function() {
                 }, 5000);
             }
 
-            if (currentItem.type === 'video') {
-    video.onended = function() {
-        fightButton.disabled = false;
-        // Show replay button for videos only
-        document.getElementById('replayButton').style.display = 'block';
-    };
+            // Check if this is the last slide
+if (index === endingSequence.length - 1) {
+    nextButton.style.display = 'none';
+    fightButton.style.display = 'block';
+    fightButton.disabled = true; // Disable initially
+    
+    // For the video (last slide), enable fight button when video ends
+    if (currentItem.type === 'video') {
+        video.onended = function() {
+            fightButton.disabled = false;
+            // Show replay button for videos only
+            document.getElementById('replayButton').style.display = 'block';
+        };
+    } else {
+        // If it's an image, enable after 3 seconds
+        setTimeout(() => {
+            fightButton.disabled = false;
+        }, 3000);
+    }
 } else {
-                    // If it's an image, enable after 3 seconds
-                    setTimeout(() => {
-                        fightButton.disabled = false;
-                    }, 3000);
-                }
-             else {
-                nextButton.style.display = 'block';
-                fightButton.style.display = 'none';
-            }
+    nextButton.style.display = 'block';
+    fightButton.style.display = 'none';
+}
         }
 
         
