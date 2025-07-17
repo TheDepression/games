@@ -1748,7 +1748,7 @@ this.pineappleProjectiles.forEach((projectile, index) => {
         );
         
         if (distance < 25) {
-            enemy.hp -= 500; // Pineapple damage
+            enemy.hp -= 1000; // Pineapple damage
             
             // Damage text
             const damageText = document.createElement('div');
@@ -1759,7 +1759,7 @@ this.pineappleProjectiles.forEach((projectile, index) => {
             damageText.style.pointerEvents = 'none';
             damageText.style.zIndex = '500';
             damageText.style.animation = 'damageFloat 1s ease-out';
-            damageText.textContent = '🍍-500';
+            damageText.textContent = '🍍-1000';
             damageText.style.left = enemy.currentX + 'px';
             damageText.style.top = enemy.currentY + 'px';
             this.gameWorld.appendChild(damageText);
@@ -2532,7 +2532,7 @@ if (this.hasPineapplePower) {
     </div>
     <div style="margin-bottom: 10px;">🍍 <strong>Pineapple Power Upgrade</strong></div>
     <div style="font-size: 12px; margin-bottom: 8px;">
-        • Shoots powerful pineapple projectiles (500 damage)<br>
+        • Shoots powerful pineapple projectiles (1000 damage)<br>
         • Recharges after 10 seconds of not shooting<br>
         • Works with your gun attacks<br>
         • Melts when you leave the castle
