@@ -1136,13 +1136,27 @@ attackEl.style.top = (this.playerY + offset.y - visualCenterY + 12) + 'px';
                }
                
                // Check boss hit (only if not in bubble mode)
-               if (this.bossMode !== 'bubble') {
-                   const bossDistance = Math.sqrt(
-                       Math.pow(this.playerX - this.bossX, 2) +
-                       Math.pow(this.playerY - this.bossY, 2)
-                   );
-                   
-                   if (bossDistance <= effectiveRange && this.isInFrontOfPlayer(this.bossX - this.playerX, this.bossY - this.playerY)) {
+if (this.bossMode !== 'bubble') {
+    // Extend hitbox on left and top sides
+    let adjustedBossX = this.bossX;
+    let adjustedBossY = this.bossY;
+    
+    // If player is to the left of boss, extend boss hitbox left by 20px
+    if (this.playerX < this.bossX) {
+        adjustedBossX = this.bossX - 16;
+    }
+    
+    // If player is above boss, extend boss hitbox up by 20px
+    if (this.playerY < this.bossY) {
+        adjustedBossY = this.bossY - 16;
+    }
+    
+    const bossDistance = Math.sqrt(
+        Math.pow(this.playerX - adjustedBossX, 2) +
+        Math.pow(this.playerY - adjustedBossY, 2)
+    );
+    
+    if (bossDistance <= effectiveRange && this.isInFrontOfPlayer(this.bossX - this.playerX, this.bossY - this.playerY)) {
                        let damage = this.machineDestroyed ? this.attackDamage : 10;
                        this.bossHp -= damage;
                        
