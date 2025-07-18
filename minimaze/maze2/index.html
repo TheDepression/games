@@ -3658,8 +3658,8 @@ if (inQuicksand && closestQuicksand) {
             // If just entered lava zone, start protection (but only if not already active)
             if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
                 this.lavaProtectionActive = true;
-                this.lavaProtectionTime = 5; // 5 seconds of protection
-                this.showMessage('🥾 ⏰5 seconds of protection');
+                this.lavaProtectionTime = 8; // 8 seconds of protection
+                this.showMessage('🥾 ⏰8 seconds of protection');
             }
             
             // Count down protection time
@@ -3694,9 +3694,9 @@ if (inQuicksand && closestQuicksand) {
         }
     } else {
         // Not on lava - reset protection for next time (ONLY HERE)
-        if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
+        if (this.hasLavaShoes && this.lavaProtectionTime !== 8) {
             this.lavaProtectionActive = false;
-            this.lavaProtectionTime = 5; // Reset to full protection
+            this.lavaProtectionTime = 8; // Reset to full protection
             if (this.wasOnLava) {  // Only show message if actually was on lava
                 this.showMessage('🥾 Left the lava! Power recharged for next time! ☺️');
             }
