@@ -384,6 +384,12 @@
                 this.caveMusic = document.getElementById('caveMusic');
 
                 this.frameCount = 0;
+                // Add this at the end of the constructor
+    window.addEventListener('resize', () => {
+        if (this.gameStarted) {
+            this.calculateScale();
+        }
+    });
                 
                 this.preloadPlayerImages();
                 this.setupControls();
@@ -1324,6 +1330,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
            
            startGame() {
                this.gameStarted = true;
+               this.calculateScale(); // ADD THIS LINE
                this.startGameLoop();
                this.startTimer();
                
@@ -1978,6 +1985,18 @@ gameState.collectedPurpleHearts = this.collectedPurpleHearts;
                     message.style.display = 'none';
                 }, 2500);
             }
+
+            calculateScale() {
+        const gameArea = document.getElementById('gameArea');
+        const gameAreaWidth = gameArea.offsetWidth;
+        const gameAreaHeight = gameArea.offsetHeight;
+        
+        const scaleX = gameAreaWidth / 350;
+        const scaleY = gameAreaHeight / 357.5;
+        const scale = Math.min(scaleX, scaleY);
+        
+        document.documentElement.style.setProperty('--scale-factor', scale);
+    }
         }
 
         let game;
@@ -2003,6 +2022,10 @@ gameState.collectedPurpleHearts = this.collectedPurpleHearts;
             
             game = new CaveD();
             game.startGame();
+            // Add a small delay to ensure DOM is ready, then calculate scale
+    setTimeout(() => {
+        game.calculateScale();
+    }, 100);
         }
 
         function pauseGame() {
