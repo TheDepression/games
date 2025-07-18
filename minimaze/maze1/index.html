@@ -3447,19 +3447,13 @@ function cancelReset() {
 }
 
 function confirmReset() {
-    // Clear all Master Frog related localStorage except name
-    const playerName = localStorage.getItem('mfPlayerName');
+    // Clear all Master Frog related localStorage
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
         if (key.startsWith('mf')) {
             localStorage.removeItem(key);
         }
     });
-    
-    // Restore the name if it existed
-    if (playerName) {
-        localStorage.setItem('mfPlayerName', playerName);
-    }
     
     // Redirect to the very beginning
     window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
