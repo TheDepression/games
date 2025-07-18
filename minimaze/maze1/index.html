@@ -3467,28 +3467,6 @@ function confirmReset() {
 // end of newest update
 
         
-function startNewGame() {
-    const savedState = localStorage.getItem('mfGameState');
-    if (savedState) {
-        if (!confirm('ほんとうに いいの？　いまの げんざいちを けして、さいしょから はじまるよ。')) {
-            return; // User cancelled
-        }
-    }
-    
-    // Clear ALL Master Frog related localStorage INCLUDING name
-    const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-        if (key.startsWith('mf')) {
-            localStorage.removeItem(key);
-        }
-    });
-    
-    // Show name input again
-    document.getElementById('welcomeMessage').textContent = '🌍世界を助ける';
-    document.getElementById('nameInput').style.display = 'block';
-    document.getElementById('gameOptions').style.display = 'none';
-    document.getElementById('saveStateInfo').style.display = 'none';
-}
 
 function continueGame() {
     // Check URL access first
