@@ -29,7 +29,7 @@
         }
         
         #gameContainer {
-    width: 100vw;
+    width: min(100vw, 650px); /* This limits width to 650px max */
     aspect-ratio: 100 / 150; /* This makes height 50% taller than width */
     background: #1a1a1a;
     border: 3px solid #444;
@@ -55,6 +55,7 @@
             height: 357.5px;
             transform-origin: 0 0;
             transition: none;
+            transform: scale(var(--scale-factor));
         }
         
         .room {
@@ -172,60 +173,7 @@
     z-index: 250;
 }
         
-        #ui {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 250;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            border: 1px solid #666;
-            pointer-events: none;
-        }
-        
-        #timer {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 250;
-            background: rgba(255,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid #665;
-            pointer-events: none;
-        }
-        
-        #deathCounter {
-            position: fixed;
-            top: 10px;
-            right: 90px;
-            z-index: 250;
-            background: rgba(128,0,128,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid #665;
-            pointer-events: none;
-        }
-        
-        #pauseBtn {
-            position: fixed;
-            top: 10px;
-            right: 160px;
-            z-index: 250;
-            background: rgba(100,0,100,0.8);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            cursor: pointer;
-        }
+       
         
         #message {
             position: absolute;
@@ -1941,19 +1889,19 @@ gameState.collectedPurpleHearts = this.collectedPurpleHearts;
             }
             
             updateTimer() {
-                const minutes = Math.floor(this.timeElapsed / 60);
-                const seconds = this.timeElapsed % 60;
-                const timerEl = document.getElementById('timer');
-                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (this.timeElapsed >= 600) {
-                    timerEl.style.background = 'rgba(255,0,0,0.8)';
-                } else if (this.timeElapsed >= 300) {
-                    timerEl.style.background = 'rgba(255,165,0,0.8)';
-                } else {
-                    timerEl.style.background = 'rgba(0,128,0,0.8)';
-                }
-            }
+    const minutes = Math.floor(this.timeElapsed / 60);
+    const seconds = this.timeElapsed % 60;
+    const timerEl = document.getElementById('timer');
+    timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (this.timeElapsed >= 600) {
+        timerEl.style.background = 'rgba(255,0,0,0.8)';
+    } else if (this.timeElapsed >= 300) {
+        timerEl.style.background = 'rgba(255,165,0,0.8)';
+    } else {
+        timerEl.style.background = 'rgba(0,128,0,0.8)';
+    }
+}
             
             updateRoomInfo() {
                 // Room info is shown in timer for cave D
