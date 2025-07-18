@@ -1468,6 +1468,9 @@ createGoblin(x, y) {
            
            startGame() {
                this.gameStarted = true;
+               // Add this after this.gameStarted = true; in startGame()
+this.positionPlayer();
+this.centerCameraOnPlayer();
        //        this.calculateWidthScale(); // ADD THIS LINE
                this.startGameLoop();
                this.startTimer();
