@@ -2808,10 +2808,10 @@ if (onLava) {
     
     if (this.hasLavaShoes) {
         // If just entered lava zone, start protection (but only if not already active)
-        if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
+        if (!this.lavaProtectionActive && this.lavaProtectionTime >= 8) {
             this.lavaProtectionActive = true;
-            this.lavaProtectionTime = 5; // 5 seconds of protection
-            this.showMessage('🥾 ⏰５秒守る');
+            this.lavaProtectionTime = 8; // 8 seconds of protection
+            this.showMessage('🥾 ⏰8秒守る');
         }
         
         // Count down protection time
@@ -2848,7 +2848,7 @@ if (onLava) {
     // Not on lava - reset protection for next time (ONLY HERE)
     if (this.hasLavaShoes && this.lavaProtectionTime !== 5) {
         this.lavaProtectionActive = false;
-        this.lavaProtectionTime = 5; // Reset to full protection
+        this.lavaProtectionTime = 8; // Reset to full protection
         if (this.wasOnLava) {  // Only show message if actually was on lava
         this.showMessage('🥾 マグマからおりた！　つぎのために パワーかいふく！☺️');
     }
@@ -3082,13 +3082,13 @@ if (inForest) {
         }
     } else if (message === "🥾 マグマのくつ 800円！") {
         if (this.hasLavaShoes) {
-            this.showMessage('5秒以内にマグマから出てねそしてすぐまた使える');
+            this.showMessage('8秒以内にマグマから出てねそしてすぐまた使える');
         } else if (this.money >= 800) {
             this.money -= 800;
             this.hasLavaShoes = true;
             this.lavaProtectionTime = 0;
             this.lavaProtectionActive = false;
-            this.showMessage('🥾 マグマくつを買った5秒れんぞく守ってくれる');
+            this.showMessage('🥾 マグマくつを買った8秒れんぞく守ってくれる');
             this.updateUI();
             this.saveGameState();
         } else {
