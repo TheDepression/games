@@ -29,7 +29,7 @@
         }
         
         #gameContainer {
-    width: 100vw;
+    width: min(100vw, 650px); /* This limits width to 650px max */
     aspect-ratio: 100 / 150; /* This makes height 50% taller than width */
     background: #1a1a1a;
     border: 3px solid #444;
@@ -55,6 +55,8 @@
             height: 357.5px;
             transform-origin: 0 0;
             transition: none;
+             /* Add these scaling properties */
+    transform: scale(var(--scale-factor));
         }
         
         .room {
@@ -315,6 +317,26 @@ if (window.innerHeight <= 667) {
     document.head.appendChild(style);
 }
         class ZeldaCave {
+
+            // Add this method to your cave class
+calculateScale() {
+    const gameArea = document.getElementById('gameArea');
+    const gameAreaWidth = gameArea.offsetWidth;
+    const gameAreaHeight = gameArea.offsetHeight;
+    
+    const scaleX = gameAreaWidth / 350;
+    const scaleY = gameAreaHeight / 357.5;
+    const scale = Math.min(scaleX, scaleY); // Use the smaller scale to fit both dimensions
+    
+    document.documentElement.style.setProperty('--scale-factor', scale);
+}
+
+// Call this in your startGame() method and on window resize
+window.addEventListener('resize', () => {
+    if (this.gameStarted) {
+        this.calculateScale();
+    }
+});
 
 preloadPlayerImages() {
     const directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
