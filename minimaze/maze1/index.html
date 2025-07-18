@@ -572,7 +572,6 @@ z-index: 25;
     
     <div id="gameOptions">
         <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">つづける</button>
-        <button class="start-button" id="newGameButton" onclick="startNewGame()" style="display: none;">新しいゲーム</button>
     </div>
 </div>
         
@@ -654,13 +653,19 @@ saveInfo.style.display = 'block';
         document.getElementById('continueButton').style.display = 'inline-block';
         document.getElementById('newGameButton').style.display = 'inline-block';
     } else if (playerName) {
-        // Has name but no save
-        document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
-        const newGameBtn = document.getElementById('newGameButton');
-        newGameBtn.style.display = 'inline-block';
-        newGameBtn.className = 'start-button';
-        newGameBtn.textContent = 'Start Adventure';
-    } else {
+    // Has name but no save - show continue button as "Start Adventure"
+    document.getElementById('welcomeMessage').textContent = `Hello ${playerName}!`;
+    const continueBtn = document.getElementById('continueButton');
+    continueBtn.style.display = 'inline-block';
+    continueBtn.textContent = 'Start Adventure';
+    continueBtn.onclick = function() {
+        // Start new game instead of continue
+        document.getElementById('startScreen').style.display = 'none';
+        game = new MazeGame();
+        game.initLevel();
+        game.startGameTimer();
+    };
+} else {
         // No name - show name input  
         console.log('Showing name input'); // Debug line
         const nameInput = document.getElementById('nameInput');
