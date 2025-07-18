@@ -1038,16 +1038,17 @@ if (hitboxHit) {
     this.deathCount++;
     this.updateDeathCounter();
                
-                // SAVE IMMEDIATELY after death count increment
-    this.saveGameState();
+                // SAVE DEATH COUNT IMMEDIATELY to prevent reload exploit
+    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+    gameState.deathCount = this.deathCount;
+    localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 this.gameStarted = false;
                 this.bossMusic.pause();
                 
                 this.showMessage('💀 Defeated by the Guardian!');
                 
                 setTimeout(() => {
-                    // Save state and respawn in pyramid
-                    const gameState = JSON.parse(localStorage.getItem('mfGameState')) || {};
+                    
                     gameState.hearts = 3; // Reset hearts
                     gameState.money = this.money; // Keep money
                     gameState.timeElapsed = this.timeElapsed; // Keep accumulated time
