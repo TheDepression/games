@@ -721,20 +721,26 @@
         <div id="controlArea">
     <!-- Top section: Main instruction -->
     <div style="text-align: center;">
-        <div style="font-size: 24px; font-weight: bold; color: white;">🎮 Swipe to move, double-tap to shoot!</div>
+        <div style="font-size: 18px; font-weight: bold; color: white;">🎮 Swipe to move</div>
+        <div style="font-size: 18px; font-weight: bold; color: white;">🔫Double-tap to shoot</div>
     </div>
     
-    <!-- Bottom section: UI elements -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <div style="color: white; font-size: 14px;">🐸 Frog</div>
-            <div style="color: white; font-size: 14px;">❤️ <span id="hearts">3</span></div>
-            <div style="color: white; font-size: 14px;">💰 <span id="money">0</span>¥</div>
-            <div id="items" style="color: white; font-size: 14px;"></div>
+    <!-- Bottom section: UI elements in 3 centered lines -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <!-- Line 1: Frog, hearts, money -->
+        <div style="display: flex; gap: 16px; color: white; font-size: 16px;">
+            <div>🐸 Broken World</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <div id="timer" style="color: white; font-size: 12px; background: rgba(0,128,0,0.8); padding: 2px 6px; border-radius: 3px;">0:00</div>
-            <div id="deathCounter" style="color: white; font-size: 12px;">☠️0</div>
+        
+        <!-- Line 2: Items -->
+        <div id="items" style="color: white; font-size: 16px; text-align: center;"></div>
+        
+        <!-- Line 3: Timer and death count -->
+        <div style="display: flex; gap: 14px; color: white; font-size: 14px;">
+            <div id="timer" style="background: rgba(0,128,0,0.8); padding: 2px 6px; border-radius: 3px;">0:00</div>
+            <div id="deathCounter">☠️0</div>
         </div>
     </div>
 </div>
