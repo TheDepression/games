@@ -2605,9 +2605,14 @@ pineappleRechargeInterval: this.pineappleRechargeInterval,
     const gameArea = document.getElementById('gameArea');
     const gameAreaWidth = gameArea.offsetWidth;
     
-    const scaleX = gameAreaWidth / 350; // Only scale width, not height
+    const scaleX = gameAreaWidth / 350;
     
     document.documentElement.style.setProperty('--scale-factor-x', scaleX);
+    
+    // Also update the camera positioning after scaling
+    setTimeout(() => {
+        this.centerCameraOnPlayer();
+    }, 50);
 }
        }
 
