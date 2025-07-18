@@ -1330,6 +1330,10 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
             
             game = new ZeldaCave();
             game.startGame();
+            // Add a small delay to ensure DOM is ready, then calculate scale
+    setTimeout(() => {
+        game.calculateScale();
+    }, 100);
         }
 
         function pauseGame() {
