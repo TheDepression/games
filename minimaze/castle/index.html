@@ -42,7 +42,7 @@
         
         #gameArea {
             width: 100%;
-   // height: calc(100% * 357.5 / 570);
+    height: calc(100% * 357.5 / 570);
             position: relative;
             overflow: hidden;
             background: #4a4a4a;
@@ -56,6 +56,7 @@
             height: 900px;
             transform-origin: 0 0;
             transition: none;
+            transform: scaleX(var(--scale-factor-x));
         }
         
         
@@ -358,7 +359,6 @@
     </script>
 
     <div id="gameContainer">
-        <div id="ui">
         <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️</button>
         <div id="gameArea">
             <div id="gameWorld">
@@ -508,11 +508,11 @@ this.pineappleProjectiles = [];
                 this.setupControls();
 
                 // Add this at the end of the constructor, after setupControls()
-//    window.addEventListener('resize', () => {
- //       if (this.gameStarted) {
- //           this.calculateWidthScale();
- //       }
-//    });
+    window.addEventListener('resize', () => {
+        if (this.gameStarted) {
+            this.calculateWidthScale();
+        }
+    });
                 this.createFloor(this.currentFloor);
                 this.updatePlayerImage('s');
             }
@@ -1469,9 +1469,9 @@ createGoblin(x, y) {
            startGame() {
                this.gameStarted = true;
                // Add this after this.gameStarted = true; in startGame()
-this.positionPlayer();
-this.centerCameraOnPlayer();
-       //        this.calculateWidthScale(); // ADD THIS LINE
+//this.positionPlayer();
+//this.centerCameraOnPlayer();
+               this.calculateWidthScale(); // ADD THIS LINE
                this.startGameLoop();
                this.startTimer();
                
@@ -2604,19 +2604,19 @@ pineappleRechargeInterval: this.pineappleRechargeInterval,
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
 }
 
- //           calculateWidthScale() {
-//    const gameArea = document.getElementById('gameArea');
-//    const gameAreaWidth = gameArea.offsetWidth;
+            calculateWidthScale() {
+    const gameArea = document.getElementById('gameArea');
+    const gameAreaWidth = gameArea.offsetWidth;
     
-//    const scaleX = gameAreaWidth / 350;
+    const scaleX = gameAreaWidth / 350;
     
-//    document.documentElement.style.setProperty('--scale-factor-x', scaleX);
+    document.documentElement.style.setProperty('--scale-factor-x', scaleX);
     
     // Also update the camera positioning after scaling
-//    setTimeout(() => {
-//        this.centerCameraOnPlayer();
-//    }, 50);
-// }
+    setTimeout(() => {
+        this.centerCameraOnPlayer();
+    }, 50);
+ }
        }
 
        let game;
@@ -2627,9 +2627,9 @@ pineappleRechargeInterval: this.pineappleRechargeInterval,
            game = new CastleGame();
            game.startGame();
            // Add a small delay to ensure DOM is ready, then calculate scale
-//    setTimeout(() => {
-//        game.calculateWidthScale();
-//    }, 100);
+    setTimeout(() => {
+        game.calculateWidthScale();
+    }, 100);
        }
         function handleChoice(accepted) {
     if (game && game.currentChoice === 'pineapple') {
