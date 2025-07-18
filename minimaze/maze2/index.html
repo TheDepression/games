@@ -700,6 +700,14 @@
   </div>
 </div>
 
+        <div id="resetDialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 900;">
+    <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 300px; border: 2px solid #555;">
+        <p style="margin: 10px 0; font-size: 14px;">Are you sure? This will delete ALL progress and restart from the very beginning of Master Frog's Adventure.</p>
+        <button onclick="confirmReset()" style="background: #f44336; color: white; border: none; padding: 10px 15px; border-radius: 5px; margin: 5px;">Yes, Delete All</button>
+        <button onclick="cancelReset()" style="background: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 5px; margin: 5px;">Cancel</button>
+    </div>
+</div>
+
 <!-- Forest overlay and vision mask -->
 <div id="forestOverlay" class="forest-overlay"></div>
 <div id="forestVisionMask" class="forest-vision-mask"></div>
@@ -733,7 +741,7 @@
 </div>
         
         <div id="startScreen">
-            <button class="new-game-button" onclick="resetAllProgress()" style="background: #665; font-size: 12px; padding: 8px 16px; opacity: 0.7; margin-bottom: 40px;">ぜんぶ消す　さいしょから</button>
+            <button class="new-game-button" onclick="showResetDialog()" style="background: #665; font-size: 12px; padding: 8px 16px; opacity: 0.7; margin-bottom: 40px;">ぜんぶ消す　さいしょから</button>
             <h2>🐸 Broken World</h2>
             <div id="welcomeMessage" style="margin: 20px 0;">せかいがだいなしされた...</div>
             <p style="font-size: 12px; opacity: 0.8;">🔫 TNT gun　持ってる! 早く2回タップで　うつ</p>
@@ -4694,25 +4702,31 @@ openGate(gateId) {
             }
         }
 
-        function resetAllProgress() {
-    if (confirm('Are you sure? This will delete ALL progress and restart from the very beginning of Master Frog\'s Adventure.')) {
-        // Clear all Master Frog related localStorage except name (keep the name)
-        const playerName = localStorage.getItem('mfPlayerName');
-        const keys = Object.keys(localStorage);
-        keys.forEach(key => {
-            if (key.startsWith('mf')) {
-                localStorage.removeItem(key);
-            }
-        });
-        
-        // Restore the name if it existed
-        if (playerName) {
-            localStorage.setItem('mfPlayerName', playerName);
+        function showResetDialog() {
+    document.getElementById('resetDialog').style.display = 'flex';
+}
+
+function cancelReset() {
+    document.getElementById('resetDialog').style.display = 'none';
+}
+
+function confirmReset() {
+    // Clear all Master Frog related localStorage except name
+    const playerName = localStorage.getItem('mfPlayerName');
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+        if (key.startsWith('mf')) {
+            localStorage.removeItem(key);
         }
-        
-        // Redirect to the very beginning
-        window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+    });
+    
+    // Restore the name if it existed
+    if (playerName) {
+        localStorage.setItem('mfPlayerName', playerName);
     }
+    
+    // Redirect to the very beginning
+    window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
 }
 
         function confirmAction() {
