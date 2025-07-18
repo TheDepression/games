@@ -18,26 +18,51 @@
             align-items: center;
             min-height: 100vh;
         }
+
+          /* Prevent text selection/highlighting */
+*:not(button) {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Make sure game area and container don't allow selection */
+#gameArea, #gameContainer, #gameWorld {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+        .new-game-button {
+    -webkit-touch-callout: auto !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
+    pointer-events: auto !important;
+}
         
         #gameContainer {
-            width: 350px;
-            height: 550px;
+            width: min(100vw, 650px);
+    aspect-ratio: 100 / 150;
             background: #2a2a2a;
             border: 3px solid #555;
             border-radius: 15px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+             touch-action: pinch-zoom; /* ADD THIS LINE */
         }
         
         #gameArea {
-            width: 350px;
-            height: 357.5px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(45deg, #f7faed 0%, #f7f7e1 50%, #ebf7e1 100%);
-            touch-action: none;
-        }
+    width: 100%;
+    height: calc(100% * 357.5 / 570);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #d2d4cb 0%, #bfbfb2 50%, #c1c7b3 100%);
+    touch-action: pinch-zoom; /* ADD THIS LINE */
+          
+}
         
         #gameWorld {
             position: absolute;
@@ -197,7 +222,7 @@ z-index: 25;
             height: 35%;
             background: #444;
             position: absolute;
-            bottom: 0;
+            bottom: 0px;
             touch-action: none;
             border-top: 2px solid #665;
             display: flex;
@@ -206,50 +231,10 @@ z-index: 25;
             align-items: center;
             font-size: 14px;
             color: #ccc;
-            z-index: 250; /* Add this line */
+            z-index: 290; /* Add this line */
         }
         
-        #ui {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 250; /* Change from 200 to 250 */
-            background: rgba(0,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            border: 1px solid #665;
-            pointer-events: none;
-        }
-        
-        #timer {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 250; /* Change from 200 to 250 */
-            background: rgba(255,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid #665;
-            pointer-events: none;
-        }
-
-        #deathCounter {
-    position: fixed;
-    top: 10px;
-    right: 90px;
-    z-index: 250;
-    background: rgba(128,0,128,0.8);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: bold;
-    border: 1px solid #665;
-    pointer-events: none;
-}
-        
+    
         .maze-wall {
             position: absolute;
             border: 1px solid rgba(0,0,0,0.3);
@@ -435,8 +420,8 @@ z-index: 25;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+    height: calc(100% * 357.5 / 550);
             background-image:
                 radial-gradient(circle at 20% 30%, #2e7d32 8px, transparent 8px),
                 radial-gradient(circle at 60% 20%, #388e3c 6px, transparent 6px),
@@ -453,15 +438,15 @@ z-index: 25;
         }
 
         .forest-overlay.active {
-            opacity: 0.8;
+            opacity: 0.5;
         }
 
         .forest-vision-mask {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+    height: calc(100% * 357.5 / 550);
             background: radial-gradient(circle 111px, transparent 111px, black 111px);
             pointer-events: none;
             z-index: 200;
@@ -483,7 +468,7 @@ z-index: 25;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 300;
+  z-index: 350;
 }
 
         .new-game-button {
@@ -522,13 +507,6 @@ z-index: 25;
 </head>
 <body>
     <div id="gameContainer">
-        <div id="ui">
-            <div>🐸 あるもの:</div>
-            <div>❤️ <span id="hearts">3</span></div>
-            <div>💰 <span id="money">0</span>¥</div>
-        </div>
-        <div id="timer">0:00</div>
-<div id="deathCounter">☠️0</div>
 <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; right: 160px; z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️</button>
         <div id="gameArea">
             <div id="gameWorld">
@@ -542,18 +520,44 @@ z-index: 25;
     <button onclick="confirmAction()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px;">OK</button>
   </div>
 </div>
+
+<div id="resetDialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 900;">
+    <div style="background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 300px; border: 2px solid #555;">
+        <p style="margin: 10px 0; font-size: 14px;">Are you sure? This will delete ALL progress and restart from the very beginning of Master Frog's Adventure.</p>
+        <button onclick="confirmReset()" style="background: #f44336; color: white; border: none; padding: 10px 15px; border-radius: 5px; margin: 5px;">Yes, Delete All</button>
+        <button onclick="cancelReset()" style="background: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 5px; margin: 5px;">Cancel</button>
+    </div>
+</div>
+        
         <div id="controlArea">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">🐸 Master Frog's Adventure</div>
-                <div style="font-size: 12px; opacity: 0.8;">🎮 ここですワイプ</div>
-            </div>
-            <div class="control-hint">
-                <div>🎮 頑張って!</div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Find items, buy upgrades, reach the exit!</div>
-            </div>
+    <!-- Top section: Main instruction -->
+    <div style="text-align: center;">
+        <div style="font-size: 18px; font-weight: bold; color: white;">🎮 Swipe to move</div>
+        <div style="font-size: 18px; font-weight: bold; color: white;">talk to many people for hints</div>
+    </div>
+    
+    <!-- Bottom section: UI elements in 3 centered lines -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <!-- Line 1: Frog, hearts, money -->
+        <div style="display: flex; gap: 16px; color: white; font-size: 16px;">
+            <div>🐸 Maze World</div>
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
         </div>
         
+        <!-- Line 2: Items -->
+        <div id="items" style="color: white; font-size: 16px; text-align: center;"></div>
+        
+        <!-- Line 3: Timer and death count -->
+        <div style="display: flex; gap: 14px; color: white; font-size: 14px;">
+            <div id="timer" style="background: rgba(0,128,0,0.8); padding: 2px 6px; border-radius: 3px;">0:00</div>
+            <div id="deathCounter">☠️0</div>
+        </div>
+    </div>
+</div>
+        
         <div id="startScreen">
+            <button class="new-game-button" onclick="showResetDialog()" style="background: #665; font-size: 12px; padding: 8px 16px; opacity: 0.7; margin-bottom: 40px;">ぜんぶ消す　さいしょから</button>
     <h2>🐸 Master Frog's Adventure</h2>
     <div id="welcomeMessage" style="margin: 20px 0;">🌍世界を助ける</div>
     <div id="saveStateInfo" style="font-size: 12px; opacity: 0.8; margin: 10px 0; display: none;"></div>
@@ -567,8 +571,7 @@ z-index: 25;
     </div>
     
     <div id="gameOptions">
-        <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">Continue</button>
-        <button class="new-game-button" onclick="startNewGame()" id="newGameButton" style="display: none;">New Game</button>
+        <button class="start-button" id="continueButton" onclick="continueGame()" style="display: none;">つづける</button>
     </div>
 </div>
         
@@ -3576,7 +3579,29 @@ function returnToTitle() {
     game.initLevel();
     game.startGameTimer();
 }
-        
+          // Prevent double-tap zoom but allow pinch zoom
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault(); // Prevent ALL double-tap zoom
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Enable pinch zoom on the actual game area
+document.addEventListener('DOMContentLoaded', function() {
+    const gameArea = document.getElementById('gameArea');
+    const gameContainer = document.getElementById('gameContainer');
+    
+    // Allow pinch zoom on game area
+    gameArea.style.touchAction = 'pinch-zoom';
+    gameContainer.style.touchAction = 'pinch-zoom';
+    
+    // Prevent zoom everywhere else
+    document.body.style.touchAction = 'manipulation';
+    document.getElementById('controlArea').style.touchAction = 'manipulation';
+});
     </script>
 </body>
 </html>
