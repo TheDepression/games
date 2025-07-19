@@ -457,16 +457,19 @@
                 this.explosionSound = document.getElementById('explosionSound');
                 this.bossDefeated = false;
 
-                // Add resize listener
+              
+                
+                this.bindEvents();
+                this.initRoom();
+                this.updatePlayerImage('s');
+                this.positionPlayer(); // Make player visible immediately
+
+                  // Add resize listener
     window.addEventListener('resize', () => {
         if (this.gameStarted) {
             this.calculateScale();
         }
     });
-                this.positionPlayer(); // Make player visible immediately
-                this.bindEvents();
-                this.initRoom();
-                this.updatePlayerImage('s');
             }
 
             loadGameState() {
