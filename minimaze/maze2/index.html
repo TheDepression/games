@@ -2388,6 +2388,7 @@ this.createGorilla();
         const encounterGorillaEl = document.createElement('div');
         encounterGorillaEl.className = 'gorilla-encounter';
         encounterGorillaEl.textContent = '🦍';
+        encounterGorillaEl.style.position = 'absolute'; // ADD THIS LINE
         encounterGorillaEl.style.left = gorillaX + 'px';
         encounterGorillaEl.style.top = gorillaY + 'px';
         encounterGorillaEl.style.fontSize = '27px';
