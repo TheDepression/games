@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cave Boss Battle</title>
     <style>
+        /* Prevent text selection/highlighting */
+*:not(button) {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Make sure game area and container don't allow selection */
+#gameArea, #gameContainer, #gameWorld {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
         body {
             margin: 0;
             padding: 0;
@@ -20,23 +37,24 @@
         }
         
         #gameContainer {
-            width: 350px;
-            height: 550px;
-            background: #1a1a1a;
-            border: 3px solid #444;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    width: min(100vw, 500px);
+    aspect-ratio: 100 / 150;
+    background: #1a1a1a;
+    border: 3px solid #444;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    touch-action: pinch-zoom; /* ADD THIS */
         }
         
         #gameArea {
-            width: 350px;
-            height: 357.5px;
-            position: relative;
-            overflow: hidden;
-            background: #2d2421;
-            touch-action: none;
+    width: 100%;
+    height: calc(100% * 357.5 / 570);
+    position: relative;
+    overflow: hidden;
+    background: #2d2421;
+    touch-action: pinch-zoom; /* ADD THIS */
         }
         
         #gameWorld {
@@ -44,6 +62,7 @@
             width: 350px;
             height: 357.5px;
             transform-origin: 0 0;
+            transform: scale(var(--scale-factor)); /* ADD THIS */
         }
         
         #player {
@@ -67,48 +86,23 @@
         }
         
         #controlArea {
-            width: 100%;
-            height: 35%;
-            background: #333;
-            position: absolute;
-            bottom: 0;
-            touch-action: none;
-            border-top: 2px solid #555;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            color: #ccc;
-            z-index: 250;
-        }
-        
-        #ui {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 250;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            border: 1px solid #666;
-            pointer-events: none;
-        }
-
-        #deathCounter {
-    position: fixed;
-    top: 10px;
-    right: 150px;
-    z-index: 250;
-    background: rgba(128,0,128,0.8);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: bold;
-    border: 1px solid #665;
-    pointer-events: none;
+    width: 100%;
+    height: 35%;
+    background: #333;
+    position: absolute;
+    bottom: 0px;
+    touch-action: none;
+    border-top: 2px solid #555;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    color: #ccc;
+    z-index: 290; /* Updated z-index */
 }
+        
+       
         
         .cave-wall {
             position: absolute;
@@ -258,18 +252,6 @@
             font-size: 12px;
         }
         
-        .boss-health {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            z-index: 250;
-            border: 1px solid #666;
-            pointer-events: none;
-        }
         
         .defeat-overlay {
             position: absolute;
@@ -325,19 +307,6 @@
 </head>
 <body>
     <div id="gameContainer">
-        <div id="ui">
-            <div>🐸 Cave Boss:</div>
-            <div>❤️ <span id="hearts">3</span></div>
-            <div>🧨 TNT: <span id="tntHits">0</span>/4</div>
-        </div>
-        
-        <div class="boss-health">
-            <div>😡 Cave Bully</div>
-            <div>HP: <span id="bossHp">4</span>/4</div>
-        </div>
-
-        <div id="deathCounter">☠️0</div>
-        
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player"></div>
@@ -355,15 +324,32 @@
         </div>
         
         <div id="controlArea">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">⚔️ Cave Boss Fight</div>
-                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
+        <!-- Top section: Main instruction -->
+        <div style="text-align: center;">
+            <div style="font-size: 18px; font-weight: bold; color: white;">⚔️ Cave Boss Fight</div>
+            <div style="font-size: 18px; font-weight: bold; color: white;">🎮 Swipe to move</div>
+        </div>
+        
+        <!-- Bottom section: UI elements in 3 centered lines -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+            <!-- Line 1: Player stats and boss HP -->
+            <div style="display: flex; gap: 16px; color: white; font-size: 16px;">
+                <div>🐸 ❤️ <span id="hearts">3</span></div>
+                <div>🧨 TNT: <span id="tntHits">0</span>/4</div>
+                <div>😡 HP: <span id="bossHp">4</span>/4</div>
             </div>
-            <div class="control-hint">
-                <div>🧨 Collect TNT to damage the boss!</div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Dodge his deadly sword attacks!</div>
+            
+            <!-- Line 2: Instructions -->
+            <div style="color: white; font-size: 14px; text-align: center; opacity: 0.8;">
+                🧨 Collect TNT to damage the boss! Dodge his deadly sword attacks!
+            </div>
+            
+            <!-- Line 3: Death count -->
+            <div style="display: flex; gap: 14px; color: white; font-size: 14px;">
+                <div id="deathCounter">☠️0</div>
             </div>
         </div>
+    </div>
         
         <div id="startScreen">
             <h2>⚔️ Cave Boss Fight</h2>
@@ -502,6 +488,14 @@
                 this.initRoom();
                 this.updatePlayerImage('s');
                 this.updateDarkness();
+                this.positionPlayer(); // ADD THIS LINE
+    
+    // Add resize listener
+    window.addEventListener('resize', () => {
+        if (this.gameStarted) {
+            this.calculateScale();
+        }
+    });
             }
 
             preloadPlayerImages() {
@@ -827,6 +821,7 @@ pinkSquareSecretClaimed: this.pinkSquareSecretClaimed
 
             startGame() {
                 this.gameStarted = true;
+                this.calculateScale(); // ADD THIS LINE
                 this.bgMusic.play().catch(e => console.log('Music play failed:', e));
                 
                 // Continue the timer from cave
@@ -1320,6 +1315,23 @@ pinkSquareSecretClaimed: this.pinkSquareSecretClaimed,
                 document.getElementById('levelCompleteText').textContent = text;
                 document.getElementById('levelComplete').style.display = 'flex';
             }
+            calculateScale() {
+    const gameArea = document.getElementById('gameArea');
+    const gameAreaWidth = gameArea.offsetWidth;
+    const gameAreaHeight = gameArea.offsetHeight;
+    
+    const scaleX = gameAreaWidth / 350;
+    const scaleY = gameAreaHeight / 357.5;
+    const scale = Math.min(scaleX, scaleY);
+    
+    document.documentElement.style.setProperty('--scale-factor', scale);
+}
+
+positionPlayer() {
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+}
         }
 
         let game;
@@ -1328,6 +1340,10 @@ pinkSquareSecretClaimed: this.pinkSquareSecretClaimed,
             document.getElementById('startScreen').style.display = 'none';
             game = new CaveBossFight();
             game.startGame();
+            // ADD THESE LINES:
+    setTimeout(() => {
+        game.calculateScale();
+    }, 100);
         }
 
         function returnToCave() {
@@ -1336,6 +1352,27 @@ pinkSquareSecretClaimed: this.pinkSquareSecretClaimed,
             }
             window.location.href = 'https://thedepression.github.io/games/minimaze/caveb';
         }
+        // Prevent double-tap zoom but allow pinch zoom
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Enable pinch zoom on the actual game area
+document.addEventListener('DOMContentLoaded', function() {
+    const gameArea = document.getElementById('gameArea');
+    const gameContainer = document.getElementById('gameContainer');
+    
+    gameArea.style.touchAction = 'pinch-zoom';
+    gameContainer.style.touchAction = 'pinch-zoom';
+    
+    document.body.style.touchAction = 'manipulation';
+    document.getElementById('controlArea').style.touchAction = 'manipulation';
+});
     </script>
 </body>
 </html>
