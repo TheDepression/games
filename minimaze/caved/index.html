@@ -1018,9 +1018,13 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                if (roomX === 3 && roomY === -1) {
                    this.createItem(80, 250, 'money', 300, 'cdmoney3');
                    this.createItem(150, 280, 'money', 300, 'cdmoney4');
-                   this.createItem(220, 250, 'money', 300, 'cdmoney5');
+               //    this.createItem(220, 250, 'money', 300, 'cdmoney5');
                    this.createItem(280, 200, 'purpleHeart', 1, 'cdpheart1');
                    this.createItem(240, 200, 'purpleHeart', 1, 'cdpheart2');
+               }
+
+               if (roomX === 3 && roomY === 0) {
+                   this.createItem(170, 340, 'money', 300, 'cdmoney5');
                }
 
                if (roomX === 0 && roomY === 0) {
@@ -1187,7 +1191,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                            {x: 220, y: 190}
                        ],
                        segmentSize: 25,
-                       speed: 3.2,
+                       speed: 3.0,
                        bodyLength: 220,
                        thickness: 15
                    },
@@ -1200,29 +1204,29 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                            {x: 110, y: 110}
                        ],
                        segmentSize: 20,
-                       speed: 3.2,
+                       speed: 3.0,
                        bodyLength: 300,
                        thickness: 20
                    },
                    'line4a': {
                        id: 'line4a',
                        path: [
-                           {x: 150, y: 70}, {x: 150, y: 190},
-                           {x: 150, y: 70}
+                           {x: 130, y: 70}, {x: 130, y: 190},
+                           {x: 130, y: 70}
                        ],
                        segmentSize: 20,
-                       speed: 2.3,
+                       speed: 2.2,
                        bodyLength: 35,
                        thickness: 15
                    },
                    'line4b': {
                        id: 'line4b',
                        path: [
-                           {x: 210, y: 90}, {x: 210, y: 190},
-                           {x: 210, y: 90}
+                           {x: 200, y: 90}, {x: 200, y: 190},
+                           {x: 200, y: 90}
                        ],
                        segmentSize: 20,
-                       speed: 2.9,
+                       speed: 2.8,
                        bodyLength: 30,
                        thickness: 15
                    },
@@ -1233,7 +1237,7 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                            {x: 270, y: 100}
                        ],
                        segmentSize: 20,
-                       speed: 2.5,
+                       speed: 2.4,
                        bodyLength: 60,
                        thickness: 15
                    },
