@@ -748,26 +748,17 @@ this.pinkSquareSecretClaimed = false;
     const gameAreaWidth = gameArea.offsetWidth;
     const gameAreaHeight = gameArea.offsetHeight;
     
-    // Scale the viewport to fit the responsive container
+    // Scale based on viewport size (350x357.5)
     const scaleX = gameAreaWidth / 350;
     const scaleY = gameAreaHeight / 357.5;
     const scale = Math.min(scaleX, scaleY);
     
-    // Apply scale to the game area itself, not the world
-    gameArea.style.transform = `scale(${scale})`;
-    gameArea.style.transformOrigin = 'center center';
+    // Apply to CSS variable for gameWorld
+    document.documentElement.style.setProperty('--scale-factor', scale);
 }
 
 updateCamera() {
-    // Keep player centered in the 350x357.5 viewport
-    const viewportWidth = 350;
-    const viewportHeight = 357.5;
-    
-    // Calculate camera position to center on player
-    let cameraX = this.playerX - viewportWidth / 2;
-    let cameraY = this.playerY - viewportHeight / 2;
-    
-    // Get current floor dimensions
+    // Only update camera for floors larger than the viewport
     const floorSizes = {
         1: { width: 800, height: 800 },
         2: { width: 600, height: 600 },  
@@ -776,12 +767,25 @@ updateCamera() {
     };
     
     const floor = floorSizes[this.currentFloor];
+    const viewportWidth = 350;
+    const viewportHeight = 357.5;
+    
+    // If floor is same size as viewport, no camera movement needed
+    if (floor.width <= viewportWidth && floor.height <= viewportHeight) {
+        this.gameWorld.style.left = '0px';
+        this.gameWorld.style.top = '0px';
+        return;
+    }
+    
+    // Calculate camera position to center on player
+    let cameraX = this.playerX - viewportWidth / 2;
+    let cameraY = this.playerY - viewportHeight / 2;
     
     // Clamp camera to floor boundaries
     cameraX = Math.max(0, Math.min(cameraX, floor.width - viewportWidth));
     cameraY = Math.max(0, Math.min(cameraY, floor.height - viewportHeight));
     
-    // Move the world to show the right viewport
+    // Apply camera position (negative because we're moving the world)
     this.gameWorld.style.left = -cameraX + 'px';
     this.gameWorld.style.top = -cameraY + 'px';
 }
@@ -1316,9 +1320,6 @@ updateCamera() {
                         this.playerX = newX;
                         this.playerY = newY;
                         this.positionPlayer();
-
-                        // Update camera to follow player
-            this.updateCamera();
                         
                         const gameAreaWidth = this.gameArea.offsetWidth;
                         const gameAreaHeight = this.gameArea.offsetHeight;
@@ -1338,6 +1339,8 @@ updateCamera() {
                 if (this.currentFloor === 2) {
                     this.checkSandZoneEffects();
                 }
+                // Update camera to follow player
+            this.updateCamera();
             }
             
             checkSandZoneEffects() {
