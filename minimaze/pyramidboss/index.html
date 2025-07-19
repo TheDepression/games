@@ -573,8 +573,8 @@ this.updateDeathCounter();
                 };
                 
                 const offset = directionOffsets[this.currentDirection];
-                attackEl.style.left = (this.playerX + offset.x - 20) + 'px';
-                attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
+                attackEl.style.left = (this.playerX + offset.x - 20 + 15) + 'px';
+attackEl.style.top = (this.playerY + offset.y - 20 + 15) + 'px';
                 
                 this.gameWorld.appendChild(attackEl);
                 
@@ -584,7 +584,7 @@ this.updateDeathCounter();
                     }
                 }, 300);
                 
-                this.checkAttackHits(this.playerX + offset.x, this.playerY + offset.y);
+                this.checkAttackHits(this.playerX + offset.x + 15, this.playerY + offset.y + 15);
                 
                 setTimeout(() => {
                     this.attackCooldown = false;
