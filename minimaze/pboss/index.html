@@ -1044,27 +1044,10 @@
            }
            
            updateUI() {
-               document.getElementById('hearts').textContent = this.hearts;
-               document.getElementById('money').textContent = this.money;
-               document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
-               
-               const ui = document.getElementById('ui');
-               let itemsHTML = '';
-               if (this.hasWeapon && this.hasOrangePower) {
-                   itemsHTML += ' <span style="filter: hue-rotate(120deg) saturate(2) brightness(1.2) drop-shadow(0 0 8px blue);">🔫</span>';
-               } else if (this.hasWeapon) {
-                   itemsHTML += ' 🔫';
-               }
-               
-               if (!document.getElementById('items')) {
-                   const itemsDiv = document.createElement('div');
-                   itemsDiv.id = 'items';
-                   itemsDiv.innerHTML = '+' + itemsHTML;
-                   ui.appendChild(itemsDiv);
-               } else {
-                   document.getElementById('items').innerHTML = '+' + itemsHTML;
-               }
-           }
+    document.getElementById('hearts').textContent = this.hearts;
+    document.getElementById('money').textContent = this.money;
+    document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
+}
            
            updateDeathCounter() {
                document.getElementById('deathCounter').textContent = `☠️${this.deathCount}`;
