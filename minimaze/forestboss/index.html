@@ -1034,6 +1034,12 @@ this.updateDeathCounter();
                 document.getElementById('bossHp').textContent = this.bossHp;
             }
 
+            positionPlayer() {
+    const visualOffset = (32 - 24) / 2;
+    this.player.style.left = (this.playerX - visualOffset) + 'px';
+    this.player.style.top = (this.playerY - visualOffset) + 'px';
+}
+
             defeatBoss() {
                 this.bossDefeated = true;
                 this.bullyDefeated = true;
