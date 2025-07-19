@@ -61,7 +61,6 @@
         #gameWorld {
             position: absolute;
             transform-origin: 0 0;
-            transform: scale(var(--scale-factor)); /* Put scaling back on gameWorld */
             transition: none;
         }
         
@@ -694,18 +693,16 @@ this.pinkSquareSecretClaimed = false;
                 
                 // Set floor dimensions
                 const floorSizes = {
-                    1: { width: 800, height: 800},
-                    2: { width: 600, height: 600},  
-                    3: { width: 500, height: 500},
-                    4: { width: 350, height: 357.5}
+                    1: { width: 800, height: 800, scale: 1 },
+                    2: { width: 600, height: 600, scale: 1 },  
+                    3: { width: 500, height: 500, scale: 1 },
+                    4: { width: 350, height: 357.5, scale: 1 }
                 };
                 
                 const floor = floorSizes[floorNumber];
                 this.gameWorld.style.width = floor.width + 'px';
                 this.gameWorld.style.height = floor.height + 'px';
                 this.gameWorld.style.transform = `scale(${floor.scale})`;
-
-                this.calculateViewportScale();
                 
                 // Set player spawn positions (only if not transitioning)
                 if (!this.isTransitioning) {
@@ -741,54 +738,6 @@ this.pinkSquareSecretClaimed = false;
                 this.updateUI();
                 this.updateFloorHint(floorNumber);
             }
-
-
-            calculateViewportScale() {
-    const gameArea = document.getElementById('gameArea');
-    const gameAreaWidth = gameArea.offsetWidth;
-    const gameAreaHeight = gameArea.offsetHeight;
-    
-    // Scale based on viewport size (350x357.5)
-    const scaleX = gameAreaWidth / 350;
-    const scaleY = gameAreaHeight / 357.5;
-    const scale = Math.min(scaleX, scaleY);
-    
-    // Apply to CSS variable for gameWorld
-    document.documentElement.style.setProperty('--scale-factor', scale);
-}
-
-updateCamera() {
-    // Only update camera for floors larger than the viewport
-    const floorSizes = {
-        1: { width: 800, height: 800 },
-        2: { width: 600, height: 600 },  
-        3: { width: 500, height: 500 },
-        4: { width: 350, height: 357.5 }
-    };
-    
-    const floor = floorSizes[this.currentFloor];
-    const viewportWidth = 350;
-    const viewportHeight = 357.5;
-    
-    // If floor is same size as viewport, no camera movement needed
-    if (floor.width <= viewportWidth && floor.height <= viewportHeight) {
-        this.gameWorld.style.left = '0px';
-        this.gameWorld.style.top = '0px';
-        return;
-    }
-    
-    // Calculate camera position to center on player
-    let cameraX = this.playerX - viewportWidth / 2;
-    let cameraY = this.playerY - viewportHeight / 2;
-    
-    // Clamp camera to floor boundaries
-    cameraX = Math.max(0, Math.min(cameraX, floor.width - viewportWidth));
-    cameraY = Math.max(0, Math.min(cameraY, floor.height - viewportHeight));
-    
-    // Apply camera position (negative because we're moving the world)
-    this.gameWorld.style.left = -cameraX + 'px';
-    this.gameWorld.style.top = -cameraY + 'px';
-}
             
             createWalls(floorNumber, floor) {
                 const { width, height } = floor;
@@ -1339,8 +1288,6 @@ updateCamera() {
                 if (this.currentFloor === 2) {
                     this.checkSandZoneEffects();
                 }
-                // Update camera to follow player
-            this.updateCamera();
             }
             
             checkSandZoneEffects() {
