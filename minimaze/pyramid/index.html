@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pyramid - Master Frog's Adventure</title>
     <style>
+        /* Prevent text selection/highlighting */
+*:not(button) {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Make sure game area and container don't allow selection */
+#gameArea, #gameContainer, #gameWorld {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
         body {
             margin: 0;
             padding: 0;
@@ -20,23 +37,25 @@
         }
         
         #gameContainer {
-            width: 350px;
-            height: 550px;
+            width: min(100vw, 500px);
+    aspect-ratio: 100 / 150;
             background: #1a1a1a;
             border: 3px solid #daa520;
             border-radius: 15px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 0 20px rgba(218, 165, 32, 0.5);
+            touch-action: pinch-zoom; /* ADD THIS LINE */
         }
         
         #gameArea {
-            width: 350px;
-            height: 357.5px;
+            width: 100%;
+    height: calc(100% * 357.5 / 570);
             position: relative;
             overflow: hidden;
             background: #8b7355;
             touch-action: none;
+            touch-action: pinch-zoom; /* ADD THIS LINE */
         }
         
         #gameWorld {
@@ -203,77 +222,23 @@
         }
         
         #controlArea {
-            width: 100%;
-            height: 35%;
-            background: #654321;
-            position: absolute;
-            bottom: 0;
-            touch-action: none;
-            border-top: 2px solid #daa520;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            color: #f4e4bc;
-            z-index: 250;
+    width: 100%;
+    height: 35%;
+    background: #654321;
+    position: absolute;
+    bottom: 0px;
+    touch-action: none;
+    border-top: 2px solid #daa520;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    color: #f4e4bc;
+    z-index: 290;
         }
         
-        #ui {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 250;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            border: 1px solid #daa520;
-            pointer-events: none;
-        }
-        
-        #timer {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 250;
-            background: rgba(255,0,0,0.8);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid #665;
-            pointer-events: none;
-        }
-        
-        #pauseBtn {
-            position: fixed;
-            top: 50px;
-            right: 10px;
-            z-index: 250;
-            background: rgba(100,0,100,0.8);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        #deathCounter {
-    position: fixed;
-    top: 10px;
-    right: 100px;
-    z-index: 250;
-    background: rgba(128,0,128,0.8);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: bold;
-    border: 1px solid #665;
-    pointer-events: none;
-}
-        
+  
         #message {
             position: absolute;
             top: 20px;
@@ -374,16 +339,7 @@
 </head>
 <body>
     <div id="gameContainer">
-        <div id="ui">
-            <div>🔺 Pyramid Floor: <span id="currentFloor">1</span></div>
-            <div>❤️ <span id="hearts">3</span></div>
-            <div>💰 <span id="money">0</span>¥</div>
-            <div id="items">Items: <span id="itemsList"></span></div>
-        </div>
-        <div id="timer">0:00</div>
-        <div id="deathCounter">☠️0</div>
-        <button id="pauseBtn" onclick="pauseGame()">⏸️</button>
-        
+       <button id="pauseBtn" onclick="pauseGame()" style="position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 250; background: rgba(100,0,100,0.8); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">⏸️</button>
         <div id="gameArea">
             <div id="gameWorld">
                 <div id="player"></div>
@@ -413,15 +369,31 @@
         </div>
         
         <div id="controlArea">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">🔺 Ancient Pyramid</div>
-                <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe here to move</div>
-            </div>
-            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px;">
-                <div id="floorHint">Floor 1: Beware the one-way walls!</div>
-                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">Find the button to reveal the stairs!</div>
-            </div>
+    <!-- Top section: Main instruction -->
+    <div style="text-align: center;">
+        <div style="font-size: 18px; font-weight: bold; color: white;">🎮 Swipe to move</div>
+        <div style="font-size: 18px; font-weight: bold; color: white;">🔺 Pyramid Floor: <span id="currentFloor">1</span></div>
+    </div>
+    
+    <!-- Bottom section: UI elements in 3 centered lines -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <!-- Line 1: Hearts, money, items -->
+        <div style="display: flex; gap: 16px; color: white; font-size: 16px;">
+            <div>❤️ <span id="hearts">3</span></div>
+            <div>💰 <span id="money">0</span>¥</div>
+            <div id="items">Items: <span id="itemsList"></span></div>
         </div>
+        
+        <!-- Line 2: Floor hint -->
+        <div id="floorHint" style="color: white; font-size: 14px; text-align: center; opacity: 0.8;"></div>
+        
+        <!-- Line 3: Timer and death count -->
+        <div style="display: flex; gap: 14px; color: white; font-size: 14px;">
+            <div id="timer" style="background: rgba(0,128,0,0.8); padding: 2px 6px; border-radius: 3px;">0:00</div>
+            <div id="deathCounter">☠️0</div>
+        </div>
+    </div>
+</div>
     </div>
 
     <audio id="pyramidMusic" loop>
