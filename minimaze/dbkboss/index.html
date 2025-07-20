@@ -403,7 +403,6 @@
                 
                 // Game state
                 this.gameStarted = false;
-                this.isPaused = false;
                 this.isInvulnerable = false;
                 this.isDying = false;
                 
@@ -610,7 +609,7 @@
             }
             
             handleMove(e) {
-                if (!this.isDragging || !this.gameStarted || this.isPaused) return;
+                if (!this.isDragging || !this.gameStarted) return;
                 e.preventDefault();
                 
                 const point = e.touches ? e.touches[0] : e;
@@ -753,7 +752,6 @@ this.player.style.top = (this.playerY - visualOffset) + 'px';
             }
             
             updatePlayer() {
-                if (this.isPaused) return;
                 
                 if (Math.abs(this.playerVelocityX) > 0.1 || Math.abs(this.playerVelocityY) > 0.1) {
                   const newX = this.playerX + this.playerVelocityX;
@@ -785,7 +783,7 @@ this.player.style.top = (this.playerY - visualOffset) + 'px';
            }
            
            updateBoss() {
-               if (this.isPaused || this.bossHp <= 0) return;
+               if (this.bossHp <= 0) return;
                
                const now = Date.now();
                
@@ -986,7 +984,6 @@ this.player.style.top = (this.playerY - visualOffset) + 'px';
 }
            
            updateProjectiles() {
-               if (this.isPaused) return;
                
                // Update sword projectiles
                this.swordProjectiles.forEach((projectile, index) => {
@@ -1168,7 +1165,7 @@ if (this.bossMode !== 'bubble') {
            }
            
            checkCollisions() {
-               if (this.isInvulnerable || this.isPaused) return;
+               if (this.isInvulnerable) return;
                
                const playerRect = {
                    left: this.playerX - 16,
@@ -1538,14 +1535,12 @@ canMoveTo(x, y) {
            }
            
            startTimer() {
-               this.updateTimer();
-               this.timerInterval = setInterval(() => {
-                   if (!this.isPaused) {
-                       this.timeElapsed++;
-                       this.updateTimer();
-                   }
-               }, 1000);
-           }
+    this.updateTimer();
+    this.timerInterval = setInterval(() => {
+        this.timeElapsed++;
+        this.updateTimer();
+    }, 1000);
+}
            
            updateTimer() {
                const minutes = Math.floor(this.timeElapsed / 60);
@@ -1628,21 +1623,6 @@ canMoveTo(x, y) {
            game.startGame();
        }
 
-       function pauseGame() {
-           if (game && game.gameStarted) {
-               game.isPaused = true;
-               game.bossMusic.pause();
-               document.getElementById('pauseMenu').style.display = 'flex';
-           }
-       }
-
-       function resumeGame() {
-           if (game) {
-               game.isPaused = false;
-               document.getElementById('pauseMenu').style.display = 'none';
-               game.bossMusic.play().catch(e => console.log('Music resume failed:', e));
-           }
-       }
 
         // Prevent double-tap zoom but allow pinch zoom
 let lastTouchEnd = 0;
