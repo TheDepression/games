@@ -575,7 +575,7 @@
             }
             
             handleStart(e) {
-                if (!this.gameStarted || this.isPaused) return;
+                if (!this.gameStarted) return;
                 e.preventDefault();
                 
                 const now = Date.now();
