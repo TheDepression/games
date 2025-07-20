@@ -305,21 +305,6 @@
     </style>
 </head>
 <body>
-    <script>
-        if (window.innerHeight <= 667) {
-            const style = document.createElement('style');
-            style.textContent = `
-                #ui, #timer, #deathCounter, #pauseBtn {
-                    opacity: 0.6 !important;
-                }
-                #ui:hover, #timer:hover, #deathCounter:hover, #pauseBtn:hover {
-                    opacity: 1 !important;
-                    transition: opacity 0.2s ease;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-    </script>
 
     <div id="gameContainer">
         
