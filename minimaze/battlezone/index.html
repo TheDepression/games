@@ -3672,6 +3672,30 @@ if (this.currentBattle === 4 && this.zombies) {
         function restartGame() {
             window.location.reload();
         }
+
+        // Prevent double-tap zoom but allow pinch zoom
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault(); // Prevent ALL double-tap zoom
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Enable pinch zoom on the actual game area
+document.addEventListener('DOMContentLoaded', function() {
+    const gameArea = document.getElementById('gameArea');
+    const gameContainer = document.getElementById('gameContainer');
+    
+    // Allow pinch zoom on game area
+    gameArea.style.touchAction = 'pinch-zoom';
+    gameContainer.style.touchAction = 'pinch-zoom';
+    
+    // Prevent zoom everywhere else
+    document.body.style.touchAction = 'manipulation';
+    document.getElementById('controlArea').style.touchAction = 'manipulation';
+});
     </script>
     
 </body>
