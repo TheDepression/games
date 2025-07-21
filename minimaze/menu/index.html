@@ -268,6 +268,113 @@
             display: none;
         }
 
+        .leaderboard-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-title {
+            font-size: 1.8em;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .leaderboard-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .leaderboard-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 80px 80px;
+            gap: 10px;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+        }
+
+        .leaderboard-row:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-header-row {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .leaderboard-rank {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .leaderboard-name {
+            text-align: left;
+        }
+
+        .leaderboard-deaths {
+            text-align: center;
+            color: #ff6b6b;
+        }
+
+        .leaderboard-time {
+            text-align: center;
+            color: #4ecdc4;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-text {
+            color: #ff6b6b;
+            text-align: center;
+            margin: 20px 0;
+        }
+
         @media (max-width: 768px) {
             .menu-container {
                 padding: 20px;
@@ -282,6 +389,12 @@
                 font-size: 1em;
                 padding: 12px 25px;
             }
+
+            .leaderboard-row {
+                grid-template-columns: 40px 1fr 60px 70px;
+                font-size: 0.9em;
+                padding: 10px 12px;
+            }
         }
     </style>
 </head>
@@ -294,6 +407,7 @@
             <button class="menu-btn" onclick="showGame()">Play Game</button>
             <button class="menu-btn" onclick="showTips()">Tips</button>
             <button class="menu-btn" onclick="showWinnerClub()">Winner's Club</button>
+            <button class="menu-btn" onclick="showLeaderboard()">Leaderboard</button>
         </div>
 
         <div class="content-area" id="contentArea">
@@ -302,9 +416,15 @@
     </div>
 
     <script src="https://player.vimeo.com/api/player.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         let currentPlayer = null;
         let gameAudio = null;
+
+        // Initialize Supabase client
+        const supabaseUrl = 'https://uhvaquliroqvjgfanmfi.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0NDk5NzMsImV4cCI6MjA0ODAyNTk3M30.N3e5Db8hl3Y6QVYSs-GFGJBXQBDFYdCEVJWHPtLzWZE'; // This would be your anon public key
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function clearContent() {
             const contentArea = document.getElementById('contentArea');
@@ -423,6 +543,91 @@
                     errorMessage.classList.add('hidden');
                 }, 3000);
             }
+        }
+
+        async function showLeaderboard() {
+            clearContent();
+            
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="leaderboard-container">
+                    <div class="leaderboard-header">
+                        <h2 class="leaderboard-title">🏆 Leaderboard</h2>
+                        <button class="leaderboard-close" onclick="clearContent()">✕</button>
+                    </div>
+                    <div class="leaderboard-table">
+                        <div class="leaderboard-row leaderboard-header-row">
+                            <div class="leaderboard-rank">Rank</div>
+                            <div class="leaderboard-name">Player</div>
+                            <div class="leaderboard-deaths">Deaths</div>
+                            <div class="leaderboard-time">Time</div>
+                        </div>
+                        <div id="leaderboardData">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            try {
+                // Fetch leaderboard data from Supabase
+                const { data, error } = await supabase
+                    .from('Frog')
+                    .select('*')
+                    .order('deaths', { ascending: true })
+                    .order('time', { ascending: true })
+                    .limit(25);
+
+                if (error) {
+                    throw error;
+                }
+
+                displayLeaderboard(data);
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+                document.getElementById('leaderboardData').innerHTML = `
+                    <div class="error-text">
+                        Failed to load leaderboard data.<br>
+                        Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        function displayLeaderboard(data) {
+            const leaderboardData = document.getElementById('leaderboardData');
+            
+            if (!data || data.length === 0) {
+                leaderboardData.innerHTML = `
+                    <div class="error-text">
+                        No scores found yet.<br>
+                        Be the first to complete the game!
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            data.forEach((player, index) => {
+                const rank = index + 1;
+                const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+                
+                // Format time (assuming it's in seconds)
+                const minutes = Math.floor(player.time / 60);
+                const seconds = Math.floor(player.time % 60);
+                const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                html += `
+                    <div class="leaderboard-row">
+                        <div class="leaderboard-rank">${rankEmoji}</div>
+                        <div class="leaderboard-name">${player.name || 'Anonymous'}</div>
+                        <div class="leaderboard-deaths">${player.deaths}</div>
+                        <div class="leaderboard-time">${timeFormatted}</div>
+                    </div>
+                `;
+            });
+
+            leaderboardData.innerHTML = html;
         }
     </script>
 </body>
