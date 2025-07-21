@@ -350,18 +350,19 @@
 
         function init() {
             // Load game state for stats
-            const savedState = localStorage.getItem('mfGameState');
-            if (savedState) {
-                gameState = JSON.parse(savedState);
-                
-                // Calculate final stats
-                playerScore = {
-                    player_name: gameState.playerName || 'Anonymous',
-                    time: gameState.timeElapsed || 0,
-                    deaths: gameState.deathCount || 0,
-                    timestamp: Date.now()
-                };
-            }
+const savedState = localStorage.getItem('mfGameState');
+const playerName = localStorage.getItem('mfPlayerName');
+if (savedState) {
+    gameState = JSON.parse(savedState);
+    
+    // Calculate final stats
+    playerScore = {
+        player_name: playerName || 'Anonymous',
+        time: gameState.timeElapsed || 0,
+        deaths: gameState.deathCount || 0,
+        timestamp: Date.now()
+    };
+}
         }
 
         function startEnding() {
