@@ -743,10 +743,10 @@ if (this.rectsOverlap(attackRect, enemy2HitRect) && directionCheck) {
     if (!this.enemy || !this.enemy.alive) return;
     
     const enemyHitRect = {
-        left: this.enemy.currentX,
-        top: this.enemy.currentY,
+        left: this.enemy.currentX - 15,
+        top: this.enemy.currentY - 15,
         right: this.enemy.currentX + 50,
-        bottom: this.enemy.currentY + 100
+        bottom: this.enemy.currentY + 110
     };
     
     const deltaX = this.enemy.currentX - this.playerX;
