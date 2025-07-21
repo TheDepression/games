@@ -2511,10 +2511,10 @@ if (this.hasPineapplePower) {
         • Shoots powerful pineapple projectiles (1000 damage)<br>
         • Recharges after 10 seconds of not shooting<br>
         • Works with your gun attacks<br>
-        • Melts when you leave the castle
+        • Melts when you leave the castle and the bully loves breaking them
     </div>
-    <div style="color: ${this.money >= 500 ? '#4CAF50' : '#f44336'};">
-        Cost: 500¥ (You have: ${this.money}¥)
+    <div style="color: ${this.money >= 200 ? '#4CAF50' : '#f44336'};">
+        Cost: 200¥ (You have: ${this.money}¥)
     </div>
     <div style="margin-top: 10px;">Purchase Pineapple Power?</div>
 `;
@@ -2531,15 +2531,15 @@ handlePineappleChoice(accepted) {
     this.lastPineappleDialog = Date.now(); // Reset dialog timer
     
     if (accepted) {
-        if (this.money >= 500) {
-            this.money -= 500;
+        if (this.money >= 200) {
+            this.money -= 200;
             this.hasPineapplePower = true;
             this.pineappleCharged = true;
             this.lastGunUse = Date.now();
             this.showMessage('🍍 Pineapple Power purchased! Press attack to fire!');
             this.updateUI();
         } else {
-            this.showMessage('🍍 Not enough money! Need 500¥');
+            this.showMessage('🍍 Not enough money! Need 200¥');
         }
     } else {
         this.showMessage('🍍 Maybe next time!');
