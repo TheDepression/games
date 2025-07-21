@@ -2968,10 +2968,10 @@ checkBearContact() {
     
     // Check contact with bear
     const bearRect = {
-        left: this.enemy.currentX,
-        top: this.enemy.currentY,
-        right: this.enemy.currentX + 45,
-        bottom: this.enemy.currentY + 90
+        left: this.enemy.currentX + 10,
+        top: this.enemy.currentY + 10,
+        right: this.enemy.currentX + 35,
+        bottom: this.enemy.currentY + 75
     };
     
     if (this.rectsOverlap(playerRect, bearRect)) {
