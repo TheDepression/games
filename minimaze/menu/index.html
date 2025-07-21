@@ -423,7 +423,7 @@
 
         // Initialize Supabase client
         const supabaseUrl = 'https://uhvaquliroqvjgfanmfi.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s'; // This would be your anon public key
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0NDk5NzMsImV4cCI6MjA0ODAyNTk3M30.N3e5Db8hl3Y6QVYSs-GFGJBXQBDFYdCEVJWHPtLzWZE'; // This would be your anon public key
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function clearContent() {
@@ -443,21 +443,35 @@
             const contentArea = document.getElementById('contentArea');
             contentArea.innerHTML = `
                 <div class="video-container">
-                    <div class="video-wrapper">
-                        <iframe id="trailerVideo" 
-                                src="https://player.vimeo.com/video/1103187653?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479&controls=0&autoplay=1" 
-                                frameborder="0" 
-                                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-                                referrerpolicy="strict-origin-when-cross-origin" 
-                                title="mftrailer">
-                        </iframe>
+                    <div class="video-wrapper" id="videoWrapper">
+                        <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/mftitlepic-min.png" 
+                             alt="Trailer Thumbnail" 
+                             style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                        <button class="start-btn" onclick="playTrailer()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">▶ Play Trailer</button>
                         <button class="close-btn" onclick="clearContent()">✕</button>
                         <button class="replay-btn hidden" id="replayBtn" onclick="replayVideo()">▶</button>
                     </div>
                 </div>
             `;
 
-            // Initialize Vimeo player
+        }
+
+        function playTrailer() {
+            const videoWrapper = document.getElementById('videoWrapper');
+            videoWrapper.innerHTML = `
+                <iframe id="trailerVideo" 
+                        src="https://player.vimeo.com/video/1103187653?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479&controls=0&autoplay=1&muted=0" 
+                        frameborder="0" 
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin" 
+                        title="mftrailer"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                </iframe>
+                <button class="close-btn" onclick="clearContent()">✕</button>
+                <button class="replay-btn hidden" id="replayBtn" onclick="replayVideo()">▶</button>
+            `;
+
+            // Initialize Vimeo player after user interaction
             currentPlayer = new Vimeo.Player('trailerVideo');
             
             currentPlayer.on('ended', function() {
