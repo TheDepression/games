@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Frog Tips</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px 0;
+        }
+
+        .tips-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .tips-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tip-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tip-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .tip-btn:hover::before {
+            left: 100%;
+        }
+
+        .tip-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+
+        .tip-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: left;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tip-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-tip {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .close-tip:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .tip-text {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .tip-image {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .tip-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .image-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #44a08d, #4ecdc4);
+        }
+
+        @media (max-width: 768px) {
+            .tips-container {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .tip-btn {
+                font-size: 1em;
+                padding: 12px 25px;
+            }
+
+            .tip-image {
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tips-container">
+        <h1>🐸 Master Frog コツ 🐸 工事中👷</h1>
+        
+        <div class="tips-buttons">
+            <button class="tip-btn" onclick="toggleTip('tip1')">やりかった　 工事中👷</button>
+            <button class="tip-btn" onclick="toggleTip('tip2')">どこ行こうか　 工事中👷</button>
+            <button class="tip-btn" onclick="toggleTip('tip3')">ひみつ場所　 工事中👷</button>
+            <button class="tip-btn" onclick="toggleTip('tip4')">ボスファイト　 工事中👷</button>
+        </div>
+
+        <!-- Tip 1 Content -->
+        <div id="tip1" class="tip-content">
+            <button class="close-tip" onclick="closeTip('tip1')">✕</button>
+            <div class="tip-text">
+                <h3>Basic Movement & Controls</h3>
+                <p>Master Frog uses simple directional controls to navigate through the maze. Use the arrow keys or WASD to move your frog character around obstacles and enemies.</p>
+                
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/shark-min.png" 
+                     alt="Shark Enemy" 
+                     class="tip-image" 
+                     onclick="openImageModal(this.src, this.alt)">
+                
+                <p>Watch out for dangerous enemies like the shark shown above! They can end your journey quickly if you're not careful.</p>
+                
+                <p><strong>Pro Tip:</strong> Take your time to observe enemy movement patterns before making your move.</p>
+            </div>
+        </div>
+
+        <!-- Tip 2 Content -->
+        <div id="tip2" class="tip-content">
+            <button class="close-tip" onclick="closeTip('tip2')">✕</button>
+            <div class="tip-text">
+                <h3>Power-ups & Items</h3>
+                <p>Throughout your adventure, you'll find various items that can help you on your journey. Keys unlock doors, boats help you cross water, and hammers break through walls.</p>
+                
+                <p>Always check your inventory to see what tools you have available. Some puzzles require specific items to solve!</p>
+                
+                <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/snake-min.png" 
+                     alt="Snake Enemy" 
+                     class="tip-image" 
+                     onclick="openImageModal(this.src, this.alt)">
+                
+                <p>Some enemies like snakes guard valuable items. Plan your approach carefully to avoid unnecessary deaths.</p>
+                
+                <p><strong>Remember:</strong> Every death counts toward your final score, so use items wisely!</p>
+            </div>
+        </div>
+
+        <!-- Tip 3 Content -->
+        <div id="tip3" class="tip-content">
+            <button class="close-tip" onclick="closeTip('tip3')">✕</button>
+            <div class="tip-text">
+                <h3>Enemy Strategies</h3>
+                <p>Each enemy type has unique behavior patterns. Learning these patterns is key to avoiding deaths and achieving a better score.</p>
+                
+                <p>Some enemies move in predictable patterns, while others react to your presence. Observe carefully before approaching!</p>
+                
+                <p><strong>Strategy Tip:</strong> Sometimes the best approach is to wait and let enemies move away from your intended path.</p>
+                
+                <p>Remember: your goal is to minimize deaths, not to defeat enemies. Avoidance is often better than confrontation.</p>
+            </div>
+        </div>
+
+        <!-- Tip 4 Content -->
+        <div id="tip4" class="tip-content">
+            <button class="close-tip" onclick="closeTip('tip4')">✕</button>
+            <div class="tip-text">
+                <h3>Advanced Techniques</h3>
+                <p>For experienced players looking to achieve the best scores, timing and route optimization are crucial.</p>
+                
+                <p>Learn the most efficient paths through each level. Sometimes a longer route with fewer enemy encounters is faster overall.</p>
+                
+                <p><strong>Speed Run Tips:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Memorize enemy spawn locations</li>
+                    <li>Plan your inventory usage in advance</li>
+                    <li>Practice consistent movement patterns</li>
+                    <li>Know when to take calculated risks</li>
+                </ul>
+                
+                <p>The leaderboard rewards both low death counts and fast completion times. Find the balance that works for your playstyle!</p>
+            </div>
+        </div>
+
+        <a href="https://thedepression.github.io/games/minimaze/menu" class="back-link">← Back to Menu</a>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal">
+        <button class="close-modal" onclick="closeImageModal()">✕</button>
+        <img id="modalImage" class="modal-image" src="" alt="">
+    </div>
+
+    <script>
+        function toggleTip(tipId) {
+            // Close all other tips first
+            const allTips = document.querySelectorAll('.tip-content');
+            allTips.forEach(tip => {
+                if (tip.id !== tipId) {
+                    tip.classList.remove('active');
+                }
+            });
+
+            // Toggle the clicked tip
+            const tip = document.getElementById(tipId);
+            tip.classList.toggle('active');
+        }
+
+        function closeTip(tipId) {
+            const tip = document.getElementById(tipId);
+            tip.classList.remove('active');
+        }
+
+        function openImageModal(src, alt) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modalImage.src = src;
+            modalImage.alt = alt;
+            modal.classList.add('active');
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal when clicking outside the image
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+                // Also close any open tips
+                const allTips = document.querySelectorAll('.tip-content');
+                allTips.forEach(tip => tip.classList.remove('active'));
+            }
+        });
+    </script>
+</body>
+</html>
