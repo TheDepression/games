@@ -723,7 +723,7 @@
     <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
         <!-- Line 1: Frog, hearts, money -->
         <div style="display: flex; gap: 16px; color: white; font-size: 16px;">
-            <div>🐸 Broken World</div>
+            <div>🐸 こわれたせかい🌍</div>
             <div>❤️ <span id="hearts">3</span></div>
             <div>💰 <span id="money">0</span>¥</div>
         </div>
@@ -750,14 +750,14 @@
         <div id="levelComplete" style="display: none;">
             <h3 id="levelCompleteTitle">Level Complete!</h3>
             <p id="levelCompleteText">Great job!</p>
-            <button id="retryButton" onclick="restartGame()">Play Again</button>
+            <button id="retryButton" onclick="restartGame()">もう一度</button>
         </div>
         
         <div id="pauseMenu" style="display: none;">
             <h3>⏸️ Game Paused</h3>
             <p style="margin: 20px 0; opacity: 0.8;">Your progress is automatically saved</p>
-            <button onclick="resumeGame()">Continue Game</button>
-            <button onclick="returnToTitle()">Return to Title</button>
+            <button onclick="resumeGame()">ゲーム続行</button>
+            <button onclick="returnToTitle()">タイトルに戻る</button>
         </div>
     </div>
 
@@ -970,7 +970,7 @@ this.lastLavaDamage = 0;
     this.playerVelocityY = 0;
     this.isDragging = false;
     this.gameStarted = false;
-    document.getElementById('confirmText').textContent = '🌲 Entering the forest...';
+    document.getElementById('confirmText').textContent = '🌲もりに入る';
     document.getElementById('confirmDialog').style.display = 'flex';
     this.pendingAction = 'enterForest';
 }
@@ -980,7 +980,7 @@ exitForest() {
     this.playerVelocityY = 0;
     this.isDragging = false;
     this.gameStarted = false;
-    document.getElementById('confirmText').textContent = '🌞 Leaving the forest!';
+    document.getElementById('confirmText').textContent = '🌞もりから出る';
     document.getElementById('confirmDialog').style.display = 'flex';
     this.pendingAction = 'exitForest';
 }
@@ -1297,7 +1297,7 @@ this.playerVelocityY = deltaY * sensitivity;
                     entrance.dataset.type = 'weakPointEntrance';
                     this.gameWorld.appendChild(entrance);
                     
-                    this.showMessage('💥 Weak point blasted open!');
+                    this.showMessage('💥 よわいところ空いた');
                 }
             }
         });
@@ -1322,7 +1322,7 @@ this.playerVelocityY = deltaY * sensitivity;
                 );
                 
                 if (distance <= effectiveRange) {
-                    this.showMessage('🔫🔨 *BLAST* Wall destroyed!');
+                    this.showMessage('🔫🔨 *バン* かべを壊した');
                     wall.remove();
                 }
             }
@@ -1395,7 +1395,7 @@ this.playerVelocityY = deltaY * sensitivity;
             );
             
             if (distance <= effectiveRange) {
-                this.showMessage('🦍 The gorilla seems friendly now...');
+                this.showMessage('🦍やさしそう');
             }
         }
     }
@@ -2372,9 +2372,9 @@ this.createGorilla();
         if (this.pinkBossDefeated && !this.hasHammerPower) {
             friendlyGorillaEl.dataset.type = 'gorillaFinalDialog';
         } else if (this.gorillaHammerDialogComplete) {
-    friendlyGorillaEl.dataset.message = "You are my hero, frog. Go get that Bully!";
+    friendlyGorillaEl.dataset.message = "あなたは私のヒーローです、カエルさん。あのいじめっ子を捕まえて！";
         } else {
-            friendlyGorillaEl.dataset.message = "🦍 Good luck saving my girlfriend! If you succeed, I will give you one more power!";
+            friendlyGorillaEl.dataset.message = "🦍 私の彼女を救うのうまく行くように！すれば、私はもう1つの力を与えます！";
         }
         
         this.gameWorld.appendChild(friendlyGorillaEl);
@@ -2465,7 +2465,7 @@ refreshGorilla() {
     if (!this.catFirstDialogComplete) {
     catEl.dataset.type = 'catFirstDialog';
     } else {
-        catEl.dataset.message = "Cat POWER!! -- You have full health.";
+        catEl.dataset.message = "😻ねこパワー!　❤️体力マックス";
     }
     
     this.gameWorld.appendChild(catEl);
@@ -2570,29 +2570,29 @@ refreshGorilla() {
             createFriendlies() {
                 // Post-apocalyptic NPC messages - same positions, new dialogue
                 const friendlies = [
-                    {x: 1200, y: 2000, message: "I am a broken man.", customEmoji: "👴🏻"},
-                    {x: 1400, y: 1330, message: "Your boat is broken?... I will repair if for 700 yen.", customEmoji: "👩‍⚕️"},
-                    {x: 60, y: 60, message: "There used to be an island here. The landscape has changed quite a bit. Luckily for me, I can float.", customEmoji: "🧙‍♀️"},
-                    {x: 140, y: 1680, message: "Thank you for reuniting me with my baby before the world ended...", customEmoji: "👩🏻"},
-                    {x: 160, y: 1680, message: "Thank you for rescuing me...Waah waah", customEmoji: "👶🏻"},
-                     {x: 500, y: 1560, message: "Watch out for my father.. The Bully made him. He made me too but I am just a baby. Someday I can attack you, but for now, I am friendly.", customEmoji: "💩"},
-                     {x: 160, y: 1580, message: "You are finally awake! The pyramid collapsed and the Bully escaped to the castle. He unleashed a giant brown monster that is destroying our town. Everything is destroyed...", customEmoji: "👮🏻‍♂️"},
-                     {x: 140, y: 1500, message: "I cannot believe we got out of that pyramid. You were unconscious for a few days. Your boat seems to have broken and your hammer was lost in the rubble... But at least we survived", customEmoji: "🙍🏻‍♂️"},
-                    {x: 200, y: 1600, message: "You should visit the boat seller in the forest. Her prices have increased after the disaster, but youre gonna need a boat to get anywhere useful in this broken world.", customEmoji: "🐸"},
-                    {x: 450, y: 960, message: "My sister has the power to heal health. The Bully kidnapped her to use her DNA for his machine. That is why he keeps surviving. Oh, I miss my sister.", customEmoji: "😺"},
-                    {x: 640, y: 960, message: "You should not be here!", customEmoji: "🪧"},
-                    {x: 720, y: 420, message: "Seriously, it is too dangerous.", customEmoji: "🪧"},
-                    {x: 980, y: 400, message: "You can escape the forest here. GET OUT NOW!", customEmoji: "🪧"},
-                    {x: 1080, y: 1120, message: "The bees will kill you. GO BACK NOW!", customEmoji: "🪧"},
-                    {x: 780, y: 560, message: "WHY ARE YOU NOT LISTENING!?!", customEmoji: "🪧"},
-                    {x: 880, y: 720, message: "Private... Do NOT enter!", customEmoji: "🪧"},
+                    {x: 1200, y: 2000, message: "俺は壊れた男だ。", customEmoji: "👴🏻"},
+{x: 1400, y: 1330, message: "ボートが壊れた？700円で修理するよ。", customEmoji: "👩‍⚕️"},
+{x: 60, y: 60, message: "ここには島があったんだ。景色がだいぶ変わったね。幸い俺は浮けるからな。", customEmoji: "🧙‍♀️"},
+{x: 140, y: 1680, message: "世界が終わる前に赤ちゃんと再会させてくれてありがとう...", customEmoji: "👩🏻"},
+{x: 160, y: 1680, message: "助けてくれてありがとう...うわーんうわーん", customEmoji: "👶🏻"},
+{x: 500, y: 1560, message: "うちの父親に気をつけて...いじめっ子が作ったんだ。俺も作られたけど、まだ赤ちゃん。いつか攻撃できるけど、今は友好的だよ。", customEmoji: "💩"},
+{x: 160, y: 1580, message: "やっと目を覚ましたな！ピラミッドが崩壊して、いじめっ子が城に逃げた。巨大な茶色いモンスターを放って町を破壊している。全てが破壊された...", customEmoji: "👮🏻‍♂️"},
+{x: 140, y: 1500, message: "あのピラミッドから出られるなんて信じられない。数日間意識を失っていたよ。ボートが壊れて、ハンマーも瓦礫の中で失くした...でも生き延びただけでも良かった", customEmoji: "🙍🏻‍♂️"},
+{x: 200, y: 1600, message: "森のボート売りを訪ねるといい。災害後に値段が上がったけど、この壊れた世界で役に立つ場所に行くにはボートが必要だ。", customEmoji: "🐸"},
+{x: 450, y: 960, message: "俺の妹は体力を回復する力を持っている。いじめっ子が機械のために彼女のDNAを使おうと誘拐した。だから奴は生き続けている。ああ、妹が恋しい。", customEmoji: "😺"},
+{x: 640, y: 960, message: "ここにいちゃダメだ！", customEmoji: "🪧"},
+{x: 720, y: 420, message: "マジで危険すぎる。", customEmoji: "🪧"},
+{x: 980, y: 400, message: "ここから森を脱出できる。今すぐ出ろ！", customEmoji: "🪧"},
+{x: 1080, y: 1120, message: "蜂が殺すぞ。今すぐ戻れ！", customEmoji: "🪧"},
+{x: 780, y: 560, message: "なぜ聞かないんだ！？", customEmoji: "🪧"},
+{x: 880, y: 720, message: "私有地...立入禁止！", customEmoji: "🪧"},
                     {x: 1940, y: 2020, message: "", customEmoji: "🤵🏻‍♂️", specialType: "battleNPC"},
-                    {x: 1960, y: 2320, message: "Do not forget the cat will fill your health anytime. Just go visit her in the forest!", customEmoji: "🐰"},
-                    {x: 2200, y: 2280, message: "The bully cannot keep me down! I have rebuilt my shop even better. Take a look inside.", customEmoji: "🥸"},
-                    {x: 200, y: 2100, message: "There is a secret in the quicksand between the cactus and the broken pyramid", customEmoji: "🐷"},
-                    {x: 20, y: 100, message: "I heard there was a new secret cave in the deep south. The castle-key seller is rumored to be hiding there!", customEmoji: "🦆"},
-                    {x: 660, y: 1300, message: "I heard there was a beautiful casino in the west side of the forest. But sadly, I cannot find a way in!", customEmoji: "🦁"},
-                    {x: 2160, y: 170, message: "Yes, I am a fish, but i do not like water. Anyway, here is a tip.. if you want to defeat the bully, you must first break his machine", customEmoji: "🐟"}
+                    {x: 1960, y: 2320, message: "猫がいつでも体力を満タンにしてくれることを忘れるな。森にいる彼女を訪ねてみろ！", customEmoji: "🐰"},
+{x: 2200, y: 2280, message: "いじめっ子に負けるもんか！さらに良い店を再建したぞ。中を見てみろ。", customEmoji: "🥸"},
+{x: 200, y: 2100, message: "サボテンと壊れたピラミッドの間の流砂に秘密がある", customEmoji: "🐷"},
+{x: 20, y: 100, message: "南の奥深くに新しい秘密の洞窟があると聞いた。城の鍵売りがそこに隠れているという噂だ！", customEmoji: "🦆"},
+{x: 660, y: 1300, message: "森の西側に美しいカジノがあると聞いた。でも残念ながら入り方が分からない！", customEmoji: "🦁"},
+{x: 2160, y: 170, message: "そう、俺は魚だが水は嫌いだ。とにかくヒントを教えよう...いじめっ子を倒したいなら、まず奴の機械を壊さなければならない", customEmoji: "🐟"}
                 ];
                 
                 friendlies.forEach((friendly, index) => {
@@ -2945,14 +2945,14 @@ updateQuicksand() {
     // Check if player is in forest and close enough to start chasing
     if (this.isInForest && playerDistance <= 60 && !this.gorilla.isChasing) {
         this.gorilla.isChasing = true;
-        this.showMessage('🦍 ROAR! Gorilla is angry!');
+        this.showMessage('🦍ゴリラ怒った');
     }
     
     // Stop chasing if player escapes forest or gets far enough away
     if (this.gorilla.isChasing && (!this.isInForest || playerDistance >= 250)) {
         this.gorilla.isChasing = false;
         this.gorilla.returning = true;
-        this.showMessage('🦍 Gorilla calmed down...');
+        this.showMessage('🦍おちついた');
     }
     
     if (this.gorilla.isChasing) {
@@ -3161,9 +3161,9 @@ updateQuicksand() {
                 
                 if (isEnteringWater && (!this.hasBoat || this.boatIsBroken)) {
     if (this.boatIsBroken) {
-        this.showMessage('⛵💔 Your boat is broken. You can\'t ride it!');
+        this.showMessage('⛵💔 ボートが壊れている。乗れない');
     } else {
-        this.showMessage('🌊 You need a boat to cross water!');
+        this.showMessage('🌊 水を渡るにはボートが必要!');
     }
     return false;
 }
@@ -3172,7 +3172,7 @@ updateQuicksand() {
             }
 
             breakWall(wall) {
-                this.showMessage('🔨 *SMASH* Wall broken!');
+                this.showMessage('🔨 *バン* かべこわした!');
                 wall.remove();
             }
 
@@ -3371,7 +3371,7 @@ entrances.forEach(entrance => {
                     if (this.rectsOverlap(playerRect, heartRect)) {
                         if (this.hearts < this.maxHearts) {
                             this.hearts++;
-                            this.showMessage('❤️ Health restored!');
+                            this.showMessage('❤️ 体力回復!');
                             this.updateUI();
                             heart.remove();
                         }
@@ -3406,7 +3406,7 @@ purpleHearts.forEach(purpleHeart => {
         this.maxHearts++;
         this.hearts = this.maxHearts; // Fill to new max
         this.collectedPurpleHearts.push(purpleHeart.dataset.id); // Track collection
-        this.showMessage(`💜 Max health increased to ${this.maxHearts}! ⚡`);
+        this.showMessage(`💜 最大体力が ${this.maxHearts}に増加 ⚡`);
         this.updateUI();
         this.saveGameState(); // Auto-save the permanent upgrade
         purpleHeart.remove();
@@ -3428,7 +3428,7 @@ redHearts.forEach(heart => {
         if (this.hearts < this.maxHearts) {
             this.hearts++;
             this.collectedRedHearts.push(heart.dataset.id); // Track collection
-            this.showMessage('❤️ Health restored!');
+            this.showMessage('❤️ 体力回復!');
             this.updateUI();
             this.saveGameState(); // Save the collection
             heart.remove();
@@ -3465,7 +3465,7 @@ if (banana) {
     
     if (this.rectsOverlap(playerRect, bananaRect)) {
         this.collectedBanana = true;
-        this.showMessage('🍌 Mysterious banana collected!');
+        this.showMessage('🍌 謎のバナナを手に入れた!');
         this.updateUI();
         this.saveGameState();
         banana.remove();
@@ -3490,7 +3490,7 @@ permanentMoney.forEach(money => {
         const value = parseInt(money.dataset.value);
         this.money += value;
         this.collectedMoney.push(money.dataset.id); // Track collection
-        this.showMessage(`💰 +${value}¥ collected!`);
+        this.showMessage(`💰 +${value}¥ ゲット!`);
         this.updateUI();
         this.saveGameState(); // Autosave the collection
         money.remove();
@@ -3512,7 +3512,7 @@ permanentMoney.forEach(money => {
                     
                     if (this.rectsOverlap(playerRect, moneyRect)) {
                         this.money += 100;
-                        this.showMessage('💰 +100¥ collected!');
+                        this.showMessage('💰 +100¥ ゲット!');
                         this.updateUI();
                         // this.saveGameState();
                         money.remove();
@@ -3530,7 +3530,7 @@ permanentMoney.forEach(money => {
                     };
                     
                     if (this.rectsOverlap(playerRect, pyramidRect)) {
-                        this.showMessage('🔺 Pyramid Destroyed. Cannot Enter.');
+                        this.showMessage('🔺 ピラミッド破壊。入れない。');
                     }
                 }
 
@@ -3583,7 +3583,7 @@ quicksands.forEach(quicksand => {
 if (inQuicksand && closestQuicksand) {
     if (!this.sinkingInQuicksand) {
         this.sinkingInQuicksand = true;
-        this.showMessage('⚠️ Quicksand! Swipe hard to escape!');
+        this.showMessage('⚠️ 流砂！激しくスワイプして脱出しろ');
     }
     
     this.quicksandCenter = closestQuicksand;
@@ -3592,7 +3592,7 @@ if (inQuicksand && closestQuicksand) {
     
     // Death at very center (within 5px)
     if (closestQuicksand.distance <= 5) {
-        this.showMessage('💀 Pulled into quicksand!');
+        this.showMessage('💀 流砂に引き込まれた!');
         this.gameOver();
     }
 } else {
@@ -3601,7 +3601,7 @@ if (inQuicksand && closestQuicksand) {
         this.sinkingInQuicksand = false;
         this.quicksandStrength = 0;
         this.quicksandCenter = null;
-        this.showMessage('🏃 Escaped the quicksand!');
+        this.showMessage('🏃 流砂から脱出した!');
     }
 }
 
@@ -3622,7 +3622,7 @@ if (inQuicksand && closestQuicksand) {
                         if (this.hasKey) {
                            this.transferToCastle();
                         } else {
-                            this.showMessage('🔑 You need a key to enter!');
+                            this.showMessage('🔑 入るには鍵が必要!');
                         }
                     }
                 }
@@ -3658,10 +3658,10 @@ if (inQuicksand && closestQuicksand) {
         
         if (this.hasLavaShoes) {
             // If just entered lava zone, start protection (but only if not already active)
-            if (!this.lavaProtectionActive && this.lavaProtectionTime >= 5) {
+            if (!this.lavaProtectionActive && this.lavaProtectionTime >= 8) {
                 this.lavaProtectionActive = true;
                 this.lavaProtectionTime = 8; // 8 seconds of protection
-                this.showMessage('🥾 ⏰8 seconds of protection');
+                this.showMessage('🥾 ⏰８秒ok');
             }
             
             // Count down protection time
@@ -3670,11 +3670,11 @@ if (inQuicksand && closestQuicksand) {
                 this.lastLavaZoneTime = now;
                 
                 if (this.lavaProtectionTime > 0) {
-                    this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
+                    this.showMessage(`🥾 🥾 守り: あと ${this.lavaProtectionTime} 秒`);
                 } else {
                     // Protection expired
                     this.lavaProtectionActive = false;
-                    this.showMessage('🥾 Protection expired! Escape the lava!');
+                    this.showMessage('🥾 にげて!');
                 }
             }
             
@@ -3682,7 +3682,7 @@ if (inQuicksand && closestQuicksand) {
             if (!this.lavaProtectionActive) {
                 if (now - this.lastLavaDamage > 1000) {
                     this.takeDamage(2); // 2 hearts damage
-                    this.showMessage('🔥 Burning hot!');
+                    this.showMessage('🔥 あつい');
                     this.lastLavaDamage = now;
                 }
             }
@@ -3690,7 +3690,7 @@ if (inQuicksand && closestQuicksand) {
             // No shoes - take damage
             if (now - this.lastLavaDamage > 1000) {
                 this.takeDamage(2); // 2 hearts damage
-                this.showMessage('🔥 Burning hot! You need special shoes!');
+                this.showMessage('🔥 あつい');
                 this.lastLavaDamage = now;
             }
         }
@@ -3700,7 +3700,7 @@ if (inQuicksand && closestQuicksand) {
             this.lavaProtectionActive = false;
             this.lavaProtectionTime = 8; // Reset to full protection
             if (this.wasOnLava) {  // Only show message if actually was on lava
-                this.showMessage('🥾 Left the lava! Power recharged for next time! ☺️');
+                this.showMessage('🥾 マグマから出た。また８秒行ける ☺️');
             }
         }
         this.wasOnLava = false; // Reset the flag
@@ -3806,7 +3806,7 @@ if (onWater && this.hasBoat && !this.boatIsBroken) {
     if (this.isInvulnerable) return;
     
     this.hearts -= damage; // Use the damage parameter
-    this.showMessage(damage > 1 ? '💔💔 Major damage!' : '💔 Ouch!');
+    this.showMessage(damage > 1 ? '💔💔 大ダメージ!' : '💔 いたい!');
     this.updateUI();
     
     this.isInvulnerable = true;
@@ -3849,7 +3849,7 @@ if (onWater && this.hasBoat && !this.boatIsBroken) {
 checkBoatRepairTransaction(npc) {
     if (!this.boatIsBroken) {
         // Boat is already repaired
-        this.showNPCMessage("👩‍⚕️ Your boat looks fine to me! Safe travels!");
+        this.showNPCMessage("👩‍⚕️ ボートは大丈夫に見える！安全な旅を!");
         return;
     }
     
@@ -3866,7 +3866,7 @@ checkBoatRepairTransaction(npc) {
         
         // Check if player just arrived (allow immediate first interaction)
         if (!this.lastInteractionTime[interactionKey]) {
-            this.showNPCMessage("👩‍⚕️ Your boat is broken? I can repair it for 700¥. Stay here to confirm!");
+            this.showNPCMessage("ボートが壊れた？700円で修理するよ。");
             this.lastInteractionTime[interactionKey] = now - 2500; // Allow next interaction in 0.5s
             return;
         }
@@ -3874,18 +3874,18 @@ checkBoatRepairTransaction(npc) {
         // Second interaction - perform the transaction
         this.money -= 700;
         this.boatIsBroken = false;
-        this.showNPCMessage("👩‍⚕️ ⛵ Boat repaired! You can now cross water safely!");
+        this.showNPCMessage("👩‍⚕️ ⛵ ボート修理完了！安全に水を渡れるよ！");
         this.updateUI();
         this.saveGameState();
         this.lastInteractionTime[interactionKey] = now;
         
         // Update the NPC's message permanently
-        npc.dataset.message = "👩‍⚕️ Your boat is working perfectly! Take care on the water!";
+        npc.dataset.message = "👩‍⚕️ ボートは完璧に動いてる！水上で気をつけて！";
         
     } else {
         // Not enough money
         const needed = 700 - this.money;
-        this.showNPCMessage(`👩‍⚕️ Boat repair costs 700¥. You need ${needed}¥ more!`);
+        this.showNPCMessage(`👩‍⚕️ ボート修理には700¥かかる。あと ${needed}¥ 必要`);
     }
 }
 
@@ -3955,7 +3955,7 @@ showGorillaDialog() {
     // Set content based on step
     if (this.gorillaDialogStep === 1) {
         img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/happygorilla.png';
-        text.textContent = "🦍 Thanks! You're kind. I can trust you. Please listen to my story..";
+        text.textContent = "🦍 ありがとう！優しいね。信頼できる。俺の話を聞いてくれ..";
         button.textContent = 'Next';
         button.onclick = () => {
             this.gorillaDialogStep = 2;
@@ -3964,7 +3964,7 @@ showGorillaDialog() {
         };
     } else if (this.gorillaDialogStep === 2) {
         img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/gfcat-min.png';
-        text.textContent = "🦍 My girlfriend was locked in a cage by the bully on a pink square island in the water. I can't swim but you have a boat. Please get her!";
+        text.textContent = "🦍 俺の彼女がいじめっ子によって水の中のピンクの四角い島の檻に閉じ込められた。俺は泳げないがお前はボートを持っている。彼女を助けてくれ！";
         button.textContent = 'Next';
         button.onclick = () => {
             this.gorillaDialogStep = 3;
@@ -3973,7 +3973,7 @@ showGorillaDialog() {
         };
     } else if (this.gorillaDialogStep === 3) {
         img.src = 'https://raw.githubusercontent.com/TheDepression/Photos/main/orangehealth-min.png';
-        text.textContent = "🦍 Take this power orange! It'll increase your gun power to 100 instead of 50. It will help you to rescue my beautiful girlfriend!";
+        text.textContent = "🦍 このパワーオレンジを受け取れ！銃の威力が50から100に上がる。美しい彼女を救うのに役立つぞ！";
         button.textContent = 'Accept Power';
         button.onclick = () => {
             this.completeGorillaEncounter();
@@ -4007,7 +4007,7 @@ completeGorillaEncounter() {
     // Recreate the level to spawn friendly gorilla
     this.initLevel();
     
-    this.showMessage('🍊 Power Orange consumed! Gun damage increased to 100! 🔫⚡');
+    this.showMessage('🍊 Power Orange ゲット! Gun damageが100になった🔫⚡');
 }
 
 
@@ -4051,7 +4051,7 @@ showGorillaFinalDialog() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = "🦍 Thank you for rescuing my girlfriend! Here is your new power... hammer power on your gun! With this hammer power, your gun can now break through grey walls, and any cracked surfaces or walls you find... enjoy!";
+    text.textContent = "🦍 彼女を救ってくれてありがとう！新しい力をやろう...銃にハンマーパワーだ！このハンマーパワーで、銃は灰色の壁や、見つけたひび割れた表面や壁を破壊できる...楽しめ！";
     
     const button = document.createElement('button');
     button.style.background = '#4CAF50';
@@ -4089,7 +4089,7 @@ completeGorillaFinalDialog() {
     // Recreate the level to update gorilla message
     this.initLevel();
     
-    this.showMessage('🔫🔨 Hammer Power acquired! Gun can now break walls and weak points!');
+    this.showMessage('🔫🔨 Hammer Power ゲット! 🔫で　グレーかべ　と　よわいところをこわせる');
 }
 
 startCatFirstDialog() {
@@ -4132,7 +4132,7 @@ showCatFirstDialog() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = "The Brown monster is gone! It is a bit safer out here now. But the Bully kidnapped me because of my power to heal. He took my DNA. That's why he never stays down for long. Come here anytime to fill your health. Meow.";
+    text.textContent = "茶色いモンスターはいなくなった！ここは少し安全になった。でもいじめっ子は私の治癒力のために私を誘拐した。彼は私のDNAを取った。だから彼は長く生き続けられる。いつでもここに来て体力を回復してね。ニャー。";
     
     const button = document.createElement('button');
     button.style.background = '#4CAF50';
@@ -4168,17 +4168,17 @@ completeCatFirstDialog() {
     // Recreate the level to update cat message
     this.initLevel();
     
-    this.showMessage('💖 Health fully restored!');
+    this.showMessage('💖 体力が完全回復');
 }
 
 handleCatHealing() {
     if (this.hearts < this.maxHearts) {
         this.hearts = this.maxHearts;
-        this.showNPCMessage("Cat POWER!! -- You have full health.");
+        this.showNPCMessage("😻ねこパワー!　❤️体力マックス");
         this.updateUI();
         this.saveGameState();
     } else {
-        this.showNPCMessage("Cat POWER!! -- You have full health.");
+        this.showNPCMessage("😻ねこパワー!　❤️体力マックス");
     }
 }
 
@@ -4198,7 +4198,7 @@ transferToWeakPoint(url) {
     gameState.lastSaveTime = Date.now();
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     
-    this.showMessage('🕳️ Entering the secret passage...');
+    this.showMessage('🕳️ ひみつ...');
     setTimeout(() => {
         window.location.href = `https://thedepression.github.io/games/minimaze/${url}`;
     }, 500);
@@ -4220,7 +4220,7 @@ transferToWeakPoint(url) {
     gameState.lastSaveTime = Date.now();
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     
-    this.showMessage('🏰 Entering the castle...');
+    this.showMessage('🏰 おしろに入る...');
     setTimeout(() => {
         window.location.href = 'https://thedepression.github.io/games/minimaze/castle';
     }, 500);
@@ -4341,7 +4341,7 @@ if (this.hasWeapon) {
                     this.startGameTimer();
                     this.saveGameState();
                     
-                    this.showMessage('🔄 Respawned - time penalty applied!');
+                    this.showMessage('🔄 Respawned');
                 }, 3000);
             }
             
@@ -4366,7 +4366,7 @@ if (this.hasWeapon) {
     gameState.lastSaveTime = Date.now();
     localStorage.setItem('mfGameState', JSON.stringify(gameState));
     
-    this.showMessage('🏪 Entering the shop...');
+    this.showMessage('🏪 店に入る...');
     setTimeout(() => {
         window.location.href = 'https://thedepression.github.io/games/minimaze/shop';
     }, 500);
@@ -4419,7 +4419,7 @@ showBattleDialogNoTrophy() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = "🤵🏻‍♂️ Fight and win 5 monster battles in a row and I will give you a trophy 🏆... give it a try?";
+    text.textContent = "🤵🏻‍♂️ 5体のモンスターと連続で戦って勝てばトロフィー🏆をあげよう...やってみるか？";
     
     const yesButton = document.createElement('button');
     yesButton.style.background = '#4CAF50';
@@ -4449,7 +4449,7 @@ showBattleDialogNoTrophy() {
     noButton.onclick = () => {
         dialogOverlay.remove();
         this.gameStarted = true;
-        this.showMessage('🤵🏻‍♂️ Come back when you have courage!');
+        this.showMessage('🤵🏻‍♂️ ざんねん。いつでもね');
     };
     
     dialogBox.appendChild(text);
@@ -4487,7 +4487,7 @@ showBattleDialogWithTrophy() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = "🤵🏻‍♂️ You were fantastic! Would you like to try again, just for fun?";
+    text.textContent = "🤵🏻‍♂️ 素晴らしかった！もう一度、楽しみでやってみるか？";
     
     const yesButton = document.createElement('button');
     yesButton.style.background = '#4CAF50';
@@ -4517,7 +4517,7 @@ showBattleDialogWithTrophy() {
     noButton.onclick = () => {
         dialogOverlay.remove();
         this.gameStarted = true;
-        this.showMessage('🤵🏻‍♂️ Thanks for visiting the arena!');
+        this.showMessage('🤵🏻‍♂️ 来てくれてありがとうございました');
     };
     
     dialogBox.appendChild(text);
@@ -4590,7 +4590,7 @@ transferToBattlezone() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = `🚪 Pay 2000¥ to open ${gateId.toUpperCase()}?`;
+    text.textContent = `🚪 2000¥払って ${gateId.toUpperCase()}を開くか？`;
     
     const moneyText = document.createElement('p');
     moneyText.style.margin = '5px 0';
@@ -4629,7 +4629,7 @@ transferToBattlezone() {
     noButton.onclick = () => {
         dialogOverlay.remove();
         this.gameStarted = true;
-        this.showMessage('🚪 Gate remains closed.');
+        this.showMessage('🚪 門は閉まったままだ。');
     };
     
     dialogBox.appendChild(text);
@@ -4658,7 +4658,7 @@ openGate(gateId) {
     this.updateUI();
     this.saveGameState();
     
-    this.showMessage(`🚪✨ ${gateId.toUpperCase()} opened permanently!`);
+    this.showMessage(`🚪✨ ${gateId.toUpperCase()} 空いてる`);
 }
         }
 
@@ -4741,7 +4741,7 @@ function confirmReset() {
         game.forestMusic.play().catch(e => console.log('Forest music play failed:', e));
         document.getElementById('forestOverlay').classList.add('active');
         document.getElementById('forestVisionMask').classList.add('active');
-        game.showMessage('🌲 Entering the forest...');
+        game.showMessage('🌲もりに入る');
         game.updateForestVisibility();
     } else if (game.pendingAction === 'exitForest') {
         game.isInForest = false;
@@ -4749,7 +4749,7 @@ function confirmReset() {
         game.bgMusic.play().catch(e => console.log('Music play failed:', e));
         document.getElementById('forestOverlay').classList.remove('active');
         document.getElementById('forestVisionMask').classList.remove('active');
-        game.showMessage('🌞 Left the forest!');
+        game.showMessage('🌞もりから出る');
         game.updateForestVisibility();
     }
     
