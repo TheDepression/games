@@ -2636,7 +2636,7 @@ hearts.forEach(heart => {
     if (this.rectsOverlap(playerRect, heartRect)) {
         if (heart.dataset.type === 'baby' && this.bullyDefeated) {
             this.hasBaby = true;
-            this.showMessage('👶🏻 Baby rescued!');
+            this.showMessage('👶🏻 赤ちゃん救出!');
             this.updateUI();
             // DON'T auto-save baby pickup - only save when delivered to mother
             heart.remove();
@@ -2644,7 +2644,7 @@ hearts.forEach(heart => {
             // Regular heart pickup
             this.hearts++;
             this.collectedHearts.push(heart.dataset.id); // Track collection
-            this.showMessage('❤️ Health restored!');
+            this.showMessage('❤️ 体力回復!');
             this.updateUI();
             this.saveGameState(); // Auto-save hearts
             heart.remove();
@@ -2667,7 +2667,7 @@ moneyItems.forEach(money => {
     if (this.rectsOverlap(playerRect, moneyRect)) {
         this.money += 100;
         this.collectedMoney.push(money.dataset.id); // Track collection
-        this.showMessage('💰 +100¥ collected!');
+        this.showMessage('💰 +100¥ ゲット!');
         this.updateUI();
         this.saveGameState(); // Auto-save
         money.remove();
@@ -2821,7 +2821,7 @@ if (onLava) {
             this.lastLavaZoneTime = now;
             
             if (this.lavaProtectionTime > 0) {
-                this.showMessage(`🥾 Protection: ${this.lavaProtectionTime} seconds left`);
+                this.showMessage(`🥾 守り: あと${this.lavaProtectionTime}秒`);
             } else {
                 // Protection expired
                 this.lavaProtectionActive = false;
@@ -3156,7 +3156,7 @@ if (inForest) {
     if (this.isInvulnerable) return;
     
     this.hearts -= damage; // Use the damage parameter
-    this.showMessage(damage > 1 ? '💔💔 Major damage!' : '💔 Ouch!');
+    this.showMessage(damage > 1 ? '💔💔 大ダメージ!' : '💔 いたい!');
     this.updateUI();
     
     this.isInvulnerable = true;
@@ -3252,7 +3252,7 @@ if (this.hasBaby) itemsText += ' 👶🏻';
         // Auto-save the respawn state to prevent pause-exploit
         this.saveGameState();
         
-        this.showMessage('🔄 Respawned at start - time penalty applied!');
+        this.showMessage('🔄 スタートに復活');
     }, 3000);
 }
     
