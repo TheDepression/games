@@ -349,30 +349,30 @@
         <div id="message"></div>
         
         <div id="startScreen">
-            <h2>🔺 Ancient Pyramid</h2>
+            <h2>🔺 ピラミッド</h2>
             <div id="welcomeMessage" style="margin: 20px 0;">The golden pyramid awaits...</div>
-            <p style="font-size: 12px; opacity: 0.8;">Navigate the mystical chambers and reach the top!</p>
-            <button class="start-button" onclick="startPyramid()">Enter Pyramid</button>
+            <p style="font-size: 12px; opacity: 0.8;">神秘的な部屋を進んで頂上を目指せ!</p>
+            <button class="start-button" onclick="startPyramid()">ピラミッドに入る</button>
         </div>
         
         <div id="pauseMenu" style="display: none;">
             <h3>⏸️ Game Paused</h3>
-            <button onclick="resumeGame()">Continue Game</button>
+            <button onclick="resumeGame()">ゲーム続行</button>
         </div>
 
         <div id="bossEncounterOverlay">
             <div class="boss-encounter-image"></div>
             <div class="boss-encounter-text">
-                "So... you've climbed all the way to the top. Impressive. But this is where your journey ENDS!"
+                "ふーん...てっぺんまで登ってきたのか。すごいじゃないか。でもお前の旅はここで終わりだ！"
             </div>
-            <button onclick="acceptBossFight()" style="background: #ff4444; font-size: 16px; padding: 12px 24px;">Final Battle!</button>
+            <button onclick="acceptBossFight()" style="background: #ff4444; font-size: 16px; padding: 12px 24px;">最終戦??</button>
         </div>
         
         <div id="controlArea">
     <!-- Top section: Main instruction -->
     <div style="text-align: center;">
         <div style="font-size: 18px; font-weight: bold; color: white;">🎮 Swipe to move</div>
-        <div style="font-size: 18px; font-weight: bold; color: white;">🔺 Pyramid Floor: <span id="currentFloor">1</span></div>
+        <div style="font-size: 18px; font-weight: bold; color: white;">🔺 Floor: <span id="currentFloor">1</span></div>
     </div>
     
     <!-- Bottom section: UI elements in 3 centered lines -->
@@ -1157,7 +1157,7 @@ this.pinkSquareSecretClaimed = false;
         const exitDoor = this.gameWorld.querySelector('[data-type="exit"]');
         if (exitDoor && this.currentFloor === 2) {
             exitDoor.remove();
-            this.showMessage('🚪 The exit is GONE!');
+            this.showMessage('🚪 出口消えた!');
         }
     }, 1000);
                     
@@ -1204,7 +1204,7 @@ this.pinkSquareSecretClaimed = false;
                 npc1.style.left = '470px';
                 npc1.style.top = '470px';
                 npc1.textContent = '🙍🏻‍♂️';
-                npc1.dataset.message = 'Ever since the bully has been around, my pet gorilla became aggressive and then ran into the forest. I think the bully did something! I followed him in here but i cannot go further. too many zombies.';
+                npc1.dataset.message = 'いじめっこが来てから、ペットのゴリラが凶暴になって森に逃げちゃった。いじめっこが何かしたんだと思う！追いかけてここまで来たけど、ゾンビが多すぎて進めない。';
                 this.gameWorld.appendChild(npc1);
                 
                 // NPC 2: Injured Officer (weapon giver)
@@ -1213,7 +1213,7 @@ this.pinkSquareSecretClaimed = false;
                 npc2.style.left = '440px';
                 npc2.style.top = '50px';
                 npc2.textContent = '👮🏻‍♂️';
-                npc2.dataset.message = this.hasWeapon ? 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!' : 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!';
+                npc2.dataset.message = this.hasWeapon ? 'もう進めない。私のTNT銃🔫を使ってゾンビを倒せ。ダブルタップで撃て！';
                 npc2.dataset.type = 'weaponGiver';
                 this.gameWorld.appendChild(npc2);
                 
@@ -1223,7 +1223,7 @@ this.pinkSquareSecretClaimed = false;
                 npc3.style.left = '40px';
                 npc3.style.top = '460px';
                 npc3.textContent = '🤯';
-                npc3.dataset.message = 'I heard the bully was on the top floor.... but there are so many zombies in this room, it is impossible to get there. - How does he keep surviving?!';
+                npc3.dataset.message = 'いじめっこが最上階にいるって聞いたけど...この部屋にはゾンビがいっぱいで行けない。あいつはどうやって生き延びてるんだ？！';
                 this.gameWorld.appendChild(npc3);
             }
             
@@ -1384,7 +1384,7 @@ this.pinkSquareSecretClaimed = false;
                     };
                     
                     if (this.rectsOverlap(playerRect, wallRect)) {
-                        this.takeDamage('⚡ Electric shock!');
+                        this.takeDamage('⚡ 電気ショック!');
                         return false;
                     }
                 }
@@ -1543,11 +1543,11 @@ if (this.currentFloor === 4 && !this.hasWeapon) {
                     
                     if (this.rectsOverlap(playerRect, enemyRect)) {
                         if (enemy.type === 'tracking') {
-                            this.takeDamage('💀 Enemy attack!');
+                            this.takeDamage('💀 こうげき!');
                         } else if (enemy.type === 'zombie') {
-                            this.takeDamage('🧟 Zombie bite!');
+                            this.takeDamage('🧟 ゾンビに噛まれた');
                         } else {
-                            this.takeDamage('💔 Potato fly attack!');
+                            this.takeDamage('💔 Potato-Fly こうげき!');
                         }
                     }
                 });
@@ -1600,7 +1600,7 @@ superHearts.forEach(heart => {
     
     if (this.rectsOverlap(playerRect, heartRect)) {
         this.hearts = 8; // Set to 8 hearts
-        this.showMessage('💖 SUPER HEART! Ultimate power!');
+        this.showMessage('💖 スーパーハート! 究極のパワー!');
         this.updateUI();
         heart.remove();
     }
@@ -1618,7 +1618,7 @@ superMoney.forEach(money => {
     
     if (this.rectsOverlap(playerRect, moneyRect)) {
         this.money += 500;
-        this.showMessage('💎 SUPER Money! +500¥ collected!');
+        this.showMessage('💎 スーパーマネー! +500¥ゲット!');
         this.updateUI();
         money.remove();
     }
@@ -1671,18 +1671,18 @@ handleWeaponGiver(element) {
     if (!this.hasWeapon) {
         if (now - lastTime > 3000) {
             this.hasWeapon = true;
-            this.showMessage('I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
+            this.showMessage('もう進めない。私のTNT銃🔫を使ってゾンビを倒せ。ダブルタップで撃て！', true);
             this.lastInteractionTime[messageKey] = now;
             
             setTimeout(() => {
-                element.dataset.message = 'I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!';
+                element.dataset.message = 'もう進めない。私のTNT銃🔫を使ってゾンビを倒せ。ダブルタップで撃て！';
             }, 3000);
             
             this.updateUI();
         }
     } else {
         if (now - lastTime > 100) {
-            this.showMessage('I cannot continue. Use my TNT gun🔫 to pass the zombies. Doudble-tap to shoot!', true);
+            this.showMessage('もう進めない。私のTNT銃🔫を使ってゾンビを倒せ。ダブルタップで撃て！', true);
             this.lastInteractionTime[messageKey] = now;
         }
     }
@@ -1801,7 +1801,7 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                     const stairsEl = document.getElementById('temporaryStairs');
                     if (stairsEl) {
                         stairsEl.remove();
-                        this.showMessage('⏰ Stairs disappeared! Find the button again.');
+                        this.showMessage('⏰ ハシゴが消えた。ボタンをもう一回押して');
                     }
                 }, 20000);
             }
@@ -1817,7 +1817,7 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                     this.stairsTimer = null;
                 }
                 
-                this.showMessage(`🔺 Ascending to Floor ${this.currentFloor}!`);
+                this.showMessage(`🔺 ${this.currentFloor}階に上がる!`);
                 
                 setTimeout(() => {
                     this.createFloor(this.currentFloor);
@@ -1848,7 +1848,7 @@ attackEl.style.top = (this.playerY + offset.y - 20) + 'px';
                 }
                 this.isTransitioning = true;
                 this.currentFloor--;
-                this.showMessage(`🔻 Descending to Floor ${this.currentFloor}!`);
+                this.showMessage(`🔻 ${this.currentFloor}階に下がる!`);
                 
                 setTimeout(() => {
                     this.createFloor(this.currentFloor);
@@ -1935,7 +1935,7 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
                        rect1.bottom > rect2.top;
             }
             
-            takeDamage(message = '💔 Ouch!') {
+            takeDamage(message = '💔 いたい!') {
                 if (this.isInvulnerable) return;
                 
                 this.hearts--;
@@ -1968,7 +1968,7 @@ gameState.pinkSquareSecretClaimed = this.pinkSquareSecretClaimed;
                 if (this.timerInterval) clearInterval(this.timerInterval);
                 this.pyramidMusic.pause();
                 
-                this.showMessage('💀 You died in the pyramid!');
+                this.showMessage('💀ピラミッドで死んだ!');
                 
                 setTimeout(() => {
                     
