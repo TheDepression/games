@@ -840,8 +840,8 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
         };
     } else if (this.hasTrophy && !this.hasKey) {
         // State 2: Has trophy, wants to trade for key
-        message.textContent = 'You are a winner!!!! wow - the trophy is beautiful!!! Here you go!!';
-        button.textContent = 'Trade Trophy for Key';
+        message.textContent = 'キミが ゆうしょうしゃ！！わあ、トロフィー すごく きれい！！はい、どうぞ！';
+        button.textContent = 'トロフィー と カギ を こうかん';
         button.onclick = () => {
             this.hasTrophy = false;
             this.hasKey = true;
@@ -850,14 +850,14 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
             popup.remove();
             this.isPopupOpen = false;
             this.mamiKeyLastInteraction = Date.now();
-            this.showMessage('🔑 Received Castle Key!');
+            this.showMessage('🔑 おしろのカギ を てにいれた！');
         };
     } else {
         // State 1: No trophy, no key (or has both somehow)
-        message.textContent = 'so you want a discount on that castle key?';
+        message.textContent = 'その 🔑おしろのカギ、やすくしてほしいの？';
         button.textContent = 'YES';
         button.onclick = () => {
-            message.textContent = 'OK,... I like winners.... come back to me with a trophy from the Battle Arena, - and I will give it to you!';
+            message.textContent = 'よし… わたしは ゆうしょうしゃが すきだ… 🏟️バトルアリーナ の 🏆トロフィー を もってきたら、あげるよ！';
             button.textContent = 'OK';
             button.onclick = () => {
                 popup.remove();
@@ -1032,13 +1032,13 @@ this.collectedPurpleHearts = gameState.collectedPurpleHearts || [];
                }
 
                if (roomX === 0 && roomY === 0) {
-                   this.createNPC(80, 30, '🦆', 'you found the secret cave. but watch out. that lava will kill you in 1 touch. I heard there are many secret items in here... but you have to escape the cave cleanly to keep them. quack quack');
+                   this.createNPC(80, 30, '🦆', 'ひみつのどうくつを みつけたね。 でもきをつけて。マグマに さわると、一回でやられるよ。 この中に、たくさんの ひみつアイテムが あるってきいたけど… このどうくつで死んだら、とったアイテムがなくしちゃうよ。ガーガー');
                }
 
                if (roomX === 3 && roomY === -1) {
-                   this.createNPC(100, 100, '🐷', 'how did you find our secret room! darn it!');
-                   this.createNPC(200, 100, '😎', 'take the purple hearts... I dont need them... please beat the bully and save us!');
-                   this.createNPC(150, 200, '', 'you cleared the pyramid. now it is time to clear the castle. go get that bully!!', false, 'https://raw.githubusercontent.com/TheDepression/Photos/main/hinapink-min.png');
+                   this.createNPC(100, 100, '🐷', 'なんで ぼくらの ひみつのへや を みつけたの！？ ちぇっ');
+                   this.createNPC(200, 100, '😎', 'むらさきのハート を もっていって… ぼくは いらないから… あの いじめっこ を たおして、ぼくら を たすけて！');
+                   this.createNPC(150, 200, '', 'ピラミッド を クリアしたね！つぎは おしろ だ！あの いじめっこ を たおしに いけ！', false, 'https://raw.githubusercontent.com/TheDepression/Photos/main/hinapink-min.png');
                }
 
                if (roomX === 5 && roomY === 0) {
