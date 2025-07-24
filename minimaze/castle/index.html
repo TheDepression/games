@@ -2506,12 +2506,12 @@ if (this.hasPineapplePower) {
     <div style="margin-bottom: 15px;">
         <img src="https://raw.githubusercontent.com/TheDepression/Photos/main/pineapplehealth-min.png" style="width: 40px; height: 40px; display: block; margin: 0 auto 10px auto;">
     </div>
-    <div style="margin-bottom: 10px;">🍍 <strong>Pineapple Power Upgrade</strong></div>
+    <div style="margin-bottom: 10px;">🍍 <strong>パイン　パワー</strong></div>
     <div style="font-size: 12px; margin-bottom: 8px;">
-        • Shoots powerful pineapple projectiles (1000 damage)<br>
-        • Recharges after 10 seconds of not shooting<br>
-        • Works with your gun attacks<br>
-        • Melts when you leave the castle and the bully loves breaking them
+        • つよいパインを　うつ (1000hp ダメージ)<br>
+        • 充電は　🔫を１０秒使わないで　パイン１個うつ<br>
+        • 使いかったは　普通にスワイプパッドを2回タップ<br>
+        • おしろから出たらとける　あといじめ子にたおされたら、こわれる
     </div>
     <div style="color: ${this.money >= 200 ? '#4CAF50' : '#f44336'};">
         Cost: 200¥ (You have: ${this.money}¥)
@@ -2536,13 +2536,13 @@ handlePineappleChoice(accepted) {
             this.hasPineapplePower = true;
             this.pineappleCharged = true;
             this.lastGunUse = Date.now();
-            this.showMessage('🍍 Pineapple Power purchased! Press attack to fire!');
+            this.showMessage('🍍 パインパワー買った! 2回タップで　うつ!');
             this.updateUI();
         } else {
-            this.showMessage('🍍 Not enough money! Need 200¥');
+            this.showMessage('🍍 お金たりない!  200¥必要');
         }
     } else {
-        this.showMessage('🍍 Maybe next time!');
+        this.showMessage('🍍 いつでもね!');
     }
 }
 
