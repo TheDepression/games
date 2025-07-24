@@ -1264,7 +1264,7 @@ showInstructionsDialog() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = "To win the trophy, you must win all 5 battles. There is no pause during a battle, so get ready to fight!";
+    text.textContent = "🏆トロフィー を もらうには、５つのバトルに ぜんぶ かたないと いけないよ。バトルちゅう は ⏸️ポーズ🚫できないから、じゅんびして たたかってね！";
     
     const button = document.createElement('button');
     button.style.background = '#4CAF50';
@@ -1274,7 +1274,7 @@ showInstructionsDialog() {
     button.style.borderRadius = '5px';
     button.style.cursor = 'pointer';
     button.style.fontSize = '14px';
-    button.textContent = 'I AM READY';
+    button.textContent = 'いけるよ';
     button.onclick = () => {
         dialogOverlay.remove();
         this.startBattleAnimation();
@@ -1597,22 +1597,22 @@ enemyTaunt() {
 let tauntMessage;
 switch (this.currentBattle) {
     case 1:
-        tauntMessage = 'GAME OVER, FROG!';
+        tauntMessage = 'ゲームオーバー だよ、カエル！';
         break;
     case 2:
-        tauntMessage = 'We are going to make frog soup for dinner tonight!';
+        tauntMessage = '俺たちのこんばんの ごはん は カエルスープ だよ〜';
         break;
     case 3:
-    tauntMessage = 'Time to operate!🐻';
+    tauntMessage = 'しゅじゅつ の じかん だ!🐻';
     break;
     case 4:
-        tauntMessage = 'Huh?! 🐸';
+        tauntMessage = 'えっ！？ 🐸';
         break;
     case 5:
-    tauntMessage = 'The Bully made me,... to kill you!';
+    tauntMessage = '君をころすたみに、いじめ子に作られた';
     break;
     default:
-        tauntMessage = 'GAME OVER, FROG!';
+        tauntMessage = 'ゲームオーバー だよ、カエル！';
 }
 this.showMessage(tauntMessage);
     
@@ -1950,7 +1950,7 @@ createBattleEnemy() {
             startLightsOutSequence() {
    
     // Show confused message
-    this.showMessage('Huh?? 🐸');
+    this.showMessage('えっ！？ 🐸');
     
     // After message, lights out
     setTimeout(() => {
@@ -3357,7 +3357,7 @@ showFinalVictory() {
     const text = document.createElement('p');
     text.style.margin = '10px 0';
     text.style.fontSize = '14px';
-    text.textContent = "🏆 CHAMPION! You have earned the trophy! You may now explore freely.";
+    text.textContent = "🏆 チャンピオン！トロフィー を てにいれた！ おめでとう🥳  下に出口あるからどうぞ";
     
     const button = document.createElement('button');
     button.style.background = '#4CAF50';
