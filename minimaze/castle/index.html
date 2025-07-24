@@ -1205,7 +1205,7 @@ if (floorNumber < 8) {
     cat.style.backgroundPosition = 'center';
     cat.style.zIndex = '40';
     cat.dataset.type = 'healer';
-    cat.dataset.message = "Meow! I followed you to help!!  MAX CAT POWER!!! ❤️";
+    cat.dataset.message = "ミャオ! 手伝うために　ついて来たんだ!!  マックスねこパワー!!! ❤️";
     this.gameWorld.appendChild(cat);
     
     // Scientist NPC - now shows pineapple info only
@@ -1215,7 +1215,7 @@ scientist.textContent = '👨🏻‍🔬';
 scientist.style.left = '300px';
 scientist.style.top = '820px';
 scientist.dataset.type = 'pineapple_seller';
-scientist.dataset.message = "🍍 My pineapple power is the best!";
+scientist.dataset.message = "🍍 俺のパインはさいこう!";
 this.gameWorld.appendChild(scientist);
 }
 
@@ -2086,7 +2086,7 @@ takeDamage() {
             } else if (type === 'boss') {
                 // Save current state including pineapple power for cutscene
                 this.saveGameStateWithPineapple();
-                this.showMessage('👑 Confronting the final boss...');
+                this.showMessage('👑 final boss...');
                 this.gameStarted = false;
                clearInterval(this.timerInterval);
                 setTimeout(() => {
@@ -2095,7 +2095,7 @@ takeDamage() {
             } else if (type === 'healer') {
                 if (this.hearts < this.maxHearts) {
                     this.hearts = this.maxHearts;
-                    this.showMessage('❤️ Fully healed by cat girlfriend!');
+                    this.showMessage('❤️ 体力マックス!');
                     this.updateUI();
                 }
             } else if (type === 'pineapple_seller') {
@@ -2105,7 +2105,7 @@ takeDamage() {
             this.showPineappleChoice();
             this.lastPineappleDialog = now;
         } else {
-            this.showMessage(`🍍 You already have Pineapple Power! ${this.pineappleCharged ? 'Ready to fire!' : 'Recharging...'}`);
+            this.showMessage(`🍍 パインもあるよ! ${this.pineappleCharged ? 'Ready to fire!' : 'Recharging...'}`);
             this.lastPineappleDialog = now;
         }
     }
@@ -2248,7 +2248,7 @@ if (this.hasPineapplePower && this.pineappleCharged) {
                clearInterval(this.timerInterval);
                this.castleMusic.pause();
                
-               this.showMessage('🌅 Exiting castle...');
+               this.showMessage('🌅 おしろ出る...');
                
                setTimeout(() => {
                    this.saveGameState();
@@ -2284,7 +2284,7 @@ gameOver() {
     clearInterval(this.timerInterval);
     this.castleMusic.pause();
     
-    this.showMessage('💀 You died in the castle!');
+    this.showMessage('💀 死んだ!');
     
     setTimeout(() => {
         this.hearts = 3;
