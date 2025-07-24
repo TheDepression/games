@@ -1200,7 +1200,7 @@ cdpheart2: this.cdpheart2,
 
             handleGunSeller() {
                 if (this.hasSuperGun) {
-                    this.showNPCMessage("💂🏼‍♀️ You already have the Super Gun! Try testing it on the demon!");
+                    this.showNPCMessage("💂🏼‍♀️ スーパーガンもあるよ　オニ👺にためしてね");
                     return;
                 }
 
@@ -1216,7 +1216,7 @@ cdpheart2: this.cdpheart2,
                 const discount = this.hasSuperGunTicket ? " (50% discount with ticket!)" : "";
 
                 if (!this.lastInteractionTime[npcKey]) {
-                    this.showNPCMessage(`💂🏼‍♀️ Super Gun for ${cost}¥!${discount} 150 damage!`);
+                    this.showNPCMessage(`💂🏼‍♀️ スーパーガンは ${cost}¥!${discount} 100hpじゃなく150hpダメージになるよ!`);
                     this.lastInteractionTime[npcKey] = now - 2500;
                     return;
                 }
@@ -1227,10 +1227,10 @@ cdpheart2: this.cdpheart2,
                         cost: cost,
                         seller: 'gunSeller'
                     };
-                    this.showPurchaseDialog(`Buy Super Gun for ${cost}¥?${discount}`);
+                    this.showPurchaseDialog(`スーパーガンを買う?? ${cost}¥?${discount}`);
                 } else {
                     const needed = cost - this.money;
-                    this.showNPCMessage(`💂🏼‍♀️ Super Gun costs ${cost}¥. You need ${needed}¥ more!`);
+                    this.showNPCMessage(`💂🏼‍♀️ スーパーガンは ${cost}¥. あと ${needed}¥ 必要ね!`);
                 }
                 
                 this.lastInteractionTime[npcKey] = now;
@@ -1238,7 +1238,7 @@ cdpheart2: this.cdpheart2,
 
             handleRangeSeller() {
                 if (this.hasEnhancedRange) {
-                    this.showNPCMessage("👨🏻‍🎤 You already have enhanced range! Test it on the demon!");
+                    this.showNPCMessage("👨🏻‍🎤 もう えんちょうをもってるよ！かどにあるオニ👺に　ためしてね");
                     return;
                 }
 
@@ -1251,7 +1251,7 @@ cdpheart2: this.cdpheart2,
                 }
 
                 if (!this.lastInteractionTime[npcKey]) {
-                    this.showNPCMessage("👨🏻‍🎤 Enhanced Range for 5000¥! Double your shooting distance!");
+                    this.showNPCMessage("👨🏻‍🎤 🔫のうつ　えんちょうは 5000円！これで　2ばい きょり になるよ！");
                     this.lastInteractionTime[npcKey] = now - 2500;
                     return;
                 }
@@ -1262,10 +1262,10 @@ cdpheart2: this.cdpheart2,
                         cost: 5000,
                         seller: 'rangeSeller'
                     };
-                    this.showPurchaseDialog("Buy Enhanced Range for 5000¥?");
+                    this.showPurchaseDialog("5000¥で買う?");
                 } else {
                     const needed = 5000 - this.money;
-                    this.showNPCMessage(`👨🏻‍🎤 Enhanced Range costs 5000¥. You need ${needed}¥ more!`);
+                    this.showNPCMessage(`👨🏻‍🎤 きょりのえんちょうは 5000円 だよ。あと  ${needed}¥ ひつようだね`);
                 }
                 
                 this.lastInteractionTime[npcKey] = now;
@@ -1290,11 +1290,11 @@ cdpheart2: this.cdpheart2,
                     if (purchase.type === 'superGun') {
                     this.hasSuperGun = true;
                     this.attackDamage = 150;
-                    this.showMessage('🔫⚫ Super Gun acquired! 150 damage! Test it on the demon!');
+                    this.showMessage('🔫⚫ スーパーガン　ゲット! 150 ダメージ! 👺オニにためして「');
                 } else if (purchase.type === 'enhancedRange') {
                     this.hasEnhancedRange = true;
                     this.attackRange = 90; // Double range
-                    this.showMessage('🔫✨ Enhanced Range acquired! Double shooting distance!');
+                    this.showMessage('🔫✨ うつ　きょり　えんちょう　ゲット! 2ばい!');
                 }
                 
                 this.updateUI();
@@ -1325,7 +1325,7 @@ cdpheart2: this.cdpheart2,
                 gameState.lastSaveTime = Date.now();
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
-                this.showMessage('🏪 Leaving the shop...');
+                this.showMessage('🏪 店から出る...');
                 setTimeout(() => {
                     window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
                 }, 500);
