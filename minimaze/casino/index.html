@@ -603,8 +603,8 @@
             <div id="npcName" class="npc-name"></div>
             <div id="npcMessage" class="npc-message"></div>
             <div class="popup-buttons">
-                <button class="play-button" onclick="game.acceptGame()">Play Game</button>
-                <button class="decline-button" onclick="game.declineGame()">No Thanks</button>
+                <button class="play-button" onclick="game.acceptGame()">やります</button>
+                <button class="decline-button" onclick="game.declineGame()">いいえ</button>
             </div>
         </div>
 
@@ -621,7 +621,7 @@
         
         <div id="controlArea">
             <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 18px; font-weight: bold;">🎰 Master Frog's Casino</div>
+                <div style="font-size: 18px; font-weight: bold;">🎰 ジリスのカジノ</div>
                 <div style="font-size: 12px; opacity: 0.8;">🎮 Swipe to move around the casino!</div>
             </div>
             <div class="control-hint">
@@ -1207,55 +1207,55 @@ cdpheart2: this.cdpheart2,
             getNPCData(name) {
                 const npcData = {
                     'Monty Hall Host': {
-    message: '🎲 Welcome to Monty Hall! Pick a door and see what\'s behind it! Will you win big?',
+    message: '🎲 ドアをえらんでみたら?',
     price: 300,
     url: 'spa-monty', // Change this from the external URL
     image: 'cgmonty.PNG'
 },
                     'Lucky Cat': {
-    message: '🐱 Meow! Choose your champion cat and watch them chase the mouse! Will your cat be faster?',
+    message: '🐱 Meow! ねこをえらんで。ネズミつかまえたら勝ち',
     price: 200,
     url: 'spa-cat', // Change this to spa-cat
     image: 'cgcat.PNG'
 },
                     'Race Master': {
-    message: '🏃 Ready to race? Pick your champion and watch them compete for glory!',
+    message: '🏃 レース の チャンピオン を えらんで、ゆうしょう かどうか　みよう！',
     price: 100,
     url: 'spa-race', // Change this to spa-race
     image: 'cg1race.PNG'
 },
                     'Memory Master': {
-    message: '🧠 Test your memory skills! Match all the cards to win the jackpot!',
+    message: '🧠 きおくりょく を ためそう！カード を ぜんぶ あわせて、ジャックポット を ねらおう！!',
     price: 400,
     url: 'spa-memory', // Changed from external URL
     image: 'cgmemory.PNG'
 },
                     'Rock Paper Scissors': {
-                        message: '✂️ Classic game of chance! Best 2 out of 3 rounds wins!',
+                        message: '✂️ じゃんけんゲーム！３かい たたかって、２かい かったほう が しょうり！',
                         price: 100,
                         url: 'spa', // Special marker for SPA game
                         image: 'cgrock.PNG'
                     },
                 'Lottery Seller': {
-    message: '🎫 Try your luck with our lottery! You could win hundreds of yen!',
+    message: '🎫 宝くじで　たくさんお金をゲットできる',
     price: 100,
     url: 'spa-lottery', // New marker for lottery SPA
     image: 'cglottery.PNG'
 },
                    'Simon Says': {
-    message: '🎵 Follow the pattern perfectly and win the musical jackpot!',
+    message: '🎵 もよう を おぼえて、かんぺき に コピーしよう！ぜんぶで ３ラウンド。ラウンド が ふえると、ごほうび も アップ！',
     price: 200, // Changed from 100 to 200
     url: 'spa-simon', // New marker for Simon SPA
     image: 'cgsimon.png'
 },
                     'Slot Machine': {
-    message: '🎰 Pull the lever and try your luck! Line up the symbols to win big!',
+    message: '🎰 レバー を ひいて うん を ためそう！マーク を そろえて おおあたり を ねらおう！',
     price: 200,
     url: 'spa-slot', // Change this to spa-slot
     image: 'cgslot.PNG'
 },
                     'Casino Greeter': {
-                        message: '🎰 Welcome to our casino! Try all the games and win big!',
+                        message: '🎰 カジノをようこそ！色々やってみてお金をゲットできる',
                         price: 0,
                         url: null,
                         image: 'cggreet.PNG'
@@ -1608,11 +1608,11 @@ if (dog && !this.dogCaught) {
                 
                 if (Math.random() < 0.01) { // 1% chance
                     this.money += 500;
-                    this.showMessage('🚽💰 Found 500¥ in the toilet! Lucky you!');
+                    this.showMessage('🚽💰 べんきで 500¥ 見つけた！');
                     this.updateUI();
                     this.saveGameState();
                 } else {
-                    this.showMessage('🚽 No money here... just a toilet.');
+                    this.showMessage('🚽 お金はここにない');
                 }
             }
 
@@ -1635,7 +1635,7 @@ if (dog && !this.dogCaught) {
                 gameState.lastSaveTime = Date.now();
                 localStorage.setItem('mfGameState', JSON.stringify(gameState));
                 
-                this.showMessage('🪜 Leaving the casino...');
+                this.showMessage('🪜 カジノから出る...');
                 
                 setTimeout(() => {
                     window.location.href = 'https://thedepression.github.io/games/minimaze/maze2';
@@ -1685,7 +1685,7 @@ if (dog && !this.dogCaught) {
                 const url = this.currentNPC.dataset.url;
                 
                 if (this.money < price) {
-                    document.getElementById('npcMessage').textContent = `I'm sorry, you don't seem to have enough money to play. You need ${price}¥ but only have ${this.money}¥.`;
+                    document.getElementById('npcMessage').textContent = `ごめん　お金は　たりない　　 ${price}¥ ですけど ${this.money}¥しかない`;
                     // Change buttons temporarily
                     const popup = document.getElementById('npcPopup');
                     popup.querySelector('.popup-buttons').innerHTML = '<button class="decline-button" onclick="game.declineGame()">Okay</button>';
@@ -1788,8 +1788,8 @@ if (url === 'spa') {
                         </div>
                     </div>
                     <div class="rps-buttons">
-                        <button class="rps-btn rps-btn-info" onclick="game.showRPSRules()">Explain Rules</button>
-                        <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Let's Play!</button>
+                        <button class="rps-btn rps-btn-info" onclick="game.showRPSRules()">せつめい</button>
+                        <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">始める!</button>
                     </div>
                 `;
             }
@@ -1802,12 +1802,12 @@ if (url === 'spa') {
                             📋 Game Rules
                         </div>
                         <div style="font-size: 14px; line-height: 1.4;">
-                            • I'll count "Rock, Paper, Scissors, 1, 2, 3!"<br>
-                            • Choose your move exactly when I say "3"<br>
-                            • Too early or too late = automatic loss!<br>
+                            • 俺は "Rock, Paper, Scissors, 1, 2, 3!"と言う<br>
+                            • ちょうど "3"と言う時に　えらんでください<br>
+                            • 早すぎ とか 遅すぎなら じどうてきに負けるよ!<br>
                             • Paper beats Rock, Rock beats Scissors, Scissors beats Paper<br>
-                            • Best 2 out of 3 rounds wins!<br>
-                            • Winner takes 200¥, loser gets nothing
+                            • 2回分の３は勝ち<br>
+                            • 勝ったら 200¥, 負けたら 0
                         </div>
                     </div>
                     <div class="rps-buttons">
@@ -1906,9 +1906,9 @@ if (url === 'spa') {
                 // Check if player made a choice
                 if (!this.rpsGameState.playerChoice) {
                     result.innerHTML = `
-                        <div style="color: #f44336;">❌ Too slow! You didn't choose in time.</div>
+                        <div style="color: #f44336;">❌ おそすぎ! 負ける.</div>
                         <div style="margin-top: 10px;">
-                            <button class="rps-btn rps-btn-primary" onclick="game.processRPSLoss()">Continue</button>
+                            <button class="rps-btn rps-btn-primary" onclick="game.processRPSLoss()">つづく</button>
                         </div>
                     `;
                     return;
@@ -1921,7 +1921,7 @@ if (url === 'spa') {
                 
                 if (!validTiming) {
                     result.innerHTML = `
-                        <div style="color: #f44336;">❌ Wrong timing! You must choose within 1 second of "3".</div>
+                        <div style="color: #f44336;">❌ タイミングは違う  "3"って言う時　の　１秒以内ね.</div>
                         <div style="margin-top: 10px;">
                             <button class="rps-btn rps-btn-primary" onclick="game.processRPSLoss()">Continue</button>
                         </div>
@@ -1994,7 +1994,7 @@ if (url === 'spa') {
                 resultText += `</div>`;
                 
                 if (winner === 'tie') {
-                    resultText += `<div style="color: #ffeb3b;">🤝 It's a tie! Let's try again.</div>`;
+                    resultText += `<div style="color: #ffeb3b;">🤝 同点です　　もう一回ね</div>`;
                     result.innerHTML = resultText + `
                         <div style="margin-top: 15px;">
                             <button class="rps-btn rps-btn-primary" onclick="game.startRPSRound()">Next Round</button>
@@ -2002,7 +2002,7 @@ if (url === 'spa') {
                     `;
                 } else if (winner === 'player') {
                     this.rpsGameState.playerWins++;
-                    resultText += `<div style="color: #4CAF50;">🎉 You win this round!</div>`;
+                    resultText += `<div style="color: #4CAF50;">🎉 おめでとう!</div>`;
                     
                     if (this.rpsGameState.playerWins === 2) {
                         result.innerHTML = resultText + `
@@ -2020,7 +2020,7 @@ if (url === 'spa') {
                     }
                 } else {
                     this.rpsGameState.npcWins++;
-                    resultText += `<div style="color: #f44336;">😞 NPC wins this round!</div>`;
+                    resultText += `<div style="color: #f44336;">😞 俺の勝ちね!</div>`;
                     
                     if (this.rpsGameState.npcWins === 2) {
                         result.innerHTML = resultText + `
@@ -2054,7 +2054,7 @@ if (url === 'spa') {
                 const content = document.getElementById('rpsContent');
                 content.innerHTML = `
                     <div style="margin-bottom: 20px;">
-                        <div style="font-size: 20px; color: #4CAF50; margin-bottom: 10px;">🎉 Congratulations!</div>
+                        <div style="font-size: 20px; color: #4CAF50; margin-bottom: 10px;">🎉 おめでとうございます!</div>
                         <div style="font-size: 16px;">You defeated me fair and square!</div>
                         <div style="font-size: 14px; color: #ffd700; margin-top: 10px;">+200¥ earned!</div>
                     </div>
@@ -2068,9 +2068,9 @@ if (url === 'spa') {
                 const content = document.getElementById('rpsContent');
                 content.innerHTML = `
                     <div style="margin-bottom: 20px;">
-                        <div style="font-size: 20px; color: #f44336; margin-bottom: 10px;">😞 Better luck next time!</div>
-                        <div style="font-size: 16px;">The house always has an edge, but you played well!</div>
-                        <div style="font-size: 14px; color: #888; margin-top: 10px;">No winnings this time.</div>
+                        <div style="font-size: 20px; color: #f44336; margin-bottom: 10px;">😞 負けたね!</div>
+                        <div style="font-size: 16px;">俺はすごいね!</div>
+                        <div style="font-size: 14px; color: #888; margin-top: 10px;">また今度ね</div>
                     </div>
                     <div class="rps-buttons">
     <button class="rps-btn rps-btn-primary" onclick="game.hideRPSOverlay()">Return to Casino</button>
