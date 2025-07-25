@@ -628,9 +628,16 @@
                 const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
                 
                 // Format time (assuming it's in seconds)
-                const minutes = Math.floor(player.time / 60);
-                const seconds = Math.floor(player.time % 60);
-                const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+const hours = Math.floor(player.time / 3600);
+const minutes = Math.floor((player.time % 3600) / 60);
+const seconds = Math.floor(player.time % 60);
+
+let timeFormatted;
+if (hours > 0) {
+    timeFormatted = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+} else {
+    timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
                 
                 html += `
                     <div class="leaderboard-row">
@@ -684,6 +691,18 @@ function skipNameAndFinish() {
     // Just reload without setting name
     window.location.reload();
 }
+
+        // Show player name and reset button when page loads
+window.addEventListener('load', function() {
+    const playerName = localStorage.getItem('mfPlayerName');
+    if (playerName) {
+        const welcomeEl = document.getElementById('playerWelcome');
+        welcomeEl.textContent = `ようこそ ${playerName}さん`;
+        welcomeEl.style.display = 'block';
+        
+        document.getElementById('resetDataBtn').style.display = 'block';
+    }
+});
     </script>
 </body>
 </html>
