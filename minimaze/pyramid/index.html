@@ -1206,6 +1206,7 @@ this.pinkSquareSecretClaimed = false;
                 npc1.textContent = '🙍🏻‍♂️';
                 npc1.dataset.message = 'いじめっこが来てから、ペットのゴリラが凶暴になって森に逃げちゃった。いじめっこが何かしたんだと思う！追いかけてここまで来たけど、ゾンビが多すぎて進めない。';
                 this.gameWorld.appendChild(npc1);
+
                 
                 // NPC 2: Injured Officer (weapon giver)
                 const npc2 = document.createElement('div');
@@ -1213,7 +1214,7 @@ this.pinkSquareSecretClaimed = false;
                 npc2.style.left = '440px';
                 npc2.style.top = '50px';
                 npc2.textContent = '👮🏻‍♂️';
-                npc2.dataset.message = this.hasWeapon ? 'もう進めない。私のTNT銃🔫を使ってゾンビを倒せ。ダブルタップで撃て！';
+                npc2.dataset.message = 'もう進めない。私のTNT銃🔫を使ってゾンビを倒せ。ダブルタップで撃て！';
                 npc2.dataset.type = 'weaponGiver';
                 this.gameWorld.appendChild(npc2);
                 
