@@ -322,7 +322,7 @@
 <div id="bossEncounterOverlay">
     <div class="boss-encounter-image"></div>
     <div class="boss-encounter-text">
-        "YOU AGAIN?! Give up, Frog. This pencil is MINE!!"
+        "また?! やめろ、くさいカエル! 俺のえんぴつよ✏️!!"
     </div>
     <button onclick="acceptBossFight()" style="background: #ff4444; font-size: 16px; padding: 12px 24px;">Fight!</button>
 </div>
@@ -1100,7 +1100,7 @@ items.forEach(item => {
     this.pencilCollected = true;
     this.hasPencil = true;
     item.remove();
-    this.showMessage('✏️ Ancient Pencil acquired! Return to main world to save it!');
+    this.showMessage('✏️ えんぴつを手に入れた。あんぜんに出れるかな？');
     this.updateUI();
     // DON'T auto-save pencil collection - only save when exiting cave
 }
