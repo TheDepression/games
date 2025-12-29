@@ -24,11 +24,11 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Changed to flex-start to avoid overflow */
+            justify-content: flex-start;
             align-items: center;
             padding: 10px;
             box-sizing: border-box;
-            overflow-y: auto; /* Allow scrolling within container if needed */
+            overflow-y: auto;
         }
         
         #mediaContainer {
@@ -118,7 +118,7 @@
             width: 100%;
             max-width: 600px;
             display: flex;
-            flex-direction: column; /* Stack buttons vertically */
+            flex-direction: column;
             gap: 10px;
             align-items: center;
             margin-top: 10px;
@@ -134,7 +134,7 @@
             cursor: pointer;
             transition: background 0.3s;
             width: 100%;
-            max-width: 200px; /* Limit button width */
+            max-width: 200px;
         }
         
         button:hover {
@@ -150,15 +150,6 @@
             display: block;
         }
         
-        #submitButton {
-            background: #4CAF50;
-            display: none;
-        }
-        
-        #submitButton:hover {
-            background: #45a049;
-        }
-
         #restartButton {
             background: #ff6b35;
             display: none;
@@ -204,7 +195,7 @@
             border-radius: 15px;
             padding: 15px;
             display: none;
-            max-height: 200px; /* Reduced height to fit on smaller screens */
+            max-height: 300px;
             overflow-y: auto;
             margin-bottom: 10px;
         }
@@ -225,7 +216,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
             gap: 10px;
-            font-size: 14px; /* Smaller font for better fit */
+            font-size: 14px;
         }
 
         .leaderboard-entry.current-player {
@@ -236,17 +227,29 @@
         .rank {
             font-weight: bold;
             color: #FFD700;
+            min-width: 40px;
         }
 
-        .loading {
+        .player-name {
+            flex: 1;
+            text-align: left;
+        }
+
+        .deaths {
+            color: #ff6b6b;
+            min-width: 60px;
             text-align: center;
-            color: #daa520;
-            font-style: italic;
+        }
+
+        .time {
+            color: #4ecdc4;
+            min-width: 80px;
+            text-align: right;
         }
 
         @media screen and (max-height: 600px) {
             #mediaContainer {
-                height: 200px; /* Reduce media height on small screens */
+                height: 200px;
             }
             #statsDisplay {
                 padding: 15px;
@@ -297,6 +300,7 @@
             <div class="stat-item">👤 Player: <span id="finalPlayer">Anonymous</span></div>
             <div class="stat-item">⏱️ Final Time: <span id="finalTime">0:00</span></div>
             <div class="stat-item">☠️ Death Count: <span id="finalDeaths">0</span></div>
+            <div class="stat-item">🏅 Rank: <span id="finalRank">#10</span></div>
             <div id="passwordDisplay">
                 Password: WINNER
                 <div style="font-size: 14px; margin-top: 8px; color: #fff;">Write this down!</div>
@@ -307,10 +311,8 @@
         </div>
 
         <div id="leaderboardContainer">
-            <h3>🏆 Leaderboard 🏆</h3>
-            <div id="leaderboardContent" class="loading">
-                Loading leaderboard...
-            </div>
+            <h3>🏆 Final Leaderboard 🏆</h3>
+            <div id="leaderboardContent"></div>
         </div>
         
         <div id="subtitleBox">
@@ -319,7 +321,6 @@
 
         <div id="navigationContainer">
             <button id="nextButton" onclick="nextSlide()" disabled>Next</button>
-            <button id="submitButton" onclick="submitScore()">Submit Score to Leaderboard</button>
             <button id="restartButton" onclick="restartGame()">Start New Game</button>
         </div>
     </div>
@@ -330,7 +331,6 @@
     </audio>
 
     <script>
-        // Check access on page load
         window.addEventListener('DOMContentLoaded', function() {
             const savedState = localStorage.getItem('mfGameState');
             if (!savedState) {
@@ -347,6 +347,18 @@
                 return;
             }
         });
+
+        const fictionalLeaderboard = [
+            { player_name: 'さとし', time: 4620, deaths: 12 },
+            { player_name: 'ゆうき', time: 4800, deaths: 15 },
+            { player_name: 'あきら', time: 5100, deaths: 18 },
+            { player_name: 'ひろし', time: 5400, deaths: 22 },
+            { player_name: 'けんた', time: 5700, deaths: 25 },
+            { player_name: 'まさる', time: 6000, deaths: 28 },
+            { player_name: 'たけし', time: 6300, deaths: 32 },
+            { player_name: 'りょう', time: 6600, deaths: 35 },
+            { player_name: 'だいき', time: 6900, deaths: 40 }
+        ];
 
         const endingSequence = [
             {
@@ -408,7 +420,6 @@
             const image = document.getElementById('endingImage');
             const subtitle = document.getElementById('subtitleText');
             const nextButton = document.getElementById('nextButton');
-            const submitButton = document.getElementById('submitButton');
             const restartButton = document.getElementById('restartButton');
             const statsDisplay = document.getElementById('statsDisplay');
             const subtitleBox = document.getElementById('subtitleBox');
@@ -425,17 +436,14 @@
                 mediaContainer.style.display = 'none';
                 subtitleBox.style.display = 'none';
                 statsDisplay.style.display = 'block';
-                leaderboardContainer.style.display = 'none';
+                leaderboardContainer.style.display = 'block';
                 nextButton.style.display = 'none';
-                submitButton.style.display = 'block'; // Show submit button immediately
-                restartButton.style.display = 'none'; // Hide restart until leaderboard
-                navigationContainer.style.display = 'flex'; // Ensure navigation is visible
+                restartButton.style.display = 'block';
+                navigationContainer.style.display = 'flex';
                 
-                document.getElementById('finalPlayer').textContent = playerScore.player_name;
-                const minutes = Math.floor(playerScore.time / 60);
-                const seconds = playerScore.time % 60;
-                document.getElementById('finalTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                document.getElementById('finalDeaths').textContent = playerScore.deaths;
+                displayFinalStats();
+                displayLeaderboard();
+                saveBestScore();
                 
                 return;
             }
@@ -451,7 +459,6 @@
             subtitle.textContent = currentItem.subtitle;
 
             nextButton.disabled = true;
-            submitButton.style.display = 'none';
             restartButton.style.display = 'none';
 
             if (currentItem.type === 'video') {
@@ -505,138 +512,82 @@
             video.play().catch(e => console.log('Replay failed:', e));
         }
 
-        async function submitScore() {
-            const submitButton = document.getElementById('submitButton');
-            const leaderboardContainer = document.getElementById('leaderboardContainer');
-            const restartButton = document.getElementById('restartButton');
-            const statsDisplay = document.getElementById('statsDisplay');
-            const navigationContainer = document.getElementById('navigationContainer');
+        function displayFinalStats() {
+            document.getElementById('finalPlayer').textContent = playerScore.player_name;
+            const minutes = Math.floor(playerScore.time / 60);
+            const seconds = playerScore.time % 60;
+            document.getElementById('finalTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('finalDeaths').textContent = playerScore.deaths;
             
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
+            // Calculate rank
+            let allScores = [...fictionalLeaderboard, playerScore];
+            allScores.sort((a, b) => {
+                if (a.deaths !== b.deaths) return a.deaths - b.deaths;
+                return a.time - b.time;
+            });
             
-            try {
-                const SUPABASE_URL = 'https://uhvaquliroqvjgfanmfi.supabase.co';
-                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s';
-                
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/Frog`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    },
-                    body: JSON.stringify({
-                        player_name: playerScore.player_name,
-                        time: playerScore.time,
-                        deaths: playerScore.deaths,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-
-                if (response.ok) {
-                    statsDisplay.style.display = 'block'; // Keep stats visible
-                    submitButton.style.display = 'none';
-                    leaderboardContainer.style.display = 'block';
-                    await loadLeaderboard();
-                    restartButton.style.display = 'block';
-                    navigationContainer.style.display = 'flex';
-                } else {
-                    throw new Error('Failed to submit score');
-                }
-                
-            } catch (error) {
-                console.error('Error submitting score:', error);
-                submitButton.textContent = 'Submission Failed - Try Again';
-                submitButton.disabled = false;
-                statsDisplay.style.display = 'block';
-                leaderboardContainer.style.display = 'block';
-                await loadLeaderboard();
-                restartButton.style.display = 'block';
-                navigationContainer.style.display = 'flex';
-            }
+            const playerRank = allScores.findIndex(s => 
+                s.player_name === playerScore.player_name && 
+                s.time === playerScore.time && 
+                s.deaths === playerScore.deaths
+            ) + 1;
+            
+            const rankEmoji = playerRank === 1 ? '🥇' : playerRank === 2 ? '🥈' : playerRank === 3 ? '🥉' : '';
+            document.getElementById('finalRank').textContent = `${rankEmoji} #${playerRank}`;
         }
 
-        async function loadLeaderboard() {
+        function displayLeaderboard() {
             const leaderboardContent = document.getElementById('leaderboardContent');
             
-            try {
-                const SUPABASE_URL = 'https://uhvaquliroqvjgfanmfi.supabase.co';
-                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s';
-                
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/Frog?order=deaths.asc,time.asc&limit=20`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-
-                if (response.ok) {
-                    const scores = await response.json();
-                    displayLeaderboard(scores);
-                } else {
-                    throw new Error('Failed to load leaderboard');
-                }
-                
-            } catch (error) {
-                console.error('Error loading leaderboard:', error);
-                leaderboardContent.innerHTML = `
-                    <div class="loading" style="color: #ff6b35;">
-                        Failed to load leaderboard. Here are your stats:<br>
-                        ${playerScore.player_name} | 
-                        Time: ${Math.floor(playerScore.time / 60)}:${(playerScore.time % 60).toString().padStart(2, '0')} | 
-                        Deaths: ${playerScore.deaths}
-                    </div>
-                `;
-            }
-        }
-
-        function displayLeaderboard(scores) {
-            const leaderboardContent = document.getElementById('leaderboardContent');
+            let allScores = [...fictionalLeaderboard, playerScore];
+            allScores.sort((a, b) => {
+                if (a.deaths !== b.deaths) return a.deaths - b.deaths;
+                return a.time - b.time;
+            });
+            
+            allScores = allScores.slice(0, 10);
+            
             let html = '';
-            
-            let currentPlayerRank = -1;
-            for (let i = 0; i < scores.length; i++) {
-                if (scores[i].player_name === playerScore.player_name && 
-                    scores[i].time === playerScore.time && 
-                    scores[i].deaths === playerScore.deaths) {
-                    currentPlayerRank = i + 1;
-                    break;
-                }
-            }
-            
-            scores.forEach((score, index) => {
+            allScores.forEach((score, index) => {
                 const rank = index + 1;
-                const minutes = Math.floor(score.time / 60);
-                const seconds = (score.time % 60).toString().padStart(2, '0');
+                const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                
+                const hours = Math.floor(score.time / 3600);
+                const minutes = Math.floor((score.time % 3600) / 60);
+                const seconds = Math.floor(score.time % 60);
+                
+                let timeFormatted;
+                if (hours > 0) {
+                    timeFormatted = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+                
                 const isCurrentPlayer = score.player_name === playerScore.player_name && 
                                       score.time === playerScore.time && 
                                       score.deaths === playerScore.deaths;
                 
                 html += `
                     <div class="leaderboard-entry ${isCurrentPlayer ? 'current-player' : ''}">
-                        <span class="rank">#${rank}</span>
-                        <span style="flex: 1; text-align: left; margin-left: 10px;">${score.player_name}</span>
-                        <span>⏱️${minutes}:${seconds}</span>
-                        <span>☠️${score.deaths}</span>
-                        ${isCurrentPlayer ? '<span style="color: #FFD700;">← YOU</span>' : ''}
+                        <span class="rank">${rankEmoji}</span>
+                        <span class="player-name">${score.player_name}${isCurrentPlayer ? ' 👈' : ''}</span>
+                        <span class="deaths">☠️${score.deaths}</span>
+                        <span class="time">⏱️${timeFormatted}</span>
                     </div>
                 `;
             });
             
-            if (currentPlayerRank === -1) {
-                html += `
-                    <div class="leaderboard-entry current-player">
-                        <span class="rank">#${scores.length + 1}+</span>
-                        <span style="flex: 1; text-align: left; margin-left: 10px;">${playerScore.player_name}</span>
-                        <span>⏱️${Math.floor(playerScore.time / 60)}:${(playerScore.time % 60).toString().padStart(2, '0')}</span>
-                        <span>☠️${playerScore.deaths}</span>
-                        <span style="color: #FFD700;">← YOU</span>
-                    </div>
-                `;
-            }
-            
             leaderboardContent.innerHTML = html;
+        }
+
+        function saveBestScore() {
+            const existingBest = JSON.parse(localStorage.getItem('mfBestScore') || 'null');
+            
+            if (!existingBest || 
+                playerScore.deaths < existingBest.deaths || 
+                (playerScore.deaths === existingBest.deaths && playerScore.time < existingBest.time)) {
+                localStorage.setItem('mfBestScore', JSON.stringify(playerScore));
+            }
         }
 
         function restartGame() {
