@@ -67,6 +67,15 @@
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  #wordDisplay.empty {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
   }
   
   #japaneseWord {
@@ -282,6 +291,21 @@
     transform: translateY(0);
   }
   
+  #startButton.pulse {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 8px 30px rgba(108, 92, 231, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+  }
+  
   #countdown {
     position: absolute;
     top: 50%;
@@ -457,14 +481,14 @@
       <div id="highScore">Best: 0</div>
     </div>
     
-    <div id="wordDisplay">
-      <div id="japaneseWord">ねこ🐈</div>
-      <div id="englishWord">cat</div>
+    <div id="wordDisplay" class="empty">
+      <div id="japaneseWord"></div>
+      <div id="englishWord"></div>
     </div>
     
     <div id="scoreInfo">
       <div id="currentScore">0</div>
-      <div id="progressText">Letters: 0/3</div>
+      <div id="progressText">Letters: 0/0</div>
     </div>
   </div>
   
@@ -472,7 +496,7 @@
   
   <div id="gameControls">
     <div id="leftControls">
-      <button onclick="startGame()">🎮 Start Game</button>
+      <button id="startButton" class="pulse" onclick="startGame()">🎮 Start Game</button>
       <button onclick="resetGame()">🛑 Stop</button>
       <button onclick="showLeaderboard()">🏆 Leaderboard</button>
     </div>
@@ -502,7 +526,7 @@
 <!-- Leaderboard Modal -->
 <div id="leaderboard">
   <div id="leaderboardContent">
-    <h2 style="text-align: center; margin-bottom: 20px;">🏆 Top 25 Players</h2>
+    <h2 style="text-align: center; margin-bottom: 20px;">🏆 Top 10 Players</h2>
     <div id="leaderboardList">
       <div class="loading">Loading leaderboard...</div>
     </div>
@@ -512,19 +536,26 @@
   </div>
 </div>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-  
-  // Supabase configuration
-  const SUPABASE_URL = 'https://uhvaquliroqvjgfanmfi.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmFxdWxpcm9xdmpnZmFubWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3MDI2OTksImV4cCI6MjA2NDI3ODY5OX0.w7P2YPbC-9pYYzHAe-S-UG6D43jijrXVV7LyGmCKn8s';
-  
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+<script>
+  // Default leaderboard with funny Japanese animal characters
+  const defaultLeaderboard = [
+    { name: 'たぬきキング🦝', score: 120 },
+    { name: 'ねこセンパイ😺', score: 95 },
+    { name: 'いぬマスター🐕', score: 78 },
+    { name: 'さるニンジャ🐵', score: 65 },
+    { name: 'ぶたチャンプ🐷', score: 52 },
+    { name: 'うさぎヒーロー🐰', score: 41 },
+    { name: 'とりレジェンド🐦', score: 28 },
+    { name: 'かめせんにん🐢', score: 15 },
+    { name: 'ぺんぎんボス🐧', score: 9 },
+    { name: 'あなた👤', score: null }
+  ];
   
   // Game elements
   const gameArea = document.getElementById('gameArea');
   const englishWord = document.getElementById('englishWord');
   const japaneseWord = document.getElementById('japaneseWord');
+  const wordDisplay = document.getElementById('wordDisplay');
   const currentScore = document.getElementById('currentScore');
   const progressText = document.getElementById('progressText');
   const playerName = document.getElementById('playerName');
@@ -535,6 +566,7 @@
   const nameInput = document.getElementById('nameInput');
   const leaderboard = document.getElementById('leaderboard');
   const leaderboardList = document.getElementById('leaderboardList');
+  const startButton = document.getElementById('startButton');
   
   // Dynamic grid size based on game area
   let gameAreaSize, segmentSize, gridWidth, gridHeight;
@@ -588,6 +620,7 @@
   let score = 0;
   let gameInterval = null;
   let gameOver = false;
+  let gameActive = false;
   let audio = new Audio();
   let countdownInterval;
   let playerData = {
@@ -637,9 +670,13 @@
     
     calculateGameDimensions();
     resetGame();
+    gameActive = true;
+    startButton.classList.remove('pulse');
+    
     currentWord = words[Math.floor(Math.random() * words.length)];
     englishWord.textContent = currentWord.eng;
     japaneseWord.textContent = currentWord.jap;
+    wordDisplay.classList.remove('empty');
     updateProgress();
     placeLetters();
     gameInterval = setInterval(moveSnake, 200);
@@ -656,8 +693,19 @@
     currentIndex = 0;
     score = 0;
     gameOver = false;
+    gameActive = false;
     currentScore.textContent = score;
     gameArea.innerHTML = '';
+    
+    // Clear word display
+    englishWord.textContent = '';
+    japaneseWord.textContent = '';
+    wordDisplay.classList.add('empty');
+    progressText.textContent = 'Letters: 0/0';
+    
+    // Re-enable pulse on start button
+    startButton.classList.add('pulse');
+    
     const gameOverMessage = document.getElementById('gameOverMessage');
     if (gameOverMessage) gameOverMessage.remove();
   };
@@ -800,7 +848,8 @@
   function isSelfCollision(head) {
     return snake.some((segment, index) => 
       index !== 0 && head.x === segment.x && head.y === segment.y
-    );  }
+    );
+  }
   
   function renderSnake() {
     gameArea.querySelectorAll('.snake-segment').forEach(segment => segment.remove());
@@ -816,47 +865,34 @@
     });
   }
   
-  // Submit score to Supabase leaderboard
-  async function submitToLeaderboard(name, score) {
-    try {
-      const { data, error } = await supabase
-        .from('leaderboard')
-        .insert([{ name: name, score: score }]);
-      
-      if (error) {
-        console.error('Error submitting score:', error);
-        return false;
-      }
-      
-      console.log('Score submitted successfully!');
-      return true;
-    } catch (error) {
-      console.error('Network error submitting score:', error);
-      return false;
+  function getLeaderboard() {
+    // Get default leaderboard and update player score
+    let leaderboard = [...defaultLeaderboard];
+    
+    // Update player entry with current high score
+    const playerIndex = leaderboard.findIndex(entry => entry.name === 'あなた👤');
+    if (playerIndex !== -1) {
+      leaderboard[playerIndex] = {
+        name: playerData.name || 'あなた👤',
+        score: playerData.highScore
+      };
     }
-  }
-  
-  // Load leaderboard from Supabase
-  async function loadLeaderboardData() {
-    try {
-      const { data, error } = await supabase
-        .from('leaderboard')
-        .select('name, score, created_at')
-        .order('score', { ascending: false })
-        .limit(25);
-      
-      if (error) throw error;
-      
-      return data || [];
-    } catch (error) {
-      console.error('Error loading leaderboard:', error);
-      return null;
-    }
+    
+    // Sort by score (null scores go to end)
+    leaderboard.sort((a, b) => {
+      if (a.score === null) return 1;
+      if (b.score === null) return -1;
+      return b.score - a.score;
+    });
+    
+    return leaderboard;
   }
   
   function endGame() {
     gameOver = true;
+    gameActive = false;
     audio.pause();
+    startButton.classList.add('pulse');
     
     // Check for new high score
     if (score > playerData.highScore) {
@@ -864,15 +900,17 @@
       highScore.textContent = `Best: ${score}`;
       localStorage.setItem('snakeLetterQuestPlayer', JSON.stringify(playerData));
       
-      // Submit to Supabase leaderboard
-      submitToLeaderboard(playerData.name, score);
+      const leaderboard = getLeaderboard();
+      const playerRank = leaderboard.findIndex(entry => 
+        entry.name === playerData.name || entry.name === 'あなた👤'
+      ) + 1;
       
       const gameOverMessage = document.createElement('div');
       gameOverMessage.id = 'gameOverMessage';
       gameOverMessage.innerHTML = `
         <div>🎉 NEW HIGH SCORE! 🎉</div>
         <div style="font-size: 18px; margin-top: 10px;">Score: ${score}</div>
-        <div style="font-size: 14px; margin-top: 10px;">Submitting to leaderboard...</div>
+        <div style="font-size: 14px; margin-top: 10px;">Rank: #${playerRank}</div>
       `;
       gameArea.appendChild(gameOverMessage);
       
@@ -892,38 +930,22 @@
     }
   }
   
-  window.showLeaderboard = async function() {
+  window.showLeaderboard = function() {
     leaderboard.style.display = 'flex';
-    leaderboardList.innerHTML = '<div class="loading">Loading leaderboard...</div>';
     
-    const data = await loadLeaderboardData();
+    const leaderboardData = getLeaderboard();
     
-    if (data === null) {
-      // Error loading from Supabase - show fallback message
-      leaderboardList.innerHTML = `
-        <div class="error">
-          Unable to load online leaderboard.<br>
-          Check your internet connection.
-        </div>
-      `;
-      return;
-    }
-    
-    if (data.length === 0) {
-      leaderboardList.innerHTML = '<div class="leaderboard-entry">No scores yet! Be the first to play.</div>';
-      return;
-    }
-    
-    // Display real leaderboard data
     let leaderboardHTML = '';
-    data.forEach((entry, index) => {
-      const isCurrentPlayer = entry.name === playerData.name && entry.score === playerData.highScore;
+    leaderboardData.forEach((entry, index) => {
+      const isCurrentPlayer = entry.name === playerData.name || 
+                              (entry.name === 'あなた👤' && entry.score === playerData.highScore);
       const entryClass = isCurrentPlayer ? 'leaderboard-entry current-player' : 'leaderboard-entry';
+      const displayScore = entry.score === null ? '-' : entry.score;
       
       leaderboardHTML += `
         <div class="${entryClass}">
           <span>${index + 1}. ${entry.name}</span>
-          <span>${entry.score}</span>
+          <span>${displayScore}</span>
         </div>
       `;
     });
