@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Leaderboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    .game-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .game-tab {
+      flex: 1;
+      min-width: 100px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .game-tab:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .game-tab.active {
+      background: white;
+      color: #667eea;
+      border-color: white;
+    }
+
+    .leaderboard-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .leaderboard-card.active {
+      display: block;
+    }
+
+    .leaderboard-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #667eea;
+      text-align: center;
+    }
+
+    .leaderboard-entry {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+
+    .leaderboard-entry:hover {
+      transform: translateX(5px);
+    }
+
+    .leaderboard-entry.current-player {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+    }
+
+    .rank {
+      font-size: 1.2rem;
+      font-weight: bold;
+      width: 40px;
+      text-align: center;
+      color: #667eea;
+    }
+
+    .rank.gold { color: #ffd700; }
+    .rank.silver { color: #c0c0c0; }
+    .rank.bronze { color: #cd7f32; }
+
+    .player-info {
+      flex: 1;
+      margin-left: 15px;
+    }
+
+    .player-name {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 3px;
+    }
+
+    .player-details {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #667eea;
+      margin-left: 15px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .status-message {
+      text-align: center;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .status-message.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-message.info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .game-tab {
+        font-size: 0.85rem;
+        padding: 10px 15px;
+        min-width: 80px;
+      }
+
+      .leaderboard-title {
+        font-size: 1.2rem;
+      }
+
+      .rank {
+        font-size: 1rem;
+        width: 35px;
+      }
+
+      .player-name {
+        font-size: 0.9rem;
+      }
+
+      .player-details {
+        font-size: 0.75rem;
+      }
+
+      .score {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏆 Community Leaderboard</h1>
+      <p>Compete with players worldwide!</p>
+    </div>
+
+    <div id="statusMessage"></div>
+
+    <div class="game-tabs">
+      <button class="game-tab active" data-game="snake">🐍 Snake</button>
+      <button class="game-tab" data-game="touch">👆 Touch</button>
+      <button class="game-tab" data-game="wordle">📝 Wordle</button>
+      <button class="game-tab" data-game="masterfrog">🐸 Master Frog</button>
+    </div>
+
+    <div id="snake" class="leaderboard-card active">
+      <h2 class="leaderboard-title">Snake Letter Quest</h2>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Loading rankings...
+      </div>
+    </div>
+
+    <div id="touch" class="leaderboard-card">
+      <h2 class="leaderboard-title">Touch the Numbers</h2>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Loading rankings...
+      </div>
+    </div>
+
+    <div id="wordle" class="leaderboard-card">
+      <h2 class="leaderboard-title">Wordle Challenge</h2>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Loading rankings...
+      </div>
+    </div>
+
+    <div id="masterfrog" class="leaderboard-card">
+      <h2 class="leaderboard-title">Master Frog Adventure</h2>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Loading rankings...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // CONFIGURE THIS: Replace with your Cloudflare Worker URL
+    const WORKER_URL = 'https://game-leaderboards.picklefish.workers.dev';
+    
+    let currentPlayerNames = {};
+    let allLeaderboards = {};
+    let updateInterval;
+
+    // Collect localStorage data from all games
+    function collectLocalStorageData() {
+      const data = {
+        snake: null,
+        touch: null,
+        wordle: null,
+        masterfrog: null
+      };
+
+      try {
+        // Snake
+        const snakeData = localStorage.getItem('snakeLetterQuestPlayer');
+        if (snakeData) {
+          const parsed = JSON.parse(snakeData);
+          if (parsed.name && parsed.highScore) {
+            data.snake = {
+              name: parsed.name,
+              score: parsed.highScore
+            };
+            currentPlayerNames.snake = parsed.name;
+          }
+        }
+
+        // Touch
+        const touchName = localStorage.getItem('kplayerName');
+        const touchScore = localStorage.getItem('khighScore');
+        if (touchName && touchScore) {
+          data.touch = {
+            name: touchName,
+            time: parseFloat(touchScore)
+          };
+          currentPlayerNames.touch = touchName;
+        }
+
+        // Wordle
+        const wordleName = localStorage.getItem('wordlePlayerName');
+        const wordleScore = localStorage.getItem('wordleBestScore');
+        if (wordleName && wordleScore) {
+          data.wordle = {
+            name: wordleName,
+            score: parseInt(wordleScore)
+          };
+          currentPlayerNames.wordle = wordleName;
+        }
+
+        // Master Frog
+        const mfName = localStorage.getItem('mfPlayerName');
+        const mfState = localStorage.getItem('mfGameState');
+        if (mfName && mfState) {
+          const parsed = JSON.parse(mfState);
+          // Only submit if final boss is defeated
+          if (parsed.finalBossDefeated === true) {
+            data.masterfrog = {
+              name: mfName,
+              deaths: parsed.deathCount || 0,
+              time: parsed.timeElapsed || 0
+            };
+            currentPlayerNames.masterfrog = mfName;
+          }
+        }
+      } catch (error) {
+        console.error('Error collecting localStorage data:', error);
+      }
+
+      return data;
+    }
+
+    // Submit scores to Cloudflare Worker
+    async function submitScores(data) {
+      try {
+        const response = await fetch(`${WORKER_URL}/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error('Error submitting scores:', error);
+        throw error;
+      }
+    }
+
+    // Fetch leaderboards from Cloudflare Worker
+    async function fetchLeaderboards() {
+      try {
+        const response = await fetch(`${WORKER_URL}/leaderboards`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        allLeaderboards = data;
+        return data;
+      } catch (error) {
+        console.error('Error fetching leaderboards:', error);
+        throw error;
+      }
+    }
+
+    // Display leaderboard for a specific game
+    function displayLeaderboard(game, data) {
+      const container = document.getElementById(game);
+      
+      if (!data || data.length === 0) {
+        container.innerHTML = `
+          <h2 class="leaderboard-title">${getGameTitle(game)}</h2>
+          <div class="empty-state">
+            <div class="empty-state-icon">🎮</div>
+            <p>No scores yet. Be the first!</p>
+          </div>
+        `;
+        return;
+      }
+
+      const currentPlayerName = currentPlayerNames[game];
+      
+      let html = `<h2 class="leaderboard-title">${getGameTitle(game)}</h2>`;
+      
+      data.forEach((entry, index) => {
+        const rank = index + 1;
+        const isCurrentPlayer = entry.name === currentPlayerName;
+        const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        
+        let scoreDisplay = '';
+        let detailsDisplay = '';
+        
+        if (game === 'snake') {
+          scoreDisplay = entry.score;
+        } else if (game === 'touch') {
+          scoreDisplay = `${entry.time.toFixed(2)}s`;
+        } else if (game === 'wordle') {
+          scoreDisplay = entry.score;
+        } else if (game === 'masterfrog') {
+          scoreDisplay = `${entry.deaths} 💀`;
+          detailsDisplay = `Time: ${formatTime(entry.time)}`;
+        }
+        
+        html += `
+          <div class="leaderboard-entry ${isCurrentPlayer ? 'current-player' : ''}">
+            <div class="rank ${rankClass}">#${rank}</div>
+            <div class="player-info">
+              <div class="player-name">${escapeHtml(entry.name)}</div>
+              ${detailsDisplay ? `<div class="player-details">${detailsDisplay}</div>` : ''}
+            </div>
+            <div class="score">${scoreDisplay}</div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    // Helper functions
+    function getGameTitle(game) {
+      const titles = {
+        snake: 'Snake Letter Quest',
+        touch: 'Touch the Numbers',
+        wordle: 'Wordle Challenge',
+        masterfrog: 'Master Frog Adventure'
+      };
+      return titles[game] || game;
+    }
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = (seconds % 60).toFixed(2);
+      return `${mins}:${secs.padStart(5, '0')}`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('statusMessage');
+      statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+      setTimeout(() => {
+        statusDiv.innerHTML = '';
+      }, 5000);
+    }
+
+    function showError(message) {
+      document.querySelectorAll('.leaderboard-card').forEach(card => {
+        card.innerHTML = `
+          <h2 class="leaderboard-title">${getGameTitle(card.id)}</h2>
+          <div class="error">${message}</div>
+        `;
+      });
+    }
+
+    // Tab switching
+    document.querySelectorAll('.game-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const game = tab.dataset.game;
+        
+        // Update active tab
+        document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update active leaderboard
+        document.querySelectorAll('.leaderboard-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        document.getElementById(game).classList.add('active');
+      });
+    });
+
+    // Initialize and load data
+    async function initialize() {
+      try {
+        // Step 1: Collect local data
+        const localData = collectLocalStorageData();
+        
+        // Step 2: Submit scores (if any)
+        const hasData = Object.values(localData).some(v => v !== null);
+        if (hasData) {
+          showStatus('Submitting your scores...', 'info');
+          await submitScores(localData);
+          showStatus('Scores submitted successfully!', 'success');
+        }
+        
+        // Step 3: Fetch and display leaderboards
+        const leaderboards = await fetchLeaderboards();
+        
+        displayLeaderboard('snake', leaderboards.snake);
+        displayLeaderboard('touch', leaderboards.touch);
+        displayLeaderboard('wordle', leaderboards.wordle);
+        displayLeaderboard('masterfrog', leaderboards.masterfrog);
+        
+      } catch (error) {
+        console.error('Initialization error:', error);
+        showError('Failed to load leaderboards. Please check your connection and try again.');
+      }
+    }
+
+    // Refresh leaderboards periodically (every 30 seconds)
+    async function refreshLeaderboards() {
+      try {
+        const leaderboards = await fetchLeaderboards();
+        displayLeaderboard('snake', leaderboards.snake);
+        displayLeaderboard('touch', leaderboards.touch);
+        displayLeaderboard('wordle', leaderboards.wordle);
+        displayLeaderboard('masterfrog', leaderboards.masterfrog);
+      } catch (error) {
+        console.error('Refresh error:', error);
+      }
+    }
+
+    // Start the app
+    initialize();
+    
+    // Set up polling every 30 seconds
+    updateInterval = setInterval(refreshLeaderboards, 30000);
+  </script>
+</body>
+</html>
