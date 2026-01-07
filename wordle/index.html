@@ -156,6 +156,15 @@
       background-color: #6aaa64;
       color: white;
     }
+    .name-input {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      font-size: 1rem;
+      border: 2px solid #6aaa64;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
     @media (max-width: 400px) {
       .game-container {
         max-width: 100%;
@@ -205,6 +214,17 @@
     <div class="score" id="score">Score: 0</div>
   </div>
   
+  <!-- Name Input Modal (First Time Only) -->
+  <div class="game-over-modal" id="nameModal">
+    <div class="modal-content">
+      <h2>Welcome to Wordle! 👋</h2>
+      <p>Please enter your name:</p>
+      <input type="text" class="name-input" id="nameInput" placeholder="Your name" maxlength="20">
+      <button class="modal-button" id="nameSubmit">Start Playing</button>
+    </div>
+  </div>
+  
+  <!-- Game Over Modal -->
   <div class="game-over-modal" id="gameOverModal">
     <div class="modal-content">
       <h2 id="modalTitle">Game Over!</h2>
@@ -216,8 +236,8 @@
   </div>
 
   <script>
-    const words5 = ["fruit", "where", "young", "queen", "rival", "smile", "dance", "fight", "sleep", "bring", "swing", "dream", "prove", "stack", "brave", "solid", "crazy", "scary", "round", "white", "black", "brown", "green", "power", "water", "sound", "house", "horse", "roses", "mouth", "share", "ghost", "luigi", "kitty", "books", "heads", "shape", "robot", "clock", "floor", "music", "party", "happy", "angry", "tired", "chair", "table", "phone", "shoes"];
-    const words6 = ["flower", "dancer", "living", "purple", "doctor", "yakiko", "zebras", "boxing", "winner", "satoko", "debido", "scared", "humble", "cheese", "helper", "waiter", "owners", "chairs","shower", "street", "wanted", "lovers", "monkey", "banana", "builds", "option", "bright", "wooden", "potato", "friend", "family", "castle", "simple", "people", "butter", "coffee", "orange", "cookie"];
+    const words5 = ["fruit", "where", "young", "queen", "rival",  "train",  "biten",  "smell",  "tooth",  "drops", "smile", "dance", "fight", "sleep", "bring", "swing", "dream", "prove", "stack", "brave", "solid", "crazy", "scary", "round", "white", "black", "brown", "green", "power", "water", "sound", "house", "horse", "roses", "mouth", "share", "ghost", "luigi", "kitty", "books", "heads", "shape", "robot", "clock", "floor", "music", "party", "happy", "angry", "tired", "chair", "table", "phone", "shoes"];
+    const words6 = ["flower", "dancer", "living", "purple", "doctor", "taller", "action", "radios", "yellow", "yakiko", "zebras", "boxing", "winner", "satoko", "debido", "scared", "humble", "cheese", "helper", "waiter", "owners", "chairs","shower", "street", "wanted", "lovers", "monkey", "banana", "builds", "option", "bright", "wooden", "potato", "friend", "family", "castle", "simple", "people", "butter", "coffee", "shorts", "ladies", "square", "rained", "orange", "cookie"];
     const allWords = [...words5, ...words6];
     const customWords = new Set(["yakiko", "satoko", "luigi", "debido", "kitty"]); // Add your custom words here
     let currentWord;
@@ -226,6 +246,7 @@
     let isGameOver = false;
     let score = 0;
     let bestScore = parseInt(localStorage.getItem('wordleBestScore') || '0');
+    let playerName = localStorage.getItem('wordlePlayerName') || '';
 
     const grid = document.getElementById("grid");
     const keyboard = document.getElementById("keyboard");
@@ -239,6 +260,39 @@
     const modalScore = document.getElementById("modalScore");
     const modalNewGame = document.getElementById("modalNewGame");
     const modalRetry = document.getElementById("modalRetry");
+    const nameModal = document.getElementById("nameModal");
+    const nameInput = document.getElementById("nameInput");
+    const nameSubmit = document.getElementById("nameSubmit");
+
+    // Check if player name exists, if not show name modal
+    function checkFirstTime() {
+      if (!playerName) {
+        nameModal.style.display = "flex";
+        nameInput.focus();
+      } else {
+        newGame();
+      }
+    }
+
+    // Handle name submission
+    nameSubmit.addEventListener("click", submitName);
+    nameInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        submitName();
+      }
+    });
+
+    function submitName() {
+      const name = nameInput.value.trim();
+      if (name) {
+        playerName = name;
+        localStorage.setItem('wordlePlayerName', playerName);
+        nameModal.style.display = "none";
+        newGame();
+      } else {
+        alert("Please enter a name!");
+      }
+    }
 
     newGameButton.addEventListener("click", newGame);
     retryButton.addEventListener("click", retryGame);
@@ -452,9 +506,9 @@ backspaceButton.classList.add("key", "backspace"); // Add both classes
       }
     }
 
-    // Initialize best score display
+    // Initialize best score display and check for first time player
     updateBestScore();
-    newGame();
+    checkFirstTime();
   </script>
 </body>
 </html>
