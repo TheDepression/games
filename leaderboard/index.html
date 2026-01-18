@@ -341,19 +341,44 @@
           currentPlayerNames.wordle = wordleName;
         }
 
-        // Master Frog
+        // Master Frog - FIXED TO CHECK BOTH mfGameState AND mfBestScore
         const mfName = localStorage.getItem('mfPlayerName');
         const mfState = localStorage.getItem('mfGameState');
-        if (mfName && mfState) {
-          const parsed = JSON.parse(mfState);
-          // Only submit if final boss is defeated
-          if (parsed.finalBossDefeated === true) {
-            data.masterfrog = {
-              name: mfName,
-              deaths: parsed.deathCount || 0,
-              time: parsed.timeElapsed || 0
-            };
-            currentPlayerNames.masterfrog = mfName;
+        const mfBest = localStorage.getItem('mfBestScore');
+        
+        if (mfName) {
+          // First try to use mfGameState if available and boss is defeated
+          if (mfState) {
+            try {
+              const parsed = JSON.parse(mfState);
+              if (parsed.finalBossDefeated === true) {
+                data.masterfrog = {
+                  name: mfName,
+                  deaths: parsed.deathCount || 0,
+                  time: parsed.timeElapsed || 0
+                };
+                currentPlayerNames.masterfrog = mfName;
+                console.log('Master Frog data from mfGameState:', data.masterfrog);
+              }
+            } catch (e) {
+              console.error('Error parsing mfGameState:', e);
+            }
+          }
+          
+          // If no valid gameState, try mfBestScore as fallback
+          if (!data.masterfrog && mfBest) {
+            try {
+              const parsed = JSON.parse(mfBest);
+              data.masterfrog = {
+                name: parsed.player_name || mfName,
+                deaths: parsed.deaths || 0,
+                time: parsed.time || 0
+              };
+              currentPlayerNames.masterfrog = parsed.player_name || mfName;
+              console.log('Master Frog data from mfBestScore:', data.masterfrog);
+            } catch (e) {
+              console.error('Error parsing mfBestScore:', e);
+            }
           }
         }
       } catch (error) {
@@ -425,7 +450,9 @@
       
       data.forEach((entry, index) => {
         const rank = index + 1;
-        const isCurrentPlayer = entry.name === currentPlayerName;
+        // Handle both 'name' and 'player_name' fields
+        const playerName = entry.name || entry.player_name || 'Anonymous';
+        const isCurrentPlayer = playerName === currentPlayerName;
         const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
         
         let scoreDisplay = '';
@@ -446,7 +473,7 @@
           <div class="leaderboard-entry ${isCurrentPlayer ? 'current-player' : ''}">
             <div class="rank ${rankClass}">#${rank}</div>
             <div class="player-info">
-              <div class="player-name">${escapeHtml(entry.name)}</div>
+              <div class="player-name">${escapeHtml(playerName)}</div>
               ${detailsDisplay ? `<div class="player-details">${detailsDisplay}</div>` : ''}
             </div>
             <div class="score">${scoreDisplay}</div>
@@ -519,6 +546,8 @@
       try {
         // Step 1: Collect local data
         const localData = collectLocalStorageData();
+        
+        console.log('Collected local data:', localData);
         
         // Step 2: Submit scores (if any)
         const hasData = Object.values(localData).some(v => v !== null);
