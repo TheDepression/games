@@ -205,6 +205,29 @@
       margin-bottom: 10px;
     }
 
+    .back-button {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto 0;
+      padding: 15px 30px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .back-button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
     @media (max-width: 600px) {
       .header h1 {
         font-size: 1.5rem;
@@ -236,6 +259,11 @@
       .score {
         font-size: 1rem;
       }
+
+      .back-button {
+        font-size: 1rem;
+        padding: 12px 24px;
+      }
     }
   </style>
 </head>
@@ -261,6 +289,7 @@
         <div class="loading-spinner"></div>
         Loading rankings...
       </div>
+      <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
     </div>
 
     <div id="touch" class="leaderboard-card">
@@ -269,6 +298,7 @@
         <div class="loading-spinner"></div>
         Loading rankings...
       </div>
+      <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
     </div>
 
     <div id="wordle" class="leaderboard-card">
@@ -277,6 +307,7 @@
         <div class="loading-spinner"></div>
         Loading rankings...
       </div>
+      <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
     </div>
 
     <div id="masterfrog" class="leaderboard-card">
@@ -285,6 +316,7 @@
         <div class="loading-spinner"></div>
         Loading rankings...
       </div>
+      <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
     </div>
   </div>
 
@@ -440,6 +472,7 @@
             <div class="empty-state-icon">🎮</div>
             <p>No scores yet. Be the first!</p>
           </div>
+          <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
         `;
         return;
       }
@@ -480,6 +513,8 @@
           </div>
         `;
       });
+      
+      html += `<a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>`;
       
       container.innerHTML = html;
     }
@@ -526,6 +561,7 @@
         card.innerHTML = `
           <h2 class="leaderboard-title">${getGameTitle(card.id)}</h2>
           <div class="error">${message}</div>
+          <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
         `;
       });
     }
