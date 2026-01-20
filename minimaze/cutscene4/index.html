@@ -151,12 +151,12 @@
         }
         
         #restartButton {
-            background: #ff6b35;
+            background: #4CAF50;
             display: none;
         }
 
         #restartButton:hover {
-            background: #ff5722;
+            background: #45a049;
         }
         
         .fade-in {
@@ -276,13 +276,40 @@
                 font-size: 14px;
             }
         }
+
+        /* Debug panel */
+        #debugPanel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 9999;
+            display: none;
+        }
+
+        #debugPanel.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <!-- Debug panel to verify data -->
+    <div id="debugPanel">
+        <div>Debug Info:</div>
+        <div id="debugContent"></div>
+    </div>
+
     <div id="startScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; text-align: center;">
         <h2>🎉 Victory Cutscene</h2>
         <p style="font-size: 18px; margin: 20px 0;">You defeated the final boss!</p>
         <button class="start-button" style="background: #4CAF50; font-size: 20px; padding: 15px 30px;" onclick="startEnding()">Watch Victory</button>
+        <button style="background: #666; font-size: 14px; padding: 10px 20px; margin-top: 10px;" onclick="toggleDebug()">Show Debug Info</button>
     </div>
 
     <div id="endingContainer">
@@ -321,7 +348,7 @@
 
         <div id="navigationContainer">
             <button id="nextButton" onclick="nextSlide()" disabled>Next</button>
-            <button id="restartButton" onclick="restartGame()">Start New Game</button>
+            <button id="restartButton" onclick="goToLeaderboard()">🏆 View Community Leaderboard 🏆</button>
         </div>
     </div>
 
@@ -331,6 +358,52 @@
     </audio>
 
     <script>
+        // Toggle debug panel
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('show');
+            updateDebugInfo();
+        }
+
+        function updateDebugInfo() {
+            const debugContent = document.getElementById('debugContent');
+            const playerName = localStorage.getItem('mfPlayerName');
+            const gameState = localStorage.getItem('mfGameState');
+            const bestScore = localStorage.getItem('mfBestScore');
+            
+            let info = '';
+            info += `<div>Player Name: ${playerName || 'NOT SET'}</div>`;
+            
+            if (gameState) {
+                try {
+                    const parsed = JSON.parse(gameState);
+                    info += `<div>Game State:</div>`;
+                    info += `<div>- finalBossDefeated: ${parsed.finalBossDefeated}</div>`;
+                    info += `<div>- timeElapsed: ${parsed.timeElapsed}</div>`;
+                    info += `<div>- deathCount: ${parsed.deathCount}</div>`;
+                } catch (e) {
+                    info += `<div>Game State: PARSE ERROR</div>`;
+                }
+            } else {
+                info += `<div>Game State: NOT SET</div>`;
+            }
+            
+            if (bestScore) {
+                try {
+                    const parsed = JSON.parse(bestScore);
+                    info += `<div>Best Score:</div>`;
+                    info += `<div>- time: ${parsed.time}</div>`;
+                    info += `<div>- deaths: ${parsed.deaths}</div>`;
+                } catch (e) {
+                    info += `<div>Best Score: PARSE ERROR</div>`;
+                }
+            } else {
+                info += `<div>Best Score: NOT SET</div>`;
+            }
+            
+            debugContent.innerHTML = info;
+        }
+
         window.addEventListener('DOMContentLoaded', function() {
             const savedState = localStorage.getItem('mfGameState');
             if (!savedState) {
@@ -346,6 +419,14 @@
                 window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
                 return;
             }
+
+            // **FIX: Ensure finalBossDefeated is set to true**
+            if (!gameState.finalBossDefeated) {
+                gameState.finalBossDefeated = true;
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+            }
+
+            updateDebugInfo();
         });
 
         const fictionalLeaderboard = [
@@ -398,12 +479,28 @@
             const playerName = localStorage.getItem('mfPlayerName');
             if (savedState) {
                 gameState = JSON.parse(savedState);
+                
+                // **FIX: Ensure we have valid time and death data**
+                const timeElapsed = gameState.timeElapsed || 0;
+                const deathCount = gameState.deathCount || 0;
+                
                 playerScore = {
                     player_name: playerName || 'Anonymous',
-                    time: gameState.timeElapsed || 0,
-                    deaths: gameState.deathCount || 0,
+                    time: timeElapsed,
+                    deaths: deathCount,
                     timestamp: Date.now()
                 };
+
+                // **FIX: Update the gameState to ensure it has the final boss flag**
+                gameState.finalBossDefeated = true;
+                gameState.timeElapsed = timeElapsed;
+                gameState.deathCount = deathCount;
+                
+                // **CRITICAL FIX: Save the updated state back to localStorage**
+                localStorage.setItem('mfGameState', JSON.stringify(gameState));
+                
+                console.log('Game state saved:', gameState);
+                console.log('Player score prepared:', playerScore);
             }
         }
 
@@ -444,6 +541,9 @@
                 displayFinalStats();
                 displayLeaderboard();
                 saveBestScore();
+                
+                // **FIX: Final verification that data is saved**
+                updateDebugInfo();
                 
                 return;
             }
@@ -587,13 +687,13 @@
                 playerScore.deaths < existingBest.deaths || 
                 (playerScore.deaths === existingBest.deaths && playerScore.time < existingBest.time)) {
                 localStorage.setItem('mfBestScore', JSON.stringify(playerScore));
+                console.log('Best score saved:', playerScore);
             }
         }
 
-        function restartGame() {
-            localStorage.setItem('winner', 'true');
-            localStorage.removeItem('mfGameState');
-            window.location.href = 'https://thedepression.github.io/games/minimaze/maze1';
+        function goToLeaderboard() {
+            // Navigate to the community leaderboard page
+            window.location.href = 'https://thedepression.github.io/games/leaderboard/';
         }
 
         window.onload = init;
