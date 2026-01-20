@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MiniMaze Dev Warp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .panel {
+      background: #111;
+      border: 2px solid #daa520;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(218, 165, 32, 0.4);
+    }
+
+    h1 {
+      color: #ffd700;
+      margin-bottom: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #daa520;
+      color: #000;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #b8961a;
+    }
+
+    .log {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #0f0;
+      min-height: 40px;
+      white-space: pre-wrap;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="panel">
+    <h1>🛠 MiniMaze Dev Warp</h1>
+
+    <button onclick="injectState()">
+      ① Inject Endgame State
+    </button>
+
+    <button onclick="goToCutscene()">
+      ② Go to Final Cutscene
+    </button>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    function injectState() {
+      const timeElapsedSeconds =
+        (1 * 3600) + (25 * 60) + 21; // 1:25:21 → 5121
+
+      const gameState = {
+        finalBossDefeated: true,
+        timeElapsed: timeElapsedSeconds,
+        deathCount: 237,
+        currentUrl: "cutscene4"
+      };
+
+      localStorage.setItem("mfPlayerName", "MrTest");
+      localStorage.setItem("mfGameState", JSON.stringify(gameState));
+
+      document.getElementById("log").textContent =
+        "Endgame state injected successfully.\n\n" +
+        "Player: MrTest\n" +
+        "Time: 1:25:21 (5121s)\n" +
+        "Deaths: 237\n" +
+        "finalBossDefeated: true";
+    }
+
+    function goToCutscene() {
+      window.location.href =
+        "https://thedepression.github.io/games/minimaze/cutscene4";
+    }
+  </script>
+
+</body>
+</html>
