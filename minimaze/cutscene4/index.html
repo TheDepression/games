@@ -119,22 +119,23 @@
             max-width: 600px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             align-items: center;
-            margin-top: 10px;
+            justify-content: center;
+            margin-top: 20px;
         }
         
         button {
             background: #daa520;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 6px;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background 0.3s;
             width: 100%;
-            max-width: 200px;
+            max-width: 300px;
         }
         
         button:hover {
@@ -322,33 +323,6 @@
             <button id="replayButton" onclick="replayVideo()">🔄 Replay</button>
         </div>
 
-        <div id="finalActionContainer" style="
-    display: none;
-    width: 100%;
-    max-width: 600px;
-    height: 400px;
-    border: 3px solid #daa520;
-    border-radius: 10px;
-    background: #111;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-">
-    <button
-        style="
-            background: #4CAF50;
-            font-size: 22px;
-            padding: 18px 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 320px;
-        "
-        onclick="goToLeaderboard()"
-    >
-        🏆 Upload Score & View Leaderboard 🏆
-    </button>
-</div>
-
         <div id="statsDisplay">
             <h2>🏆 CONGRATULATIONS! 🏆</h2>
             <div class="stat-item">👤 Player: <span id="finalPlayer">Anonymous</span></div>
@@ -362,6 +336,11 @@
             <div style="font-size: 14px; margin-top: 15px;">
                 You have proven yourself as the ultimate Master Frog!
             </div>
+        </div>
+
+        <div id="leaderboardContainer">
+            <h3>🏆 Final Leaderboard 🏆</h3>
+            <div id="leaderboardContent"></div>
         </div>
         
         <div id="subtitleBox">
@@ -552,23 +531,22 @@
             }
 
             if (index >= endingSequence.length) {
-    mediaContainer.style.display = 'none';
-    subtitleBox.style.display = 'none';
-
-    statsDisplay.style.display = 'block';
-    leaderboardContainer.style.display = 'none';
-
-    document.getElementById('finalActionContainer').style.display = 'flex';
-
-    nextButton.style.display = 'none';
-    restartButton.style.display = 'none';
-    navigationContainer.style.display = 'none';
-
-    displayFinalStats();
-    saveBestScore();
-    updateDebugInfo();
-    return;
-}
+                mediaContainer.style.display = 'none';
+                subtitleBox.style.display = 'none';
+                statsDisplay.style.display = 'block';
+                leaderboardContainer.style.display = 'none';
+                nextButton.style.display = 'none';
+                restartButton.style.display = 'block';
+                navigationContainer.style.display = 'flex';
+                
+                displayFinalStats();
+                saveBestScore();
+                
+                // **FIX: Final verification that data is saved**
+                updateDebugInfo();
+                
+                return;
+            }
 
             const currentItem = endingSequence[index];
 
