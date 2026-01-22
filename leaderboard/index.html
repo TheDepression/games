@@ -42,16 +42,16 @@
 
     .game-tabs {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 20px;
-      overflow-x: auto;
-      padding-bottom: 5px;
+      justify-content: center;
     }
 
     .game-tab {
-      flex: 1;
+      flex: 0 0 calc(33.333% - 7px);
       min-width: 100px;
-      padding: 12px 20px;
+      padding: 12px 15px;
       background: rgba(255, 255, 255, 0.2);
       border: 2px solid transparent;
       border-radius: 10px;
@@ -61,6 +61,7 @@
       transition: all 0.3s;
       text-align: center;
       white-space: nowrap;
+      font-size: 0.9rem;
     }
 
     .game-tab:hover {
@@ -234,9 +235,9 @@
       }
 
       .game-tab {
-        font-size: 0.85rem;
-        padding: 10px 15px;
-        min-width: 80px;
+        font-size: 0.8rem;
+        padding: 10px 8px;
+        min-width: 70px;
       }
 
       .leaderboard-title {
@@ -277,14 +278,17 @@
     <div id="statusMessage"></div>
 
     <div class="game-tabs">
-      <button class="game-tab active" data-game="snake">🐍 Snake</button>
-      <button class="game-tab" data-game="touch">👆 Touch</button>
+      <!-- Row 1 -->
+      <button class="game-tab active" data-game="sense">🕰️ センス</button>
+      <button class="game-tab" data-game="touch">👆 数字触り</button>
+      <button class="game-tab" data-game="snake">🐍 Snake</button>
+      <!-- Row 2 -->
       <button class="game-tab" data-game="wordle">📝 Wordle</button>
-      <button class="game-tab" data-game="masterfrog">🐸 Master Frog</button>
+      <button class="game-tab" data-game="masterfrog">🐸 M.Frog</button>
     </div>
 
-    <div id="snake" class="leaderboard-card active">
-      <h2 class="leaderboard-title">Snake Letter Quest</h2>
+    <div id="sense" class="leaderboard-card active">
+      <h2 class="leaderboard-title">Sense Test</h2>
       <div class="loading">
         <div class="loading-spinner"></div>
         Loading rankings...
@@ -294,6 +298,15 @@
 
     <div id="touch" class="leaderboard-card">
       <h2 class="leaderboard-title">Touch the Numbers</h2>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Loading rankings...
+      </div>
+      <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
+    </div>
+
+    <div id="snake" class="leaderboard-card">
+      <h2 class="leaderboard-title">Snake Letter Quest</h2>
       <div class="loading">
         <div class="loading-spinner"></div>
         Loading rankings...
@@ -331,6 +344,7 @@
     // Collect localStorage data from all games
     function collectLocalStorageData() {
       const data = {
+        sense: null,
         snake: null,
         touch: null,
         wordle: null,
@@ -338,6 +352,17 @@
       };
 
       try {
+        // Sense Test
+        const senseName = localStorage.getItem('senseTestName');
+        const senseScore = localStorage.getItem('senseTestBest');
+        if (senseName && senseScore) {
+          data.sense = {
+            name: senseName,
+            score: parseFloat(senseScore)
+          };
+          currentPlayerNames.sense = senseName;
+        }
+
         // Snake
         const snakeData = localStorage.getItem('snakeLetterQuestPlayer');
         if (snakeData) {
@@ -491,7 +516,9 @@
         let scoreDisplay = '';
         let detailsDisplay = '';
         
-        if (game === 'snake') {
+        if (game === 'sense') {
+          scoreDisplay = `${Math.round(entry.score)}%`;
+        } else if (game === 'snake') {
           scoreDisplay = entry.score;
         } else if (game === 'touch') {
           scoreDisplay = `${entry.time.toFixed(2)}s`;
@@ -522,6 +549,7 @@
     // Helper functions
     function getGameTitle(game) {
       const titles = {
+        sense: 'Sense Test',
         snake: 'Snake Letter Quest',
         touch: 'Touch the Numbers',
         wordle: 'Wordle Challenge',
@@ -602,6 +630,7 @@
         // Step 3: Fetch and display leaderboards
         const leaderboards = await fetchLeaderboards();
         
+        displayLeaderboard('sense', leaderboards.sense);
         displayLeaderboard('snake', leaderboards.snake);
         displayLeaderboard('touch', leaderboards.touch);
         displayLeaderboard('wordle', leaderboards.wordle);
@@ -617,6 +646,7 @@
     async function refreshLeaderboards() {
       try {
         const leaderboards = await fetchLeaderboards();
+        displayLeaderboard('sense', leaderboards.sense);
         displayLeaderboard('snake', leaderboards.snake);
         displayLeaderboard('touch', leaderboards.touch);
         displayLeaderboard('wordle', leaderboards.wordle);
