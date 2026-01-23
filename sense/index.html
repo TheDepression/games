@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sense Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            background: #ffffff;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Name Entry Screen */
+        #nameScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        #nameScreen h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: #333;
+            text-align: center;
+        }
+
+        #nameScreen input {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.2rem;
+            padding: 15px 25px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            outline: none;
+            text-align: center;
+            width: 280px;
+            transition: border-color 0.3s;
+        }
+
+        #nameScreen input:focus {
+            border-color: #ff8c00;
+        }
+
+        #nameScreen button {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            padding: 15px 50px;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4);
+        }
+
+        #nameScreen button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.5);
+        }
+
+        /* Menu Screen */
+        #menuScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 60px 20px 40px;
+        }
+
+        .title-container {
+            text-align: center;
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 12vw, 6rem);
+            color: #333;
+            animation: pulse 2s ease-in-out infinite;
+            background: linear-gradient(135deg, #333 0%, #666 50%, #333 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite, shimmer 3s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .start-btn {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            padding: 25px 80px;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 30px rgba(255, 140, 0, 0.5);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(255, 140, 0, 0.6);
+        }
+
+        .start-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .lang-toggle {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .lang-btn {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .lang-btn.active {
+            background: #ff8c00;
+            border-color: #ff8c00;
+            color: white;
+        }
+
+        .lang-btn:hover:not(.active) {
+            border-color: #ff8c00;
+            color: #ff8c00;
+        }
+
+        .refresh-btn {
+            font-size: 1.2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 10px;
+            opacity: 0.7;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .refresh-btn:hover {
+            opacity: 1;
+            transform: rotate(180deg);
+        }
+
+        .stage-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bottom-info {
+            text-align: center;
+            color: #666;
+        }
+
+        .player-name {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .best-score {
+            font-size: 1rem;
+            color: #ff8c00;
+            font-weight: 600;
+        }
+
+        .home-link {
+            margin-top: 15px;
+        }
+
+        .home-link a {
+            color: #999;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .home-link a:hover {
+            color: #ff8c00;
+        }
+
+        /* Game Canvas Screen */
+        #gameScreen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #ffffff;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .game-instruction {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #333;
+            text-align: center;
+            max-width: 90%;
+            transition: opacity 0.5s;
+        }
+
+        .game-subtitle {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #666;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-family: 'Quicksand', sans-serif;
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: 600;
+            color: #333;
+            transition: opacity 2s;
+        }
+
+        .score-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: #ff8c00;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 20;
+        }
+
+        .score-popup.show {
+            opacity: 1;
+        }
+
+        /* Stage indicator */
+        .stage-header {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 15;
+        }
+
+        .stage-indicator {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* Results Screen */
+        #resultsScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+
+        .results-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            color: #333;
+        }
+
+        .final-score {
+            font-family: 'Quicksand', sans-serif;
+            font-size: clamp(4rem, 15vw, 7rem);
+            font-weight: 600;
+            color: #ff8c00;
+        }
+
+        .score-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+            color: #666;
+        }
+
+        .score-item {
+            font-size: 1rem;
+        }
+
+        .play-again-btn {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            padding: 18px 60px;
+            background: linear-gradient(135deg, #ff8c00, #ff6b00);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 25px rgba(255, 140, 0, 0.4);
+            margin-top: 20px;
+        }
+
+        .play-again-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 140, 0, 0.5);
+        }
+
+        .new-record {
+            font-size: 1.2rem;
+            color: #4CAF50;
+            font-weight: 600;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Rabbit track */
+        .rabbit-track {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .rabbit {
+            font-size: 40px;
+            position: absolute;
+            transition: opacity 2s;
+        }
+
+        /* Touch indicator */
+        .touch-indicator {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 140, 0, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Reference line for stage 2 */
+        .reference-line {
+            position: absolute;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            transition: opacity 1s;
+        }
+
+        /* Guide circle for stage 3 */
+        .guide-circle {
+            position: absolute;
+            border: 3px dashed #ccc;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: opacity 1s;
+        }
+
+        .start-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff8c00;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        /* Countdown display */
+        .countdown {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(5rem, 20vw, 10rem);
+            color: #333;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 25;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-out {
+            opacity: 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Name Entry Screen -->
+        <div id="nameScreen">
+            <h1>Welcome to<br>Sense Test</h1>
+            <input type="text" id="nameInput" placeholder="Enter your name" maxlength="20">
+            <button id="nameSubmit">Let's Go!</button>
+        </div>
+
+        <!-- Menu Screen -->
+        <div id="menuScreen">
+            <div class="title-container">
+                <h1 class="main-title">Sense Test</h1>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <button class="start-btn" id="startBtn">Start</button>
+                <div class="lang-toggle">
+                    <button class="lang-btn active" id="langEn">English</button>
+                    <button class="lang-btn" id="langJa">日本語</button>
+                </div>
+            </div>
+            <div class="bottom-info">
+                <div class="player-name">Player: <span id="displayName"></span></div>
+                <div class="best-score">Best Score: <span id="bestScore">--</span>%</div>
+                <div class="home-link">
+                    <a href="https://hirakatajin.com">← Back to Homepage</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen">
+            <canvas id="gameCanvas"></canvas>
+            <div class="stage-header">
+                <span class="stage-indicator" id="stageIndicator"></span>
+                <button class="refresh-btn" id="refreshBtn" title="Refresh">🔄</button>
+            </div>
+            <div class="game-overlay" id="gameOverlay">
+                <div class="game-instruction" id="gameInstruction"></div>
+                <div class="game-subtitle" id="gameSubtitle"></div>
+            </div>
+            <div class="timer-display hidden" id="timerDisplay">0.0</div>
+            <div class="score-popup" id="scorePopup"></div>
+            <div class="countdown hidden" id="countdown"></div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen">
+            <h1 class="results-title">Final Results</h1>
+            <div class="final-score" id="finalScore">0%</div>
+            <div class="new-record hidden" id="newRecord">🎉 New Personal Best! 🎉</div>
+            <div class="score-breakdown" id="scoreBreakdown"></div>
+            <button class="play-again-btn" id="playAgainBtn">Play Again</button>
+            <div class="home-link">
+                <a href="https://hirakatajin.com">← Back to Homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgm" loop>
+        <source src="https://music.hirakatajin.com/Magical%20pond.m4a" type="audio/mp4">
+    </audio>
+
+    <script>
+        // Game State
+        const state = {
+            playerName: '',
+            bestScore: null,
+            currentStage: 0,
+            scores: [0, 0, 0, 0],
+            bgmStarted: false,
+            lang: 'en' // 'en' or 'ja'
+        };
+
+        // Translations
+        const translations = {
+            en: {
+                stage1: 'Stage 1 of 4: Time Sense',
+                stage2: 'Stage 2 of 4: Length Sense',
+                stage3: 'Stage 3 of 4: Shape Sense',
+                stage4: 'Stage 4 of 4: Invisible Rabbit',
+                holdScreen: 'Hold the screen for exactly',
+                seconds: 'seconds',
+                touchToBegin: 'Touch anywhere to begin',
+                target: 'Target',
+                yourTime: 'Your time',
+                thisLineIs: 'This line is',
+                pixelsLong: 'pixels long',
+                rememberLength: 'Remember this length...',
+                okBegin: 'OK, Begin',
+                drawLine: 'Draw a line',
+                touchAndDrag: 'Touch and drag to draw',
+                yourLine: 'Your line',
+                drawPerfect: 'Draw a perfect',
+                startAtOrange: 'Start at the orange dot, go clockwise',
+                accuracy: 'accuracy',
+                watchRabbit: '🐰 Watch the rabbit\'s pattern',
+                movesConstant: 'It moves around the square at constant speed',
+                rabbitFading: 'Rabbit fading...',
+                touchNow: 'Touch!',
+                orangeTouch: 'Orange = your touch, 🐰 = actual position',
+                timeRanOut: 'Time ran out!',
+                finalResults: 'Final Results',
+                newRecord: '🎉 New Personal Best! 🎉',
+                playAgain: 'Play Again',
+                pts: 'pts',
+                circle: 'circle',
+                square: 'square',
+                triangle: 'triangle',
+                oval: 'oval',
+                rectangle: 'rectangle',
+                timeSense: 'Time Sense',
+                lengthSense: 'Length Sense',
+                shapeSense: 'Shape Sense',
+                rabbitChase: 'Rabbit Chase'
+            },
+            ja: {
+                stage1: 'ステージ 1/4: 時間感覚',
+                stage2: 'ステージ 2/4: 長さ感覚',
+                stage3: 'ステージ 3/4: 形感覚',
+                stage4: 'ステージ 4/4: 透明うさぎ',
+                holdScreen: '画面を押し続けてください',
+                seconds: '秒間',
+                touchToBegin: 'どこでもタッチして開始',
+                target: '目標',
+                yourTime: 'あなたの時間',
+                thisLineIs: 'この線は',
+                pixelsLong: 'ピクセルです',
+                rememberLength: 'この長さを覚えて...',
+                okBegin: 'OK、始める',
+                drawLine: '線を描いて',
+                touchAndDrag: 'タッチしてドラッグ',
+                yourLine: 'あなたの線',
+                drawPerfect: '完璧な形を描いて',
+                startAtOrange: 'オレンジの点から時計回りに',
+                accuracy: '正確さ',
+                watchRabbit: '🐰 うさぎのパターンを見て',
+                movesConstant: '一定の速度で四角を回ります',
+                rabbitFading: 'うさぎが消えていく...',
+                touchNow: 'タッチ！',
+                orangeTouch: 'オレンジ = あなたのタッチ、🐰 = 実際の位置',
+                timeRanOut: '時間切れ！',
+                finalResults: '最終結果',
+                newRecord: '🎉 新記録！ 🎉',
+                playAgain: 'もう一度',
+                pts: '点',
+                circle: '円',
+                square: '正方形',
+                triangle: '三角形',
+                oval: '楕円',
+                rectangle: '長方形',
+                timeSense: '時間感覚',
+                lengthSense: '長さ感覚',
+                shapeSense: '形感覚',
+                rabbitChase: 'うさぎ追跡'
+            }
+        };
+
+        const t = (key) => translations[state.lang][key] || key;
+
+        // DOM Elements
+        const nameScreen = document.getElementById('nameScreen');
+        const menuScreen = document.getElementById('menuScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const nameInput = document.getElementById('nameInput');
+        const nameSubmit = document.getElementById('nameSubmit');
+        const displayName = document.getElementById('displayName');
+        const bestScoreEl = document.getElementById('bestScore');
+        const startBtn = document.getElementById('startBtn');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameOverlay = document.getElementById('gameOverlay');
+        const gameInstruction = document.getElementById('gameInstruction');
+        const gameSubtitle = document.getElementById('gameSubtitle');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const scorePopup = document.getElementById('scorePopup');
+        const stageIndicator = document.getElementById('stageIndicator');
+        const countdown = document.getElementById('countdown');
+        const finalScore = document.getElementById('finalScore');
+        const scoreBreakdown = document.getElementById('scoreBreakdown');
+        const newRecord = document.getElementById('newRecord');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const bgm = document.getElementById('bgm');
+        const langEn = document.getElementById('langEn');
+        const langJa = document.getElementById('langJa');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // Initialize
+        function init() {
+            loadData();
+            setupCanvas();
+            setupEventListeners();
+
+            if (state.playerName) {
+                showMenu();
+            } else {
+                showNameScreen();
+            }
+        }
+
+        function loadData() {
+            state.playerName = localStorage.getItem('senseTestName') || '';
+            const saved = localStorage.getItem('senseTestBest');
+            state.bestScore = saved ? parseFloat(saved) : null;
+            state.lang = localStorage.getItem('senseTestLang') || 'en';
+        }
+
+        function saveData() {
+            localStorage.setItem('senseTestName', state.playerName);
+            if (state.bestScore !== null) {
+                localStorage.setItem('senseTestBest', state.bestScore.toString());
+            }
+        }
+
+        function setupCanvas() {
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+        }
+
+        function setupEventListeners() {
+            nameSubmit.addEventListener('click', submitName);
+            nameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') submitName();
+            });
+            startBtn.addEventListener('click', startGame);
+            playAgainBtn.addEventListener('click', () => {
+                showMenu();
+            });
+            
+            // Language toggle
+            langEn.addEventListener('click', () => {
+                state.lang = 'en';
+                langEn.classList.add('active');
+                langJa.classList.remove('active');
+                localStorage.setItem('senseTestLang', 'en');
+            });
+            langJa.addEventListener('click', () => {
+                state.lang = 'ja';
+                langJa.classList.add('active');
+                langEn.classList.remove('active');
+                localStorage.setItem('senseTestLang', 'ja');
+            });
+            
+            // Refresh button
+            refreshBtn.addEventListener('click', () => {
+                location.reload();
+            });
+        }
+
+        function submitName() {
+            const name = nameInput.value.trim();
+            if (name) {
+                state.playerName = name;
+                saveData();
+                showMenu();
+            }
+        }
+
+        function showNameScreen() {
+            hideAllScreens();
+            nameScreen.style.display = 'flex';
+        }
+
+        function showMenu() {
+            hideAllScreens();
+            displayName.textContent = state.playerName;
+            bestScoreEl.textContent = state.bestScore !== null ? Math.round(state.bestScore) : '--';
+            menuScreen.style.display = 'flex';
+            
+            // Set language toggle state
+            if (state.lang === 'ja') {
+                langJa.classList.add('active');
+                langEn.classList.remove('active');
+            } else {
+                langEn.classList.add('active');
+                langJa.classList.remove('active');
+            }
+        }
+
+        function hideAllScreens() {
+            nameScreen.style.display = 'none';
+            menuScreen.style.display = 'none';
+            gameScreen.style.display = 'none';
+            resultsScreen.style.display = 'none';
+        }
+
+        function startBGM() {
+            if (!state.bgmStarted) {
+                bgm.volume = 0.4;
+                bgm.play().catch(() => {});
+                state.bgmStarted = true;
+            }
+        }
+
+        function startGame() {
+            startBGM();
+            state.currentStage = 0;
+            state.scores = [0, 0, 0, 0];
+            hideAllScreens();
+            gameScreen.style.display = 'block';
+            runStage(0);
+        }
+
+        function runStage(stageNum) {
+            state.currentStage = stageNum;
+            clearCanvas();
+            
+            switch(stageNum) {
+                case 0: runTimeStage(); break;
+                case 1: runLengthStage(); break;
+                case 2: runCircleStage(); break;
+                case 3: runRabbitStage(); break;
+                default: showResults();
+            }
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function showStageScore(score, callback) {
+            scorePopup.textContent = Math.round(score) + ' pts';
+            scorePopup.classList.add('show');
+            
+            setTimeout(() => {
+                scorePopup.classList.remove('show');
+                setTimeout(callback, 500);
+            }, 1500);
+        }
+
+        // ==================== STAGE 1: TIME SENSE ====================
+        function runTimeStage() {
+            stageIndicator.textContent = t('stage1');
+            
+            const targetTime = Math.floor(Math.random() * 16) + 10; // 10-25 seconds
+            const maxTime = targetTime * 2;
+            
+            gameInstruction.innerHTML = `${t('holdScreen')} <strong style="color: #ff8c00;">${targetTime}</strong> ${t('seconds')}`;
+            gameSubtitle.textContent = t('touchToBegin');
+            gameOverlay.classList.remove('hidden');
+            timerDisplay.classList.add('hidden');
+            
+            let startTime = null;
+            let timerInterval = null;
+            let isHolding = false;
+            let hasStarted = false;
+
+            const updateTimer = () => {
+                if (!startTime) return;
+                const elapsed = (Date.now() - startTime) / 1000;
+                
+                if (elapsed >= maxTime) {
+                    endHold(maxTime);
+                }
+            };
+
+            const startHold = (e) => {
+                e.preventDefault();
+                if (hasStarted) return;
+                hasStarted = true;
+                isHolding = true;
+                startTime = Date.now();
+                
+                gameOverlay.classList.add('hidden');
+                
+                // Turn screen blue while holding and show target time
+                ctx.fillStyle = '#4a90d9';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Display target time reminder on blue screen
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 48px Quicksand, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${t('target')}: ${targetTime}s`, canvas.width / 2, canvas.height / 2);
+                
+                // Reset text alignment
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'alphabetic';
+                
+                timerInterval = setInterval(updateTimer, 50);
+            };
+
+            const endHold = (overrideTime = null) => {
+                if (!isHolding || !startTime) return;
+                isHolding = false;
+                
+                clearInterval(timerInterval);
+                
+                // Return to white
+                clearCanvas();
+                
+                const elapsed = overrideTime || (Date.now() - startTime) / 1000;
+                const diff = Math.abs(elapsed - targetTime);
+                const maxDiff = targetTime; // 100% off = 0 points
+                
+                let score;
+                if (diff >= maxDiff) {
+                    score = 0;
+                } else {
+                    score = Math.max(0, 100 - (diff / targetTime) * 100);
+                }
+                
+                state.scores[0] = score;
+                
+                canvas.removeEventListener('mousedown', startHold);
+                canvas.removeEventListener('touchstart', startHold);
+                canvas.removeEventListener('mouseup', endHold);
+                canvas.removeEventListener('touchend', endHold);
+                
+                gameSubtitle.textContent = `${t('target')}: ${targetTime}s | ${t('yourTime')}: ${elapsed.toFixed(1)}s`;
+                gameOverlay.classList.remove('hidden');
+                gameInstruction.textContent = '';
+                
+                showStageScore(score, () => runStage(1));
+            };
+
+            canvas.addEventListener('mousedown', startHold);
+            canvas.addEventListener('touchstart', startHold);
+            canvas.addEventListener('mouseup', () => endHold());
+            canvas.addEventListener('touchend', () => endHold());
+        }
+
+        // ==================== STAGE 2: LENGTH SENSE ====================
+        function runLengthStage() {
+            stageIndicator.textContent = t('stage2');
+            
+            const targetLength = Math.floor(Math.random() * 501) + 200; // 200-700px
+            let phase = 'show'; // show, draw
+            let drawPoints = [];
+            let isDrawing = false;
+            let arrowAnimationId = null;
+
+            // Show reference line (100px)
+            gameInstruction.innerHTML = `${t('thisLineIs')} <strong style="color: red; font-size: 1.2em;">100</strong> ${t('pixelsLong')}`;
+            gameSubtitle.textContent = t('rememberLength');
+            gameOverlay.classList.remove('hidden');
+            
+            clearCanvas();
+            
+            const refY = canvas.height / 2 + 60;
+            const refX = (canvas.width - 100) / 2;
+            
+            // Draw the reference line
+            const drawReferenceLine = () => {
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(refX, refY);
+                ctx.lineTo(refX + 100, refY);
+                ctx.stroke();
+            };
+            
+            drawReferenceLine();
+            
+            // Animate pulsing arrows pointing at the line
+            let pulsePhase = 0;
+            const animateArrows = () => {
+                clearCanvas();
+                drawReferenceLine();
+                
+                pulsePhase += 0.1;
+                const pulse = Math.sin(pulsePhase) * 0.3 + 0.7; // Oscillates between 0.4 and 1.0
+                const offset = Math.sin(pulsePhase) * 5; // Arrows move in/out slightly
+                
+                ctx.fillStyle = `rgba(255, 0, 0, ${pulse})`;
+                ctx.font = 'bold 30px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const lineCenterX = refX + 50;
+                const lineCenterY = refY;
+                
+                // Arrow from top
+                ctx.save();
+                ctx.translate(lineCenterX, lineCenterY - 50 + offset);
+                ctx.fillText('↓', 0, 0);
+                ctx.restore();
+                
+                // Arrow from bottom
+                ctx.save();
+                ctx.translate(lineCenterX, lineCenterY + 50 - offset);
+                ctx.fillText('↑', 0, 0);
+                ctx.restore();
+                
+                // Arrow from left
+                ctx.save();
+                ctx.translate(refX - 40 + offset, lineCenterY);
+                ctx.fillText('→', 0, 0);
+                ctx.restore();
+                
+                // Arrow from right
+                ctx.save();
+                ctx.translate(refX + 100 + 40 - offset, lineCenterY);
+                ctx.fillText('←', 0, 0);
+                ctx.restore();
+                
+                // Reset text alignment to default
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'alphabetic';
+                
+                arrowAnimationId = requestAnimationFrame(animateArrows);
+            };
+            
+            arrowAnimationId = requestAnimationFrame(animateArrows);
+            
+            // Create OK button
+            const okButton = document.createElement('button');
+            okButton.textContent = t('okBegin');
+            okButton.style.cssText = `
+                position: absolute;
+                bottom: 25%;
+                left: 50%;
+                transform: translateX(-50%);
+                font-family: 'Quicksand', sans-serif;
+                font-weight: 600;
+                font-size: 1.2rem;
+                padding: 15px 50px;
+                background: linear-gradient(135deg, #ff8c00, #ff6b00);
+                color: white;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4);
+                z-index: 30;
+                transition: transform 0.2s, box-shadow 0.2s;
+            `;
+            okButton.addEventListener('mouseenter', () => {
+                okButton.style.transform = 'translateX(-50%) translateY(-2px)';
+                okButton.style.boxShadow = '0 6px 20px rgba(255, 140, 0, 0.5)';
+            });
+            okButton.addEventListener('mouseleave', () => {
+                okButton.style.transform = 'translateX(-50%)';
+                okButton.style.boxShadow = '0 4px 15px rgba(255, 140, 0, 0.4)';
+            });
+            
+            gameScreen.appendChild(okButton);
+            
+            // OK button click handler
+            okButton.addEventListener('click', () => {
+                // Stop arrow animation
+                cancelAnimationFrame(arrowAnimationId);
+                
+                // Remove OK button
+                okButton.remove();
+                
+                // Reset canvas context to default state
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'alphabetic';
+                
+                // Transition to draw phase
+                phase = 'draw';
+                clearCanvas();
+                gameInstruction.innerHTML = `${t('drawLine')} <strong style="color: red; font-size: 1.2em;">${targetLength}</strong> px`;
+                gameSubtitle.textContent = t('touchAndDrag');
+            });
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            };
+
+            const startDraw = (e) => {
+                if (phase !== 'draw') return;
+                e.preventDefault();
+                isDrawing = true;
+                drawPoints = [getPos(e)];
+                gameOverlay.classList.add('hidden');
+            };
+
+            const moveDraw = (e) => {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                drawPoints.push(pos);
+                
+                // Draw the line
+                clearCanvas();
+                ctx.strokeStyle = '#ff8c00';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(drawPoints[0].x, drawPoints[0].y);
+                for (let i = 1; i < drawPoints.length; i++) {
+                    ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
+                }
+                ctx.stroke();
+            };
+
+            const endDraw = (e) => {
+                if (!isDrawing) return;
+                isDrawing = false;
+                
+                // Calculate total length
+                let totalLength = 0;
+                for (let i = 1; i < drawPoints.length; i++) {
+                    const dx = drawPoints[i].x - drawPoints[i-1].x;
+                    const dy = drawPoints[i].y - drawPoints[i-1].y;
+                    totalLength += Math.sqrt(dx * dx + dy * dy);
+                }
+                
+                const diff = Math.abs(totalLength - targetLength);
+                const maxDiff = targetLength;
+                
+                let score;
+                if (diff >= maxDiff) {
+                    score = 0;
+                } else {
+                    score = Math.max(0, 100 - (diff / targetLength) * 100);
+                }
+                
+                state.scores[1] = score;
+                
+                canvas.removeEventListener('mousedown', startDraw);
+                canvas.removeEventListener('touchstart', startDraw);
+                canvas.removeEventListener('mousemove', moveDraw);
+                canvas.removeEventListener('touchmove', moveDraw);
+                canvas.removeEventListener('mouseup', endDraw);
+                canvas.removeEventListener('touchend', endDraw);
+                
+                gameSubtitle.textContent = `${t('target')}: ${targetLength}px | ${t('yourLine')}: ${Math.round(totalLength)}px`;
+                gameOverlay.classList.remove('hidden');
+                gameInstruction.textContent = '';
+                
+                showStageScore(score, () => runStage(2));
+            };
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('touchstart', startDraw);
+            canvas.addEventListener('mousemove', moveDraw);
+            canvas.addEventListener('touchmove', moveDraw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('touchend', endDraw);
+        }
+
+        // ==================== STAGE 3: SHAPE SENSE ====================
+        function runCircleStage() {
+            stageIndicator.textContent = t('stage3');
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const baseSize = Math.min(canvas.width, canvas.height) * 0.37; // 5% larger (was 0.35)
+            const trackWidth = 18; // 10% thinner (was 20)
+            
+            // Randomly select a shape
+            const shapes = ['circle', 'square', 'triangle', 'oval', 'rectangle'];
+            const selectedShape = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            let phase = 'show';
+            let drawPoints = [];
+            let isDrawing = false;
+            let shapePoints = []; // Points that define the shape path
+            let startPoint = { x: 0, y: 0 };
+
+            gameInstruction.textContent = `${t('drawPerfect')} ${t(selectedShape)}`;
+            gameSubtitle.textContent = t('startAtOrange');
+            gameOverlay.classList.remove('hidden');
+
+            // Generate shape points and find start point
+            const generateShapePoints = () => {
+                shapePoints = [];
+                const numPoints = 360; // High resolution for smooth checking
+                
+                switch (selectedShape) {
+                    case 'circle':
+                        for (let i = 0; i <= numPoints; i++) {
+                            const angle = -Math.PI / 2 + (i / numPoints) * Math.PI * 2;
+                            shapePoints.push({
+                                x: centerX + baseSize * Math.cos(angle),
+                                y: centerY + baseSize * Math.sin(angle)
+                            });
+                        }
+                        startPoint = { x: centerX, y: centerY - baseSize };
+                        break;
+                        
+                    case 'oval':
+                        const ovalWidth = baseSize * 1.3;
+                        const ovalHeight = baseSize * 0.7;
+                        for (let i = 0; i <= numPoints; i++) {
+                            const angle = -Math.PI / 2 + (i / numPoints) * Math.PI * 2;
+                            shapePoints.push({
+                                x: centerX + ovalWidth * Math.cos(angle),
+                                y: centerY + ovalHeight * Math.sin(angle)
+                            });
+                        }
+                        startPoint = { x: centerX, y: centerY - ovalHeight };
+                        break;
+                        
+                    case 'square':
+                        const sqHalf = baseSize * 0.85;
+                        const sqCorners = [
+                            { x: centerX, y: centerY - sqHalf },      // top center (start)
+                            { x: centerX + sqHalf, y: centerY - sqHalf }, // top right
+                            { x: centerX + sqHalf, y: centerY + sqHalf }, // bottom right
+                            { x: centerX - sqHalf, y: centerY + sqHalf }, // bottom left
+                            { x: centerX - sqHalf, y: centerY - sqHalf }, // top left
+                            { x: centerX, y: centerY - sqHalf }       // back to start
+                        ];
+                        // Interpolate between corners
+                        for (let c = 0; c < sqCorners.length - 1; c++) {
+                            const from = sqCorners[c];
+                            const to = sqCorners[c + 1];
+                            const segPoints = Math.floor(numPoints / 4);
+                            for (let i = 0; i <= segPoints; i++) {
+                                const t = i / segPoints;
+                                shapePoints.push({
+                                    x: from.x + (to.x - from.x) * t,
+                                    y: from.y + (to.y - from.y) * t
+                                });
+                            }
+                        }
+                        startPoint = { x: centerX, y: centerY - sqHalf };
+                        break;
+                        
+                    case 'rectangle':
+                        const rectW = baseSize * 1.2;
+                        const rectH = baseSize * 0.65;
+                        const rectCorners = [
+                            { x: centerX, y: centerY - rectH },      // top center (start)
+                            { x: centerX + rectW, y: centerY - rectH }, // top right
+                            { x: centerX + rectW, y: centerY + rectH }, // bottom right
+                            { x: centerX - rectW, y: centerY + rectH }, // bottom left
+                            { x: centerX - rectW, y: centerY - rectH }, // top left
+                            { x: centerX, y: centerY - rectH }       // back to start
+                        ];
+                        for (let c = 0; c < rectCorners.length - 1; c++) {
+                            const from = rectCorners[c];
+                            const to = rectCorners[c + 1];
+                            const segPoints = Math.floor(numPoints / 4);
+                            for (let i = 0; i <= segPoints; i++) {
+                                const t = i / segPoints;
+                                shapePoints.push({
+                                    x: from.x + (to.x - from.x) * t,
+                                    y: from.y + (to.y - from.y) * t
+                                });
+                            }
+                        }
+                        startPoint = { x: centerX, y: centerY - rectH };
+                        break;
+                        
+                    case 'triangle':
+                        const triSize = baseSize * 1.1;
+                        const triHeight = triSize * Math.sqrt(3) / 2;
+                        const triCorners = [
+                            { x: centerX, y: centerY - triHeight * 0.6 },           // top (start)
+                            { x: centerX + triSize / 2, y: centerY + triHeight * 0.4 }, // bottom right
+                            { x: centerX - triSize / 2, y: centerY + triHeight * 0.4 }, // bottom left
+                            { x: centerX, y: centerY - triHeight * 0.6 }            // back to top
+                        ];
+                        for (let c = 0; c < triCorners.length - 1; c++) {
+                            const from = triCorners[c];
+                            const to = triCorners[c + 1];
+                            const segPoints = Math.floor(numPoints / 3);
+                            for (let i = 0; i <= segPoints; i++) {
+                                const t = i / segPoints;
+                                shapePoints.push({
+                                    x: from.x + (to.x - from.x) * t,
+                                    y: from.y + (to.y - from.y) * t
+                                });
+                            }
+                        }
+                        startPoint = { x: centerX, y: centerY - triHeight * 0.6 };
+                        break;
+                }
+            };
+            
+            generateShapePoints();
+            
+            // Calculate target perimeter (total length of the shape path)
+            let targetPerimeter = 0;
+            for (let i = 1; i < shapePoints.length; i++) {
+                const dx = shapePoints[i].x - shapePoints[i-1].x;
+                const dy = shapePoints[i].y - shapePoints[i-1].y;
+                targetPerimeter += Math.sqrt(dx * dx + dy * dy);
+            }
+
+            // Draw the guide shape
+            const drawGuideShape = (opacity = 1) => {
+                ctx.strokeStyle = `rgba(221, 221, 221, ${opacity})`;
+                ctx.lineWidth = 3;
+                ctx.setLineDash([10, 10]);
+                ctx.beginPath();
+                ctx.moveTo(shapePoints[0].x, shapePoints[0].y);
+                for (let i = 1; i < shapePoints.length; i++) {
+                    ctx.lineTo(shapePoints[i].x, shapePoints[i].y);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Draw start point
+                ctx.fillStyle = `rgba(255, 140, 0, ${opacity})`;
+                ctx.beginPath();
+                ctx.arc(startPoint.x, startPoint.y, 12, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            clearCanvas();
+            drawGuideShape(1);
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            };
+
+            const isNearStart = (pos) => {
+                const dx = pos.x - startPoint.x;
+                const dy = pos.y - startPoint.y;
+                return Math.sqrt(dx * dx + dy * dy) < 30;
+            };
+            
+            const getDistanceToShape = (point) => {
+                let minDist = Infinity;
+                for (const sp of shapePoints) {
+                    const dx = point.x - sp.x;
+                    const dy = point.y - sp.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < minDist) minDist = dist;
+                }
+                return minDist;
+            };
+
+            const startDraw = (e) => {
+                e.preventDefault();
+                const pos = getPos(e);
+                
+                if (!isNearStart(pos)) return;
+                
+                isDrawing = true;
+                drawPoints = [pos];
+                phase = 'drawing';
+                gameOverlay.classList.add('hidden');
+            };
+
+            const moveDraw = (e) => {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                drawPoints.push(pos);
+                
+                const progress = drawPoints.length;
+                
+                clearCanvas();
+                
+                // Fade guide after 5% progress
+                const guideOpacity = Math.max(0, 1 - progress / 30);
+                
+                if (guideOpacity > 0) {
+                    drawGuideShape(guideOpacity);
+                }
+                
+                // Draw user's line (also fades)
+                const lineOpacity = Math.max(0, 1 - progress / 30);
+                ctx.strokeStyle = `rgba(255, 140, 0, ${lineOpacity})`;
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(drawPoints[0].x, drawPoints[0].y);
+                for (let i = 1; i < drawPoints.length; i++) {
+                    ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
+                }
+                ctx.stroke();
+            };
+
+            const endDraw = (e) => {
+                if (!isDrawing) return;
+                isDrawing = false;
+                
+                // Calculate player's drawn line length
+                let drawnLength = 0;
+                for (let i = 1; i < drawPoints.length; i++) {
+                    const dx = drawPoints[i].x - drawPoints[i-1].x;
+                    const dy = drawPoints[i].y - drawPoints[i-1].y;
+                    drawnLength += Math.sqrt(dx * dx + dy * dy);
+                }
+                
+                // AUTO ZERO: If drawn length is less than half of target, no points
+                if (drawnLength < targetPerimeter * 0.5) {
+                    state.scores[2] = 0;
+                    
+                    canvas.removeEventListener('mousedown', startDraw);
+                    canvas.removeEventListener('touchstart', startDraw);
+                    canvas.removeEventListener('mousemove', moveDraw);
+                    canvas.removeEventListener('touchmove', moveDraw);
+                    canvas.removeEventListener('mouseup', endDraw);
+                    canvas.removeEventListener('touchend', endDraw);
+                    
+                    // Show the actual shape vs their drawing
+                    clearCanvas();
+                    drawGuideShape(1);
+                    
+                    ctx.strokeStyle = '#ff8c00';
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(drawPoints[0].x, drawPoints[0].y);
+                    for (let i = 1; i < drawPoints.length; i++) {
+                        ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
+                    }
+                    ctx.stroke();
+                    
+                    gameSubtitle.textContent = `${t(selectedShape)} ${t('accuracy')}: 0% (too short)`;
+                    gameOverlay.classList.remove('hidden');
+                    gameInstruction.textContent = '';
+                    
+                    showStageScore(0, () => runStage(3));
+                    return;
+                }
+                
+                // Score component 1: How well they stayed on the track (0-100)
+                let pointsOnTrack = 0;
+                let totalPoints = drawPoints.length;
+                
+                for (const point of drawPoints) {
+                    const distFromShape = getDistanceToShape(point);
+                    if (distFromShape <= trackWidth) {
+                        pointsOnTrack++;
+                    }
+                }
+                
+                const zoneScore = totalPoints > 0 ? (pointsOnTrack / totalPoints) * 100 : 0;
+                
+                // Score component 2: How close their line length is to target perimeter (0-100)
+                const lengthDiff = Math.abs(drawnLength - targetPerimeter);
+                const lengthScore = Math.max(0, 100 - (lengthDiff / targetPerimeter) * 100);
+                
+                // Check if they completed the shape (ended near start)
+                const endPoint = drawPoints[drawPoints.length - 1];
+                const endNearStart = isNearStart(endPoint);
+                
+                // Combo score: 50% zone accuracy + 50% length accuracy
+                let score = (zoneScore * 0.5) + (lengthScore * 0.5);
+                
+                // Penalty for not completing (not ending near start)
+                if (!endNearStart && drawPoints.length > 50) {
+                    score *= 0.7;
+                }
+                
+                score = Math.max(0, Math.min(100, score));
+                state.scores[2] = score;
+                
+                canvas.removeEventListener('mousedown', startDraw);
+                canvas.removeEventListener('touchstart', startDraw);
+                canvas.removeEventListener('mousemove', moveDraw);
+                canvas.removeEventListener('touchmove', moveDraw);
+                canvas.removeEventListener('mouseup', endDraw);
+                canvas.removeEventListener('touchend', endDraw);
+                
+                // Show the actual shape vs their drawing
+                clearCanvas();
+                drawGuideShape(1);
+                
+                ctx.strokeStyle = '#ff8c00';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(drawPoints[0].x, drawPoints[0].y);
+                for (let i = 1; i < drawPoints.length; i++) {
+                    ctx.lineTo(drawPoints[i].x, drawPoints[i].y);
+                }
+                ctx.stroke();
+                
+                gameSubtitle.textContent = `${t(selectedShape)} ${t('accuracy')}: ${Math.round(score)}%`;
+                gameOverlay.classList.remove('hidden');
+                gameInstruction.textContent = '';
+                
+                showStageScore(score, () => runStage(3));
+            };
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('touchstart', startDraw);
+            canvas.addEventListener('mousemove', moveDraw);
+            canvas.addEventListener('touchmove', moveDraw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('touchend', endDraw);
+        }
+
+        // ==================== STAGE 4: RABBIT CHASE ====================
+        function runRabbitStage() {
+            stageIndicator.textContent = t('stage4');
+            
+            // Square track parameters
+            const padding = 60;
+            const trackSize = Math.min(canvas.width, canvas.height) - padding * 2;
+            const trackLeft = (canvas.width - trackSize) / 2;
+            const trackTop = (canvas.height - trackSize) / 2;
+            const trackWidth = 40;
+            
+            // Random consistent speed (2 to 4 pixels per frame)
+            const rabbitSpeed = 2 + Math.random() * 2;
+            
+            // Random starting corner and direction
+            const corners = [
+                { x: trackLeft, y: trackTop, dir: 'right' },                    // top-left, go right
+                { x: trackLeft + trackSize, y: trackTop, dir: 'down' },         // top-right, go down
+                { x: trackLeft + trackSize, y: trackTop + trackSize, dir: 'left' }, // bottom-right, go left
+                { x: trackLeft, y: trackTop + trackSize, dir: 'up' }            // bottom-left, go up
+            ];
+            const startCorner = corners[Math.floor(Math.random() * 4)];
+            
+            // Random offset along the starting edge (0 to trackSize)
+            const startOffset = Math.random() * trackSize;
+            
+            let rabbit = {
+                x: startCorner.x,
+                y: startCorner.y,
+                direction: startCorner.dir,
+                visible: true
+            };
+            
+            // Apply offset based on starting direction
+            switch (rabbit.direction) {
+                case 'right': rabbit.x += startOffset; break;
+                case 'down': rabbit.y += startOffset; break;
+                case 'left': rabbit.x -= startOffset; break;
+                case 'up': rabbit.y -= startOffset; break;
+            }
+            
+            let phase = 'watch'; // watch, countdown, play
+            let animationId = null;
+            let countdownValue = 3;
+            let canTouch = false;
+            let touchTimeout = null;
+
+            gameInstruction.textContent = t('watchRabbit');
+            gameSubtitle.textContent = t('movesConstant');
+            gameOverlay.classList.remove('hidden');
+
+            const drawTrack = () => {
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = trackWidth;
+                ctx.lineCap = 'square';
+                ctx.beginPath();
+                ctx.moveTo(trackLeft, trackTop);
+                ctx.lineTo(trackLeft + trackSize, trackTop);
+                ctx.lineTo(trackLeft + trackSize, trackTop + trackSize);
+                ctx.lineTo(trackLeft, trackTop + trackSize);
+                ctx.closePath();
+                ctx.stroke();
+            };
+
+            const moveRabbit = () => {
+                switch (rabbit.direction) {
+                    case 'up':
+                        rabbit.y -= rabbitSpeed;
+                        if (rabbit.y <= trackTop) {
+                            rabbit.y = trackTop;
+                            rabbit.direction = 'right';
+                        }
+                        break;
+                    case 'right':
+                        rabbit.x += rabbitSpeed;
+                        if (rabbit.x >= trackLeft + trackSize) {
+                            rabbit.x = trackLeft + trackSize;
+                            rabbit.direction = 'down';
+                        }
+                        break;
+                    case 'down':
+                        rabbit.y += rabbitSpeed;
+                        if (rabbit.y >= trackTop + trackSize) {
+                            rabbit.y = trackTop + trackSize;
+                            rabbit.direction = 'left';
+                        }
+                        break;
+                    case 'left':
+                        rabbit.x -= rabbitSpeed;
+                        if (rabbit.x <= trackLeft) {
+                            rabbit.x = trackLeft;
+                            rabbit.direction = 'up';
+                        }
+                        break;
+                }
+            };
+
+            const drawRabbit = (opacity = 1) => {
+                if (opacity > 0) {
+                    ctx.font = '40px Arial';
+                    ctx.globalAlpha = opacity;
+                    ctx.fillText('🐰', rabbit.x - 20, rabbit.y + 15);
+                    ctx.globalAlpha = 1;
+                }
+            };
+
+            let watchCycles = 0;
+            let fadeStartTime = null;
+            const watchDuration = 6000; // 6 seconds of watching
+            const fadeDuration = 2000; // 2 seconds to fade
+
+            const animate = () => {
+                clearCanvas();
+                drawTrack();
+                moveRabbit();
+                
+                if (phase === 'watch') {
+                    drawRabbit(1);
+                    
+                    if (!fadeStartTime && Date.now() - animStartTime > watchDuration) {
+                        fadeStartTime = Date.now();
+                        gameInstruction.textContent = t('rabbitFading');
+                    }
+                    
+                    if (fadeStartTime) {
+                        const fadeProgress = (Date.now() - fadeStartTime) / fadeDuration;
+                        if (fadeProgress >= 1) {
+                            phase = 'countdown';
+                            startCountdown();
+                        } else {
+                            drawRabbit(1 - fadeProgress);
+                        }
+                    }
+                } else if (phase === 'play') {
+                    // Rabbit is invisible but still moving
+                }
+                
+                if (phase !== 'ended') {
+                    animationId = requestAnimationFrame(animate);
+                }
+            };
+
+            let animStartTime = Date.now();
+            animationId = requestAnimationFrame(animate);
+
+            const startCountdown = () => {
+                gameOverlay.classList.add('hidden');
+                countdown.classList.remove('hidden');
+                countdownValue = 3;
+                
+                const countInterval = setInterval(() => {
+                    countdown.textContent = countdownValue;
+                    countdownValue--;
+                    
+                    if (countdownValue < 0) {
+                        clearInterval(countInterval);
+                        countdown.textContent = t('touchNow');
+                        setTimeout(() => {
+                            countdown.classList.add('hidden');
+                            phase = 'play';
+                            canTouch = true;
+                            
+                            // 10 second timeout
+                            touchTimeout = setTimeout(() => {
+                                if (canTouch) {
+                                    endGame(null);
+                                }
+                            }, 10000);
+                        }, 500);
+                    }
+                }, 1000);
+            };
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            };
+
+            const getTrackPosition = (x, y) => {
+                // Find closest point on track
+                const points = [
+                    { x: trackLeft, y: trackTop }, // top-left
+                    { x: trackLeft + trackSize, y: trackTop }, // top-right
+                    { x: trackLeft + trackSize, y: trackTop + trackSize }, // bottom-right
+                    { x: trackLeft, y: trackTop + trackSize } // bottom-left
+                ];
+                
+                // Check each edge
+                let minDist = Infinity;
+                let closestPoint = null;
+                
+                for (let i = 0; i < 4; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % 4];
+                    
+                    // Project point onto line segment
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const len = Math.sqrt(dx * dx + dy * dy);
+                    const t = Math.max(0, Math.min(1, ((x - p1.x) * dx + (y - p1.y) * dy) / (len * len)));
+                    
+                    const closest = {
+                        x: p1.x + t * dx,
+                        y: p1.y + t * dy
+                    };
+                    
+                    const dist = Math.sqrt((x - closest.x) ** 2 + (y - closest.y) ** 2);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestPoint = closest;
+                    }
+                }
+                
+                return closestPoint;
+            };
+
+            const getTrackDistance = (p1, p2) => {
+                // Calculate distance along the track (perimeter)
+                const perimeter = trackSize * 4;
+                
+                const getTrackPos = (p) => {
+                    // Convert x,y to position along track (0 to perimeter)
+                    if (Math.abs(p.y - trackTop) < 5) {
+                        // Top edge
+                        return p.x - trackLeft;
+                    } else if (Math.abs(p.x - (trackLeft + trackSize)) < 5) {
+                        // Right edge
+                        return trackSize + (p.y - trackTop);
+                    } else if (Math.abs(p.y - (trackTop + trackSize)) < 5) {
+                        // Bottom edge
+                        return trackSize * 2 + (trackLeft + trackSize - p.x);
+                    } else {
+                        // Left edge
+                        return trackSize * 3 + (trackTop + trackSize - p.y);
+                    }
+                };
+                
+                const pos1 = getTrackPos(p1);
+                const pos2 = getTrackPos(p2);
+                
+                let dist = Math.abs(pos1 - pos2);
+                // Use shorter distance (could go either way around)
+                if (dist > perimeter / 2) {
+                    dist = perimeter - dist;
+                }
+                
+                return dist;
+            };
+
+            const isOnTrack = (x, y) => {
+                // Check if point is within trackWidth distance of the track path
+                const closestPoint = getTrackPosition(x, y);
+                const dx = x - closestPoint.x;
+                const dy = y - closestPoint.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                return dist <= trackWidth / 2 + 10; // Small tolerance
+            };
+
+            const handleTouch = (e) => {
+                if (!canTouch || phase !== 'play') return;
+                e.preventDefault();
+                
+                const pos = getPos(e);
+                
+                // Only register touch if on the track
+                if (!isOnTrack(pos.x, pos.y)) {
+                    return; // Ignore touches outside the track
+                }
+                
+                canTouch = false;
+                clearTimeout(touchTimeout);
+                endGame(pos);
+            };
+
+            const endGame = (touchPos) => {
+                phase = 'ended';
+                cancelAnimationFrame(animationId);
+                
+                let score = 0;
+                
+                if (touchPos) {
+                    const closestTrackPoint = getTrackPosition(touchPos.x, touchPos.y);
+                    const rabbitPos = { x: rabbit.x, y: rabbit.y };
+                    const distance = getTrackDistance(closestTrackPoint, rabbitPos);
+                    const perimeter = trackSize * 4;
+                    const maxDist = perimeter / 2; // Opposite side = 0 points
+                    
+                    score = Math.max(0, 100 - (distance / maxDist) * 100);
+                }
+                
+                state.scores[3] = score;
+                
+                // Show result
+                clearCanvas();
+                drawTrack();
+                
+                // Show rabbit position
+                ctx.font = '40px Arial';
+                ctx.fillText('🐰', rabbit.x - 20, rabbit.y + 15);
+                
+                // Show touch position if any
+                if (touchPos) {
+                    ctx.fillStyle = '#ff8c00';
+                    ctx.beginPath();
+                    ctx.arc(touchPos.x, touchPos.y, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                canvas.removeEventListener('mousedown', handleTouch);
+                canvas.removeEventListener('touchstart', handleTouch);
+                
+                gameSubtitle.textContent = touchPos ? t('orangeTouch') : t('timeRanOut');
+                gameOverlay.classList.remove('hidden');
+                gameInstruction.textContent = '';
+                
+                showStageScore(score, () => showResults());
+            };
+
+            canvas.addEventListener('mousedown', handleTouch);
+            canvas.addEventListener('touchstart', handleTouch);
+        }
+
+        // ==================== RESULTS ====================
+        function showResults() {
+            hideAllScreens();
+            
+            const total = state.scores.reduce((a, b) => a + b, 0);
+            const average = total / 4;
+            const percentage = Math.round(average);
+            
+            finalScore.textContent = percentage + '%';
+            
+            const stageNames = [t('timeSense'), t('lengthSense'), t('shapeSense'), t('rabbitChase')];
+            scoreBreakdown.innerHTML = state.scores.map((score, i) => 
+                `<div class="score-item">${stageNames[i]}: ${Math.round(score)} ${t('pts')}</div>`
+            ).join('');
+            
+            // Update results screen text
+            document.querySelector('.results-title').textContent = t('finalResults');
+            newRecord.textContent = t('newRecord');
+            playAgainBtn.textContent = t('playAgain');
+            
+            // Check for new record
+            if (state.bestScore === null || percentage > state.bestScore) {
+                state.bestScore = percentage;
+                saveData();
+                newRecord.classList.remove('hidden');
+            } else {
+                newRecord.classList.add('hidden');
+            }
+            
+            resultsScreen.style.display = 'flex';
+        }
+
+        // Initialize the game
+        init();
+    </script>
+</body>
+</html>
