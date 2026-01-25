@@ -279,15 +279,25 @@
 
     <div class="game-tabs">
       <!-- Row 1 -->
-      <button class="game-tab active" data-game="sense">🕰️ センス</button>
+      <button class="game-tab active" data-game="hirahunt">🎯 HiraHunt</button>
+      <button class="game-tab" data-game="sense">🕰️ センス</button>
       <button class="game-tab" data-game="touch">👆 数字触り</button>
-      <button class="game-tab" data-game="snake">🐍 Snake</button>
       <!-- Row 2 -->
+      <button class="game-tab" data-game="snake">🐍 Snake</button>
       <button class="game-tab" data-game="wordle">📝 Wordle</button>
       <button class="game-tab" data-game="masterfrog">🐸 M.Frog</button>
     </div>
 
-    <div id="sense" class="leaderboard-card active">
+    <div id="hirahunt" class="leaderboard-card active">
+      <h2 class="leaderboard-title">Hirakata Hunt</h2>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        Loading rankings...
+      </div>
+      <a href="http://hirakatajin.com/games" class="back-button">🔙 ゲームメニューに戻る</a>
+    </div>
+
+    <div id="sense" class="leaderboard-card">
       <h2 class="leaderboard-title">Sense Test</h2>
       <div class="loading">
         <div class="loading-spinner"></div>
@@ -344,6 +354,7 @@
     // Collect localStorage data from all games
     function collectLocalStorageData() {
       const data = {
+        hirahunt: null,
         sense: null,
         snake: null,
         touch: null,
@@ -352,6 +363,27 @@
       };
 
       try {
+        // Hirakata Hunt
+        const hirahuntName = localStorage.getItem('hirakataHunt_name');
+        const hirahuntScore = localStorage.getItem('hirakataHunt_score');
+        const hirahuntCaught = localStorage.getItem('hirakataHunt_caught');
+        if (hirahuntName && hirahuntScore) {
+          // Count unique character types caught
+          let catches = 0;
+          if (hirahuntCaught) {
+            try {
+              const caught = JSON.parse(hirahuntCaught);
+              catches = Object.keys(caught).length;
+            } catch (e) {}
+          }
+          data.hirahunt = {
+            name: hirahuntName,
+            score: parseInt(hirahuntScore),
+            catches: catches
+          };
+          currentPlayerNames.hirahunt = hirahuntName;
+        }
+
         // Sense Test
         const senseName = localStorage.getItem('senseTestName');
         const senseScore = localStorage.getItem('senseTestBest');
@@ -516,7 +548,12 @@
         let scoreDisplay = '';
         let detailsDisplay = '';
         
-        if (game === 'sense') {
+        if (game === 'hirahunt') {
+          scoreDisplay = `${entry.score} pts`;
+          if (entry.catches !== undefined) {
+            detailsDisplay = `${entry.catches} catches`;
+          }
+        } else if (game === 'sense') {
           scoreDisplay = `${Math.round(entry.score)}%`;
         } else if (game === 'snake') {
           scoreDisplay = entry.score;
@@ -549,6 +586,7 @@
     // Helper functions
     function getGameTitle(game) {
       const titles = {
+        hirahunt: 'Hirakata Hunt',
         sense: 'Sense Test',
         snake: 'Snake Letter Quest',
         touch: 'Touch the Numbers',
@@ -630,6 +668,7 @@
         // Step 3: Fetch and display leaderboards
         const leaderboards = await fetchLeaderboards();
         
+        displayLeaderboard('hirahunt', leaderboards.hirahunt);
         displayLeaderboard('sense', leaderboards.sense);
         displayLeaderboard('snake', leaderboards.snake);
         displayLeaderboard('touch', leaderboards.touch);
@@ -646,6 +685,7 @@
     async function refreshLeaderboards() {
       try {
         const leaderboards = await fetchLeaderboards();
+        displayLeaderboard('hirahunt', leaderboards.hirahunt);
         displayLeaderboard('sense', leaderboards.sense);
         displayLeaderboard('snake', leaderboards.snake);
         displayLeaderboard('touch', leaderboards.touch);
