@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Paint Brawl</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#000; overflow:hidden; font-family:'Arial Black',sans-serif; touch-action:none; }
+  #gameCanvas { display:block; width:100vw; height:100vh; }
+
+  #topBar {
+    position:fixed; top:0; left:0; width:100%; display:flex;
+    justify-content:space-between; align-items:flex-start;
+    padding:12px 16px;
+    background:linear-gradient(to bottom,rgba(0,0,0,0.72),transparent);
+    pointer-events:none; z-index:10;
+  }
+  .timerBox {
+    background:rgba(0,0,0,0.6); border-radius:12px; padding:7px 14px;
+    border:2px solid rgba(255,255,255,0.25); text-align:center; min-width:90px;
+  }
+  .timerBox .lbl { font-size:9px; color:#aaa; letter-spacing:2px; text-transform:uppercase; }
+  .timerBox .val { font-size:20px; font-weight:900; color:#fff; }
+  .timerBox.warn .val { color:#ff4444; }
+  #turnBox {
+    background:rgba(0,0,0,0.6); border-radius:12px; padding:7px 18px;
+    border:2px solid rgba(255,255,255,0.25); text-align:center;
+  }
+  #turnBox .lbl { font-size:9px; color:#aaa; letter-spacing:2px; text-transform:uppercase; }
+  #turnBox .val { font-size:17px; font-weight:900; }
+  #distBox {
+    background:rgba(0,0,0,0.55); border-radius:9px; padding:4px 12px;
+    border:1px solid rgba(255,255,255,0.2); text-align:center; margin-top:5px; display:none;
+  }
+  #distBox .lbl { font-size:8px; color:#aaa; letter-spacing:1px; text-transform:uppercase; }
+  #distBox .val { font-size:13px; font-weight:900; color:#ffdd44; }
+
+  #slingInstr {
+    position:fixed; bottom:218px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.55); border-radius:10px; padding:6px 16px;
+    color:#fff; font-size:12px; text-align:center; z-index:10; pointer-events:none;
+  }
+  #slingCanvas { position:fixed; bottom:0; left:0; width:100%; height:215px; z-index:20; pointer-events:auto; }
+
+  #gridHUD {
+    position:fixed; top:90px; right:14px;
+    background:rgba(0,0,0,0.6); border-radius:12px; padding:8px;
+    border:2px solid rgba(255,255,255,0.2); z-index:10; pointer-events:none;
+  }
+  .miniGrid { display:grid; grid-template-columns:repeat(3,34px); gap:3px; }
+  .miniCell {
+    width:34px; height:34px; border-radius:5px; background:#2a6b2a;
+    border:1px solid rgba(255,255,255,0.2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:9px; font-weight:900; color:rgba(255,255,255,0.85);
+  }
+  .miniCell.yellow { background:#c8a000; }
+  .miniCell.blue   { background:#0044bb; }
+
+  .fullOverlay {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.88); z-index:100;
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; text-align:center; padding:20px;
+  }
+  .fullOverlay h1 { font-size:42px; font-weight:900; margin-bottom:8px; letter-spacing:3px; }
+  .fullOverlay p  { font-size:16px; color:#ccc; margin-bottom:22px; }
+  .btnPrimary {
+    background:linear-gradient(135deg,#ffdd44,#ff8800); border:none; border-radius:14px;
+    padding:14px 44px; font-size:20px; font-weight:900; color:#000; cursor:pointer;
+    margin:6px; letter-spacing:2px; box-shadow:0 4px 18px rgba(255,200,0,0.4);
+  }
+  .btnGreen {
+    background:linear-gradient(135deg,#44ffaa,#00cc88); border:none; border-radius:14px;
+    padding:14px 44px; font-size:20px; font-weight:900; color:#000; cursor:pointer; margin-top:18px;
+  }
+  select.gs {
+    background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.3);
+    border-radius:10px; padding:9px 14px; color:#fff; font-size:14px; margin:4px; cursor:pointer;
+  }
+  .settingsGrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; width:100%; max-width:400px; }
+  .settingsGrid label { font-size:10px; color:#aaa; letter-spacing:1px; text-transform:uppercase; margin-bottom:2px; display:block; }
+
+  #overhead {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.9); z-index:80;
+    display:none; flex-direction:column; align-items:center; justify-content:center; color:#fff; text-align:center;
+  }
+  #overhead h2 { font-size:32px; font-weight:900; margin-bottom:10px; letter-spacing:3px; }
+  #overheadCanvas { border:2px solid rgba(255,255,255,0.3); border-radius:8px; }
+  #overhead .sf { font-size:17px; color:#ffdd44; margin-top:10px; }
+
+  #niceShotPopup {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.72); z-index:90;
+    display:none; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;
+  }
+  #niceShotPopup .msg { font-size:54px; font-weight:900; color:#fff; text-shadow:3px 3px 0 #000; }
+  #niceShotPopup .sub { font-size:20px; color:#ffdd44; margin-top:6px; font-weight:900; }
+  #niceShotPopup canvas { border:2px solid rgba(255,255,255,0.4); border-radius:8px; margin-top:14px; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<div id="topBar">
+  <div>
+    <div class="timerBox" id="gameTimerBox">
+      <div class="lbl">GAME TIME</div>
+      <div class="val" id="gameTimerVal">10:00</div>
+    </div>
+    <div id="distBox">
+      <div class="lbl">DISTANCE</div>
+      <div class="val" id="distVal">— m</div>
+    </div>
+  </div>
+  <div id="turnBox">
+    <div class="lbl">TURN</div>
+    <div class="val" id="turnVal">—</div>
+  </div>
+  <div class="timerBox" id="turnTimerBox">
+    <div class="lbl">SHOT TIMER</div>
+    <div class="val" id="turnTimerVal">25</div>
+  </div>
+</div>
+
+<div id="gridHUD"><div class="miniGrid" id="miniGrid"></div></div>
+
+<div id="slingInstr">Drag ↓ to pull · ← → to aim · Release to throw</div>
+<canvas id="slingCanvas"></canvas>
+
+<div id="overhead">
+  <h2 id="overheadTitle">ROUND 1</h2>
+  <canvas id="overheadCanvas" width="280" height="280"></canvas>
+  <div class="sf" id="startFromText">Starting from: North</div>
+</div>
+
+<div id="niceShotPopup">
+  <div class="msg" id="niceShotMsg">🎯 NICE SHOT!</div>
+  <div class="sub" id="niceShotSub"></div>
+  <canvas id="niceShotCanvas" width="200" height="200"></canvas>
+</div>
+
+<div class="fullOverlay" id="winScreen">
+  <h1 id="winTitle">🎉 YELLOW WINS!</h1>
+  <p id="winSub">Three in a row!</p>
+  <button class="btnGreen" onclick="location.reload()">PLAY AGAIN</button>
+</div>
+
+<div class="fullOverlay" id="overlay" style="display:flex">
+  <h1>
+    🎈🫟
+    Tic-Tac-SplaToe
+    🫟🎈
+  </h1>
+  <p style="font-size:18px;color:#ccc;margin-bottom:4px">まるばつーん</p>
+  <p style="font-size:13px;color:#888;margin-bottom:22px;letter-spacing:2px">By: 出日土</p>
+  <div class="settingsGrid">
+    <div>
+      <label>Game Mode</label>
+      <select class="gs" id="modeSelect">
+        <option value="2p">2 Players</option>
+        <option value="cpu">vs Computer</option>
+      </select>
+    </div>
+    <div id="diffWrap">
+      <label>Difficulty</label>
+      <select class="gs" id="diffSelect">
+        <option value="easy">Easy</option>
+        <option value="med">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+    <div>
+      <label>Time Limit</label>
+      <select class="gs" id="timeLimitSelect">
+        <option value="300">5 Minutes</option>
+        <option value="600" selected>10 Minutes</option>
+        <option value="0">No Limit</option>
+      </select>
+    </div>
+    <div>
+      <label>Background Music</label>
+      <select class="gs" id="musicSelect">
+        <option value="none">No Music</option>
+        <option value="track1">Upbeat Field 🎵</option>
+        <option value="track2">Chill Breeze 🎵</option>
+        <option value="track3">Hype Arena 🎵</option>
+      </select>
+    </div>
+  </div>
+  <button class="btnPrimary" onclick="startGame()">START GAME</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ================================================================
+// AUDIO  — synthesised SFX placeholders; swap BGM src for real files
+// ================================================================
+let actx = null;
+function getACtx() { if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
+
+function playSound(type) {
+  try {
+    const ctx = getACtx();
+    if (type === 'pop') {
+      const buf = ctx.createBuffer(1, ctx.sampleRate*0.18|0, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+      const s=ctx.createBufferSource(), g=ctx.createGain();
+      g.gain.setValueAtTime(0.55,ctx.currentTime); g.gain.linearRampToValueAtTime(0,ctx.currentTime+0.18);
+      s.buffer=buf; s.connect(g); g.connect(ctx.destination); s.start(); return;
+    }
+    const osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    const t=ctx.currentTime;
+    if (type==='pull')     { osc.type='sawtooth'; osc.frequency.setValueAtTime(120,t); osc.frequency.linearRampToValueAtTime(75,t+0.15); gain.gain.setValueAtTime(0.07,t); gain.gain.linearRampToValueAtTime(0,t+0.15); osc.start(); osc.stop(t+0.15); }
+    else if (type==='throw'){ osc.type='sine';     osc.frequency.setValueAtTime(280,t); osc.frequency.exponentialRampToValueAtTime(70,t+0.28); gain.gain.setValueAtTime(0.16,t); gain.gain.linearRampToValueAtTime(0,t+0.28); osc.start(); osc.stop(t+0.28); }
+    else if (type==='miss') { osc.type='sawtooth'; osc.frequency.setValueAtTime(200,t); osc.frequency.linearRampToValueAtTime(70,t+0.3); gain.gain.setValueAtTime(0.1,t); gain.gain.linearRampToValueAtTime(0,t+0.3); osc.start(); osc.stop(t+0.3); }
+    else if (type==='niceshot'){ osc.type='sine'; [440,550,660].forEach((f,i)=>{ osc.frequency.setValueAtTime(f,t+i*0.09); }); gain.gain.setValueAtTime(0.18,t); gain.gain.linearRampToValueAtTime(0,t+0.4); osc.start(); osc.stop(t+0.4); }
+    else if (type==='whistle'){ osc.type='sine'; osc.frequency.setValueAtTime(900,t); osc.frequency.setValueAtTime(750,t+0.15); osc.frequency.setValueAtTime(900,t+0.3); gain.gain.setValueAtTime(0.22,t); gain.gain.linearRampToValueAtTime(0,t+0.45); osc.start(); osc.stop(t+0.45); }
+    else if (type==='win') { [440,550,660,880].forEach((f,i)=>{ const o2=ctx.createOscillator(),g2=ctx.createGain(); o2.connect(g2); g2.connect(ctx.destination); o2.type='sine'; o2.frequency.value=f; g2.gain.setValueAtTime(0,t+i*0.1); g2.gain.linearRampToValueAtTime(0.18,t+i*0.1+0.05); g2.gain.linearRampToValueAtTime(0,t+i*0.1+0.25); o2.start(t+i*0.1); o2.stop(t+i*0.1+0.3); }); return; }
+  } catch(e) {}
+}
+
+// BGM — swap null values for real audio file URLs when available
+// e.g. track1: 'audio/upbeat.mp3'
+const BGM = { track1:null, track2:null, track3:null };
+let bgmAudio = null;
+function startBGM(k) {
+  stopBGM();
+  if (!k||k==='none'||!BGM[k]) return;
+  bgmAudio = new Audio(BGM[k]);
+  bgmAudio.loop=true; bgmAudio.volume=0.32;
+  bgmAudio.play().catch(()=>{});
+}
+function stopBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio=null; } }
+
+// ================================================================
+// GAME STATE
+// ================================================================
+const COLORS = {
+  yellow:{ hex:0xffcc00, css:'#ffcc00', name:'Yellow' },
+  blue:  { hex:0x2277ff, css:'#2277ff', name:'Blue'   }
+};
+const CELL_SIZE    = 1.8;
+const GRID_ORIGIN  = { x:0, z:0 };
+const GRID_HALF    = CELL_SIZE * 1.5;
+const FIELD_RADIUS = 45;
+const TURN_TIME    = 25;
+
+let gameMode='2p', cpuDifficulty='med', currentPlayer='yellow';
+let gameStarted=false, gameOver=false;
+let maxGameTime=600, gameTimeLeft=600, turnTimeLeft=TURN_TIME;
+let gameTimerInterval=null, turnTimerInterval=null;
+let roundNumber=0;
+let currentThrowPos={ x:0,z:0,angle:0,name:'North' };
+let gameTimeExpired=false, finalTurnInProgress=false;
+let grid = Array(9).fill(null).map(()=>({owner:null,count:0}));
+
+// ================================================================
+// THREE.JS
+// ================================================================
+const c3d = document.getElementById('gameCanvas');
+const renderer = new THREE.WebGLRenderer({canvas:c3d,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb,60,130);
+
+const camera = new THREE.PerspectiveCamera(60,1,0.1,200);
+camera.position.set(0,1.7,8); camera.lookAt(0,0.5,0);
+
+scene.add(new THREE.AmbientLight(0xffffff,0.65));
+const sun = new THREE.DirectionalLight(0xffffee,1.1);
+sun.position.set(20,40,20); sun.castShadow=true;
+sun.shadow.mapSize.width=2048; sun.shadow.mapSize.height=2048;
+sun.shadow.camera.left=-60; sun.shadow.camera.right=60;
+sun.shadow.camera.top=60;   sun.shadow.camera.bottom=-60; sun.shadow.camera.far=130;
+scene.add(sun);
+
+// Ground
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshLambertMaterial({color:0x3a8a3a}));
+ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+
+// Platform
+const GRID_TOTAL=GRID_HALF*2;
+const platform=new THREE.Mesh(new THREE.BoxGeometry(GRID_TOTAL+0.2,0.08,GRID_TOTAL+0.2),new THREE.MeshLambertMaterial({color:0x2d7a2d}));
+platform.position.set(GRID_ORIGIN.x,0.04,GRID_ORIGIN.z); platform.receiveShadow=true; scene.add(platform);
+
+// Grid lines — equal 3x3
+(()=>{
+  const mat=new THREE.LineBasicMaterial({color:0xffffff}), y=0.09, h=GRID_HALF;
+  const d1=-h+CELL_SIZE, d2=-h+CELL_SIZE*2;
+  [  [[-h,y,-h],[h,y,-h]], [[h,y,-h],[h,y,h]], [[h,y,h],[-h,y,h]], [[-h,y,h],[-h,y,-h]],
+     [[d1,y,-h],[d1,y,h]], [[d2,y,-h],[d2,y,h]], [[-h,y,d1],[h,y,d1]], [[-h,y,d2],[h,y,d2]]
+  ].forEach(([a,b])=>{ const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]); scene.add(new THREE.Line(g,mat)); });
+})();
+
+// Cell meshes
+const cellMeshes=[];
+for(let i=0;i<9;i++){
+  const r=Math.floor(i/3),c=i%3;
+  const cx=-GRID_HALF+c*CELL_SIZE+CELL_SIZE*0.5, cz=-GRID_HALF+r*CELL_SIZE+CELL_SIZE*0.5;
+  const mat=new THREE.MeshLambertMaterial({color:0x2d7a2d,transparent:true,opacity:0});
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(CELL_SIZE-0.12,CELL_SIZE-0.12),mat);
+  mesh.rotation.x=-Math.PI/2; mesh.position.set(cx+GRID_ORIGIN.x,0.092,cz+GRID_ORIGIN.z);
+  scene.add(mesh); cellMeshes.push(mesh);
+}
+
+// Slingshot 3D
+const slingGroup=new THREE.Group(); scene.add(slingGroup);
+(()=>{
+  const mat=new THREE.MeshLambertMaterial({color:0x8B4513});
+  const h=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.05,0.5),mat); h.position.set(0,-0.1,0); slingGroup.add(h);
+  const l=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.3),mat); l.position.set(-0.12,0.2,0); l.rotation.z=-0.4; slingGroup.add(l);
+  const rr=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.3),mat); rr.position.set(0.12,0.2,0); rr.rotation.z=0.4; slingGroup.add(rr);
+})();
+
+const throwMarker=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.05,16),new THREE.MeshLambertMaterial({color:0xffff00,transparent:true,opacity:0.7}));
+throwMarker.visible=false; scene.add(throwMarker);
+
+// Splats
+const splats=[];
+function addSplat(idx,color){
+  const r=Math.floor(idx/3),c=idx%3;
+  const cx=-GRID_HALF+c*CELL_SIZE+CELL_SIZE*0.5+GRID_ORIGIN.x, cz=-GRID_HALF+r*CELL_SIZE+CELL_SIZE*0.5+GRID_ORIGIN.z;
+  for(let i=0;i<5;i++){
+    const mat=new THREE.MeshBasicMaterial({color:COLORS[color].hex,transparent:true,opacity:0.85});
+    const mesh=new THREE.Mesh(new THREE.CircleGeometry(0.1+Math.random()*0.55,10),mat);
+    mesh.rotation.x=-Math.PI/2;
+    mesh.position.set(cx+(Math.random()-0.5)*0.8,0.094+i*0.0005,cz+(Math.random()-0.5)*0.8);
+    scene.add(mesh); splats.push({mesh,cell:idx});
+  }
+}
+function clearSplats(idx){ for(let i=splats.length-1;i>=0;i--){ if(splats[i].cell===idx){scene.remove(splats[i].mesh);splats.splice(i,1);} } }
+
+// Balloon
+let balloon=null, balloonAnimating=false;
+function createBalloon(color){
+  if(balloon){scene.remove(balloon);balloon=null;}
+  const g=new THREE.Group(), mat=new THREE.MeshLambertMaterial({color:COLORS[color].hex});
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(0.18,16,16),mat));
+  const k=new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8),mat); k.position.y=-0.2; g.add(k);
+  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-0.2,0),new THREE.Vector3(0,-0.5,0)]),new THREE.LineBasicMaterial({color:0xffffff})));
+  return g;
+}
+
+// ================================================================
+// GRID LOGIC
+// ================================================================
+function cellFromWorld(x,z){
+  const lx=x-GRID_ORIGIN.x, lz=z-GRID_ORIGIN.z;
+  if(lx<-GRID_HALF||lx>GRID_HALF||lz<-GRID_HALF||lz>GRID_HALF) return -1;
+  return Math.max(0,Math.min(2,Math.floor((lz+GRID_HALF)/CELL_SIZE)))*3 + Math.max(0,Math.min(2,Math.floor((lx+GRID_HALF)/CELL_SIZE)));
+}
+function applyThrow(idx,player){
+  const cell=grid[idx];
+  if(!cell.owner){ cell.owner=player; cell.count=1; }
+  else if(cell.owner===player){ cell.count++; }
+  else{ cell.count--; if(cell.count<=0){cell.owner=null;cell.count=0;clearSplats(idx);} }
+  updateCellVis(idx); updateMiniGrid();
+}
+function updateCellVis(idx){
+  const cell=grid[idx]; clearSplats(idx);
+  const m=cellMeshes[idx];
+  if(cell.owner&&cell.count>0){ m.material.color.setHex(COLORS[cell.owner].hex); m.material.opacity=Math.min(0.3+cell.count*0.15,0.9); addSplat(idx,cell.owner); }
+  else m.material.opacity=0;
+}
+function checkWin(){
+  for(const [a,b,c] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){
+    const ga=grid[a],gb=grid[b],gc=grid[c];
+    if(ga.owner&&ga.owner===gb.owner&&gb.owner===gc.owner&&ga.count>0&&gb.count>0&&gc.count>0) return ga.owner;
+  }
+  return null;
+}
+function updateMiniGrid(){
+  const mg=document.getElementById('miniGrid'); mg.innerHTML='';
+  grid.forEach((cell,i)=>{
+    const d=document.createElement('div');
+    d.className='miniCell'+(cell.owner?' '+cell.owner:'');
+    if(cell.count>1) d.textContent='x'+cell.count;
+    mg.appendChild(d);
+  });
+}
+
+// ================================================================
+// THROW POSITIONS
+// ================================================================
+function pickThrowPos(){
+  const angs=[0,45,90,135,180,225,270,315], names=['North','Northeast','East','Southeast','South','Southwest','West','Northwest'];
+  const i=Math.floor(Math.random()*angs.length), rad=angs[i]*Math.PI/180;
+  // Range: 6m (very close) to 38m (far end of field) — weighted so extreme distances are rarer
+  const u=Math.random(), dist = u<0.2 ? 6+Math.random()*4 : u<0.7 ? 12+Math.random()*10 : 24+Math.random()*14;
+  return {x:Math.sin(rad)*dist, z:Math.cos(rad)*dist, angle:angs[i], name:names[i]};
+}
+function setCamToThrow(pos){
+  camera.position.set(pos.x,1.8,pos.z);
+  camera.lookAt(GRID_ORIGIN.x,0.5,GRID_ORIGIN.z);
+  const dir=new THREE.Vector3(GRID_ORIGIN.x-pos.x,0,GRID_ORIGIN.z-pos.z).normalize();
+  slingGroup.position.set(pos.x+dir.x*0.5,1.15,pos.z+dir.z*0.5);
+  slingGroup.lookAt(GRID_ORIGIN.x,1.15,GRID_ORIGIN.z);
+  // Show static distance from player to grid center
+  const gridDist = Math.sqrt(pos.x*pos.x + pos.z*pos.z);
+  document.getElementById('distVal').textContent = gridDist.toFixed(1) + ' m';
+  document.getElementById('distBox').style.display = 'block';
+}
+
+// ================================================================
+// SLINGSHOT 2D CANVAS
+// ================================================================
+const slingCanvas=document.getElementById('slingCanvas');
+const sCtx=slingCanvas.getContext('2d');
+let pullVec={x:0,y:0}, pulling=false, pullMag=0;
+const MAX_PULL=110;
+let mouseDown=false, mouseAnchor=null;
+let t1Id=null,t2Id=null,t1p=null,t2p=null,prevPD=null;
+
+function resizeSC(){ slingCanvas.width=window.innerWidth; slingCanvas.height=215; }
+resizeSC();
+
+function canInteract(){ return gameStarted&&!gameOver&&!balloonAnimating&&!(gameMode==='cpu'&&currentPlayer==='blue'); }
+
+// Mouse
+slingCanvas.addEventListener('mousedown',e=>{
+  if(!canInteract()) return;
+  mouseDown=true; pulling=true; mouseAnchor={x:e.clientX,y:e.clientY};
+  pullVec={x:0,y:0}; pullMag=0; playSound('pull');
+});
+slingCanvas.addEventListener('mousemove',e=>{
+  if(!mouseDown||!mouseAnchor) return;
+  pullVec.x=Math.max(-MAX_PULL,Math.min(MAX_PULL,e.clientX-mouseAnchor.x));
+  pullVec.y=Math.max(-MAX_PULL,Math.min(MAX_PULL,e.clientY-mouseAnchor.y));
+  pullMag=Math.min(MAX_PULL,Math.sqrt(pullVec.x**2+pullVec.y**2));
+  showDistPreview();
+});
+slingCanvas.addEventListener('mouseup',e=>{
+  if(mouseDown&&pulling&&pullMag>5){ mouseDown=false; launchBalloon(); }
+  else{ mouseDown=false; cancelThrow(); }
+});
+slingCanvas.addEventListener('mouseleave',e=>{ if(mouseDown){mouseDown=false;cancelThrow();} });
+
+// Touch
+slingCanvas.addEventListener('touchstart',e=>{
+  e.preventDefault(); if(!canInteract()) return;
+  for(const t of e.changedTouches){
+    if(t1Id===null){t1Id=t.identifier;t1p={x:t.clientX,y:t.clientY};}
+    else if(t2Id===null){t2Id=t.identifier;t2p={x:t.clientX,y:t.clientY};pulling=true;playSound('pull');}
+  }
+  if(t1p&&t2p) prevPD=d2(t1p,t2p);
+},{passive:false});
+slingCanvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  for(const t of e.changedTouches){
+    if(t.identifier===t1Id) t1p={x:t.clientX,y:t.clientY};
+    if(t.identifier===t2Id) t2p={x:t.clientX,y:t.clientY};
+  }
+  if(!t1p||!t2p||!pulling) return;
+  const pd=d2(t1p,t2p), delta=(prevPD||pd)-pd;
+  pullMag=Math.max(0,Math.min(MAX_PULL,pullMag+delta*0.8)); prevPD=pd;
+  const mx=(t1p.x+t2p.x)/2, my=(t1p.y+t2p.y)/2;
+  const rect=slingCanvas.getBoundingClientRect();
+  const dx=mx-(rect.left+slingCanvas.width/2), dy=my-(rect.top+60);
+  const n=Math.sqrt(dx**2+dy**2)||1;
+  pullVec.x=(dx/n)*pullMag; pullVec.y=(dy/n)*pullMag;
+  showDistPreview();
+},{passive:false});
+slingCanvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  let r1=false,r2=false;
+  for(const t of e.changedTouches){
+    if(t.identifier===t1Id){r1=true;t1Id=null;}
+    if(t.identifier===t2Id){r2=true;t2Id=null;}
+  }
+  if(r1&&r2){ if(pulling&&pullMag>5) launchBalloon(); else cancelThrow(); }
+  else if(r1||r2){ cancelThrow(); t1Id=null;t2Id=null;t1p=null;t2p=null; }
+},{passive:false});
+
+function d2(a,b){ return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2); }
+function cancelThrow(){ pulling=false;pullMag=0;pullVec={x:0,y:0};prevPD=null;mouseAnchor=null; document.getElementById('distBox').style.display='none'; }
+function showDistPreview(){
+  // Distance is static per turn — just make the box visible while pulling
+  document.getElementById('distBox').style.display='block';
+}
+
+function drawSling(){
+  const w=slingCanvas.width, h=slingCanvas.height;
+  sCtx.clearRect(0,0,w,h);
+  if(!gameStarted||gameOver) return;
+  const cx=w/2, baseY=h-18, forkY=56, sp=42;
+  const FL={x:cx-sp,y:forkY}, FR={x:cx+sp,y:forkY};
+  sCtx.strokeStyle='#8B4513'; sCtx.lineWidth=10; sCtx.lineCap='round';
+  sCtx.beginPath(); sCtx.moveTo(cx,baseY); sCtx.lineTo(cx,forkY+26); sCtx.stroke();
+  sCtx.beginPath(); sCtx.moveTo(cx,forkY+26); sCtx.lineTo(FL.x,FL.y); sCtx.stroke();
+  sCtx.beginPath(); sCtx.moveTo(cx,forkY+26); sCtx.lineTo(FR.x,FR.y); sCtx.stroke();
+  sCtx.fillStyle='#5a2d0c';
+  [FL,FR].forEach(p=>{sCtx.beginPath();sCtx.arc(p.x,p.y,8,0,Math.PI*2);sCtx.fill();});
+
+  if(pulling&&pullMag>4){
+    // Slingshot pocket: dragging right → pocket goes right → throw goes LEFT (correctly inverted)
+    const px=cx+pullVec.x, py=forkY+pullVec.y;
+    const stress=pullMag/MAX_PULL;
+    sCtx.strokeStyle=`rgba(${Math.round(stress*255)},${Math.round((1-stress)*200)},0,0.92)`; sCtx.lineWidth=4;
+    sCtx.beginPath(); sCtx.moveTo(FL.x,FL.y); sCtx.lineTo(px,py); sCtx.stroke();
+    sCtx.beginPath(); sCtx.moveTo(FR.x,FR.y); sCtx.lineTo(px,py); sCtx.stroke();
+    const pc=COLORS[currentPlayer].css, br=22+stress*6;
+    const grd=sCtx.createRadialGradient(px-5,py-8,3,px,py,br);
+    grd.addColorStop(0,'#ffffff88'); grd.addColorStop(0.3,pc); grd.addColorStop(1,pc+'bb');
+    sCtx.fillStyle=grd; sCtx.beginPath(); sCtx.arc(px,py,br,0,Math.PI*2); sCtx.fill();
+    sCtx.strokeStyle='rgba(255,255,255,0.3)'; sCtx.lineWidth=2; sCtx.stroke();
+    sCtx.fillStyle=pc; sCtx.beginPath(); sCtx.arc(px,py+br,5,0,Math.PI*2); sCtx.fill();
+    // Power bar — no number
+    const bw=180,bh=12,bx=(w-bw)/2,by=h-42;
+    sCtx.fillStyle='rgba(0,0,0,0.5)'; sCtx.fillRect(bx,by,bw,bh);
+    const bg=sCtx.createLinearGradient(bx,0,bx+bw,0);
+    bg.addColorStop(0,'#44ff44'); bg.addColorStop(0.5,'#ffff00'); bg.addColorStop(1,'#ff4444');
+    sCtx.fillStyle=bg; sCtx.fillRect(bx,by,bw*stress,bh);
+    sCtx.fillStyle='#fff'; sCtx.font='bold 10px Arial'; sCtx.textAlign='center';
+    sCtx.fillText('POWER',w/2,by-3);
+  } else {
+    sCtx.strokeStyle='#996633'; sCtx.lineWidth=3;
+    sCtx.beginPath(); sCtx.moveTo(FL.x,FL.y); sCtx.lineTo(cx,forkY); sCtx.stroke();
+    sCtx.beginPath(); sCtx.moveTo(FR.x,FR.y); sCtx.lineTo(cx,forkY); sCtx.stroke();
+    if(gameStarted&&!balloonAnimating&&!gameOver&&!(gameMode==='cpu'&&currentPlayer==='blue')){
+      const pc=COLORS[currentPlayer].css;
+      const grd=sCtx.createRadialGradient(cx-5,forkY-8,3,cx,forkY,22);
+      grd.addColorStop(0,'#ffffff88'); grd.addColorStop(0.3,pc); grd.addColorStop(1,pc+'cc');
+      sCtx.fillStyle=grd; sCtx.beginPath(); sCtx.arc(cx,forkY,22,0,Math.PI*2); sCtx.fill();
+    }
+  }
+}
+
+// ================================================================
+// LAUNCH
+// ================================================================
+function launchBalloon(){
+  if(!pulling||pullMag<5||balloonAnimating||gameOver){cancelThrow();return;}
+  const power=pullMag/MAX_PULL; pulling=false; stopTurnTimer(); playSound('throw');
+
+  // DIRECTION FIX:
+  // pullVec.x positive = dragged RIGHT = pocket right = sling throws LEFT → invert X
+  // pullVec.y positive = dragged DOWN  = pulled back  = throws FORWARD → keep Y
+  const aimX = -(pullVec.x/MAX_PULL);
+  const aimY =  (pullVec.y/MAX_PULL);
+
+  const camDir=new THREE.Vector3(); camera.getWorldDirection(camDir); camDir.y=0; camDir.normalize();
+  const camRight=new THREE.Vector3(); camRight.crossVectors(camDir,new THREE.Vector3(0,1,0)).normalize();
+
+  const from=new THREE.Vector3(currentThrowPos.x,1.5,currentThrowPos.z);
+  const maxDist=FIELD_RADIUS*1.9, throwDist=power*maxDist;
+
+  const tx=from.x+camDir.x*throwDist*aimY+camRight.x*throwDist*aimX*0.65;
+  const tz=from.z+camDir.z*throwDist*aimY+camRight.z*throwDist*aimX*0.65;
+
+  const missR=(1-power*0.6)*2.0;
+  const fx=tx+(Math.random()-0.5)*missR*2, fz=tz+(Math.random()-0.5)*missR*2;
+
+  animateBalloon(from,new THREE.Vector3(fx,0,fz),currentPlayer,()=>{
+    const idx=cellFromWorld(fx,fz);
+    if(idx>=0){
+      playSound('pop'); applyThrow(idx,currentPlayer);
+      const w=checkWin(); if(w){showWin(w);return;}
+      showNiceShot(idx,()=>endTurn());
+    } else {
+      playSound('miss'); showMissEffect(fx,fz); endTurn();
+    }
+  });
+  cancelThrow();
+}
+
+function animateBalloon(from,to,color,onLand){
+  balloonAnimating=true; balloon=createBalloon(color); scene.add(balloon);
+  const dur=1.4, t0=performance.now(), peak=5+from.distanceTo(to)*0.15;
+  function tick(now){
+    const t=Math.min((now-t0)/(dur*1000),1);
+    balloon.position.set(from.x+(to.x-from.x)*t, Math.max(0.1,peak*4*t*(1-t)+from.y*(1-t)), from.z+(to.z-from.z)*t);
+    balloon.rotation.y+=0.08; balloon.rotation.x+=0.03;
+    if(t<1){requestAnimationFrame(tick);return;}
+    popBalloon(balloon,color,to,()=>{balloon=null;balloonAnimating=false;onLand();});
+  }
+  requestAnimationFrame(tick);
+}
+
+function popBalloon(bm,color,lp,onDone){
+  if(!bm){onDone();return;}
+  const rm=new THREE.MeshBasicMaterial({color:COLORS[color].hex,transparent:true,opacity:1});
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(0.1,0.08,8,16),rm);
+  ring.position.set(lp.x,Math.max(0.15,lp.y),lp.z); scene.add(ring);
+  const drops=[];
+  for(let i=0;i<8;i++){
+    const dm=new THREE.MeshBasicMaterial({color:COLORS[color].hex,transparent:true,opacity:1});
+    const dp=new THREE.Mesh(new THREE.SphereGeometry(0.07,6,6),dm);
+    dp.position.copy(ring.position); const a=(i/8)*Math.PI*2;
+    dp.userData.vel=new THREE.Vector3(Math.cos(a)*1.5,1.5+Math.random(),Math.sin(a)*1.5);
+    scene.add(dp); drops.push(dp);
+  }
+  scene.remove(bm);
+  const t0=performance.now();
+  function anim(now){
+    const t=Math.min((now-t0)/500,1);
+    ring.scale.setScalar(1+t*6); rm.opacity=1-t;
+    drops.forEach(d=>{d.userData.vel.y-=0.08;d.position.addScaledVector(d.userData.vel,0.016);d.material.opacity=1-t;});
+    if(t<1){requestAnimationFrame(anim);return;}
+    scene.remove(ring); drops.forEach(d=>scene.remove(d)); onDone();
+  }
+  requestAnimationFrame(anim);
+}
+
+// ================================================================
+// NICE SHOT POPUP
+// ================================================================
+const NICE_MSGS=['🎯 NICE SHOT!','💥 BULLSEYE!','🎈 SPLAT!','🔥 ON FIRE!','⚡ PERFECT!','💪 BOOM!'];
+function showNiceShot(idx,onDone){
+  const popup=document.getElementById('niceShotPopup');
+  document.getElementById('niceShotMsg').textContent=NICE_MSGS[Math.floor(Math.random()*NICE_MSGS.length)];
+  const cell=grid[idx];
+  document.getElementById('niceShotSub').textContent=cell.count>1?`${COLORS[currentPlayer].name} ×${cell.count} — Protected!`:'';
+  playSound('niceshot');
+  drawNiceShotGrid(document.getElementById('niceShotCanvas'),idx);
+  popup.style.display='flex';
+  setTimeout(()=>{popup.style.display='none';onDone();},2000);
+}
+function drawNiceShotGrid(canvas,hi){
+  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,cs=w/3;
+  ctx.clearRect(0,0,w,h);
+  for(let i=0;i<9;i++){
+    const r=Math.floor(i/3),c=i%3,cell=grid[i];
+    ctx.fillStyle=cell.owner?COLORS[cell.owner].css:'#2a6b2a';
+    ctx.fillRect(c*cs+1,r*cs+1,cs-2,cs-2);
+    if(i===hi){ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.strokeRect(c*cs+3,r*cs+3,cs-6,cs-6);}
+    if(cell.count>1){ctx.fillStyle='#fff';ctx.font=`bold ${cs*0.28}px Arial`;ctx.textAlign='center';ctx.fillText('×'+cell.count,c*cs+cs/2,r*cs+cs*0.6);}
+  }
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;
+  for(let i=1;i<3;i++){ctx.beginPath();ctx.moveTo(i*cs,0);ctx.lineTo(i*cs,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*cs);ctx.lineTo(w,i*cs);ctx.stroke();}
+  ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=2;ctx.strokeRect(0,0,w,h);
+}
+
+// ================================================================
+// MISS
+// ================================================================
+function showMissEffect(lx,lz){
+  const dx=lx-GRID_ORIGIN.x,dz=lz-GRID_ORIGIN.z,ax=Math.abs(dx),az=Math.abs(dz),hh=GRID_HALF;
+  let hint='😬 Just missed!';
+  if(dz<-hh-0.5&&az>ax) hint='📏 Too short!';
+  else if(dz>hh+0.5&&az>ax) hint='💨 Overshot!';
+  else if(dx<-hh-0.5) hint='⬅️ Too far left!';
+  else if(dx>hh+0.5) hint='➡️ Too far right!';
+  const el=document.createElement('div');
+  el.innerHTML=`<div style="font-size:48px;font-weight:900">MISS!</div><div style="font-size:19px;margin-top:5px">${hint}</div>`;
+  el.style.cssText='position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);color:#ff4444;text-shadow:3px 3px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.65);padding:16px 26px;border-radius:14px;';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1800);
+}
+
+// ================================================================
+// TIMERS
+// ================================================================
+function startTurnTimer(){ turnTimeLeft=TURN_TIME; updateTTD(); clearInterval(turnTimerInterval); turnTimerInterval=setInterval(()=>{ turnTimeLeft--; updateTTD(); if(turnTimeLeft<=0){clearInterval(turnTimerInterval);showSkip();endTurn();} },1000); }
+function stopTurnTimer(){ clearInterval(turnTimerInterval); }
+function updateTTD(){ document.getElementById('turnTimerVal').textContent=turnTimeLeft; document.getElementById('turnTimerBox').classList.toggle('warn',turnTimeLeft<=8); }
+
+function startGameTimer(){
+  if(maxGameTime===0) return;
+  gameTimeLeft=maxGameTime; clearInterval(gameTimerInterval);
+  gameTimerInterval=setInterval(()=>{
+    gameTimeLeft--; updateGTD();
+    if(gameTimeLeft<=0&&!gameTimeExpired){gameTimeExpired=true;playSound('whistle');showWhistle();finalTurnInProgress=true;}
+    if(gameTimeExpired&&!finalTurnInProgress){clearInterval(gameTimerInterval);endByTime();}
+  },1000);
+}
+function updateGTD(){
+  if(maxGameTime===0){document.getElementById('gameTimerVal').textContent='∞';return;}
+  const m=Math.floor(gameTimeLeft/60),s=gameTimeLeft%60;
+  document.getElementById('gameTimerVal').textContent=`${m}:${String(s).padStart(2,'0')}`;
+  document.getElementById('gameTimerBox').classList.toggle('warn',gameTimeLeft<=30);
+}
+function showWhistle(){ const el=document.createElement('div'); el.textContent="📢 TIME'S UP — Finish your turn!"; el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#ffdd44;text-shadow:3px 3px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.75);padding:16px 28px;border-radius:14px;'; document.body.appendChild(el); setTimeout(()=>el.remove(),2500); }
+function showSkip(){ const el=document.createElement('div'); el.textContent='⏱ TURN SKIPPED'; el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#ff8800;z-index:200;pointer-events:none;background:rgba(0,0,0,0.7);padding:14px 24px;border-radius:14px;'; document.body.appendChild(el); setTimeout(()=>el.remove(),1500); }
+function endByTime(){ clearInterval(gameTimerInterval);clearInterval(turnTimerInterval);gameOver=true;stopBGM(); document.getElementById('winTitle').textContent="⏱ TIME'S UP — TIE!"; document.getElementById('winSub').textContent='A sudden-death throw to decide the winner!'; document.getElementById('winScreen').style.display='flex'; }
+
+// ================================================================
+// TURN MANAGEMENT
+// ================================================================
+function endTurn(){
+  stopTurnTimer();
+  if(gameTimeExpired){finalTurnInProgress=false;endByTime();return;}
+  currentPlayer=currentPlayer==='yellow'?'blue':'yellow'; updateTurnDisplay();
+  if(currentPlayer==='yellow'){ roundNumber++; showRoundTransition(); }
+  else if(gameMode==='cpu'&&currentPlayer==='blue') setTimeout(()=>cpuThrow(),1000);
+  else startTurnTimer();
+}
+function updateTurnDisplay(){ const el=document.getElementById('turnVal'); el.textContent=COLORS[currentPlayer].name.toUpperCase(); el.style.color=COLORS[currentPlayer].css; }
+
+// ================================================================
+// ROUND TRANSITION
+// ================================================================
+function showRoundTransition(){
+  stopTurnTimer();
+  const np=pickThrowPos(); currentThrowPos=np;
+  document.getElementById('overheadTitle').textContent=`ROUND ${roundNumber}`;
+  document.getElementById('startFromText').textContent=`Starting from: ${np.name}`;
+  const oh=document.getElementById('overhead'); oh.style.display='flex';
+  drawOverheadWithDot(document.getElementById('overheadCanvas'),np,()=>{
+    setTimeout(()=>{
+      oh.style.display='none';
+      setCamToThrow(np);
+      throwMarker.position.set(np.x,0.1,np.z); throwMarker.visible=true;
+      setTimeout(()=>throwMarker.visible=false,1500);
+      updateTurnDisplay();
+      if(gameMode==='cpu'&&currentPlayer==='blue') setTimeout(()=>cpuThrow(),800);
+      else startTurnTimer();
+    },600);
+  });
+}
+
+function drawOverheadWithDot(canvas,target,onDone){
+  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+  const scale=w/(FIELD_RADIUS*2.3),cx=w/2,cy=h/2;
+  const gs=CELL_SIZE*scale,gx=cx-gs*1.5,gy=cy-gs*1.5;
+  const tc={x:cx+target.x*scale,y:cy+target.z*scale};
+  let frame=0,total=65,dx=Math.random()*w,dy=Math.random()*h;
+  function draw(){
+    ctx.fillStyle='#3a8a3a'; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#2d7a2d'; ctx.fillRect(gx,gy,gs*3,gs*3);
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.strokeRect(gx,gy,gs*3,gs*3);
+    [1,2].forEach(i=>{ ctx.beginPath();ctx.moveTo(gx+gs*i,gy);ctx.lineTo(gx+gs*i,gy+gs*3);ctx.stroke(); ctx.beginPath();ctx.moveTo(gx,gy+gs*i);ctx.lineTo(gx+gs*3,gy+gs*i);ctx.stroke(); });
+    grid.forEach((cell,i)=>{ if(!cell.owner||cell.count<=0)return; const r=Math.floor(i/3),c=i%3; ctx.fillStyle=COLORS[cell.owner].css+'aa'; ctx.fillRect(gx+c*gs+2,gy+r*gs+2,gs-4,gs-4); });
+    if(frame<total*0.7){dx=Math.random()*w;dy=Math.random()*h;}
+    else{const t=(frame-total*0.7)/(total*0.3);dx+=(tc.x-dx)*t*0.25;dy+=(tc.y-dy)*t*0.25;}
+    ctx.globalAlpha=frame>total*0.85?1:(Math.sin(frame*0.5)*0.5+0.5);
+    ctx.fillStyle='#ffdd44';ctx.beginPath();ctx.arc(dx,dy,8,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1; ctx.fillStyle='#fff';ctx.font='bold 10px Arial';ctx.textAlign='center';ctx.fillText('THROW',tc.x,tc.y-14);
+    frame++;
+    if(frame<total){requestAnimationFrame(draw);}
+    else{ctx.fillStyle='#ffdd44';ctx.beginPath();ctx.arc(tc.x,tc.y,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();onDone();}
+  }
+  requestAnimationFrame(draw);
+}
+
+// ================================================================
+// CPU AI
+// ================================================================
+function cpuThrow(){
+  if(gameOver) return; updateTurnDisplay();
+  const cell=pickCpuCell(), r=Math.floor(cell/3), c=cell%3;
+  const ccx=-GRID_HALF+c*CELL_SIZE+CELL_SIZE*0.5+GRID_ORIGIN.x;
+  const ccz=-GRID_HALF+r*CELL_SIZE+CELL_SIZE*0.5+GRID_ORIGIN.z;
+  let mo;
+  if(cpuDifficulty==='easy') mo=2.8+Math.random()*2.5;
+  else if(cpuDifficulty==='med') mo=1.2+Math.random()*1.4;
+  else mo=Math.random()<0.15?1.0+Math.random()*1.8:0.2+Math.random()*0.5; // hard: ~85% accurate
+  const fx=ccx+(Math.random()-0.5)*mo*2, fz=ccz+(Math.random()-0.5)*mo*2;
+  const from=new THREE.Vector3(currentThrowPos.x,1.5,currentThrowPos.z), to=new THREE.Vector3(fx,0,fz);
+  setTimeout(()=>{
+    animateBalloon(from,to,'blue',()=>{
+      const hi=cellFromWorld(fx,fz);
+      if(hi>=0){playSound('pop');applyThrow(hi,'blue');const w=checkWin();if(w){showWin(w);return;}showNiceShot(hi,()=>endTurn());}
+      else{playSound('miss');showMissEffect(fx,fz);endTurn();}
+    });
+  },600);
+}
+
+function pickCpuCell(){
+  if(cpuDifficulty==='easy') return Math.floor(Math.random()*9);
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const ln of lines){ const bc=ln.filter(i=>grid[i].owner==='blue'&&grid[i].count>0).length; if(bc===2){const e=ln.find(i=>!grid[i].owner||grid[i].count===0);if(e!==undefined)return e;} }
+  for(const ln of lines){ const yc=ln.filter(i=>grid[i].owner==='yellow'&&grid[i].count>0).length; if(yc===2){const e=ln.find(i=>!grid[i].owner||grid[i].count===0);if(e!==undefined)return e;} }
+  if(cpuDifficulty==='hard'){const ow=grid.map((c,i)=>({c,i})).filter(({c})=>c.owner==='blue'&&c.count>0);if(ow.length&&Math.random()<0.3)return ow[Math.floor(Math.random()*ow.length)].i;}
+  if(!grid[4].owner&&Math.random()<0.6) return 4;
+  const corners=[0,2,6,8].filter(i=>!grid[i].owner); if(corners.length&&Math.random()<0.5)return corners[Math.floor(Math.random()*corners.length)];
+  return Math.floor(Math.random()*9);
+}
+
+function showWin(winner){
+  stopTurnTimer();clearInterval(gameTimerInterval);gameOver=true;stopBGM();playSound('win');
+  document.getElementById('winTitle').textContent=`🎉 ${COLORS[winner].name.toUpperCase()} WINS!`;
+  document.getElementById('winSub').textContent='Three in a row — paint claims victory!';
+  document.getElementById('winScreen').style.display='flex';
+}
+
+// ================================================================
+// START
+// ================================================================
+function startGame(){
+  gameMode=document.getElementById('modeSelect').value;
+  cpuDifficulty=document.getElementById('diffSelect').value;
+  maxGameTime=parseInt(document.getElementById('timeLimitSelect').value);
+  const music=document.getElementById('musicSelect').value;
+  document.getElementById('overlay').style.display='none';
+  gameStarted=true;gameOver=false;gameTimeExpired=false;
+  roundNumber=1;currentPlayer='yellow';
+  grid=Array(9).fill(null).map(()=>({owner:null,count:0}));
+  updateMiniGrid();updateTurnDisplay();
+  if(maxGameTime===0) document.getElementById('gameTimerVal').textContent='∞';
+  else updateGTD();
+  startBGM(music);
+  currentThrowPos=pickThrowPos(); setCamToThrow(currentThrowPos);
+  startGameTimer(); showRoundTransition();
+}
+
+document.getElementById('modeSelect').addEventListener('change',e=>{
+  document.getElementById('diffWrap').style.display=e.target.value==='cpu'?'block':'none';
+});
+
+// ================================================================
+// RENDER LOOP
+// ================================================================
+function resize(){ const w=window.innerWidth,h=window.innerHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); resizeSC(); }
+window.addEventListener('resize',resize); resize();
+function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); drawSling(); }
+animate();
+</script>
+</body>
+</html>
