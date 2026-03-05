@@ -813,8 +813,8 @@ function endByTime(){
   clearInterval(gameTimerInterval); clearInterval(turnTimerInterval);
   stopBGM();
   // Count cells per player to check if it's actually a tie
-  const yc=grid.filter(c=>c.owner==='yellow'&&c.count>0).length;
-  const bc=grid.filter(c=>c.owner==='blue'&&c.count>0).length;
+  const yc=grid.filter(c=>c.owner==='yellow').reduce((s,c)=>s+c.count,0);
+const bc=grid.filter(c=>c.owner==='blue').reduce((s,c)=>s+c.count,0);
   if(yc!==bc){
     // Not a tie — winner by cell count
     showWin(yc>bc?'yellow':'blue'); return;
