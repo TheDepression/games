@@ -184,9 +184,9 @@
       <label>Background Music</label>
       <select class="gs" id="musicSelect">
         <option value="none">No Music</option>
-        <option value="track1">Upbeat Field 🎵</option>
-        <option value="track2">Chill Breeze 🎵</option>
-        <option value="track3">Hype Arena 🎵</option>
+        <option value="track1">Pamgaea 🎵</option>
+        <option value="track2">Carefree 🎵</option>
+        <option value="track3">Scheming Weasel 🎵</option>
       </select>
     </div>
   </div>
@@ -224,9 +224,12 @@ function playSound(type) {
   } catch(e) {}
 }
 
-// BGM — swap null values for real audio file URLs when available
-// e.g. track1: 'audio/upbeat.mp3'
-const BGM = { track1:null, track2:null, track3:null };
+// BGM — Kevin MacLeod (incompetech.com) public domain tracks via archive.org
+const BGM = {
+  track1: 'https://ia800501.us.archive.org/8/items/Kevin_MacLeod_-_Pamgaea/Kevin_MacLeod_-_Pamgaea.mp3',
+  track2: 'https://ia803102.us.archive.org/30/items/FigsInWigs-KevinMacLeod/Kevin%20MacLeod%20-%20Carefree.mp3',
+  track3: 'https://ia800501.us.archive.org/8/items/Kevin_MacLeod_-_Pamgaea/Kevin_MacLeod_-_Scheming_Weasel_faster.mp3'
+};
 let bgmAudio = null;
 function startBGM(k) {
   stopBGM();
@@ -267,9 +270,9 @@ const renderer = new THREE.WebGLRenderer({canvas:c3d,antialias:true});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
-const scene  = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb,60,130);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xd0eeff);
+scene.fog = new THREE.Fog(0xe8f4ff, 60, 130);
 
 const camera = new THREE.PerspectiveCamera(60,1,0.1,200);
 camera.position.set(0,1.7,8); camera.lookAt(0,0.5,0);
@@ -282,9 +285,51 @@ sun.shadow.camera.left=-60; sun.shadow.camera.right=60;
 sun.shadow.camera.top=60;   sun.shadow.camera.bottom=-60; sun.shadow.camera.far=130;
 scene.add(sun);
 
-// Ground
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshLambertMaterial({color:0x3a8a3a}));
-ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+// Sky dome: vertex-colored sphere — blue at top, pale at equator
+(()=>{
+  const skyGeo = new THREE.SphereGeometry(150, 16, 8);
+  // Shift verts: colour by height
+  const pos = skyGeo.attributes.position;
+  const colors = [];
+  for(let i=0;i<pos.count;i++){
+    const y = pos.getY(i);
+    const t = Math.max(0, Math.min(1, (y+10)/160)); // 0 at horizon, 1 at top
+    const top = {r:0.38,g:0.68,b:0.94};
+    const horiz = {r:0.94,g:0.97,b:1.0};
+    colors.push(
+      horiz.r+(top.r-horiz.r)*t,
+      horiz.g+(top.g-horiz.g)*t,
+      horiz.b+(top.b-horiz.b)*t
+    );
+  }
+  skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors,3));
+  const skyMat = new THREE.MeshBasicMaterial({vertexColors:true, side:THREE.BackSide});
+  scene.add(new THREE.Mesh(skyGeo, skyMat));
+})();
+
+// Ground — canvas noise texture for grass
+(()=>{
+  const size=256;
+  const cv=document.createElement('canvas'); cv.width=size; cv.height=size;
+  const ctx=cv.getContext('2d');
+  // Base green
+  ctx.fillStyle='#3a8a3a'; ctx.fillRect(0,0,size,size);
+  // Noise stipple
+  for(let i=0;i<18000;i++){
+    const x=Math.random()*size, y=Math.random()*size;
+    const bright=Math.random();
+    const shade = bright>0.6 ? `rgba(80,160,60,0.35)` : bright>0.3 ? `rgba(30,90,30,0.3)` : `rgba(20,70,20,0.2)`;
+    ctx.fillStyle=shade;
+    ctx.fillRect(x,y,1+Math.random()*2,1+Math.random()*2);
+  }
+  const tex=new THREE.CanvasTexture(cv);
+  tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.repeat.set(40,40);
+  const ground=new THREE.Mesh(
+    new THREE.PlaneGeometry(200,200),
+    new THREE.MeshLambertMaterial({map:tex})
+  );
+  ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+})();
 
 // Platform
 const GRID_TOTAL=GRID_HALF*2;
@@ -443,40 +488,27 @@ slingCanvas.addEventListener('mouseup',e=>{
 });
 slingCanvas.addEventListener('mouseleave',e=>{ if(mouseDown){mouseDown=false;cancelThrow();} });
 
-// Touch
+// Touch — single finger, same behaviour as mouse
 slingCanvas.addEventListener('touchstart',e=>{
   e.preventDefault(); if(!canInteract()) return;
-  for(const t of e.changedTouches){
-    if(t1Id===null){t1Id=t.identifier;t1p={x:t.clientX,y:t.clientY};}
-    else if(t2Id===null){t2Id=t.identifier;t2p={x:t.clientX,y:t.clientY};pulling=true;playSound('pull');}
-  }
-  if(t1p&&t2p) prevPD=d2(t1p,t2p);
+  const t=e.changedTouches[0];
+  t1Id=t.identifier; t1p={x:t.clientX,y:t.clientY};
+  mouseAnchor={x:t.clientX,y:t.clientY};
+  pulling=true; pullVec={x:0,y:0}; pullMag=0; playSound('pull');
 },{passive:false});
 slingCanvas.addEventListener('touchmove',e=>{
   e.preventDefault();
-  for(const t of e.changedTouches){
-    if(t.identifier===t1Id) t1p={x:t.clientX,y:t.clientY};
-    if(t.identifier===t2Id) t2p={x:t.clientX,y:t.clientY};
-  }
-  if(!t1p||!t2p||!pulling) return;
-  const pd=d2(t1p,t2p), delta=(prevPD||pd)-pd;
-  pullMag=Math.max(0,Math.min(MAX_PULL,pullMag+delta*0.8)); prevPD=pd;
-  const mx=(t1p.x+t2p.x)/2, my=(t1p.y+t2p.y)/2;
-  const rect=slingCanvas.getBoundingClientRect();
-  const dx=mx-(rect.left+slingCanvas.width/2), dy=my-(rect.top+60);
-  const n=Math.sqrt(dx**2+dy**2)||1;
-  pullVec.x=(dx/n)*pullMag; pullVec.y=(dy/n)*pullMag;
+  const t=[...e.changedTouches].find(t=>t.identifier===t1Id);
+  if(!t||!mouseAnchor||!pulling) return;
+  pullVec.x=Math.max(-MAX_PULL,Math.min(MAX_PULL,t.clientX-mouseAnchor.x));
+  pullVec.y=Math.max(-MAX_PULL,Math.min(MAX_PULL,t.clientY-mouseAnchor.y));
+  pullMag=Math.min(MAX_PULL,Math.sqrt(pullVec.x**2+pullVec.y**2));
   showDistPreview();
 },{passive:false});
 slingCanvas.addEventListener('touchend',e=>{
   e.preventDefault();
-  let r1=false,r2=false;
-  for(const t of e.changedTouches){
-    if(t.identifier===t1Id){r1=true;t1Id=null;}
-    if(t.identifier===t2Id){r2=true;t2Id=null;}
-  }
-  if(r1&&r2){ if(pulling&&pullMag>5) launchBalloon(); else cancelThrow(); }
-  else if(r1||r2){ cancelThrow(); t1Id=null;t2Id=null;t1p=null;t2p=null; }
+  const released=[...e.changedTouches].find(t=>t.identifier===t1Id);
+  if(released){ t1Id=null; if(pulling&&pullMag>5) launchBalloon(); else cancelThrow(); }
 },{passive:false});
 
 function d2(a,b){ return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2); }
@@ -540,17 +572,17 @@ function launchBalloon(){
   if(!pulling||pullMag<5||balloonAnimating||gameOver){cancelThrow();return;}
   const power=pullMag/MAX_PULL; pulling=false; stopTurnTimer(); playSound('throw');
 
-  // DIRECTION FIX:
-  // pullVec.x positive = dragged RIGHT = pocket right = sling throws LEFT → invert X
-  // pullVec.y positive = dragged DOWN  = pulled back  = throws FORWARD → keep Y
   const aimX = -(pullVec.x/MAX_PULL);
-  const aimY =  (pullVec.y/MAX_PULL);
+  // Always throw forward — clamp aimY to minimum 0.3 so horizontal/slight pulls still go forward
+  const aimY = Math.max(0.3, pullVec.y/MAX_PULL);
 
   const camDir=new THREE.Vector3(); camera.getWorldDirection(camDir); camDir.y=0; camDir.normalize();
   const camRight=new THREE.Vector3(); camRight.crossVectors(camDir,new THREE.Vector3(0,1,0)).normalize();
 
   const from=new THREE.Vector3(currentThrowPos.x,1.5,currentThrowPos.z);
-  const maxDist=FIELD_RADIUS*1.9, throwDist=power*maxDist;
+
+  // 10% pull = 5m, 100% pull = 50m (linear: throwDist = power * 50)
+  const throwDist = power * 50;
 
   const tx=from.x+camDir.x*throwDist*aimY+camRight.x*throwDist*aimX*0.65;
   const tz=from.z+camDir.z*throwDist*aimY+camRight.z*throwDist*aimX*0.65;
@@ -563,9 +595,12 @@ function launchBalloon(){
     if(idx>=0){
       playSound('pop'); applyThrow(idx,currentPlayer);
       const w=checkWin(); if(w){showWin(w);return;}
+      if(tiebreakerMode) { resolveTiebreaker(currentPlayer, idx); return; }
       showNiceShot(idx,()=>endTurn());
     } else {
-      playSound('miss'); showMissEffect(fx,fz); endTurn();
+      playSound('miss'); showMissEffect(fx,fz);
+      if(tiebreakerMode) { resolveTiebreaker(null, -1); return; }
+      endTurn();
     }
   });
   cancelThrow();
@@ -573,6 +608,7 @@ function launchBalloon(){
 
 function animateBalloon(from,to,color,onLand){
   balloonAnimating=true; balloon=createBalloon(color); scene.add(balloon);
+  lastTBLandX=to.x; lastTBLandZ=to.z; // track for tiebreaker
   const dur=1.4, t0=performance.now(), peak=5+from.distanceTo(to)*0.15;
   function tick(now){
     const t=Math.min((now-t0)/(dur*1000),1);
@@ -678,7 +714,78 @@ function updateGTD(){
 }
 function showWhistle(){ const el=document.createElement('div'); el.textContent="📢 TIME'S UP — Finish your turn!"; el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#ffdd44;text-shadow:3px 3px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.75);padding:16px 28px;border-radius:14px;'; document.body.appendChild(el); setTimeout(()=>el.remove(),2500); }
 function showSkip(){ const el=document.createElement('div'); el.textContent='⏱ TURN SKIPPED'; el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#ff8800;z-index:200;pointer-events:none;background:rgba(0,0,0,0.7);padding:14px 24px;border-radius:14px;'; document.body.appendChild(el); setTimeout(()=>el.remove(),1500); }
-function endByTime(){ clearInterval(gameTimerInterval);clearInterval(turnTimerInterval);gameOver=true;stopBGM(); document.getElementById('winTitle').textContent="⏱ TIME'S UP — TIE!"; document.getElementById('winSub').textContent='A sudden-death throw to decide the winner!'; document.getElementById('winScreen').style.display='flex'; }
+// ================================================================
+// TIEBREAKER
+// ================================================================
+let tiebreakerMode=false;
+let tiebreakerThrows={}; // { yellow: distToCenter, blue: distToCenter }
+
+function startTiebreaker(){
+  tiebreakerMode=true; tiebreakerThrows={};
+  // Place both players at a fixed position 15m out for the tiebreaker
+  currentThrowPos=pickThrowPos();
+  setCamToThrow(currentThrowPos);
+  currentPlayer='yellow'; updateTurnDisplay();
+
+  const el=document.createElement('div');
+  el.innerHTML='<div style="font-size:36px;font-weight:900">⚡ SUDDEN DEATH!</div><div style="font-size:18px;margin-top:8px">Each player throws once — closest to center wins</div>';
+  el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffdd44;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.8);padding:24px 36px;border-radius:16px;';
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.remove(); startTurnTimer(); },3000);
+}
+
+function resolveTiebreaker(player, cellIdx){
+  // Measure distance of last balloon landing to grid center
+  // We need the actual landing coords — grab from last throw
+  const lx=lastTBLandX, lz=lastTBLandZ;
+  const distToCenter=Math.sqrt(lx*lx+lz*lz);
+  tiebreakerThrows[player||currentPlayer]=distToCenter;
+
+  if(Object.keys(tiebreakerThrows).length===1){
+    // Yellow threw — now blue's turn
+    const msg=document.createElement('div');
+    const d=distToCenter.toFixed(1);
+    msg.textContent=`🟡 Yellow: ${d}m from center — Blue's turn!`;
+    msg.style.cssText='position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);font-size:22px;font-weight:900;color:#ffdd44;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.75);padding:14px 24px;border-radius:12px;';
+    document.body.appendChild(msg);
+    setTimeout(()=>msg.remove(),2500);
+    currentPlayer='blue'; updateTurnDisplay();
+    if(gameMode==='cpu') setTimeout(()=>cpuThrow(),1500);
+    else startTurnTimer();
+  } else {
+    // Both threw — compare
+    const yDist=tiebreakerThrows['yellow']||999, bDist=tiebreakerThrows['blue']||999;
+    if(Math.abs(yDist-bDist)<0.5){
+      // Too close — go again
+      tiebreakerThrows={};
+      currentPlayer='yellow'; updateTurnDisplay();
+      const el=document.createElement('div');
+      el.textContent='🔁 TOO CLOSE — Throw again!';
+      el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#fff;z-index:200;pointer-events:none;background:rgba(0,0,0,0.8);padding:16px 28px;border-radius:14px;';
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.remove(); startTurnTimer(); },2500);
+    } else {
+      const winner=yDist<bDist?'yellow':'blue';
+      tiebreakerMode=false;
+      showWin(winner);
+    }
+  }
+}
+
+let lastTBLandX=0, lastTBLandZ=0;
+
+function endByTime(){
+  clearInterval(gameTimerInterval); clearInterval(turnTimerInterval);
+  stopBGM();
+  // Count cells per player to check if it's actually a tie
+  const yc=grid.filter(c=>c.owner==='yellow'&&c.count>0).length;
+  const bc=grid.filter(c=>c.owner==='blue'&&c.count>0).length;
+  if(yc!==bc){
+    // Not a tie — winner by cell count
+    showWin(yc>bc?'yellow':'blue'); return;
+  }
+  startTiebreaker();
+}
 
 // ================================================================
 // TURN MANAGEMENT
@@ -803,6 +910,8 @@ function startGame(){
 document.getElementById('modeSelect').addEventListener('change',e=>{
   document.getElementById('diffWrap').style.display=e.target.value==='cpu'?'block':'none';
 });
+// Hide difficulty by default since 2p is default
+document.getElementById('diffWrap').style.display='none';
 
 // ================================================================
 // RENDER LOOP
