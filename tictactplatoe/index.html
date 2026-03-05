@@ -105,6 +105,7 @@
 <canvas id="gameCanvas"></canvas>
 
 <div id="topBar">
+  <!-- Left: game timer + distance -->
   <div>
     <div class="timerBox" id="gameTimerBox">
       <div class="lbl">GAME TIME</div>
@@ -115,15 +116,27 @@
       <div class="val" id="distVal">— m</div>
     </div>
   </div>
+  <!-- Centre: turn indicator -->
   <div id="turnBox">
     <div class="lbl">TURN</div>
     <div class="val" id="turnVal">—</div>
   </div>
+  <!-- Score counter — subtle, between turn and shot timer -->
+  <div id="scoreBox" style="background:rgba(0,0,0,0.55);border-radius:10px;padding:5px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center;display:none;">
+    <div style="font-size:8px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">SCORE</div>
+    <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
+      <span style="font-size:13px;font-weight:900;color:#ffcc00" id="scoreYellow">🟡 0</span>
+      <span style="font-size:10px;color:#666">—</span>
+      <span style="font-size:13px;font-weight:900;color:#2277ff" id="scoreBlue">0 🔵</span>
+    </div>
+  </div>
+  <!-- Exit — between score and shot timer -->
+  <button id="exitBtn" onclick="if(confirm('ゲームを終了しますか？'))location.reload()" style="display:none;background:rgba(80,0,0,0.75);border:2px solid rgba(255,100,100,0.5);border-radius:10px;padding:5px 12px;color:#ff8888;font-size:10px;font-weight:900;letter-spacing:1px;cursor:pointer;pointer-events:auto;align-self:flex-start;margin-top:4px;">✕ EXIT</button>
+  <!-- Right: shot timer -->
   <div class="timerBox" id="turnTimerBox">
     <div class="lbl">SHOT TIMER</div>
     <div class="val" id="turnTimerVal">25</div>
   </div>
- <button id="exitBtn" onclick="if(confirm('ゲームを終了しますか？'))location.reload()" style="display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);background:rgba(80,0,0,0.75);border:2px solid rgba(255,100,100,0.5);border-radius:10px;padding:5px 18px;color:#ff8888;font-size:11px;font-weight:900;letter-spacing:2px;cursor:pointer;z-index:15;pointer-events:auto;">EXIT GAME</button>
 </div>
 
 <div id="gridHUD"><div class="miniGrid" id="miniGrid"></div></div>
@@ -146,6 +159,7 @@
 <div class="fullOverlay" id="winScreen">
   <h1 id="winTitle">🎉 YELLOW WINS!</h1>
   <p id="winSub">Three in a row!</p>
+  <canvas id="winGridCanvas" width="180" height="180" style="border-radius:10px;border:2px solid rgba(255,255,255,0.3);margin-bottom:16px;"></canvas>
   <button class="btnGreen" onclick="location.reload()">PLAY AGAIN</button>
 </div>
 
@@ -468,14 +482,49 @@ function checkWin(){
   }
   return null;
 }
+function updateScore(){
+  const yc=grid.filter(c=>c.owner==='yellow'&&c.count>0).length;
+  const bc=grid.filter(c=>c.owner==='blue'&&c.count>0).length;
+  document.getElementById('scoreYellow').textContent=`🟡 ${yc}`;
+  document.getElementById('scoreBlue').textContent=`${bc} 🔵`;
+}
+
 function updateMiniGrid(){
+  // Rotate the mini grid so it matches the player's view direction
+  // We figure out which world direction the camera is facing and rotate indices accordingly
+  const camDir=new THREE.Vector3(); camera.getWorldDirection(camDir); camDir.y=0; camDir.normalize();
+  // angle from North (+Z axis). atan2 gives angle in world space.
+  const angle = Math.atan2(camDir.x, camDir.z); // 0=north, 90=east, etc
+  // Snap to nearest 45°
+  const deg = ((angle*180/Math.PI) % 360 + 360) % 360;
+  const snap = Math.round(deg/45)*45 % 360;
+
+  // Build rotation map: for each snap angle, map display index -> world grid index
+  // World grid: row0=near(-z), row2=far(+z), col0=left(-x), col2=right(+x) when facing north
+  // We rotate the display so "near row" always shows what's closest to the player
+  function rotateIdx(i, times){
+    // rotate 3x3 grid indices clockwise by 90° `times` times
+    let r=Math.floor(i/3), c=i%3;
+    for(let t=0;t<times;t++){ const nr=c; const nc=2-r; r=nr; c=nc; }
+    return r*3+c;
+  }
+  // snap 0=N: facing +z, camera sees row2 as near → rotate 180 (player faces grid from south by default)
+  // snap 180=S: facing -z → no rotation (standard view)
+  // snap 90=E: facing +x → rotate 90
+  // snap 270=W: facing -x → rotate 270
+  const rotTimes = { 0:2, 45:2, 90:1, 135:1, 180:0, 225:0, 270:3, 315:3 };
+  const times = rotTimes[snap] !== undefined ? rotTimes[snap] : 0;
+
   const mg=document.getElementById('miniGrid'); mg.innerHTML='';
-  grid.forEach((cell,i)=>{
+  for(let di=0;di<9;di++){
+    const wi=rotateIdx(di,times);
+    const cell=grid[wi];
     const d=document.createElement('div');
     d.className='miniCell'+(cell.owner?' '+cell.owner:'');
     if(cell.count>1) d.textContent='x'+cell.count;
     mg.appendChild(d);
-  });
+  }
+  updateScore();
 }
 
 // ================================================================
@@ -912,6 +961,10 @@ function cpuThrow(){
   const from=new THREE.Vector3(currentThrowPos.x,1.5,currentThrowPos.z), to=new THREE.Vector3(fx,0,fz);
   setTimeout(()=>{
     animateBalloon(from,to,'blue',()=>{
+      // Intercept for pre-game tiebreaker
+      if(preGameTB&&preGameTB.active){ handlePreGameTBLand(fx,fz); return; }
+      // Intercept for end-game tiebreaker
+      if(tiebreakerMode){ resolveTiebreaker('blue',-1); return; }
       const hi=cellFromWorld(fx,fz);
       if(hi>=0){playSound('pop');applyThrow(hi,'blue');const w=checkWin();if(w){showWin(w);return;}showNiceShot(hi,()=>endTurn());}
       else{playSound('miss');showMissEffect(fx,fz);endTurn();}
@@ -930,10 +983,37 @@ function pickCpuCell(){
   return Math.floor(Math.random()*9);
 }
 
+function drawFinalGrid(){
+  const canvas=document.getElementById('winGridCanvas');
+  const ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height, cs=w/3;
+  ctx.clearRect(0,0,w,h);
+  // Find winning line if any
+  let winLine=null;
+  for(const [a,b,c] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){
+    const ga=grid[a],gb=grid[b],gc=grid[c];
+    if(ga.owner&&ga.owner===gb.owner&&gb.owner===gc.owner&&ga.count>0&&gb.count>0&&gc.count>0){winLine=[a,b,c];break;}
+  }
+  for(let i=0;i<9;i++){
+    const r=Math.floor(i/3),c=i%3,cell=grid[i];
+    const isWin=winLine&&winLine.includes(i);
+    ctx.fillStyle=cell.owner?COLORS[cell.owner].css:'#2a6b2a';
+    ctx.globalAlpha=isWin?1:0.6;
+    ctx.fillRect(c*cs+2,r*cs+2,cs-4,cs-4);
+    ctx.globalAlpha=1;
+    if(isWin){ ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.strokeRect(c*cs+4,r*cs+4,cs-8,cs-8); }
+    if(cell.count>1){ ctx.fillStyle='#fff'; ctx.font=`bold ${cs*0.3}px Arial`; ctx.textAlign='center'; ctx.fillText('×'+cell.count,c*cs+cs/2,r*cs+cs*0.65); }
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=2;
+  for(let i=1;i<3;i++){ ctx.beginPath();ctx.moveTo(i*cs,0);ctx.lineTo(i*cs,h);ctx.stroke(); ctx.beginPath();ctx.moveTo(0,i*cs);ctx.lineTo(w,i*cs);ctx.stroke(); }
+}
+
 function showWin(winner){
   stopTurnTimer();clearInterval(gameTimerInterval);gameOver=true;stopBGM();playSound('win');
   document.getElementById('winTitle').textContent=`🎉 ${COLORS[winner].name.toUpperCase()} WINS!`;
-  document.getElementById('winSub').textContent='Three in a row — paint claims victory!';
+  const yc=grid.filter(c=>c.owner==='yellow'&&c.count>0).length;
+  const bc=grid.filter(c=>c.owner==='blue'&&c.count>0).length;
+  document.getElementById('winSub').textContent=`Yellow: ${yc} cells · Blue: ${bc} cells`;
+  drawFinalGrid();
   document.getElementById('winScreen').style.display='flex';
 }
 
@@ -950,6 +1030,7 @@ function startGame(){
   document.getElementById('overlay').style.display='none';
   gameStarted=true;gameOver=false;gameTimeExpired=false;tiebreakerMode=false;
   document.getElementById('exitBtn').style.display='block';
+  document.getElementById('scoreBox').style.display='block';
   roundNumber=1;
   grid=Array(9).fill(null).map(()=>({owner:null,count:0}));
   updateMiniGrid();
@@ -1037,7 +1118,7 @@ document.getElementById('diffWrap').style.display='none';
 // ================================================================
 function resize(){ const w=window.innerWidth,h=window.innerHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); resizeSC(); }
 window.addEventListener('resize',resize); resize();
-function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); drawSling(); }
+function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); drawSling(); if(gameStarted&&!gameOver) updateMiniGrid(); }
 animate();
 </script>
 </body>
