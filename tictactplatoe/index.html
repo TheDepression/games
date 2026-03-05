@@ -184,9 +184,10 @@
       <label>Background Music</label>
       <select class="gs" id="musicSelect">
         <option value="none">No Music</option>
-        <option value="track1">Pamgaea 🎵</option>
-        <option value="track2">Carefree 🎵</option>
-        <option value="track3">Scheming Weasel 🎵</option>
+        <option value="track1">Sunday Hangover 🎵</option>
+        <option value="track2">Rabbit Hybrid 🎵</option>
+        <option value="track3">Tropical Hammock 🎵</option>
+       <option value="track4">Apple Johnson Trance 🎵</option>
       </select>
     </div>
     <div>
@@ -253,11 +254,12 @@ function playSound(type) {
   } catch(e) {}
 }
 
-// BGM — Kevin MacLeod (incompetech.com) public domain tracks via archive.org
+// BGM 
 const BGM = {
-  track1: 'https://ia800501.us.archive.org/8/items/Kevin_MacLeod_-_Pamgaea/Kevin_MacLeod_-_Pamgaea.mp3',
-  track2: 'https://ia803102.us.archive.org/30/items/FigsInWigs-KevinMacLeod/Kevin%20MacLeod%20-%20Carefree.mp3',
-  track3: 'https://ia800501.us.archive.org/8/items/Kevin_MacLeod_-_Pamgaea/Kevin_MacLeod_-_Scheming_Weasel_faster.mp3'
+  track1: 'https://raw.githubusercontent.com/TheDepression/Sounds/refs/heads/main/Lost%20at%20the%20beach.m4a',
+  track2: 'https://music.hirakatajin.com/hybridfix.m4a',
+  track3: 'https://music.hirakatajin.com/beachwoods.mp3'
+  track4: 'https://music.hirakatajin.com/applejohnsonlong.mp3'
 };
 let bgmAudio = null;
 function startBGM(k) {
