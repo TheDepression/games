@@ -766,7 +766,7 @@ function startTiebreaker(){
   el.innerHTML='<div style="font-size:36px;font-weight:900">⚡ SUDDEN DEATH!</div><div style="font-size:18px;margin-top:8px">Each player throws once — closest to center wins</div>';
   el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffdd44;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.8);padding:24px 36px;border-radius:16px;';
   document.body.appendChild(el);
-  setTimeout(()=>{ el.remove(); startTurnTimer(); },3000);
+  setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer==='blue') cpuThrow(); else startTurnTimer(); },3000);
 }
 
 function resolveTiebreaker(player, cellIdx){
@@ -798,7 +798,7 @@ function resolveTiebreaker(player, cellIdx){
       el.textContent='🔁 TOO CLOSE — Throw again!';
       el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#fff;z-index:200;pointer-events:none;background:rgba(0,0,0,0.8);padding:16px 28px;border-radius:14px;';
       document.body.appendChild(el);
-      setTimeout(()=>{ el.remove(); startTurnTimer(); },2500);
+      setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer==='blue') cpuThrow(); else startTurnTimer(); },2500);
     } else {
       const winner=yDist<bDist?'yellow':'blue';
       tiebreakerMode=false;
@@ -977,7 +977,7 @@ function runFirstThrowTiebreaker(){
   el.innerHTML='<div style="font-size:30px;font-weight:900">🎯 CLOSEST THROW GOES FIRST</div><div style="font-size:17px;margin-top:8px;color:#ffdd44">🟡 Yellow — throw toward the grid!</div>';
   el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:22px 32px;border-radius:16px;';
   document.body.appendChild(el);
-  setTimeout(()=>{ el.remove(); startTurnTimer(); },3000);
+  setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer==='blue') cpuThrow(); else startTurnTimer(); },3000);
 }
 
 // Override launchBalloon landing handler for pre-game tiebreaker
@@ -989,7 +989,7 @@ function handlePreGameTBLand(fx, fz){
     el.innerHTML=`<div style="font-size:26px;font-weight:900">🟡 Yellow: ${dist.toFixed(1)}m from center</div><div style="font-size:17px;margin-top:6px;color:#2277ff">🔵 Blue — your turn!</div>`;
     el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:18px 28px;border-radius:14px;';
     document.body.appendChild(el);
-    setTimeout(()=>{ el.remove(); currentPlayer='blue'; updateTurnDisplay(); startTurnTimer(); },2500);
+    setTimeout(()=>{ el.remove(); currentPlayer='blue'; updateTurnDisplay(); if(gameMode==='cpu') cpuThrow(); else startTurnTimer(); },2500);
   } else {
     const bd=dist, yd=preGameTB.yellowDist;
     preGameTB.active=false;
