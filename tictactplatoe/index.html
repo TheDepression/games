@@ -55,8 +55,6 @@
     display:flex; align-items:center; justify-content:center;
     font-size:9px; font-weight:900; color:rgba(255,255,255,0.85);
   }
-  .miniCell.yellow { background:#c8a000; }
-  .miniCell.blue   { background:#0044bb; }
 
   .fullOverlay {
     position:fixed; top:0; left:0; width:100%; height:100%;
@@ -105,7 +103,6 @@
 <canvas id="gameCanvas"></canvas>
 
 <div id="topBar">
-  <!-- Left: game timer + distance -->
   <div>
     <div class="timerBox" id="gameTimerBox">
       <div class="lbl">GAME TIME</div>
@@ -116,23 +113,19 @@
       <div class="val" id="distVal">— m</div>
     </div>
   </div>
-  <!-- Centre: turn indicator -->
   <div id="turnBox">
     <div class="lbl">TURN</div>
     <div class="val" id="turnVal">—</div>
   </div>
-  <!-- Score counter — subtle, between turn and shot timer -->
   <div id="scoreBox" style="background:rgba(0,0,0,0.55);border-radius:10px;padding:5px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center;display:none;">
     <div style="font-size:8px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">SCORE</div>
     <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
-      <span style="font-size:13px;font-weight:900;color:#ffcc00" id="scoreYellow">🟡 0</span>
+      <span style="font-size:13px;font-weight:900" id="scoreP1">● 0</span>
       <span style="font-size:10px;color:#666">—</span>
-      <span style="font-size:13px;font-weight:900;color:#2277ff" id="scoreBlue">0 🔵</span>
+      <span style="font-size:13px;font-weight:900" id="scoreP2">0 ●</span>
     </div>
   </div>
-  <!-- Exit — between score and shot timer -->
   <button id="exitBtn" onclick="if(confirm('ゲームを終了しますか？'))location.reload()" style="display:none;background:rgba(80,0,0,0.75);border:2px solid rgba(255,100,100,0.5);border-radius:10px;padding:5px 12px;color:#ff8888;font-size:10px;font-weight:900;letter-spacing:1px;cursor:pointer;pointer-events:auto;align-self:flex-start;margin-top:4px;">✕ EXIT</button>
-  <!-- Right: shot timer -->
   <div class="timerBox" id="turnTimerBox">
     <div class="lbl">SHOT TIMER</div>
     <div class="val" id="turnTimerVal">25</div>
@@ -157,8 +150,8 @@
 </div>
 
 <div class="fullOverlay" id="winScreen">
-  <h1 id="winTitle">🎉 YELLOW WINS!</h1>
-  <p id="winSub">Three in a row!</p>
+  <h1 id="winTitle">🎉 WINS!</h1>
+  <p id="winSub"></p>
   <canvas id="winGridCanvas" width="180" height="180" style="border-radius:10px;border:2px solid rgba(255,255,255,0.3);margin-bottom:16px;"></canvas>
   <button class="btnGreen" onclick="location.reload()">PLAY AGAIN</button>
 </div>
@@ -188,6 +181,28 @@
       </select>
     </div>
     <div>
+      <label id="p1ColorLabel">Player 1 Color</label>
+      <select class="gs" id="p1ColorSelect">
+        <option value="yellow">🟡 Yellow</option>
+        <option value="blue">🔵 Blue</option>
+        <option value="red">🔴 Red</option>
+        <option value="pink">🩷 Pink</option>
+        <option value="grey">⬛ Grey</option>
+        <option value="purple">🟣 Purple</option>
+      </select>
+    </div>
+    <div>
+      <label id="p2ColorLabel">Player 2 Color</label>
+      <select class="gs" id="p2ColorSelect">
+        <option value="blue" selected>🔵 Blue</option>
+        <option value="yellow">🟡 Yellow</option>
+        <option value="red">🔴 Red</option>
+        <option value="pink">🩷 Pink</option>
+        <option value="grey">⬛ Grey</option>
+        <option value="purple">🟣 Purple</option>
+      </select>
+    </div>
+    <div>
       <label>Time Limit</label>
       <select class="gs" id="timeLimitSelect">
         <option value="300">5 Minutes</option>
@@ -202,14 +217,14 @@
         <option value="track1">Sunday Hangover 🎵</option>
         <option value="track2">Rabbit Hybrid 🎵</option>
         <option value="track3">Tropical Hammock 🎵</option>
-       <option value="track4">Apple Johnson Trance 🎵</option>
+        <option value="track4">Apple Johnson Trance 🎵</option>
       </select>
     </div>
     <div>
       <label>Who Goes First</label>
       <select class="gs" id="firstSelect">
-        <option value="yellow">🟡 Yellow</option>
-        <option value="blue">🔵 Blue</option>
+        <option value="p1">Player 1</option>
+        <option value="p2">Player 2</option>
         <option value="random">🎲 Random</option>
         <option value="tiebreaker">🎯 Closest Throw</option>
       </select>
@@ -243,22 +258,13 @@ function getACtx() {
   if (actx.state === 'suspended') actx.resume();
   return actx;
 }
-// Unlock audio on very first user interaction (required by iOS Safari)
+// Unlock audio on every user interaction — iOS Safari suspends context during silence
 function unlockAudio() {
-  getACtx();
-  // Play a silent buffer to fully unlock
-  try {
-    const ctx = actx;
-    const buf = ctx.createBuffer(1,1,ctx.sampleRate);
-    const src = ctx.createBufferSource();
-    src.buffer = buf; src.connect(ctx.destination); src.start(0);
-    ctx.resume();
-  } catch(e){}
-  document.removeEventListener('touchstart', unlockAudio);
-  document.removeEventListener('mousedown', unlockAudio);
+  if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+  if(actx.state==='suspended') actx.resume();
 }
-document.addEventListener('touchstart', unlockAudio, {once:true});
-document.addEventListener('mousedown', unlockAudio, {once:true});
+document.addEventListener('touchstart', unlockAudio, {passive:true});
+document.addEventListener('mousedown', unlockAudio, {passive:true});
 
 function playSound(type) {
   try {
@@ -303,22 +309,32 @@ function stopBGM() { if (bgmAudio) { bgmAudio.pause(); bgmAudio=null; } }
 // ================================================================
 // GAME STATE
 // ================================================================
-const COLORS = {
-  yellow:{ hex:0xffcc00, css:'#ffcc00', name:'Yellow' },
-  blue:  { hex:0x2277ff, css:'#2277ff', name:'Blue'   }
+const ALL_COLORS = {
+  yellow: { hex:0xffcc00, css:'#ffcc00', name:'Yellow' },
+  blue:   { hex:0x2277ff, css:'#2277ff', name:'Blue'   },
+  red:    { hex:0xee2222, css:'#ee2222', name:'Red'     },
+  pink:   { hex:0xff66bb, css:'#ff66bb', name:'Pink'    },
+  grey:   { hex:0x556677, css:'#556677', name:'Grey'    },
+  purple: { hex:0x8833cc, css:'#8833cc', name:'Purple'  }
 };
+// Active colors for this game — set at start
+let COLORS = {
+  p1: ALL_COLORS.yellow,
+  p2: ALL_COLORS.blue
+};
+// player1Key / player2Key are the slot names used everywhere
+let player1Key='p1', player2Key='p2';
 const CELL_SIZE    = 1.8;
 const GRID_ORIGIN  = { x:0, z:0 };
 const GRID_HALF    = CELL_SIZE * 1.5;
 const FIELD_RADIUS = 45;
 const TURN_TIME    = 25;
 
-let gameMode='2p', cpuDifficulty='med', currentPlayer='yellow';
- let roundFirstPlayer='yellow';
+let gameMode='2p', cpuDifficulty='med', currentPlayer='p1';
 let gameStarted=false, gameOver=false;
 let maxGameTime=600, gameTimeLeft=600, turnTimeLeft=TURN_TIME;
 let gameTimerInterval=null, turnTimerInterval=null;
-let roundNumber=0;
+let roundNumber=0, roundFirstPlayer='p1';
 let currentThrowPos={ x:0,z:0,angle:0,name:'North' };
 let gameTimeExpired=false, finalTurnInProgress=false;
 let grid = Array(9).fill(null).map(()=>({owner:null,count:0}));
@@ -484,44 +500,29 @@ function checkWin(){
   return null;
 }
 function updateScore(){
-  const yc=grid.filter(c=>c.owner==='yellow'&&c.count>0).length;
-  const bc=grid.filter(c=>c.owner==='blue'&&c.count>0).length;
-  document.getElementById('scoreYellow').textContent=`🟡 ${yc}`;
-  document.getElementById('scoreBlue').textContent=`${bc} 🔵`;
+  const p1c=grid.filter(c=>c.owner===player1Key&&c.count>0).length;
+  const p2c=grid.filter(c=>c.owner===player2Key&&c.count>0).length;
+  document.getElementById('scoreP1').textContent=`● ${p1c}`;
+  document.getElementById('scoreP1').style.color=COLORS[player1Key].css;
+  document.getElementById('scoreP2').textContent=`${p2c} ●`;
+  document.getElementById('scoreP2').style.color=COLORS[player2Key].css;
 }
 
 function updateMiniGrid(){
-  // Rotate the mini grid so it matches the player's view direction
-  // We figure out which world direction the camera is facing and rotate indices accordingly
   const camDir=new THREE.Vector3(); camera.getWorldDirection(camDir); camDir.y=0; camDir.normalize();
-  // angle from North (+Z axis). atan2 gives angle in world space.
-  const angle = Math.atan2(camDir.x, camDir.z); // 0=north, 90=east, etc
-  // Snap to nearest 45°
-  const deg = ((angle*180/Math.PI) % 360 + 360) % 360;
-  const snap = Math.round(deg/45)*45 % 360;
-
-  // Build rotation map: for each snap angle, map display index -> world grid index
-  // World grid: row0=near(-z), row2=far(+z), col0=left(-x), col2=right(+x) when facing north
-  // We rotate the display so "near row" always shows what's closest to the player
-  function rotateIdx(i, times){
-    // rotate 3x3 grid indices clockwise by 90° `times` times
-    let r=Math.floor(i/3), c=i%3;
-    for(let t=0;t<times;t++){ const nr=c; const nc=2-r; r=nr; c=nc; }
-    return r*3+c;
-  }
-  // snap 0=N: facing +z, camera sees row2 as near → rotate 180 (player faces grid from south by default)
-  // snap 180=S: facing -z → no rotation (standard view)
-  // snap 90=E: facing +x → rotate 90
-  // snap 270=W: facing -x → rotate 270
-  const rotTimes = { 0:2, 45:2, 90:1, 135:1, 180:0, 225:0, 270:3, 315:3 };
-  const times = rotTimes[snap] !== undefined ? rotTimes[snap] : 0;
-
+  const angle=Math.atan2(camDir.x,camDir.z);
+  const deg=((angle*180/Math.PI)%360+360)%360;
+  const snap=Math.round(deg/45)*45%360;
+  function rotateIdx(i,times){ let r=Math.floor(i/3),c=i%3; for(let t=0;t<times;t++){const nr=c,nc=2-r;r=nr;c=nc;} return r*3+c; }
+  const rotTimes={0:2,45:2,90:1,135:1,180:0,225:0,270:3,315:3};
+  const times=rotTimes[snap]!==undefined?rotTimes[snap]:0;
   const mg=document.getElementById('miniGrid'); mg.innerHTML='';
   for(let di=0;di<9;di++){
     const wi=rotateIdx(di,times);
     const cell=grid[wi];
     const d=document.createElement('div');
-    d.className='miniCell'+(cell.owner?' '+cell.owner:'');
+    d.className='miniCell';
+    if(cell.owner){ d.style.background=COLORS[cell.owner].css+'cc'; }
     if(cell.count>1) d.textContent='x'+cell.count;
     mg.appendChild(d);
   }
@@ -563,7 +564,7 @@ let t1Id=null,t2Id=null,t1p=null,t2p=null,prevPD=null;
 function resizeSC(){ slingCanvas.width=window.innerWidth; slingCanvas.height=215; }
 resizeSC();
 
-function canInteract(){ return gameStarted&&!gameOver&&!balloonAnimating&&!(gameMode==='cpu'&&currentPlayer==='blue'); }
+function canInteract(){ return gameStarted&&!gameOver&&!balloonAnimating&&!(gameMode==='cpu'&&currentPlayer===player2Key); }
 
 // Mouse
 slingCanvas.addEventListener('mousedown',e=>{
@@ -652,7 +653,7 @@ function drawSling(){
     sCtx.strokeStyle='#996633'; sCtx.lineWidth=3;
     sCtx.beginPath(); sCtx.moveTo(FL.x,FL.y); sCtx.lineTo(cx,forkY); sCtx.stroke();
     sCtx.beginPath(); sCtx.moveTo(FR.x,FR.y); sCtx.lineTo(cx,forkY); sCtx.stroke();
-    if(gameStarted&&!balloonAnimating&&!gameOver&&!(gameMode==='cpu'&&currentPlayer==='blue')){
+    if(gameStarted&&!balloonAnimating&&!gameOver&&!(gameMode==='cpu'&&currentPlayer===player2Key)){
       const pc=COLORS[currentPlayer].css;
       const grd=sCtx.createRadialGradient(cx-5,forkY-8,3,cx,forkY,22);
       grd.addColorStop(0,'#ffffff88'); grd.addColorStop(0.3,pc); grd.addColorStop(1,pc+'cc');
@@ -689,17 +690,16 @@ function launchBalloon(){
   const fx=tx+(Math.random()-0.5)*missR*2, fz=tz+(Math.random()-0.5)*missR*2;
 
   animateBalloon(from,new THREE.Vector3(fx,0,fz),currentPlayer,()=>{
-    // Pre-game tiebreaker intercept
-    if(preGameTB && preGameTB.active){ handlePreGameTBLand(fx,fz); return; }
+    if(preGameTB&&preGameTB.active){ handlePreGameTBLand(fx,fz); return; }
     const idx=cellFromWorld(fx,fz);
     if(idx>=0){
       playSound('pop'); applyThrow(idx,currentPlayer);
       const w=checkWin(); if(w){showWin(w);return;}
-      if(tiebreakerMode) { resolveTiebreaker(currentPlayer, idx); return; }
+      if(tiebreakerMode){ resolveTiebreaker(currentPlayer,idx); return; }
       showNiceShot(idx,()=>endTurn());
     } else {
       playSound('miss'); showMissEffect(fx,fz);
-      if(tiebreakerMode) { resolveTiebreaker(null, -1); return; }
+      if(tiebreakerMode){ resolveTiebreaker(currentPlayer,-1); return; }
       endTurn();
     }
   });
@@ -778,26 +778,19 @@ function drawNiceShotGrid(canvas,hi){
 // MISS
 // ================================================================
 function showMissEffect(lx,lz){
-  // Direction from player toward grid center
   const pdx=GRID_ORIGIN.x-currentThrowPos.x, pdz=GRID_ORIGIN.z-currentThrowPos.z;
   const plen=Math.sqrt(pdx*pdx+pdz*pdz)||1;
-  const fwd={x:pdx/plen, z:pdz/plen}; // unit vector pointing at grid
-  const right={x:-fwd.z, z:fwd.x};    // perpendicular
-
-  // Landing offset from grid center
+  const fwd={x:pdx/plen,z:pdz/plen};
+  const right={x:-fwd.z,z:fwd.x};
   const ox=lx-GRID_ORIGIN.x, oz=lz-GRID_ORIGIN.z;
-
-  // Project offset onto forward/right axes
-  const forwardDist = ox*fwd.x + oz*fwd.z;
-  const lateralDist = ox*right.x + oz*right.z;
-
+  const forwardDist=ox*fwd.x+oz*fwd.z;
+  const lateralDist=ox*right.x+oz*right.z;
   let hint='😬 Just missed!';
   if(Math.abs(forwardDist)>Math.abs(lateralDist)){
-    hint = forwardDist < 0 ? '📏 Too short!' : '💨 Overshot!';
+    hint=forwardDist<0?'📏 Too short!':'💨 Overshot!';
   } else {
-    hint = lateralDist > 0 ? '➡️ Too far right!' : '⬅️ Too far left!';
+    hint=lateralDist>0?'➡️ Too far right!':'⬅️ Too far left!';
   }
-
   const el=document.createElement('div');
   el.innerHTML=`<div style="font-size:48px;font-weight:900">MISS!</div><div style="font-size:19px;margin-top:5px">${hint}</div>`;
   el.style.cssText='position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);color:#ff4444;text-shadow:3px 3px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.65);padding:16px 26px;border-radius:14px;';
@@ -828,78 +821,53 @@ function updateGTD(){
 }
 function showWhistle(){ const el=document.createElement('div'); el.textContent="📢 TIME'S UP — Finish your turn!"; el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#ffdd44;text-shadow:3px 3px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.75);padding:16px 28px;border-radius:14px;'; document.body.appendChild(el); setTimeout(()=>el.remove(),2500); }
 function showSkip(){ const el=document.createElement('div'); el.textContent='⏱ TURN SKIPPED'; el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#ff8800;z-index:200;pointer-events:none;background:rgba(0,0,0,0.7);padding:14px 24px;border-radius:14px;'; document.body.appendChild(el); setTimeout(()=>el.remove(),1500); }
-// ================================================================
-// TIEBREAKER
-// ================================================================
 let tiebreakerMode=false;
-let tiebreakerThrows={}; // { yellow: distToCenter, blue: distToCenter }
+let tiebreakerThrows={};
 
 function startTiebreaker(){
   tiebreakerMode=true; tiebreakerThrows={};
-  // Place both players at a fixed position 15m out for the tiebreaker
   currentThrowPos=pickThrowPos();
   setCamToThrow(currentThrowPos);
-  currentPlayer='yellow'; updateTurnDisplay();
-
+  currentPlayer=player1Key; updateTurnDisplay();
   const el=document.createElement('div');
   el.innerHTML='<div style="font-size:36px;font-weight:900">⚡ SUDDEN DEATH!</div><div style="font-size:18px;margin-top:8px">Each player throws once — closest to center wins</div>';
   el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#ffdd44;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.8);padding:24px 36px;border-radius:16px;';
   document.body.appendChild(el);
-  setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer==='blue') cpuThrow(); else startTurnTimer(); },3000);
+  setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer===player2Key) cpuThrow(); else startTurnTimer(); },3000);
 }
 
 function resolveTiebreaker(player, cellIdx){
-  // Measure distance of last balloon landing to grid center
-  // We need the actual landing coords — grab from last throw
   const lx=lastTBLandX, lz=lastTBLandZ;
   const distToCenter=Math.sqrt(lx*lx+lz*lz);
   tiebreakerThrows[player||currentPlayer]=distToCenter;
-
   if(Object.keys(tiebreakerThrows).length===1){
-    // Yellow threw — now blue's turn
     const msg=document.createElement('div');
     const d=distToCenter.toFixed(1);
-    msg.textContent=`🟡 Yellow: ${d}m from center — Blue's turn!`;
-    msg.style.cssText='position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);font-size:22px;font-weight:900;color:#ffdd44;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.75);padding:14px 24px;border-radius:12px;';
+    msg.innerHTML=`<span style="color:${COLORS[player1Key].css}">${COLORS[player1Key].name}: ${d}m</span> — <span style="color:${COLORS[player2Key].css}">${COLORS[player2Key].name}'s turn!</span>`;
+    msg.style.cssText='position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);font-size:22px;font-weight:900;color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.75);padding:14px 24px;border-radius:12px;';
     document.body.appendChild(msg);
     setTimeout(()=>msg.remove(),2500);
-    currentPlayer='blue'; updateTurnDisplay();
+    currentPlayer=player2Key; updateTurnDisplay();
     if(gameMode==='cpu') setTimeout(()=>cpuThrow(),1500);
     else startTurnTimer();
   } else {
-    // Both threw — compare
-    const yDist=tiebreakerThrows['yellow']||999, bDist=tiebreakerThrows['blue']||999;
-    if(Math.abs(yDist-bDist)<0.5){
-      // Too close — go again
+    const p1d=tiebreakerThrows[player1Key]||999, p2d=tiebreakerThrows[player2Key]||999;
+    if(Math.abs(p1d-p2d)<0.5){
       tiebreakerThrows={};
-      currentPlayer='yellow'; updateTurnDisplay();
+      currentPlayer=player1Key; updateTurnDisplay();
       const el=document.createElement('div');
       el.textContent='🔁 TOO CLOSE — Throw again!';
       el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:900;color:#fff;z-index:200;pointer-events:none;background:rgba(0,0,0,0.8);padding:16px 28px;border-radius:14px;';
       document.body.appendChild(el);
-      setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer==='blue') cpuThrow(); else startTurnTimer(); },2500);
+      setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer===player2Key) cpuThrow(); else startTurnTimer(); },2500);
     } else {
-      const winner=yDist<bDist?'yellow':'blue';
-      tiebreakerMode=false;
-      showWin(winner);
+      const winner=p1d<p2d?player1Key:player2Key;
+      tiebreakerMode=false; showWin(winner);
     }
   }
 }
 
 let lastTBLandX=0, lastTBLandZ=0;
-
-function endByTime(){
-  clearInterval(gameTimerInterval); clearInterval(turnTimerInterval);
-  stopBGM();
-  // Count cells per player to check if it's actually a tie
-  const yc=grid.filter(c=>c.owner==='yellow').reduce((s,c)=>s+c.count,0);
-const bc=grid.filter(c=>c.owner==='blue').reduce((s,c)=>s+c.count,0);
-  if(yc!==bc){
-    // Not a tie — winner by cell count
-    showWin(yc>bc?'yellow':'blue'); return;
-  }
-  startTiebreaker();
-}
 
 // ================================================================
 // TURN MANAGEMENT
@@ -907,11 +875,9 @@ const bc=grid.filter(c=>c.owner==='blue').reduce((s,c)=>s+c.count,0);
 function endTurn(){
   stopTurnTimer();
   if(gameTimeExpired){finalTurnInProgress=false;endByTime();return;}
-  const prev=currentPlayer;
-  currentPlayer=currentPlayer==='yellow'?'blue':'yellow'; updateTurnDisplay();
-  // Round ends when we've cycled back to whoever goes first this round
+  currentPlayer=currentPlayer===player1Key?player2Key:player1Key; updateTurnDisplay();
   if(currentPlayer===roundFirstPlayer){ roundNumber++; showRoundTransition(); }
-  else if(gameMode==='cpu'&&currentPlayer==='blue') setTimeout(()=>cpuThrow(),1000);
+  else if(gameMode==='cpu'&&currentPlayer===player2Key) setTimeout(()=>cpuThrow(),1000);
   else startTurnTimer();
 }
 function updateTurnDisplay(){ const el=document.getElementById('turnVal'); el.textContent=COLORS[currentPlayer].name.toUpperCase(); el.style.color=COLORS[currentPlayer].css; }
@@ -920,7 +886,7 @@ function updateTurnDisplay(){ const el=document.getElementById('turnVal'); el.te
 // ROUND TRANSITION
 // ================================================================
 function showRoundTransition(){
- roundFirstPlayer=currentPlayer;
+  roundFirstPlayer=currentPlayer;
   stopTurnTimer();
   const np=pickThrowPos(); currentThrowPos=np;
   document.getElementById('overheadTitle').textContent=`ROUND ${roundNumber}`;
@@ -933,7 +899,7 @@ function showRoundTransition(){
       throwMarker.position.set(np.x,0.1,np.z); throwMarker.visible=true;
       setTimeout(()=>throwMarker.visible=false,1500);
       updateTurnDisplay();
-      if(gameMode==='cpu'&&currentPlayer==='blue') setTimeout(()=>cpuThrow(),800);
+      if(gameMode==='cpu'&&currentPlayer===player2Key) setTimeout(()=>cpuThrow(),800);
       else startTurnTimer();
     },600);
   });
@@ -974,17 +940,15 @@ function cpuThrow(){
   let mo;
   if(cpuDifficulty==='easy') mo=2.8+Math.random()*2.5;
   else if(cpuDifficulty==='med') mo=1.2+Math.random()*1.4;
-  else mo=Math.random()<0.15?1.0+Math.random()*1.8:0.2+Math.random()*0.5; // hard: ~85% accurate
+  else mo=Math.random()<0.15?1.0+Math.random()*1.8:0.2+Math.random()*0.5;
   const fx=ccx+(Math.random()-0.5)*mo*2, fz=ccz+(Math.random()-0.5)*mo*2;
   const from=new THREE.Vector3(currentThrowPos.x,1.5,currentThrowPos.z), to=new THREE.Vector3(fx,0,fz);
   setTimeout(()=>{
-    animateBalloon(from,to,'blue',()=>{
-      // Intercept for pre-game tiebreaker
+    animateBalloon(from,to,player2Key,()=>{
       if(preGameTB&&preGameTB.active){ handlePreGameTBLand(fx,fz); return; }
-      // Intercept for end-game tiebreaker
-      if(tiebreakerMode){ resolveTiebreaker('blue',-1); return; }
+      if(tiebreakerMode){ resolveTiebreaker(player2Key,-1); return; }
       const hi=cellFromWorld(fx,fz);
-      if(hi>=0){playSound('pop');applyThrow(hi,'blue');const w=checkWin();if(w){showWin(w);return;}showNiceShot(hi,()=>endTurn());}
+      if(hi>=0){playSound('pop');applyThrow(hi,player2Key);const w=checkWin();if(w){showWin(w);return;}showNiceShot(hi,()=>endTurn());}
       else{playSound('miss');showMissEffect(fx,fz);endTurn();}
     });
   },600);
@@ -993,9 +957,9 @@ function cpuThrow(){
 function pickCpuCell(){
   if(cpuDifficulty==='easy') return Math.floor(Math.random()*9);
   const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  for(const ln of lines){ const bc=ln.filter(i=>grid[i].owner==='blue'&&grid[i].count>0).length; if(bc===2){const e=ln.find(i=>!grid[i].owner||grid[i].count===0);if(e!==undefined)return e;} }
-  for(const ln of lines){ const yc=ln.filter(i=>grid[i].owner==='yellow'&&grid[i].count>0).length; if(yc===2){const e=ln.find(i=>!grid[i].owner||grid[i].count===0);if(e!==undefined)return e;} }
-  if(cpuDifficulty==='hard'){const ow=grid.map((c,i)=>({c,i})).filter(({c})=>c.owner==='blue'&&c.count>0);if(ow.length&&Math.random()<0.3)return ow[Math.floor(Math.random()*ow.length)].i;}
+  for(const ln of lines){ const bc=ln.filter(i=>grid[i].owner===player2Key&&grid[i].count>0).length; if(bc===2){const e=ln.find(i=>!grid[i].owner||grid[i].count===0);if(e!==undefined)return e;} }
+  for(const ln of lines){ const yc=ln.filter(i=>grid[i].owner===player1Key&&grid[i].count>0).length; if(yc===2){const e=ln.find(i=>!grid[i].owner||grid[i].count===0);if(e!==undefined)return e;} }
+  if(cpuDifficulty==='hard'){const ow=grid.map((c,i)=>({c,i})).filter(({c})=>c.owner===player2Key&&c.count>0);if(ow.length&&Math.random()<0.3)return ow[Math.floor(Math.random()*ow.length)].i;}
   if(!grid[4].owner&&Math.random()<0.6) return 4;
   const corners=[0,2,6,8].filter(i=>!grid[i].owner); if(corners.length&&Math.random()<0.5)return corners[Math.floor(Math.random()*corners.length)];
   return Math.floor(Math.random()*9);
@@ -1003,9 +967,9 @@ function pickCpuCell(){
 
 function drawFinalGrid(){
   const canvas=document.getElementById('winGridCanvas');
-  const ctx=canvas.getContext('2d'), w=canvas.width, h=canvas.height, cs=w/3;
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,cs=w/3;
   ctx.clearRect(0,0,w,h);
-  // Find winning line if any
   let winLine=null;
   for(const [a,b,c] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]){
     const ga=grid[a],gb=grid[b],gc=grid[c];
@@ -1015,24 +979,35 @@ function drawFinalGrid(){
     const r=Math.floor(i/3),c=i%3,cell=grid[i];
     const isWin=winLine&&winLine.includes(i);
     ctx.fillStyle=cell.owner?COLORS[cell.owner].css:'#2a6b2a';
-    ctx.globalAlpha=isWin?1:0.6;
+    ctx.globalAlpha=isWin?1:0.55;
     ctx.fillRect(c*cs+2,r*cs+2,cs-4,cs-4);
     ctx.globalAlpha=1;
-    if(isWin){ ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.strokeRect(c*cs+4,r*cs+4,cs-8,cs-8); }
-    if(cell.count>1){ ctx.fillStyle='#fff'; ctx.font=`bold ${cs*0.3}px Arial`; ctx.textAlign='center'; ctx.fillText('×'+cell.count,c*cs+cs/2,r*cs+cs*0.65); }
+    if(isWin){ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.strokeRect(c*cs+4,r*cs+4,cs-8,cs-8);}
+    if(cell.count>1){ctx.fillStyle='#fff';ctx.font=`bold ${cs*0.3}px Arial`;ctx.textAlign='center';ctx.fillText('×'+cell.count,c*cs+cs/2,r*cs+cs*0.65);}
   }
-  ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=2;
-  for(let i=1;i<3;i++){ ctx.beginPath();ctx.moveTo(i*cs,0);ctx.lineTo(i*cs,h);ctx.stroke(); ctx.beginPath();ctx.moveTo(0,i*cs);ctx.lineTo(w,i*cs);ctx.stroke(); }
+  ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=2;
+  for(let i=1;i<3;i++){ctx.beginPath();ctx.moveTo(i*cs,0);ctx.lineTo(i*cs,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*cs);ctx.lineTo(w,i*cs);ctx.stroke();}
 }
 
 function showWin(winner){
   stopTurnTimer();clearInterval(gameTimerInterval);gameOver=true;stopBGM();playSound('win');
-  document.getElementById('winTitle').textContent=`🎉 ${COLORS[winner].name.toUpperCase()} WINS!`;
-  const yc=grid.filter(c=>c.owner==='yellow').reduce((s,c)=>s+c.count,0);
-  const bc=grid.filter(c=>c.owner==='blue').reduce((s,c)=>s+c.count,0);
-  document.getElementById('winSub').textContent=`Yellow: ${yc} hits · Blue: ${bc} hits`;
+  const wt=document.getElementById('winTitle');
+  wt.textContent=`🎉 ${COLORS[winner].name.toUpperCase()} WINS!`;
+  wt.style.color=COLORS[winner].css;
+  const p1h=grid.filter(c=>c.owner===player1Key).reduce((s,c)=>s+c.count,0);
+  const p2h=grid.filter(c=>c.owner===player2Key).reduce((s,c)=>s+c.count,0);
+  document.getElementById('winSub').textContent=`${COLORS[player1Key].name}: ${p1h} hits · ${COLORS[player2Key].name}: ${p2h} hits`;
   drawFinalGrid();
   document.getElementById('winScreen').style.display='flex';
+}
+
+function endByTime(){
+  clearInterval(gameTimerInterval); clearInterval(turnTimerInterval);
+  stopBGM();
+  const p1s=grid.filter(c=>c.owner===player1Key).reduce((s,c)=>s+c.count,0);
+  const p2s=grid.filter(c=>c.owner===player2Key).reduce((s,c)=>s+c.count,0);
+  if(p1s!==p2s){ showWin(p1s>p2s?player1Key:player2Key); return; }
+  startTiebreaker();
 }
 
 // ================================================================
@@ -1045,8 +1020,14 @@ function startGame(){
   const music=document.getElementById('musicSelect').value;
   const firstMode=document.getElementById('firstSelect').value;
 
+  // Set player colors
+  const p1ColorKey=document.getElementById('p1ColorSelect').value;
+  const p2ColorKey=document.getElementById('p2ColorSelect').value;
+  COLORS[player1Key]=ALL_COLORS[p1ColorKey];
+  COLORS[player2Key]=ALL_COLORS[p2ColorKey];
+
   document.getElementById('overlay').style.display='none';
-  gameStarted=true;gameOver=false;gameTimeExpired=false;tiebreakerMode=false;
+  gameStarted=true; gameOver=false; gameTimeExpired=false; tiebreakerMode=false;
   document.getElementById('exitBtn').style.display='block';
   document.getElementById('scoreBox').style.display='block';
   roundNumber=1;
@@ -1059,68 +1040,61 @@ function startGame(){
   startGameTimer();
 
   if(firstMode==='random'){
-    currentPlayer=Math.random()<0.5?'yellow':'blue';
+    currentPlayer=Math.random()<0.5?player1Key:player2Key;
+    roundFirstPlayer=currentPlayer;
     const el=document.createElement('div');
     el.textContent=`🎲 ${COLORS[currentPlayer].name} goes first!`;
     el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:32px;font-weight:900;color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;background:rgba(0,0,0,0.8);padding:20px 32px;border-radius:14px;';
     document.body.appendChild(el); setTimeout(()=>el.remove(),2200);
-    updateTurnDisplay();
-    showRoundTransition();
+    updateTurnDisplay(); showRoundTransition();
   } else if(firstMode==='tiebreaker'){
-    currentPlayer='yellow';
-    updateTurnDisplay();
+    currentPlayer=player1Key; updateTurnDisplay();
     runFirstThrowTiebreaker();
   } else {
-    // manual: yellow or blue
-    currentPlayer=firstMode==='blue'?'blue':'yellow';
-    updateTurnDisplay();
-    showRoundTransition();
+    currentPlayer=firstMode==='p2'?player2Key:player1Key;
+    roundFirstPlayer=currentPlayer;
+    updateTurnDisplay(); showRoundTransition();
   }
 }
 
 // Pre-game tiebreaker: both players throw to center, closest goes first
-let preGameTB={active:false, yellowDist:null};
+let preGameTB={active:false, p1Dist:null};
 function runFirstThrowTiebreaker(){
-  preGameTB={active:true, yellowDist:null};
+  preGameTB={active:true, p1Dist:null};
   currentThrowPos={x:0,z:15,angle:180,name:'South'};
   setCamToThrow(currentThrowPos);
-  document.getElementById('distVal').textContent=Math.sqrt(currentThrowPos.x**2+currentThrowPos.z**2).toFixed(1)+' m';
+  document.getElementById('distVal').textContent='15.0 m';
   document.getElementById('distBox').style.display='block';
-
   const el=document.createElement('div');
-  el.innerHTML='<div style="font-size:30px;font-weight:900">🎯 CLOSEST THROW GOES FIRST</div><div style="font-size:17px;margin-top:8px;color:#ffdd44">🟡 Yellow — throw toward the grid!</div>';
+  el.innerHTML=`<div style="font-size:30px;font-weight:900">🎯 CLOSEST THROW GOES FIRST</div><div style="font-size:17px;margin-top:8px;color:${COLORS[player1Key].css}">${COLORS[player1Key].name} — throw toward the grid!</div>`;
   el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:22px 32px;border-radius:16px;';
   document.body.appendChild(el);
-  // Yellow ALWAYS throws first in the toss — never CPU here
-  currentPlayer='yellow'; updateTurnDisplay();
+  currentPlayer=player1Key; updateTurnDisplay();
   setTimeout(()=>{ el.remove(); startTurnTimer(); },3000);
 }
 
-// Override launchBalloon landing handler for pre-game tiebreaker
 function handlePreGameTBLand(fx, fz){
   const dist=Math.sqrt(fx*fx+fz*fz);
-  if(preGameTB.yellowDist===null){
-    preGameTB.yellowDist=dist;
+  if(preGameTB.p1Dist===null){
+    preGameTB.p1Dist=dist;
     const el=document.createElement('div');
-    el.innerHTML=`<div style="font-size:26px;font-weight:900">🟡 Yellow: ${dist.toFixed(1)}m from center</div><div style="font-size:17px;margin-top:6px;color:#2277ff">🔵 Blue — your turn!</div>`;
+    el.innerHTML=`<div style="font-size:26px;font-weight:900;color:${COLORS[player1Key].css}">${COLORS[player1Key].name}: ${dist.toFixed(1)}m from center</div><div style="font-size:17px;margin-top:6px;color:${COLORS[player2Key].css}">${COLORS[player2Key].name} — your turn!</div>`;
     el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:18px 28px;border-radius:14px;';
     document.body.appendChild(el);
-    setTimeout(()=>{ el.remove(); currentPlayer='blue'; updateTurnDisplay(); if(gameMode==='cpu') cpuThrow(); else startTurnTimer(); },2500);
+    setTimeout(()=>{ el.remove(); currentPlayer=player2Key; updateTurnDisplay(); if(gameMode==='cpu') cpuThrow(); else startTurnTimer(); },2500);
   } else {
-    const bd=dist, yd=preGameTB.yellowDist;
-    const winner=Math.abs(yd-bd)<0.5?null:(yd<bd?'yellow':'blue');
+    const p2d=dist, p1d=preGameTB.p1Dist;
+    const winner=Math.abs(p1d-p2d)<0.5?null:(p1d<p2d?player1Key:player2Key);
     const el=document.createElement('div');
     if(!winner){
-      // Don't set active=false — restart keeps it active
       el.textContent='🔁 TOO CLOSE — throw again!';
       el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;color:#fff;z-index:200;pointer-events:none;background:rgba(0,0,0,0.82);padding:18px 28px;border-radius:14px;';
       document.body.appendChild(el);
-      // Always restart toss from yellow — never skip to CPU
       setTimeout(()=>{ el.remove(); runFirstThrowTiebreaker(); },2200);
     } else {
-      preGameTB.active=false; // only deactivate once we have a real winner
+      preGameTB.active=false;
       currentPlayer=winner;
-      el.innerHTML=`<div style="font-size:28px;font-weight:900">${COLORS[winner].name} goes first!</div><div style="font-size:15px;margin-top:6px;color:#ffdd44">(${yd.toFixed(1)}m vs ${bd.toFixed(1)}m)</div>`;
+      el.innerHTML=`<div style="font-size:28px;font-weight:900;color:${COLORS[winner].css}">${COLORS[winner].name} goes first!</div><div style="font-size:15px;margin-top:6px;color:#ffdd44">(${p1d.toFixed(1)}m vs ${p2d.toFixed(1)}m)</div>`;
       el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:18px 28px;border-radius:14px;';
       document.body.appendChild(el);
       setTimeout(()=>{ el.remove(); roundNumber=1; roundFirstPlayer=winner; updateTurnDisplay(); showRoundTransition(); },2800);
@@ -1129,9 +1103,11 @@ function handlePreGameTBLand(fx, fz){
 }
 
 document.getElementById('modeSelect').addEventListener('change',e=>{
-  document.getElementById('diffWrap').style.display=e.target.value==='cpu'?'block':'none';
+  const isCpu=e.target.value==='cpu';
+  document.getElementById('diffWrap').style.display=isCpu?'block':'none';
+  document.getElementById('p1ColorLabel').textContent=isCpu?'Your Color':'Player 1 Color';
+  document.getElementById('p2ColorLabel').textContent=isCpu?'CPU Color':'Player 2 Color';
 });
-// Hide difficulty by default since 2p is default
 document.getElementById('diffWrap').style.display='none';
 
 // ================================================================
