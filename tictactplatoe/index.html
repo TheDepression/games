@@ -777,12 +777,26 @@ function drawNiceShotGrid(canvas,hi){
 // MISS
 // ================================================================
 function showMissEffect(lx,lz){
-  const dx=lx-GRID_ORIGIN.x,dz=lz-GRID_ORIGIN.z,ax=Math.abs(dx),az=Math.abs(dz),hh=GRID_HALF;
+  // Direction from player toward grid center
+  const pdx=GRID_ORIGIN.x-currentThrowPos.x, pdz=GRID_ORIGIN.z-currentThrowPos.z;
+  const plen=Math.sqrt(pdx*pdx+pdz*pdz)||1;
+  const fwd={x:pdx/plen, z:pdz/plen}; // unit vector pointing at grid
+  const right={x:-fwd.z, z:fwd.x};    // perpendicular
+
+  // Landing offset from grid center
+  const ox=lx-GRID_ORIGIN.x, oz=lz-GRID_ORIGIN.z;
+
+  // Project offset onto forward/right axes
+  const forwardDist = ox*fwd.x + oz*fwd.z;
+  const lateralDist = ox*right.x + oz*right.z;
+
   let hint='😬 Just missed!';
-  if(dz<-hh-0.5&&az>ax) hint='📏 Too short!';
-  else if(dz>hh+0.5&&az>ax) hint='💨 Overshot!';
-  else if(dx<-hh-0.5) hint='⬅️ Too far left!';
-  else if(dx>hh+0.5) hint='➡️ Too far right!';
+  if(Math.abs(forwardDist)>Math.abs(lateralDist)){
+    hint = forwardDist < 0 ? '📏 Too short!' : '💨 Overshot!';
+  } else {
+    hint = lateralDist > 0 ? '➡️ Too far right!' : '⬅️ Too far left!';
+  }
+
   const el=document.createElement('div');
   el.innerHTML=`<div style="font-size:48px;font-weight:900">MISS!</div><div style="font-size:19px;margin-top:5px">${hint}</div>`;
   el.style.cssText='position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);color:#ff4444;text-shadow:3px 3px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.65);padding:16px 26px;border-radius:14px;';
