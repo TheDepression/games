@@ -1010,9 +1010,9 @@ function drawFinalGrid(){
 function showWin(winner){
   stopTurnTimer();clearInterval(gameTimerInterval);gameOver=true;stopBGM();playSound('win');
   document.getElementById('winTitle').textContent=`🎉 ${COLORS[winner].name.toUpperCase()} WINS!`;
-  const yc=grid.filter(c=>c.owner==='yellow'&&c.count>0).length;
-  const bc=grid.filter(c=>c.owner==='blue'&&c.count>0).length;
-  document.getElementById('winSub').textContent=`Yellow: ${yc} cells · Blue: ${bc} cells`;
+  const yc=grid.filter(c=>c.owner==='yellow').reduce((s,c)=>s+c.count,0);
+  const bc=grid.filter(c=>c.owner==='blue').reduce((s,c)=>s+c.count,0);
+  document.getElementById('winSub').textContent=`Yellow: ${yc} hits · Blue: ${bc} hits`;
   drawFinalGrid();
   document.getElementById('winScreen').style.display='flex';
 }
@@ -1064,7 +1064,6 @@ function startGame(){
 let preGameTB={active:false, yellowDist:null};
 function runFirstThrowTiebreaker(){
   preGameTB={active:true, yellowDist:null};
-  // Fixed center-facing position for the toss
   currentThrowPos={x:0,z:15,angle:180,name:'South'};
   setCamToThrow(currentThrowPos);
   document.getElementById('distVal').textContent=Math.sqrt(currentThrowPos.x**2+currentThrowPos.z**2).toFixed(1)+' m';
@@ -1074,7 +1073,9 @@ function runFirstThrowTiebreaker(){
   el.innerHTML='<div style="font-size:30px;font-weight:900">🎯 CLOSEST THROW GOES FIRST</div><div style="font-size:17px;margin-top:8px;color:#ffdd44">🟡 Yellow — throw toward the grid!</div>';
   el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:22px 32px;border-radius:16px;';
   document.body.appendChild(el);
-  setTimeout(()=>{ el.remove(); if(gameMode==='cpu'&&currentPlayer==='blue') cpuThrow(); else startTurnTimer(); },3000);
+  // Yellow ALWAYS throws first in the toss — never CPU here
+  currentPlayer='yellow'; updateTurnDisplay();
+  setTimeout(()=>{ el.remove(); startTurnTimer(); },3000);
 }
 
 // Override launchBalloon landing handler for pre-game tiebreaker
@@ -1089,20 +1090,22 @@ function handlePreGameTBLand(fx, fz){
     setTimeout(()=>{ el.remove(); currentPlayer='blue'; updateTurnDisplay(); if(gameMode==='cpu') cpuThrow(); else startTurnTimer(); },2500);
   } else {
     const bd=dist, yd=preGameTB.yellowDist;
-    preGameTB.active=false;
     const winner=Math.abs(yd-bd)<0.5?null:(yd<bd?'yellow':'blue');
     const el=document.createElement('div');
     if(!winner){
+      // Don't set active=false — restart keeps it active
       el.textContent='🔁 TOO CLOSE — throw again!';
       el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);font-size:26px;font-weight:900;color:#fff;z-index:200;pointer-events:none;background:rgba(0,0,0,0.82);padding:18px 28px;border-radius:14px;';
       document.body.appendChild(el);
+      // Always restart toss from yellow — never skip to CPU
       setTimeout(()=>{ el.remove(); runFirstThrowTiebreaker(); },2200);
     } else {
+      preGameTB.active=false; // only deactivate once we have a real winner
       currentPlayer=winner;
       el.innerHTML=`<div style="font-size:28px;font-weight:900">${COLORS[winner].name} goes first!</div><div style="font-size:15px;margin-top:6px;color:#ffdd44">(${yd.toFixed(1)}m vs ${bd.toFixed(1)}m)</div>`;
       el.style.cssText='position:fixed;top:42%;left:50%;transform:translate(-50%,-50%);color:#fff;text-shadow:2px 2px 0 #000;z-index:200;pointer-events:none;text-align:center;background:rgba(0,0,0,0.82);padding:18px 28px;border-radius:14px;';
       document.body.appendChild(el);
-      setTimeout(()=>{ el.remove(); updateTurnDisplay(); showRoundTransition(); },2800);
+      setTimeout(()=>{ el.remove(); roundNumber=1; updateTurnDisplay(); showRoundTransition(); },2800);
     }
   }
 }
