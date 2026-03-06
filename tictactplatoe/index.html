@@ -642,13 +642,13 @@ function drawSling(){
     sCtx.strokeStyle='rgba(255,255,255,0.3)'; sCtx.lineWidth=2; sCtx.stroke();
     sCtx.fillStyle=pc; sCtx.beginPath(); sCtx.arc(px,py+br,5,0,Math.PI*2); sCtx.fill();
     // Power bar — no number
-    const bw=180,bh=12,bx=(w-bw)/2,by=h-42;
+   const bw=180,bh=12,bx=(w-bw)/2,by=18;
     sCtx.fillStyle='rgba(0,0,0,0.5)'; sCtx.fillRect(bx,by,bw,bh);
     const bg=sCtx.createLinearGradient(bx,0,bx+bw,0);
     bg.addColorStop(0,'#44ff44'); bg.addColorStop(0.5,'#ffff00'); bg.addColorStop(1,'#ff4444');
     sCtx.fillStyle=bg; sCtx.fillRect(bx,by,bw*stress,bh);
     sCtx.fillStyle='#fff'; sCtx.font='bold 10px Arial'; sCtx.textAlign='center';
-    sCtx.fillText('POWER',w/2,by-3);
+    sCtx.fillText('POWER',w/2,by+bh+13);
   } else {
     sCtx.strokeStyle='#996633'; sCtx.lineWidth=3;
     sCtx.beginPath(); sCtx.moveTo(FL.x,FL.y); sCtx.lineTo(cx,forkY); sCtx.stroke();
