@@ -536,7 +536,7 @@ function pickThrowPos(){
   const angs=[0,45,90,135,180,225,270,315], names=['North','Northeast','East','Southeast','South','Southwest','West','Northwest'];
   const i=Math.floor(Math.random()*angs.length), rad=angs[i]*Math.PI/180;
   // Range: 6m (very close) to 38m (far end of field) — weighted so extreme distances are rarer
-  const u=Math.random(), dist = u<0.2 ? 6+Math.random()*4 : u<0.7 ? 12+Math.random()*10 : 24+Math.random()*14;
+  const u=Math.random(), dist = u<0.2 ? 6+Math.random()*4 : u<0.7 ? 12+Math.random()*10 : 24+Math.random()*22;
   return {x:Math.sin(rad)*dist, z:Math.cos(rad)*dist, angle:angs[i], name:names[i]};
 }
 function setCamToThrow(pos){
